@@ -15,7 +15,7 @@ class TleLoadingTests(unittest.TestCase):
     def test_loads_all_configured_satellites(self):
         _, satellites = load_tle_file(TLE_PATH)
 
-        self.assertEqual(len(satellites), 10)
+        self.assertEqual(len(satellites), 7)
         self.assertEqual(satellites[0].satellite.name, "STARLINK-5426")
 
 
@@ -24,7 +24,7 @@ class ConstellationSimulatorTests(unittest.TestCase):
     def setUpClass(cls):
         cls.simulator = ConstellationSimulator(
             TLE_PATH,
-            [f"SAT-{index}" for index in range(1, 11)],
+            [f"SAT-{index}" for index in range(1, 8)],
             eclipse_search_hours=3,
         )
 
@@ -35,8 +35,8 @@ class ConstellationSimulatorTests(unittest.TestCase):
     def test_update_produces_complete_state(self):
         state = self.simulator.update(datetime(2026, 7, 19, tzinfo=timezone.utc))
 
-        self.assertEqual(state["satellite_count"], 10)
-        self.assertEqual(set(state["satellites"]), {f"SAT-{i}" for i in range(1, 11)})
+        self.assertEqual(state["satellite_count"], 7)
+        self.assertEqual(set(state["satellites"]), {f"SAT-{i}" for i in range(1, 8)})
         satellite = state["satellites"]["SAT-1"]
         self.assertIn("position_km", satellite)
         self.assertIn("velocity_km_s", satellite)
@@ -53,7 +53,7 @@ class ConstellationSimulatorTests(unittest.TestCase):
         state = self.simulator.update(datetime(2026, 7, 19, tzinfo=timezone.utc))
         state["satellites"].clear()
 
-        self.assertEqual(len(self.simulator.snapshot()["satellites"]), 10)
+        self.assertEqual(len(self.simulator.snapshot()["satellites"]), 7)
 
 
 if __name__ == "__main__":

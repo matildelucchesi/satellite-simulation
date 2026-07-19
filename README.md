@@ -1,6 +1,6 @@
 # Satellite Network Simulation
 
-Simulazione modulare di una costellazione di dieci satelliti ispirata a
+Simulazione modulare di una costellazione di sette satelliti ispirata a
 Starlink, con propagazione orbitale, agenti indipendenti, elezione e migrazione
 del Controller, metriche e dashboard in tempo reale.
 
@@ -8,7 +8,7 @@ del Controller, metriche e dashboard in tempo reale.
 
 - `simulator`: coordinatore headless che propaga i TLE con Skyfield e conserva
   lo stato corrente della costellazione.
-- `satellite_agent`: immagine riutilizzata per i dieci agenti satellitari.
+- `satellite_agent`: immagine riutilizzata per i sette agenti satellitari.
 - `controller`: microservizio Controller associato logicamente a `SAT-1`.
 - `dashboard`: base per la futura interfaccia di monitoraggio.
 - `common`: configurazioni e utilità condivise tra i servizi.
@@ -33,7 +33,7 @@ Endpoint iniziali:
 - Controller: `http://localhost:8001/health`
 - Dashboard: `http://localhost:8081/health`
 - Interfaccia Dashboard: `http://localhost:8081/`
-- Satelliti SAT-1 ... SAT-10: porte `8101` ... `8110`, percorso `/health`
+- Satelliti SAT-1 ... SAT-7: porte `8101` ... `8107`, percorso `/health`
 
 API di ogni Satellite Agent:
 
@@ -71,10 +71,10 @@ prossima entrata in ombra e distanza da tutti gli altri satelliti. Il file TLE
 locale e `config/starlink.tle`; puo essere sostituito mantenendo il formato a
 tre righe e un numero di satelliti coerente con `satellite_count` in
 `config/constellation.json`.
-La selezione predefinita usa dieci Starlink del guscio a circa 53 gradi con
-piani orbitali e fasi differenti. I cinque satelliti aggiunti occupano gli
-intervalli tra quelli esistenti, così le posizioni proiettate risultano
-distribuite lungo l'orbita.
+La selezione predefinita usa sette Starlink del guscio a circa 53 gradi con
+piani orbitali e fasi differenti. I due satelliti aggiunti occupano gli
+intervalli più ampi tra quelli originali, così le posizioni proiettate restano
+ben distribuite lungo l'orbita.
 
 Ogni Satellite Agent recupera inoltre il proprio stato dal Simulator ogni
 secondo e invia un heartbeat periodico al `score_manager` del Simulator;

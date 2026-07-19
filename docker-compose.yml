@@ -113,33 +113,6 @@ services:
     ports:
       - "8107:5000"
 
-  satellite-8:
-    <<: *satellite-agent
-    environment:
-      <<: *satellite-environment
-      SATELLITE_ID: SAT-8
-      CONTROLLER_ENABLED: "false"
-    ports:
-      - "8108:5000"
-
-  satellite-9:
-    <<: *satellite-agent
-    environment:
-      <<: *satellite-environment
-      SATELLITE_ID: SAT-9
-      CONTROLLER_ENABLED: "false"
-    ports:
-      - "8109:5000"
-
-  satellite-10:
-    <<: *satellite-agent
-    environment:
-      <<: *satellite-environment
-      SATELLITE_ID: SAT-10
-      CONTROLLER_ENABLED: "false"
-    ports:
-      - "8110:5000"
-
   controller:
     build:
       context: .

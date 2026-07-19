@@ -1,7 +1,7 @@
 {
   "constellation": {
     "name": "starlink-simulation",
-    "satellite_count": 10,
+    "satellite_count": 7,
     "controller_satellite_id": "SAT-1"
   },
   "satellites": [
@@ -11,9 +11,6 @@
     {"id": "SAT-4", "name": "STARLINK-4104", "controller": false},
     {"id": "SAT-5", "name": "STARLINK-3825", "controller": false},
     {"id": "SAT-6", "name": "STARLINK-5264", "controller": false},
-    {"id": "SAT-7", "name": "STARLINK-5129", "controller": false},
-    {"id": "SAT-8", "name": "STARLINK-4074", "controller": false},
-    {"id": "SAT-9", "name": "STARLINK-4262", "controller": false},
-    {"id": "SAT-10", "name": "STARLINK-4396", "controller": false}
+    {"id": "SAT-7", "name": "STARLINK-5129", "controller": false}
   ]
 }
