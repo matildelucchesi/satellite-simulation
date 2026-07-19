@@ -8,6 +8,7 @@ from app.migration_manager import (
     MigrationManager,
     RestResponse,
 )
+from app.contact_window import ContactWindowConfig
 
 
 CHECKPOINT = {
@@ -50,7 +51,7 @@ class FakeTransport:
         return RestResponse(200, {"status": "ok"}, 16)
 
 
-def config():
+def config(alignment_seconds=0.0):
     return MigrationConfig(
         default_mode="hot",
         controller_url="http://controller:5000",
@@ -58,10 +59,84 @@ def config():
         request_timeout_seconds=1.0,
         max_retries=0,
         retry_delay_seconds=0.0,
+        contact_window=ContactWindowConfig(
+            required_alignment_seconds=alignment_seconds,
+            max_distance_km=5500.0,
+            require_line_of_sight=True,
+            earth_radius_km=6378.137,
+            max_sample_gap_seconds=2.5,
+        ),
     )
 
 
+def constellation(second, in_contact=True):
+    target = {"x": 7000.0, "y": 1000.0, "z": 0.0}
+    if not in_contact:
+        target = {"x": -7000.0, "y": 0.0, "z": 0.0}
+    return {
+        "generated_at": f"2026-07-19T10:00:{second:02d}Z"
+        if second < 60
+        else f"2026-07-19T10:01:{second - 60:02d}Z",
+        "satellites": {
+            "SAT-1": {"position_km": {"x": 7000.0, "y": 0.0, "z": 0.0}},
+            "SAT-2": {"position_km": target},
+        },
+    }
+
+
 class MigrationManagerTests(unittest.TestCase):
+    def test_repeated_recommendation_reuses_pending_alignment(self):
+        manager = MigrationManager(
+            config(alignment_seconds=60), ["SAT-1", "SAT-2"], FakeTransport()
+        )
+
+        first = manager.enqueue("SAT-1", "SAT-2", "hot")
+        second = manager.enqueue("SAT-1", "SAT-2", "hot")
+
+        self.assertEqual(second, first)
+        self.assertEqual(manager.snapshot()["count"], 1)
+
+    def test_requires_sixty_seconds_of_continuous_contact_before_queueing(self):
+        manager = MigrationManager(
+            config(alignment_seconds=60), ["SAT-1", "SAT-2"], FakeTransport()
+        )
+        migration_id = manager.enqueue("SAT-1", "SAT-2", "hot")
+
+        for second in range(60):
+            manager.update_constellation(constellation(second))
+
+        waiting = manager.migration_snapshot(migration_id)
+        self.assertEqual(waiting["status"], "waiting_for_contact")
+        self.assertEqual(
+            waiting["contact_window"]["continuous_alignment_seconds"], 59.0
+        )
+        self.assertFalse(manager.process_next())
+
+        manager.update_constellation(constellation(60))
+
+        ready = manager.migration_snapshot(migration_id)
+        self.assertEqual(ready["status"], "queued")
+        self.assertEqual(ready["metrics"]["alignment_wait_ms"], 60000.0)
+
+    def test_contact_interruption_resets_the_sixty_second_alignment(self):
+        manager = MigrationManager(
+            config(alignment_seconds=60), ["SAT-1", "SAT-2"], FakeTransport()
+        )
+        migration_id = manager.enqueue("SAT-1", "SAT-2", "cold")
+        for second in range(31):
+            manager.update_constellation(constellation(second))
+        manager.update_constellation(constellation(31, in_contact=False))
+        for second in range(32, 92):
+            manager.update_constellation(constellation(second))
+
+        waiting = manager.migration_snapshot(migration_id)
+        self.assertEqual(waiting["status"], "waiting_for_contact")
+        self.assertEqual(waiting["contact_window"]["reset_count"], 1)
+
+        manager.update_constellation(constellation(92))
+
+        self.assertEqual(manager.migration_snapshot(migration_id)["status"], "queued")
+
     def test_hot_migration_syncs_final_state_before_stopping_source(self):
         transport = FakeTransport()
         manager = MigrationManager(config(), ["SAT-1", "SAT-2"], transport)

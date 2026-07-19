@@ -95,7 +95,13 @@ def create_api_blueprint(
                 return jsonify(
                     {"error": "migration_rejected", "message": str(exc)}
                 ), 409
-            return jsonify({"status": "queued", "migration_id": migration_id}), 202
+            migration = migration_manager.migration_snapshot(migration_id)
+            return jsonify(
+                {
+                    "status": migration["status"] if migration else "unknown",
+                    "migration_id": migration_id,
+                }
+            ), 202
         return jsonify(migration_manager.snapshot())
 
     @api.get("/api/v1/migrations/<migration_id>")

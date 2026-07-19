@@ -40,10 +40,12 @@ function render(data) {
   const controllerState = data.controller_state || {};
   const migrations = data.migrations || {};
   const currentController = findController(heartbeatMap, evaluation);
+  const displayedMigration = selectDisplayedMigration(migrations);
 
   renderKpis(satellites, heartbeatMap, currentController, migrations);
-  renderNetwork(satellites, constellation.distances_km || {}, controllerState.topology || {}, scores, currentController);
-  renderEclipseForecast(satellites);
+  renderMigrationRoute(displayedMigration);
+  renderNetwork(satellites, constellation.distances_km || {}, controllerState.topology || {}, scores, currentController, displayedMigration);
+  renderTransitionTable(satellites);
   renderSatelliteTable(satellites, heartbeatMap, scores, currentController);
   renderRouting(controllerState.routing_table || {});
   renderMigrations(migrations);
@@ -71,11 +73,56 @@ function renderKpis(satellites, heartbeats, controller, migrations) {
   $("migrationStatus").textContent = latest ? `${latest.mode?.toUpperCase()} · ${latest.status}` : "Nessun evento";
 }
 
-function renderNetwork(satellites, distances, topology, scores, controller) {
+function selectDisplayedMigration(migrations) {
+  const list = migrations.migrations || [];
+  const activeId = migrations.active_migration_id;
+  if (activeId) {
+    return list.find((migration) => migration.migration_id === activeId) || migrations.latest || null;
+  }
+  return migrations.latest || list.at(-1) || null;
+}
+
+function renderMigrationRoute(migration) {
+  const route = $("migrationRoute");
+  if (!migration) {
+    route.className = "migration-route idle";
+    route.innerHTML = `<span class="migration-route-label">TRASFERIMENTO CONTROLLER</span><strong>Nessun trasferimento registrato</strong>`;
+    return;
+  }
+  const status = String(migration.status || "unknown").toLowerCase();
+  const statusClass = ["completed", "failed"].includes(status) ? status : "active";
+  const heading = status === "waiting_for_contact"
+    ? "ALLINEAMENTO SATELLITI"
+    : ["queued", "in_progress"].includes(status)
+      ? "TRASFERIMENTO IN CORSO"
+      : "ULTIMO TRASFERIMENTO";
+  const labels = {
+    waiting_for_contact: "IN ALLINEAMENTO",
+    queued: "IN CODA",
+    in_progress: "IN TRASFERIMENTO",
+    completed: "COMPLETATO",
+    failed: "FALLITO",
+  };
+  const contact = migration.contact_window || {};
+  const alignment = status === "waiting_for_contact"
+    ? `<span class="alignment-progress">${formatNumber(contact.continuous_alignment_seconds, 0)} / ${formatNumber(contact.required_alignment_seconds, 0)} s</span>`
+    : "";
+  route.className = `migration-route ${statusClass}`;
+  route.innerHTML = `
+    <span class="migration-route-label">${heading}</span>
+    <strong>${escapeHtml(migration.source_satellite_id || "—")} → ${escapeHtml(migration.target_satellite_id || "—")}</strong>
+    <span class="migration-mode">${escapeHtml(String(migration.mode || "—").toUpperCase())}</span>
+    <span class="migration-state">${escapeHtml(labels[status] || status.toUpperCase())}</span>
+    ${alignment}`;
+}
+
+function renderNetwork(satellites, distances, topology, scores, controller, migration) {
   const ids = Object.keys(satellites).sort(compareSatelliteIds);
   const linksGroup = $("networkLinks");
+  const migrationGroup = $("migrationTransfer");
   const nodesGroup = $("networkNodes");
   linksGroup.replaceChildren();
+  migrationGroup.replaceChildren();
   nodesGroup.replaceChildren();
   if (!ids.length) return;
 
@@ -93,12 +140,19 @@ function renderNetwork(satellites, distances, topology, scores, controller) {
     linksGroup.appendChild(line);
   });
 
+  renderMigrationTransfer(migrationGroup, migration, positions);
+
   ids.forEach((id) => {
     const satellite = satellites[id] || {};
     const point = positions[id];
     const illumination = satellite.illumination?.state === "shadow" ? "shadow" : "sunlit";
-    const group = svg("g", { class: `satellite-node ${illumination}`, transform: `translate(${point.x} ${point.y})` });
+    const isMigrationSource = id === migration?.source_satellite_id;
+    const isMigrationTarget = id === migration?.target_satellite_id;
+    const migrationRoles = `${isMigrationSource ? " migration-source" : ""}${isMigrationTarget ? " migration-target" : ""}`;
+    const group = svg("g", { class: `satellite-node ${illumination}${migrationRoles}`, transform: `translate(${point.x} ${point.y})` });
     if (id === controller) group.appendChild(svg("circle", { r: 20, class: "controller-ring" }));
+    if (isMigrationSource) group.appendChild(svg("circle", { r: 24, class: "migration-source-ring" }));
+    if (isMigrationTarget) group.appendChild(svg("circle", { r: 24, class: "migration-target-ring" }));
     const icon = svg("svg", {
       x: -16, y: -16, width: 32, height: 32,
       viewBox: "0 -960 960 960", class: "material-satellite-icon",
@@ -112,11 +166,60 @@ function renderNetwork(satellites, distances, topology, scores, controller) {
     const score = svg("text", { x: 0, y: 45, "text-anchor": "middle", class: "node-score" });
     score.textContent = scores[id] ? `score ${formatNumber(scores[id].score, 1)}` : "score —";
     group.appendChild(score);
+    if (isMigrationSource || isMigrationTarget) {
+      const role = svg("text", { x: 0, y: -27, "text-anchor": "middle", class: "migration-node-tag" });
+      role.textContent = isMigrationSource ? "SRC" : "DST";
+      group.appendChild(role);
+    }
     const title = svg("title");
     title.textContent = `${id}\n${illumination === "sunlit" ? "In luce" : "In ombra"}\nAltitudine ${formatNumber(satellite.geodetic?.altitude_km, 1)} km`;
     group.appendChild(title);
     nodesGroup.appendChild(group);
   });
+}
+
+function renderMigrationTransfer(group, migration, positions) {
+  if (!migration) return;
+  const source = positions[migration.source_satellite_id];
+  const target = positions[migration.target_satellite_id];
+  if (!source || !target) return;
+  const segment = insetSegment(source, target, 30);
+  const statusClass = migration.status === "waiting_for_contact"
+    ? " aligning"
+    : migration.status === "completed"
+      ? " completed"
+      : migration.status === "failed"
+        ? " failed"
+        : "";
+  group.appendChild(svg("line", {
+    x1: segment.x1, y1: segment.y1, x2: segment.x2, y2: segment.y2,
+    class: `migration-transfer-line${statusClass}`,
+  }));
+  const label = svg("text", {
+    x: (source.x + target.x) / 2,
+    y: (source.y + target.y) / 2 - 10,
+    "text-anchor": "middle",
+    class: "migration-transfer-label",
+  });
+  const contact = migration.contact_window || {};
+  label.textContent = migration.status === "waiting_for_contact"
+    ? `ALIGN ${formatNumber(contact.continuous_alignment_seconds, 0)}/${formatNumber(contact.required_alignment_seconds, 0)}s`
+    : `${String(migration.mode || "").toUpperCase()} · CONTROLLER`;
+  group.appendChild(label);
+}
+
+function insetSegment(source, target, inset) {
+  const dx = target.x - source.x;
+  const dy = target.y - source.y;
+  const length = Math.hypot(dx, dy) || 1;
+  const ux = dx / length;
+  const uy = dy / length;
+  return {
+    x1: source.x + ux * inset,
+    y1: source.y + uy * inset,
+    x2: target.x - ux * inset,
+    y2: target.y - uy * inset,
+  };
 }
 
 function projectPositions(ids, satellites) {
@@ -128,30 +231,28 @@ function projectPositions(ids, satellites) {
   return Object.fromEntries(raw.map(({ id, angle }) => [id, pointOnOrbit(angle)]));
 }
 
-function renderEclipseForecast(satellites) {
-  const horizonSeconds = 90 * 60;
+function renderTransitionTable(satellites) {
   const rows = Object.keys(satellites).sort(compareSatelliteIds).map((id) => {
     const illumination = satellites[id]?.illumination || {};
     const isSunlit = illumination.state === "sunlight";
-    const seconds = Number(isSunlit ? illumination.seconds_until_eclipse : illumination.seconds_until_sunlight);
+    const isShadow = illumination.state === "shadow";
+    const rawSeconds = isSunlit ? illumination.seconds_until_eclipse : illumination.seconds_until_sunlight;
+    const seconds = rawSeconds === null || rawSeconds === undefined ? Number.NaN : Number(rawSeconds);
     const knownTransition = Number.isFinite(seconds) && seconds >= 0;
-    const transitionPercent = knownTransition ? Math.min(100, seconds / horizonSeconds * 100) : 100;
-    const action = isSunlit ? "entra in ombra" : "esce dall'ombra";
-    const stateLabel = isSunlit ? "LUCE" : "OMBRA";
-    const stateClass = isSunlit ? "sun-to-shadow" : "shadow-to-sun";
-    const detail = knownTransition ? `${action} tra ${formatDuration(seconds)}` : "transizione non disponibile";
-    return `<div class="forecast-row ${stateClass}">
-      <div class="forecast-name"><strong>${escapeHtml(id)}</strong><span>${stateLabel}</span></div>
-      <div class="forecast-track" title="${escapeHtml(detail)}">
-        <span class="forecast-segment forecast-current" style="width:${transitionPercent}%"></span>
-        <span class="forecast-segment forecast-next" style="left:${transitionPercent}%;width:${100 - transitionPercent}%"></span>
-        <span class="forecast-now"></span>
-        ${knownTransition && transitionPercent < 100 ? `<span class="forecast-transition" style="left:${transitionPercent}%"></span>` : ""}
-      </div>
-      <div class="forecast-detail">${escapeHtml(detail)}</div>
-    </div>`;
+    const transitionAt = isSunlit ? illumination.next_eclipse_at : illumination.next_sunlight_at;
+    const stateLabel = isSunlit ? "LUCE" : isShadow ? "OMBRA" : "—";
+    const nextLabel = isSunlit ? "OMBRA" : isShadow ? "LUCE" : "—";
+    const stateClass = isSunlit ? "sunlight" : isShadow ? "shadow" : "";
+    const urgencyClass = knownTransition && seconds < 300 ? " urgent" : "";
+    return `<tr>
+      <td class="sat-name">${escapeHtml(id)}</td>
+      <td><span class="transition-state ${stateClass}">${stateLabel}</span></td>
+      <td class="transition-next">→ ${nextLabel}</td>
+      <td class="transition-countdown${urgencyClass}">${knownTransition ? formatDuration(seconds) : "—"}</td>
+      <td class="transition-clock">${formatTransitionClock(transitionAt)}</td>
+    </tr>`;
   });
-  $("eclipseForecast").innerHTML = rows.length ? rows.join("") : `<div class="empty-state">Nessuna previsione disponibile</div>`;
+  $("transitionRows").innerHTML = rows.length ? rows.join("") : `<tr><td colspan="5" class="empty-state">Nessuna previsione disponibile</td></tr>`;
 }
 
 function projectVector(position) {
@@ -219,12 +320,17 @@ function renderRouting(routingTable) {
 
 function renderMigrations(migrations) {
   const list = [...(migrations.migrations || [])].reverse();
-  $("activeMigration").textContent = migrations.active_migration_id ? "In corso" : "Idle";
+  const pending = list.find((migration) => ["waiting_for_contact", "queued", "in_progress"].includes(migration.status));
+  $("activeMigration").textContent = pending ? "In corso" : "Idle";
   $("migrationEvents").innerHTML = list.length ? list.map((migration) => {
     const metrics = migration.metrics || {};
+    const contact = migration.contact_window || {};
+    const alignment = migration.status === "waiting_for_contact"
+      ? ` · allineamento ${formatNumber(contact.continuous_alignment_seconds, 0)}/${formatNumber(contact.required_alignment_seconds, 0)}s · ${escapeHtml(contact.reason || "—")}`
+      : "";
     return `<article class="migration-event ${migration.status === "failed" ? "failed" : ""}">
       <strong>${escapeHtml((migration.mode || "").toUpperCase())} · ${escapeHtml(migration.source_satellite_id || "—")} → ${escapeHtml(migration.target_satellite_id || "—")}</strong>
-      <p>${escapeHtml(migration.status || "—")} · ${formatNumber(metrics.duration_ms, 1)} ms · downtime ${formatNumber(metrics.downtime_ms, 1)} ms · seq ${metrics.final_sequence_number ?? "—"}</p>
+      <p>${escapeHtml(migration.status || "—")}${alignment} · ${formatNumber(metrics.duration_ms, 1)} ms · downtime ${formatNumber(metrics.downtime_ms, 1)} ms · seq ${metrics.final_sequence_number ?? "—"}</p>
     </article>`;
   }).join("") : `<div class="empty-state boxed">Nessuna migrazione registrata</div>`;
 }
@@ -279,6 +385,14 @@ function formatDuration(seconds) {
   if (!Number.isFinite(value)) return "—";
   if (value < 60) return `${Math.round(value)}s`;
   return `${Math.floor(value / 60)}m ${Math.round(value % 60)}s`;
+}
+
+function formatTransitionClock(timestamp) {
+  if (!timestamp) return "—";
+  const date = new Date(timestamp);
+  return Number.isNaN(date.getTime())
+    ? "—"
+    : date.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 }
 
 function formatClock(timestamp) {

@@ -87,6 +87,13 @@ protocollo, gli URL REST, timeout e retry sono configurabili in
 `config/migration.json`. `POST /api/v1/migrations` permette inoltre di avviare
 manualmente una migrazione `cold` o `hot`; `GET /api/v1/migrations/<id>` espone
 stato, ACK, tempi, downtime, byte trasferiti, retry e risultato del rollback.
+Prima di entrare nella coda di esecuzione, ogni migrazione resta nello stato
+`waiting_for_contact`: sorgente e destinazione devono mantenere per 60 secondi
+consecutivi una distanza non superiore a 5.500 km e linea di vista libera dalla
+Terra. Un'interruzione del contatto o un intervallo eccessivo fra gli snapshot
+azzera l'allineamento. Durata, distanza, causa dell'attesa e numero di reset
+sono esposti nel campo `contact_window` della migrazione; soglie e durata sono
+configurabili in `config/migration.json`.
 La Hot Migration usa una pre-copy iniziale, mette brevemente il source in
 quiescenza, acquisisce un secondo checkpoint con gli aggiornamenti intervenuti,
 attende l'ACK `200` del target sul final sequence number e solo allora esegue
@@ -98,8 +105,11 @@ ripristinato e il source viene riavviato.
 
 La Dashboard Flask aggrega Simulator e Controller tramite `/api/dashboard` e
 aggiorna ogni secondo una rete SVG, tabella satelliti, routing table, heartbeat,
-score, luce/ombra, migrazioni e stream degli eventi. Non usa CDN o librerie
-frontend esterne ed è quindi disponibile anche senza accesso Internet.
+score, luce/ombra, migrazioni e stream degli eventi. Accanto alla rete mostra
+per ogni satellite il conto alla rovescia e l'orario della prossima transizione;
+source e target delle migrazioni del Controller sono evidenziati anche nel
+grafo. Non usa CDN o librerie frontend esterne ed è quindi disponibile anche
+senza accesso Internet.
 
 Il modulo Metrics del Simulator registra automaticamente heartbeat ed elezioni
 del Controller e aggrega numero di migrazioni, ACK, downtime e durata degli

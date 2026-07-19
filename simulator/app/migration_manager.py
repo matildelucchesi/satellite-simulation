@@ -16,6 +16,8 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 from uuid import uuid4
 
+from .contact_window import ContactWindowConfig, evaluate_contact
+
 
 class MigrationManagerError(ValueError):
     """Errore di configurazione o richiesta di migrazione non valida."""
@@ -33,6 +35,7 @@ class MigrationConfig:
     request_timeout_seconds: float
     max_retries: int
     retry_delay_seconds: float
+    contact_window: ContactWindowConfig
 
     @classmethod
     def from_file(cls, path: str | Path) -> "MigrationConfig":
@@ -76,6 +79,9 @@ class MigrationConfig:
             retry_delay_seconds=_non_negative_number(
                 payload.get("retry_delay_seconds"), "retry_delay_seconds"
             ),
+            contact_window=ContactWindowConfig.from_dict(
+                payload.get("contact_window")
+            ),
         )
 
     def agent_url(self, satellite_id: str) -> str:
@@ -90,6 +96,7 @@ class MigrationConfig:
             "request_timeout_seconds": self.request_timeout_seconds,
             "max_retries": self.max_retries,
             "retry_delay_seconds": self.retry_delay_seconds,
+            "contact_window": self.contact_window.to_dict(),
         }
 
 
@@ -218,19 +225,31 @@ class MigrationManager:
         with self._lock:
             if identifier in self._migrations:
                 return identifier
-            if any(
-                migration["status"] in {"queued", "in_progress"}
-                and migration["source_satellite_id"] == source
-                and migration["target_satellite_id"] == target
-                for migration in self._migrations.values()
-            ):
-                raise MigrationManagerError("Una migrazione equivalente è già in corso")
+            equivalent = next(
+                (
+                    migration
+                    for migration in self._migrations.values()
+                    if migration["status"] in {
+                        "waiting_for_contact",
+                        "queued",
+                        "in_progress",
+                    }
+                    and migration["source_satellite_id"] == source
+                    and migration["target_satellite_id"] == target
+                ),
+                None,
+            )
+            if equivalent is not None:
+                return equivalent["migration_id"]
+            required_alignment = self.config.contact_window.required_alignment_seconds
             migration = {
                 "migration_id": identifier,
                 "mode": selected_mode,
                 "source_satellite_id": source,
                 "target_satellite_id": target,
-                "status": "queued",
+                "status": (
+                    "queued" if required_alignment == 0 else "waiting_for_contact"
+                ),
                 "created_at": _utc_now(),
                 "started_at": None,
                 "completed_at": None,
@@ -238,6 +257,7 @@ class MigrationManager:
                 "error": None,
                 "metrics": {
                     "duration_ms": None,
+                    "alignment_wait_ms": None,
                     "downtime_ms": None,
                     "state_bytes": 0,
                     "initial_state_bytes": 0,
@@ -252,11 +272,94 @@ class MigrationManager:
                     "rollback_attempted": False,
                     "rollback_succeeded": None,
                 },
+                "contact_window": {
+                    **self.config.contact_window.to_dict(),
+                    "eligible": None,
+                    "reason": "waiting_for_constellation",
+                    "current_distance_km": None,
+                    "line_of_sight": None,
+                    "alignment_started_at": None,
+                    "last_observed_at": None,
+                    "ready_at": None,
+                    "continuous_alignment_seconds": 0.0,
+                    "reset_count": 0,
+                },
             }
             self._migrations[identifier] = migration
             self._migration_order.append(identifier)
-            self._queue.put(identifier)
+            if migration["status"] == "queued":
+                self._queue.put(identifier)
         return identifier
+
+    def update_constellation(self, snapshot: dict[str, Any]) -> None:
+        """Avanza l'allineamento solo con contatto geometrico continuo."""
+
+        with self._lock:
+            waiting = [
+                migration
+                for migration in self._migrations.values()
+                if migration["status"] == "waiting_for_contact"
+            ]
+            for migration in waiting:
+                observation = evaluate_contact(
+                    snapshot,
+                    migration["source_satellite_id"],
+                    migration["target_satellite_id"],
+                    self.config.contact_window,
+                )
+                window = migration["contact_window"]
+                observed_at = observation.observed_at
+                previous_observation = _parse_timestamp(window["last_observed_at"])
+                alignment_started = _parse_timestamp(window["alignment_started_at"])
+
+                window["eligible"] = observation.eligible
+                window["reason"] = observation.reason
+                window["current_distance_km"] = (
+                    round(observation.distance_km, 3)
+                    if observation.distance_km is not None
+                    else None
+                )
+                window["line_of_sight"] = observation.line_of_sight
+
+                sample_gap_invalid = (
+                    previous_observation is not None
+                    and (
+                        observed_at <= previous_observation
+                        or (observed_at - previous_observation).total_seconds()
+                        > self.config.contact_window.max_sample_gap_seconds
+                    )
+                )
+                if not observation.eligible or sample_gap_invalid:
+                    if alignment_started is not None:
+                        window["reset_count"] += 1
+                    alignment_started = None
+                    window["alignment_started_at"] = None
+                    window["continuous_alignment_seconds"] = 0.0
+                    if sample_gap_invalid:
+                        window["reason"] = "sample_gap_exceeded"
+                elif alignment_started is None:
+                    alignment_started = observed_at
+                    window["alignment_started_at"] = _isoformat(observed_at)
+
+                window["last_observed_at"] = _isoformat(observed_at)
+                if alignment_started is None:
+                    continue
+
+                elapsed = max(
+                    0.0, (observed_at - alignment_started).total_seconds()
+                )
+                window["continuous_alignment_seconds"] = round(elapsed, 3)
+                if elapsed < self.config.contact_window.required_alignment_seconds:
+                    window["reason"] = "alignment_in_progress"
+                    continue
+
+                window["reason"] = "contact_window_ready"
+                window["ready_at"] = _isoformat(observed_at)
+                migration["metrics"]["alignment_wait_ms"] = round(
+                    elapsed * 1000, 3
+                )
+                migration["status"] = "queued"
+                self._queue.put(migration["migration_id"])
 
     def process_next(self) -> bool:
         """Esegue sincronicamente il prossimo elemento; utile anche nei test."""
@@ -689,6 +792,22 @@ def _non_negative_number(value: Any, name: str) -> float:
 
 
 def _utc_now() -> str:
-    return datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace(
+    return _isoformat(datetime.now(timezone.utc))
+
+
+def _isoformat(value: datetime) -> str:
+    return value.astimezone(timezone.utc).isoformat(timespec="milliseconds").replace(
         "+00:00", "Z"
     )
+
+
+def _parse_timestamp(value: Any) -> datetime | None:
+    if not isinstance(value, str):
+        return None
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        return None
+    return parsed.astimezone(timezone.utc)

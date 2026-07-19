@@ -64,10 +64,39 @@
               <span><i class="legend-dot sun"></i>Luce</span>
               <span><i class="legend-dot shadow"></i>Ombra</span>
               <span><i class="legend-ring"></i>Controller</span>
+              <span><i class="legend-ring migration-source"></i>Source</span>
+              <span><i class="legend-ring migration-target"></i>Target</span>
             </div>
           </div>
-          <div class="network-stage">
-            <svg id="networkSvg" viewBox="0 0 1000 440" role="img" aria-label="Topologia della rete satellitare">
+          <div class="network-overview">
+            <aside class="transition-board" aria-labelledby="transitionTitle">
+              <div class="transition-heading">
+                <div>
+                  <p class="eyebrow">CAMBIO LUCE / OMBRA</p>
+                  <h3 id="transitionTitle">Prossime transizioni</h3>
+                </div>
+                <span class="live-chip">LIVE</span>
+              </div>
+              <div class="transition-table-wrap">
+                <table class="transition-table">
+                  <thead>
+                    <tr><th>Satellite</th><th>Stato</th><th>Prossimo</th><th>Tra</th><th>Alle</th></tr>
+                  </thead>
+                  <tbody id="transitionRows">
+                    <tr><td colspan="5" class="empty-state">Calcolo transizioni…</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="transition-note">Orario locale del browser · aggiornamento ogni secondo</p>
+            </aside>
+
+            <div class="network-visual">
+              <div id="migrationRoute" class="migration-route idle" aria-live="polite">
+                <span class="migration-route-label">TRASFERIMENTO CONTROLLER</span>
+                <strong>Nessun trasferimento registrato</strong>
+              </div>
+              <div class="network-stage">
+                <svg id="networkSvg" viewBox="0 0 1000 440" role="img" aria-label="Topologia della rete satellitare">
               <defs>
                 <radialGradient id="spaceGradient" cx="50%" cy="48%" r="72%">
                   <stop offset="0" stop-color="#10243c"></stop>
@@ -83,12 +112,16 @@
                   <feGaussianBlur stdDeviation="5" result="blur"></feGaussianBlur>
                   <feMerge><feMergeNode in="blur"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge>
                 </filter>
+                <marker id="migrationArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                  <path d="M0,0 L0,6 L9,3 z" class="migration-arrow-head"></path>
+                </marker>
               </defs>
               <rect width="1000" height="440" rx="18" fill="url(#spaceGradient)"></rect>
               <g class="stars" opacity=".5"></g>
               <text x="42" y="42" class="zone-label">STATO REALE SKYFIELD · GIALLO = LUCE · BLU = OMBRA</text>
               <ellipse cx="500" cy="220" rx="255" ry="154" class="orbit-path"></ellipse>
               <g id="networkLinks"></g>
+              <g id="migrationTransfer"></g>
               <g id="earth">
                 <circle cx="500" cy="220" r="65" class="earth-halo"></circle>
                 <circle cx="500" cy="220" r="50" fill="url(#earthGradient)"></circle>
@@ -96,19 +129,10 @@
                 <text x="500" y="294" text-anchor="middle" class="earth-label">EARTH</text>
               </g>
               <g id="networkNodes"></g>
-            </svg>
-          </div>
-          <p class="network-note">Posizione proiettata dai vettori GCRS · il colore del nodo deriva dal calcolo 3D Sole–Terra–satellite di Skyfield</p>
-        </section>
-
-        <section class="panel eclipse-panel">
-          <div class="panel-heading compact">
-            <div><p class="eyebrow">ECLIPSE FORECAST</p><h2>Previsione luce / ombra</h2></div>
-            <span class="counter">orizzonte 90 min</span>
-          </div>
-          <div class="forecast-axis"><span>ORA</span><span>30 min</span><span>60 min</span><span>90 min</span></div>
-          <div id="eclipseForecast" class="eclipse-forecast">
-            <div class="empty-state">Calcolo previsione eclissi…</div>
+                </svg>
+              </div>
+              <p class="network-note">Posizione proiettata dai vettori GCRS · il colore del nodo deriva dal calcolo 3D Sole–Terra–satellite di Skyfield</p>
+            </div>
           </div>
         </section>
 

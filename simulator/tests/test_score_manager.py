@@ -6,6 +6,7 @@ from tempfile import TemporaryDirectory
 import unittest
 
 from app.migration_manager import MigrationConfig, MigrationManager
+from app.contact_window import ContactWindowConfig
 from app.score_manager import ScoreManager, ScoreManagerConfig, ScoreWeights
 
 
@@ -26,6 +27,13 @@ def migration_config():
         request_timeout_seconds=1.0,
         max_retries=0,
         retry_delay_seconds=0.0,
+        contact_window=ContactWindowConfig(
+            required_alignment_seconds=0.0,
+            max_distance_km=5500.0,
+            require_line_of_sight=True,
+            earth_radius_km=6378.137,
+            max_sample_gap_seconds=2.5,
+        ),
     )
 
 

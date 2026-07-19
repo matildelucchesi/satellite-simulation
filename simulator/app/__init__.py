@@ -60,13 +60,17 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
         evaluation_listener=metrics_manager.record_election,
     )
 
+    def update_coordinators(snapshot: dict[str, Any]) -> None:
+        score_manager.update_constellation(snapshot)
+        migration_manager.update_constellation(snapshot)
+
     simulator = ConstellationSimulator(
         tle_path=app.config["TLE_PATH"],
         satellite_ids=satellite_ids,
         constellation_name=constellation_config["constellation"]["name"],
         tick_seconds=app.config["SIMULATOR_TICK_SECONDS"],
         eclipse_search_hours=app.config["ECLIPSE_SEARCH_HOURS"],
-        state_listener=score_manager.update_constellation,
+        state_listener=update_coordinators,
     )
     app.extensions["constellation_simulator"] = simulator
     app.extensions["score_manager"] = score_manager

@@ -62,7 +62,7 @@ class SimulatorApiTests(unittest.TestCase):
             metrics_state["last_selected_controller_satellite_id"]
         )
 
-    def test_manual_migration_can_be_queued_and_inspected(self):
+    def test_manual_migration_waits_for_contact_and_can_be_inspected(self):
         queued = self.client.post(
             "/api/v1/migrations",
             json={
@@ -77,7 +77,8 @@ class SimulatorApiTests(unittest.TestCase):
         self.assertEqual(queued.status_code, 202)
         self.assertEqual(migration.status_code, 200)
         self.assertEqual(migration.get_json()["mode"], "cold")
-        self.assertEqual(migration.get_json()["status"], "queued")
+        self.assertEqual(queued.get_json()["status"], "waiting_for_contact")
+        self.assertEqual(migration.get_json()["status"], "waiting_for_contact")
 
     def test_metrics_count_heartbeats_and_export_json_and_csv(self):
         for satellite_id in range(1, 3):

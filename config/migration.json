@@ -4,5 +4,12 @@
   "agent_url_template": "http://satellite-{satellite_number}:5000",
   "request_timeout_seconds": 5,
   "max_retries": 2,
-  "retry_delay_seconds": 0.5
+  "retry_delay_seconds": 0.5,
+  "contact_window": {
+    "required_alignment_seconds": 60,
+    "max_distance_km": 5500,
+    "require_line_of_sight": true,
+    "earth_radius_km": 6378.137,
+    "max_sample_gap_seconds": 2.5
+  }
 }

@@ -55,6 +55,7 @@ class MetricsManager:
         failed = [item for item in migrations if item.get("status") == "failed"]
         handover_times = _numeric_metrics(completed, "duration_ms")
         downtime_times = _numeric_metrics(completed, "downtime_ms")
+        alignment_times = _numeric_metrics(completed, "alignment_wait_ms")
         ack_count = sum(
             int(bool(item.get("metrics", {}).get(field)))
             for item in migrations
@@ -79,6 +80,7 @@ class MetricsManager:
             "total_downtime_ms": _total(downtime_times),
             "average_downtime_ms": _average(downtime_times),
             "average_handover_time_ms": _average(handover_times),
+            "average_alignment_wait_ms": _average(alignment_times),
             "controller_election_count": len(election_times),
             "average_controller_election_time_ms": _average(election_times),
             "last_selected_controller_satellite_id": selected,

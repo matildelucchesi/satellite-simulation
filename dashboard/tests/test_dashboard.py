@@ -57,6 +57,9 @@ class DashboardApiTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"Starlink Simulation", response.data)
         self.assertIn(b"networkSvg", response.data)
+        self.assertIn(b"transitionRows", response.data)
+        self.assertIn(b"migrationRoute", response.data)
+        self.assertIn(b"migrationTransfer", response.data)
 
     def test_dashboard_api_returns_json(self):
         response = self.client.get("/api/dashboard")

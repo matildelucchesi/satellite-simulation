@@ -15,6 +15,7 @@ class MetricsManagerTests(unittest.TestCase):
                     "status": "completed",
                     "metrics": {
                         "duration_ms": 120.0,
+                        "alignment_wait_ms": 60000.0,
                         "downtime_ms": 30.0,
                         "ack_received": True,
                         "controller_restore_ack": True,
@@ -24,6 +25,7 @@ class MetricsManagerTests(unittest.TestCase):
                     "status": "completed",
                     "metrics": {
                         "duration_ms": 80.0,
+                        "alignment_wait_ms": 62000.0,
                         "downtime_ms": 10.0,
                         "ack_received": True,
                         "controller_restore_ack": False,
@@ -64,6 +66,7 @@ class MetricsManagerTests(unittest.TestCase):
         self.assertEqual(metrics["total_downtime_ms"], 40.0)
         self.assertEqual(metrics["average_downtime_ms"], 20.0)
         self.assertEqual(metrics["average_handover_time_ms"], 100.0)
+        self.assertEqual(metrics["average_alignment_wait_ms"], 61000.0)
         self.assertEqual(metrics["controller_election_count"], 2)
         self.assertEqual(metrics["average_controller_election_time_ms"], 5.0)
         self.assertGreaterEqual(metrics["simulation_time_seconds"], 0)
