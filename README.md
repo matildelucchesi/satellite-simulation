@@ -72,3 +72,9 @@ secondo e invia un heartbeat periodico al `score_manager` del Simulator;
 eventuali errori di consegna restano visibili in `GET /status` senza
 interrompere l'agente. I pesi `w1`...`w4`, il TTL degli heartbeat e le soglie di
 migrazione sono configurabili in `config/scoring.json`.
+
+Il `migration_manager` esegue in modo asincrono una migrazione alla volta. Il
+protocollo, gli URL REST, timeout e retry sono configurabili in
+`config/migration.json`. `POST /api/v1/migrations` permette inoltre di avviare
+manualmente una migrazione `cold` o `hot`; `GET /api/v1/migrations/<id>` espone
+stato, ACK, tempi, downtime, byte trasferiti, retry e risultato del rollback.

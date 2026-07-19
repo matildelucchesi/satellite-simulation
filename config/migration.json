@@ -1,0 +1,8 @@
+{
+  "default_mode": "hot",
+  "controller_url": "http://controller:5000",
+  "agent_url_template": "http://satellite-{satellite_number}:5000",
+  "request_timeout_seconds": 5,
+  "max_retries": 2,
+  "retry_delay_seconds": 0.5
+}

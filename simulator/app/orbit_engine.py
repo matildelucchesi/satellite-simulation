@@ -142,6 +142,12 @@ class ConstellationSimulator:
         if thread is not None and thread.is_alive():
             thread.join(timeout=timeout)
 
+    def close(self) -> None:
+        """Arresta il worker e chiude il file delle effemeridi."""
+
+        self.stop()
+        self.ephemeris.close()
+
     def snapshot(self) -> dict[str, Any]:
         """Restituisce una copia isolata dello stato corrente."""
 

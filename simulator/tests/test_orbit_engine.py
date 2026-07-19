@@ -28,6 +28,10 @@ class ConstellationSimulatorTests(unittest.TestCase):
             eclipse_search_hours=3,
         )
 
+    @classmethod
+    def tearDownClass(cls):
+        cls.simulator.close()
+
     def test_update_produces_complete_state(self):
         state = self.simulator.update(datetime(2026, 7, 19, tzinfo=timezone.utc))
 
@@ -49,4 +53,3 @@ class ConstellationSimulatorTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

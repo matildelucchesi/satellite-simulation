@@ -5,7 +5,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from app.migration_manager import MigrationManager
+from app.migration_manager import MigrationConfig, MigrationManager
 from app.score_manager import ScoreManager, ScoreManagerConfig, ScoreWeights
 
 
@@ -15,6 +15,17 @@ def config(weights=None, threshold=10.0, cooldown=60.0):
         heartbeat_ttl_seconds=60.0,
         minimum_score_improvement=threshold,
         migration_cooldown_seconds=cooldown,
+    )
+
+
+def migration_config():
+    return MigrationConfig(
+        default_mode="hot",
+        controller_url="http://controller:5000",
+        agent_url_template="http://satellite-{satellite_number}:5000",
+        request_timeout_seconds=1.0,
+        max_retries=0,
+        retry_delay_seconds=0.0,
     )
 
 
@@ -40,7 +51,9 @@ def constellation():
 
 class ScoreManagerTests(unittest.TestCase):
     def setUp(self):
-        self.migrations = MigrationManager()
+        self.migrations = MigrationManager(
+            migration_config(), ["SAT-1", "SAT-2", "SAT-3"]
+        )
         self.manager = ScoreManager(
             ["SAT-1", "SAT-2", "SAT-3"],
             config(),
@@ -71,6 +84,7 @@ class ScoreManagerTests(unittest.TestCase):
         latest = self.migrations.snapshot()["latest"]
         self.assertEqual(latest["source_satellite_id"], "SAT-1")
         self.assertEqual(latest["target_satellite_id"], "SAT-2")
+        self.assertEqual(latest["mode"], "hot")
 
     def test_weights_are_loaded_from_json_file(self):
         with TemporaryDirectory() as directory:

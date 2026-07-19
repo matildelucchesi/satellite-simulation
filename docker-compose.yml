@@ -38,6 +38,7 @@ services:
       CONFIG_PATH: /app/config/constellation.json
       TLE_PATH: /app/config/starlink.tle
       SCORING_CONFIG_PATH: /app/config/scoring.json
+      MIGRATION_CONFIG_PATH: /app/config/migration.json
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
       SIMULATOR_TICK_SECONDS: ${SIMULATOR_TICK_SECONDS:-1}
       ECLIPSE_SEARCH_HOURS: ${ECLIPSE_SEARCH_HOURS:-24}

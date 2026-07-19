@@ -20,6 +20,7 @@ class SimulatorApiTests(unittest.TestCase):
             }
         )
         self.simulator = self.app.extensions["constellation_simulator"]
+        self.addCleanup(self.simulator.close)
         self.simulator.update()
         self.client = self.app.test_client()
 
@@ -54,6 +55,23 @@ class SimulatorApiTests(unittest.TestCase):
         self.assertTrue(score_state["evaluation"]["ready"])
         self.assertEqual(len(score_state["evaluation"]["scores"]), 5)
         self.assertEqual(heartbeat_state["count"], 5)
+
+    def test_manual_migration_can_be_queued_and_inspected(self):
+        queued = self.client.post(
+            "/api/v1/migrations",
+            json={
+                "source_satellite_id": "SAT-1",
+                "target_satellite_id": "SAT-2",
+                "mode": "cold",
+            },
+        )
+        migration_id = queued.get_json()["migration_id"]
+        migration = self.client.get(f"/api/v1/migrations/{migration_id}")
+
+        self.assertEqual(queued.status_code, 202)
+        self.assertEqual(migration.status_code, 200)
+        self.assertEqual(migration.get_json()["mode"], "cold")
+        self.assertEqual(migration.get_json()["status"], "queued")
 
 
 if __name__ == "__main__":

@@ -13,7 +13,11 @@ from flask import Flask, jsonify, request
 
 from common.settings import ServiceSettings
 
-from .migration_manager import MigrationManager
+from .migration_manager import (
+    MigrationConfig,
+    MigrationManager,
+    MigrationManagerError,
+)
 from .orbit_engine import ConstellationSimulator
 from .score_manager import ScoreManager, ScoreManagerConfig, ScoreManagerError
 
@@ -30,6 +34,7 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
         SIMULATOR_TICK_SECONDS=float(os.getenv("SIMULATOR_TICK_SECONDS", "1")),
         ECLIPSE_SEARCH_HOURS=float(os.getenv("ECLIPSE_SEARCH_HOURS", "24")),
         SCORING_CONFIG_PATH=os.getenv("SCORING_CONFIG_PATH"),
+        MIGRATION_CONFIG_PATH=os.getenv("MIGRATION_CONFIG_PATH"),
         SIMULATOR_AUTOSTART=os.getenv("SIMULATOR_AUTOSTART", "true").lower()
         in {"1", "true", "yes"},
     )
@@ -42,7 +47,13 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
     scoring_config_path = app.config["SCORING_CONFIG_PATH"] or str(
         Path(app.config["CONFIG_PATH"]).with_name("scoring.json")
     )
-    migration_manager = MigrationManager()
+    migration_config_path = app.config["MIGRATION_CONFIG_PATH"] or str(
+        Path(app.config["CONFIG_PATH"]).with_name("migration.json")
+    )
+    migration_manager = MigrationManager(
+        config=MigrationConfig.from_file(migration_config_path),
+        satellite_ids=satellite_ids,
+    )
     score_manager = ScoreManager(
         satellite_ids=satellite_ids,
         config=ScoreManagerConfig.from_file(scoring_config_path),
@@ -62,8 +73,10 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
     app.extensions["migration_manager"] = migration_manager
 
     if app.config["SIMULATOR_AUTOSTART"]:
+        migration_manager.start()
         simulator.start()
-        atexit.register(simulator.stop)
+        atexit.register(migration_manager.stop)
+        atexit.register(simulator.close)
 
     @app.get("/health")
     def health():
@@ -121,9 +134,37 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
     def scores():
         return jsonify(score_manager.snapshot())
 
-    @app.get("/api/v1/migrations")
+    @app.route("/api/v1/migrations", methods=["GET", "POST"])
     def migrations():
+        if request.method == "POST":
+            payload = request.get_json(silent=True)
+            if payload is None:
+                return jsonify({"error": "invalid_json"}), 400
+            try:
+                migration_id = migration_manager.enqueue(
+                    source_satellite_id=payload.get("source_satellite_id"),
+                    target_satellite_id=payload.get("target_satellite_id"),
+                    mode=payload.get("mode"),
+                    recommendation={"source": "manual_api"},
+                )
+            except MigrationManagerError as exc:
+                return jsonify(
+                    {"error": "migration_rejected", "message": str(exc)}
+                ), 409
+            return jsonify(
+                {
+                    "status": "queued",
+                    "migration_id": migration_id,
+                }
+            ), 202
         return jsonify(migration_manager.snapshot())
+
+    @app.get("/api/v1/migrations/<migration_id>")
+    def migration(migration_id: str):
+        state = migration_manager.migration_snapshot(migration_id)
+        if state is None:
+            return jsonify({"error": "migration_not_found"}), 404
+        return jsonify(state)
 
     return app
 
