@@ -1,3 +1,4 @@
 Flask>=3.0,<4.0
 skyfield>=1.49,<2.0
+skyfield-data>=7.0,<8.0
 

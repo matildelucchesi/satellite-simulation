@@ -11,4 +11,5 @@ __pycache__/
 htmlcov/
 logs/*
 !logs/.gitkeep
-
+state/*
+!state/.gitkeep
