@@ -103,3 +103,18 @@ handover. `GET /api/v1/metrics` restituisce lo snapshot JSON corrente. Gli
 endpoint `/api/v1/metrics/export.json` e `/api/v1/metrics/export.csv` scaricano
 lo stesso snapshot nei due formati; il tempo totale viene calcolato dall'avvio
 del processo Simulator.
+
+## Architettura dei moduli
+
+Ogni container usa una composition root in `app/__init__.py`: qui vengono lette
+le impostazioni, costruiti i servizi e iniettate le dipendenze. Le route Flask
+sono isolate in `app/routes.py` e traducono soltanto HTTP/JSON verso i casi
+d'uso. La logica applicativa resta nei moduli `service`, `agent`,
+`score_manager`, `migration_manager`, `metrics` e `orbit_engine`.
+
+Le dipendenze infrastrutturali sono dietro porte esplicite: il Satellite Agent
+usa `AgentHttpTransport`, mentre il Controller usa `CheckpointRepository`.
+Gli adapter correnti sono basati sulla standard library (`urllib` e filesystem)
+e possono essere sostituiti nei test o da implementazioni future senza cambiare
+la logica applicativa. La configurazione della costellazione è gestita dal
+modulo dedicato `simulator/app/configuration.py`.

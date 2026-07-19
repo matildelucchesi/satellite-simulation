@@ -10,12 +10,12 @@ import math
 import re
 from threading import Event, RLock, Thread
 from typing import Any
-from urllib.error import HTTPError, URLError
 from urllib.parse import quote
-from urllib.request import Request, urlopen
 from uuid import uuid4
 
 import psutil
+
+from .transport import AgentHttpTransport, UrllibAgentHttpTransport
 
 LOGGER = logging.getLogger(__name__)
 REQUIRED_ORBITAL_FIELDS = {
@@ -42,6 +42,7 @@ class SatelliteAgent:
         state_sync_interval_seconds: float = 1.0,
         heartbeat_interval_seconds: float = 5.0,
         request_timeout_seconds: float = 2.0,
+        transport: AgentHttpTransport | None = None,
     ) -> None:
         satellite_id = satellite_id.strip().upper()
         if not satellite_id or satellite_id == "UNASSIGNED":
@@ -57,6 +58,7 @@ class SatelliteAgent:
         self.state_sync_interval_seconds = state_sync_interval_seconds
         self.heartbeat_interval_seconds = heartbeat_interval_seconds
         self.request_timeout_seconds = request_timeout_seconds
+        self.transport = transport or UrllibAgentHttpTransport()
 
         self._lock = RLock()
         self._stop_event = Event()
@@ -336,20 +338,18 @@ class SatelliteAgent:
         if not self.heartbeat_url:
             return heartbeat
 
-        request = Request(
-            self.heartbeat_url,
-            data=json.dumps(heartbeat).encode("utf-8"),
-            headers={"Content-Type": "application/json"},
-            method="POST",
-        )
         try:
-            with urlopen(request, timeout=self.request_timeout_seconds) as response:
-                if not 200 <= response.status < 300:
-                    raise RuntimeError(f"Heartbeat rifiutato con HTTP {response.status}")
+            status = self.transport.post_json(
+                self.heartbeat_url,
+                heartbeat,
+                self.request_timeout_seconds,
+            )
+            if not 200 <= status < 300:
+                raise RuntimeError(f"Heartbeat rifiutato con HTTP {status}")
             with self._lock:
                 self._last_heartbeat_sent_at = _utc_now()
                 self._last_heartbeat_error = None
-        except (HTTPError, URLError, OSError, RuntimeError) as exc:
+        except Exception as exc:
             with self._lock:
                 self._last_heartbeat_error = str(exc)
             raise
@@ -362,9 +362,7 @@ class SatelliteAgent:
             f"{self.simulator_url}/api/v1/satellites/"
             f"{quote(self.satellite_id, safe='')}"
         )
-        request = Request(url, headers={"Accept": "application/json"}, method="GET")
-        with urlopen(request, timeout=self.request_timeout_seconds) as response:
-            payload = json.loads(response.read().decode("utf-8"))
+        payload = self.transport.get_json(url, self.request_timeout_seconds)
         return self.receive_state(payload)
 
     def _periodic_loop(self, interval: float, callback: Any) -> None:

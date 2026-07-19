@@ -92,6 +92,32 @@ class ControllerServiceTests(unittest.TestCase):
         self.assertEqual(checkpoint["sequence_number"], sequence)
         self.assertEqual(self.controller.snapshot()["sequence_number"], sequence + 1)
 
+    def test_checkpoint_storage_can_be_injected(self):
+        class InMemoryRepository:
+            path = Path("memory-checkpoint.json")
+            value = None
+
+            def save(self, serialized_state):
+                self.value = serialized_state
+
+            def load(self):
+                if self.value is None:
+                    raise FileNotFoundError
+                return self.value
+
+        repository = InMemoryRepository()
+        controller = ControllerService(
+            repository.path,
+            checkpoint_repository=repository,
+        )
+        controller.record_heartbeat(heartbeat())
+
+        expected = controller.checkpoint()
+        controller.shutdown()
+        restored = controller.restore()
+
+        self.assertEqual(restored, expected)
+
 
 if __name__ == "__main__":
     unittest.main()

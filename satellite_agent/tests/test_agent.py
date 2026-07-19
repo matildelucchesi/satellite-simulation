@@ -1,8 +1,7 @@
 """Test dello stato e degli heartbeat del Satellite Agent."""
 
-import json
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 from app.agent import AgentValidationError, SatelliteAgent
 
@@ -26,6 +25,21 @@ def orbital_state(satellite_id: str = "SAT-3"):
             "SAT-5": 400.0,
         },
     }
+
+
+class FakeTransport:
+    def __init__(self, get_payload=None, post_status=202):
+        self.get_payload = get_payload
+        self.post_status = post_status
+        self.calls = []
+
+    def get_json(self, url, timeout):
+        self.calls.append(("GET", url, None, timeout))
+        return self.get_payload
+
+    def post_json(self, url, payload, timeout):
+        self.calls.append(("POST", url, payload, timeout))
+        return self.post_status
 
 
 class SatelliteAgentTests(unittest.TestCase):
@@ -127,33 +141,34 @@ class SatelliteAgentTests(unittest.TestCase):
         )
 
     @patch("app.agent.psutil.cpu_percent", return_value=28.0)
-    @patch("app.agent.urlopen")
-    def test_sends_heartbeat_as_json(self, mocked_urlopen, _cpu_percent):
-        response = MagicMock(status=202)
-        mocked_urlopen.return_value.__enter__.return_value = response
+    def test_sends_heartbeat_as_json(self, _cpu_percent):
+        transport = FakeTransport()
         agent = SatelliteAgent(
-            "SAT-3", heartbeat_url="http://controller:5000/heartbeat"
+            "SAT-3",
+            heartbeat_url="http://controller:5000/heartbeat",
+            transport=transport,
         )
         agent.receive_state(orbital_state())
 
         agent.send_heartbeat()
 
-        sent_request = mocked_urlopen.call_args.args[0]
-        self.assertEqual(json.loads(sent_request.data)["neighbors"], 4)
-        self.assertEqual(sent_request.get_method(), "POST")
+        method, _url, payload, _timeout = transport.calls[0]
+        self.assertEqual(payload["neighbors"], 4)
+        self.assertEqual(method, "POST")
         self.assertIsNotNone(agent.status()["heartbeat"]["last_sent_at"])
 
-    @patch("app.agent.urlopen")
-    def test_synchronizes_state_from_simulator(self, mocked_urlopen):
-        response = MagicMock()
-        response.read.return_value = json.dumps(orbital_state()).encode("utf-8")
-        mocked_urlopen.return_value.__enter__.return_value = response
-        agent = SatelliteAgent("SAT-3", simulator_url="http://simulator:5000")
+    def test_synchronizes_state_from_simulator(self):
+        transport = FakeTransport(get_payload=orbital_state())
+        agent = SatelliteAgent(
+            "SAT-3",
+            simulator_url="http://simulator:5000",
+            transport=transport,
+        )
 
         agent.sync_from_simulator()
 
-        sent_request = mocked_urlopen.call_args.args[0]
-        self.assertTrue(sent_request.full_url.endswith("/api/v1/satellites/SAT-3"))
+        _method, url, _payload, _timeout = transport.calls[0]
+        self.assertTrue(url.endswith("/api/v1/satellites/SAT-3"))
         self.assertIsNotNone(agent.orbital_state())
 
 

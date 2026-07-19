@@ -3,24 +3,21 @@
 from __future__ import annotations
 
 import atexit
-import json
 import logging
 import os
 from pathlib import Path
 from typing import Any
 
-from flask import Flask, Response, jsonify, request
+from flask import Flask
 
 from common.settings import ServiceSettings
 
-from .migration_manager import (
-    MigrationConfig,
-    MigrationManager,
-    MigrationManagerError,
-)
+from .configuration import load_constellation_config
+from .migration_manager import MigrationConfig, MigrationManager
 from .metrics import MetricsManager
 from .orbit_engine import ConstellationSimulator
-from .score_manager import ScoreManager, ScoreManagerConfig, ScoreManagerError
+from .routes import create_api_blueprint
+from .score_manager import ScoreManager, ScoreManagerConfig
 
 
 def create_app(test_config: dict[str, Any] | None = None) -> Flask:
@@ -43,7 +40,7 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
         app.config.update(test_config)
 
     logging.basicConfig(level=settings.log_level.upper())
-    constellation_config = _read_constellation_config(app.config["CONFIG_PATH"])
+    constellation_config = load_constellation_config(app.config["CONFIG_PATH"])
     satellite_ids = [item["id"] for item in constellation_config["satellites"]]
     scoring_config_path = app.config["SCORING_CONFIG_PATH"] or str(
         Path(app.config["CONFIG_PATH"]).with_name("scoring.json")
@@ -75,6 +72,15 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
     app.extensions["score_manager"] = score_manager
     app.extensions["migration_manager"] = migration_manager
     app.extensions["metrics_manager"] = metrics_manager
+    app.register_blueprint(
+        create_api_blueprint(
+            settings.name,
+            simulator,
+            score_manager,
+            migration_manager,
+            metrics_manager,
+        )
+    )
 
     if app.config["SIMULATOR_AUTOSTART"]:
         migration_manager.start()
@@ -82,140 +88,4 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
         atexit.register(migration_manager.stop)
         atexit.register(simulator.close)
 
-    @app.get("/health")
-    def health():
-        status = "ok" if simulator.ready else "unavailable"
-        payload = {
-            "service": settings.name,
-            "status": status,
-            "ready": simulator.ready,
-            "running": simulator.running,
-            "last_error": simulator.last_error,
-        }
-        return jsonify(payload), 200 if simulator.ready else 503
-
-    @app.get("/api/v1/constellation")
-    def constellation_state():
-        return jsonify(simulator.snapshot())
-
-    @app.get("/api/v1/satellites")
-    def satellites_state():
-        state = simulator.snapshot()
-        return jsonify(
-            {
-                "generated_at": state.get("generated_at"),
-                "satellites": state.get("satellites", {}),
-            }
-        )
-
-    @app.get("/api/v1/satellites/<satellite_id>")
-    def satellite_state(satellite_id: str):
-        satellite = simulator.satellite_snapshot(satellite_id.upper())
-        if satellite is None:
-            return jsonify({"error": "satellite_not_found"}), 404
-        return jsonify(satellite)
-
-    @app.route("/api/v1/heartbeats", methods=["GET", "POST"])
-    def heartbeats():
-        if request.method == "GET":
-            return jsonify(score_manager.heartbeat_snapshot())
-        payload = request.get_json(silent=True)
-        if payload is None:
-            return jsonify({"error": "invalid_json"}), 400
-        try:
-            heartbeat = score_manager.record_heartbeat(payload)
-        except ScoreManagerError as exc:
-            return jsonify({"error": "invalid_heartbeat", "message": str(exc)}), 400
-        metrics_manager.record_heartbeat()
-        return jsonify(
-            {
-                "status": "accepted",
-                "heartbeat": heartbeat,
-                "evaluation": score_manager.snapshot()["evaluation"],
-            }
-        ), 202
-
-    @app.get("/api/v1/scores")
-    def scores():
-        return jsonify(score_manager.snapshot())
-
-    @app.route("/api/v1/migrations", methods=["GET", "POST"])
-    def migrations():
-        if request.method == "POST":
-            payload = request.get_json(silent=True)
-            if payload is None:
-                return jsonify({"error": "invalid_json"}), 400
-            try:
-                migration_id = migration_manager.enqueue(
-                    source_satellite_id=payload.get("source_satellite_id"),
-                    target_satellite_id=payload.get("target_satellite_id"),
-                    mode=payload.get("mode"),
-                    recommendation={"source": "manual_api"},
-                )
-            except MigrationManagerError as exc:
-                return jsonify(
-                    {"error": "migration_rejected", "message": str(exc)}
-                ), 409
-            return jsonify(
-                {
-                    "status": "queued",
-                    "migration_id": migration_id,
-                }
-            ), 202
-        return jsonify(migration_manager.snapshot())
-
-    @app.get("/api/v1/migrations/<migration_id>")
-    def migration(migration_id: str):
-        state = migration_manager.migration_snapshot(migration_id)
-        if state is None:
-            return jsonify({"error": "migration_not_found"}), 404
-        return jsonify(state)
-
-    @app.get("/api/v1/metrics")
-    def metrics():
-        return jsonify(metrics_manager.snapshot())
-
-    @app.get("/api/v1/metrics/export")
-    @app.get("/api/v1/metrics/export.<export_format>")
-    def export_metrics(export_format: str | None = None):
-        selected_format = (export_format or request.args.get("format", "json")).lower()
-        if selected_format == "json":
-            response = jsonify(metrics_manager.snapshot())
-            response.headers["Content-Disposition"] = (
-                'attachment; filename="simulation-metrics.json"'
-            )
-            return response
-        if selected_format == "csv":
-            return Response(
-                metrics_manager.to_csv(),
-                mimetype="text/csv",
-                headers={
-                    "Content-Disposition": (
-                        'attachment; filename="simulation-metrics.csv"'
-                    )
-                },
-            )
-        return jsonify(
-            {
-                "error": "unsupported_format",
-                "message": "I formati supportati sono json e csv",
-            }
-        ), 400
-
     return app
-
-
-def _read_constellation_config(path: str | Path) -> dict[str, Any]:
-    config_path = Path(path)
-    if not config_path.is_file():
-        raise FileNotFoundError(f"Configurazione non trovata: {config_path}")
-    with config_path.open(encoding="utf-8") as stream:
-        data = json.load(stream)
-
-    satellites = data.get("satellites", [])
-    expected = data.get("constellation", {}).get("satellite_count")
-    if expected != 5 or len(satellites) != expected:
-        raise ValueError("La configurazione deve descrivere esattamente 5 satelliti")
-    if any("id" not in satellite for satellite in satellites):
-        raise ValueError("Ogni satellite deve avere un identificatore")
-    return data

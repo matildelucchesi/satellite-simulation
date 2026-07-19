@@ -11,6 +11,8 @@ from pathlib import Path
 from threading import RLock
 from typing import Any
 
+from .repository import CheckpointRepository, JsonFileCheckpointRepository
+
 
 class ControllerStateError(ValueError):
     """Segnala heartbeat o checkpoint non validi."""
@@ -104,8 +106,15 @@ class ControllerState:
 class ControllerService:
     """Gestisce lo stato del Controller in modo atomico e thread-safe."""
 
-    def __init__(self, checkpoint_path: str | Path) -> None:
-        self.checkpoint_path = Path(checkpoint_path)
+    def __init__(
+        self,
+        checkpoint_path: str | Path,
+        checkpoint_repository: CheckpointRepository | None = None,
+    ) -> None:
+        self._checkpoint_repository = checkpoint_repository or (
+            JsonFileCheckpointRepository(checkpoint_path)
+        )
+        self.checkpoint_path = self._checkpoint_repository.path
         self._lock = RLock()
         self._state = ControllerState.empty()
         self._active = True
@@ -165,25 +174,14 @@ class ControllerService:
         with self._lock:
             serialized = self._state.to_json()
             state = self._state.to_dict()
-            self.checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
-            temporary_path = self.checkpoint_path.with_suffix(
-                self.checkpoint_path.suffix + ".tmp"
-            )
-            temporary_path.write_text(serialized + "\n", encoding="utf-8")
-            temporary_path.replace(self.checkpoint_path)
+            self._checkpoint_repository.save(serialized)
         return state
 
     def restore(self, payload: dict[str, Any] | None = None) -> dict[str, Any]:
         """Ripristina uno stato dal corpo JSON oppure dall'ultimo file salvato."""
 
         if payload is None:
-            if not self.checkpoint_path.is_file():
-                raise FileNotFoundError(
-                    f"Checkpoint non trovato: {self.checkpoint_path}"
-                )
-            restored = ControllerState.from_json(
-                self.checkpoint_path.read_text(encoding="utf-8")
-            )
+            restored = ControllerState.from_json(self._checkpoint_repository.load())
         else:
             checkpoint = payload.get("checkpoint", payload)
             restored = ControllerState.from_dict(checkpoint)

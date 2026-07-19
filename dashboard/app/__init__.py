@@ -5,10 +5,11 @@ from __future__ import annotations
 import os
 from typing import Any
 
-from flask import Flask, jsonify, render_template
+from flask import Flask
 
 from common.settings import ServiceSettings
 
+from .routes import create_api_blueprint
 from .service import DashboardDataService
 
 
@@ -35,18 +36,6 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
         fetcher=app.config.get("DASHBOARD_FETCHER"),
     )
     app.extensions["dashboard_data_service"] = data_service
-
-    @app.get("/")
-    def index():
-        return render_template("index.html")
-
-    @app.get("/api/dashboard")
-    def dashboard_data():
-        return jsonify(data_service.collect())
-
-    @app.get("/health")
-    def health():
-        return jsonify({"service": settings.name, "status": "ok"})
+    app.register_blueprint(create_api_blueprint(settings.name, data_service))
 
     return app
-
