@@ -33,6 +33,7 @@ Endpoint iniziali:
 - Migrazioni raccomandate: `http://localhost:8000/api/v1/migrations`
 - Controller: `http://localhost:8001/health`
 - Dashboard: `http://localhost:8080/health`
+- Interfaccia Dashboard: `http://localhost:8080/`
 - Satelliti SAT-1 ... SAT-5: porte `8101` ... `8105`, percorso `/health`
 
 API di ogni Satellite Agent:
@@ -90,3 +91,8 @@ La Cold Migration mette subito il source in quiescenza, lo arresta, acquisisce
 il checkpoint definitivo, attende lo stesso ACK `200` dal target e soltanto
 dopo esegue restore e attivazione. In caso di errore il checkpoint viene
 ripristinato e il source viene riavviato.
+
+La Dashboard Flask aggrega Simulator e Controller tramite `/api/dashboard` e
+aggiorna ogni secondo una rete SVG, tabella satelliti, routing table, heartbeat,
+score, luce/ombra, migrazioni e stream degli eventi. Non usa CDN o librerie
+frontend esterne ed è quindi disponibile anche senza accesso Internet.

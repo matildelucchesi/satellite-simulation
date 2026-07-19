@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#07111f">
+    <title>Starlink Simulation Control</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </span>
+          <div>
+            <p class="eyebrow">ORBITAL CONTROL</p>
+            <h1>Starlink Simulation</h1>
+          </div>
+        </div>
+        <div class="live-status">
+          <span id="connectionDot" class="status-dot pending"></span>
+          <div>
+            <strong id="connectionLabel">Connessione…</strong>
+            <small id="lastUpdate">In attesa del primo snapshot</small>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <section class="kpi-grid" aria-label="Indicatori principali">
+          <article class="kpi-card accent-cyan">
+            <span>Satelliti online</span>
+            <strong id="onlineCount">—</strong>
+            <small>su 5 nodi configurati</small>
+          </article>
+          <article class="kpi-card accent-violet">
+            <span>Controller corrente</span>
+            <strong id="controllerCurrent">—</strong>
+            <small id="controllerStatus">Stato sconosciuto</small>
+          </article>
+          <article class="kpi-card accent-yellow">
+            <span>In luce</span>
+            <strong id="sunlightCount">—</strong>
+            <small id="shadowCount">— in ombra</small>
+          </article>
+          <article class="kpi-card accent-green">
+            <span>Migrazioni</span>
+            <strong id="migrationCount">—</strong>
+            <small id="migrationStatus">Nessun evento</small>
+          </article>
+        </section>
+
+        <div id="errorBanner" class="error-banner hidden" role="alert"></div>
+
+        <section class="panel network-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">LIVE CONSTELLATION</p>
+              <h2>Rete satellitare</h2>
+            </div>
+            <div class="legend" aria-label="Legenda">
+              <span><i class="legend-dot sun"></i>Luce</span>
+              <span><i class="legend-dot shadow"></i>Ombra</span>
+              <span><i class="legend-ring"></i>Controller</span>
+            </div>
+          </div>
+          <div class="network-stage">
+            <svg id="networkSvg" viewBox="0 0 1000 440" role="img" aria-label="Topologia della rete satellitare">
+              <defs>
+                <linearGradient id="spaceGradient" x1="0" x2="1">
+                  <stop offset="0" stop-color="#172947"></stop>
+                  <stop offset="0.48" stop-color="#0d2036"></stop>
+                  <stop offset="0.52" stop-color="#081322"></stop>
+                  <stop offset="1" stop-color="#030914"></stop>
+                </linearGradient>
+                <radialGradient id="earthGradient" cx="35%" cy="30%">
+                  <stop offset="0" stop-color="#4fe0db"></stop>
+                  <stop offset="0.55" stop-color="#1377a8"></stop>
+                  <stop offset="1" stop-color="#082d55"></stop>
+                </radialGradient>
+                <filter id="glow">
+                  <feGaussianBlur stdDeviation="5" result="blur"></feGaussianBlur>
+                  <feMerge><feMergeNode in="blur"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge>
+                </filter>
+              </defs>
+              <rect width="1000" height="440" rx="18" fill="url(#spaceGradient)"></rect>
+              <g class="stars" opacity=".5"></g>
+              <text x="42" y="42" class="zone-label light-label">☀ ZONA LUCE</text>
+              <text x="830" y="42" class="zone-label shadow-label">ZONA D'OMBRA ◐</text>
+              <ellipse cx="500" cy="220" rx="255" ry="154" class="orbit-path"></ellipse>
+              <g id="networkLinks"></g>
+              <g id="earth">
+                <circle cx="500" cy="220" r="65" class="earth-halo"></circle>
+                <circle cx="500" cy="220" r="50" fill="url(#earthGradient)"></circle>
+                <path d="M465 205c22-30 58-28 78-5-13 5-18 15-12 27-22-4-31 13-50 8-4-13-10-20-16-30z" class="earth-land"></path>
+                <text x="500" y="294" text-anchor="middle" class="earth-label">EARTH</text>
+              </g>
+              <g id="networkNodes"></g>
+            </svg>
+          </div>
+          <p class="network-note">Posizione proiettata dai vettori GCRS · sfondo luce/ombra illustrativo · colore del nodo basato sul calcolo Skyfield</p>
+        </section>
+
+        <section class="panel telemetry-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">SATELLITE TELEMETRY</p>
+              <h2>Stato della costellazione</h2>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Satellite</th><th>Controller</th><th>Heartbeat</th><th>Posizione</th>
+                  <th>Sole / ombra</th><th>T eclissi</th><th>Vicini</th><th>D media</th>
+                  <th>CPU</th><th>Score</th>
+                </tr>
+              </thead>
+              <tbody id="satelliteRows">
+                <tr><td colspan="10" class="empty-state">Caricamento telemetria…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <div class="content-grid">
+          <section class="panel">
+            <div class="panel-heading compact">
+              <div><p class="eyebrow">NETWORK</p><h2>Routing table</h2></div>
+              <span id="routeCount" class="counter">0 rotte</span>
+            </div>
+            <div class="table-wrap small-table">
+              <table>
+                <thead><tr><th>Source</th><th>Destinazione</th><th>Next hop</th><th>Hop</th></tr></thead>
+                <tbody id="routingRows"><tr><td colspan="4" class="empty-state">Nessuna rotta</td></tr></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-heading compact">
+              <div><p class="eyebrow">ORCHESTRATION</p><h2>Eventi di migrazione</h2></div>
+              <span id="activeMigration" class="counter">Idle</span>
+            </div>
+            <div id="migrationEvents" class="event-list">
+              <div class="empty-state boxed">Nessuna migrazione registrata</div>
+            </div>
+          </section>
+        </div>
+
+        <section class="panel log-panel">
+          <div class="panel-heading compact">
+            <div><p class="eyebrow">EVENT STREAM</p><h2>Log della simulazione</h2></div>
+            <button id="pauseLogs" class="ghost-button" type="button">Pausa log</button>
+          </div>
+          <div id="logStream" class="log-stream" aria-live="polite">
+            <div class="empty-state">In attesa di eventi…</div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+  </body>
+</html>
+
