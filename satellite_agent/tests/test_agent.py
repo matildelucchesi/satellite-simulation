@@ -18,11 +18,12 @@ def orbital_state(satellite_id: str = "SAT-3"):
             "seconds_until_eclipse": 540.4,
         },
         "distances_km": {
-            "SAT-1": 100.0,
-            "SAT-2": 200.0,
+            **{
+                f"SAT-{index}": float(index * 100)
+                for index in range(1, 11)
+                if index != 3
+            },
             "SAT-3": 0.0,
-            "SAT-4": 300.0,
-            "SAT-5": 400.0,
         },
     }
 
@@ -80,7 +81,7 @@ class SatelliteAgentTests(unittest.TestCase):
             {
                 "id": 3,
                 "time_to_eclipse": 540,
-                "neighbors": 4,
+                "neighbors": 9,
                 "cpu": 28,
                 "controller": False,
             },
@@ -153,7 +154,7 @@ class SatelliteAgentTests(unittest.TestCase):
         agent.send_heartbeat()
 
         method, _url, payload, _timeout = transport.calls[0]
-        self.assertEqual(payload["neighbors"], 4)
+        self.assertEqual(payload["neighbors"], 9)
         self.assertEqual(method, "POST")
         self.assertIsNotNone(agent.status()["heartbeat"]["last_sent_at"])
 

@@ -1,15 +1,14 @@
 # Satellite Network Simulation
 
-Scaffold iniziale per una simulazione modulare di una costellazione di cinque
-satelliti ispirata a Starlink. I componenti applicativi sono volutamente
-limitati a un'app Flask e a un endpoint di health check: la logica di
-simulazione verrà aggiunta in una fase successiva.
+Simulazione modulare di una costellazione di dieci satelliti ispirata a
+Starlink, con propagazione orbitale, agenti indipendenti, elezione e migrazione
+del Controller, metriche e dashboard in tempo reale.
 
 ## Componenti
 
 - `simulator`: coordinatore headless che propaga i TLE con Skyfield e conserva
   lo stato corrente della costellazione.
-- `satellite_agent`: immagine riutilizzata per i cinque agenti satellitari.
+- `satellite_agent`: immagine riutilizzata per i dieci agenti satellitari.
 - `controller`: microservizio Controller associato logicamente a `SAT-1`.
 - `dashboard`: base per la futura interfaccia di monitoraggio.
 - `common`: configurazioni e utilità condivise tra i servizi.
@@ -32,9 +31,9 @@ Endpoint iniziali:
 - Heartbeat ricevuti: `http://localhost:8000/api/v1/heartbeats`
 - Migrazioni raccomandate: `http://localhost:8000/api/v1/migrations`
 - Controller: `http://localhost:8001/health`
-- Dashboard: `http://localhost:8080/health`
-- Interfaccia Dashboard: `http://localhost:8080/`
-- Satelliti SAT-1 ... SAT-5: porte `8101` ... `8105`, percorso `/health`
+- Dashboard: `http://localhost:8081/health`
+- Interfaccia Dashboard: `http://localhost:8081/`
+- Satelliti SAT-1 ... SAT-10: porte `8101` ... `8110`, percorso `/health`
 
 API di ogni Satellite Agent:
 
@@ -70,7 +69,12 @@ espone posizione e velocita nel riferimento inerziale GCRS, coordinate
 geodetiche WGS84, velocita scalare, stato `sunlight`/`shadow`, tempo alla
 prossima entrata in ombra e distanza da tutti gli altri satelliti. Il file TLE
 locale e `config/starlink.tle`; puo essere sostituito mantenendo il formato a
-tre righe e un totale esatto di cinque satelliti.
+tre righe e un numero di satelliti coerente con `satellite_count` in
+`config/constellation.json`.
+La selezione predefinita usa dieci Starlink del guscio a circa 53 gradi con
+piani orbitali e fasi differenti. I cinque satelliti aggiunti occupano gli
+intervalli tra quelli esistenti, così le posizioni proiettate risultano
+distribuite lungo l'orbita.
 
 Ogni Satellite Agent recupera inoltre il proprio stato dal Simulator ogni
 secondo e invia un heartbeat periodico al `score_manager` del Simulator;

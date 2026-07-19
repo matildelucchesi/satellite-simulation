@@ -2,6 +2,7 @@
 
 const state = { pausedLogs: false, lastLogs: [], inFlight: false };
 const $ = (id) => document.getElementById(id);
+const MATERIAL_SATELLITE_ALT_PATH = "M560-32v-80q117 0 198.5-81.5T840-392h80q0 75-28.5 140.5t-77 114q-48.5 48.5-114 77T560-32Zm0-160v-80q50 0 85-35t35-85h80q0 83-58.5 141.5T560-192ZM222-57q-15 0-30-6t-27-17L23-222q-11-12-17-27t-6-30q0-16 6-30.5T23-335l127-127q23-23 57-23.5t57 22.5l50 50 28-28-50-50q-23-23-23-56t23-56l57-57q23-23 56.5-23t56.5 23l50 50 28-28-50-50q-23-23-23-56.5t23-56.5l127-127q12-12 27-18t30-6q15 0 29.5 6t26.5 18l142 142q12 11 17.5 25.5T895-730q0 15-5.5 30T872-673L745-546q-23 23-56.5 23T632-546l-50-50-28 28 50 50q23 23 22.5 56.5T603-405l-56 56q-23 23-56.5 23T434-349l-50-50-28 28 50 50q23 23 22.5 57T405-207L278-80q-11 11-25.5 17T222-57Zm0-79 42-42-142-142-42 42 142 142Zm85-85 42-42-142-142-42 42 142 142Zm184-184 56-56-142-142-56 56 142 142Zm198-198 42-42-142-142-42 42 142 142Zm85-85 42-42-142-142-42 42 142 142ZM448-504Z";
 
 document.addEventListener("DOMContentLoaded", () => {
   createStars();
@@ -42,6 +43,7 @@ function render(data) {
 
   renderKpis(satellites, heartbeatMap, currentController, migrations);
   renderNetwork(satellites, constellation.distances_km || {}, controllerState.topology || {}, scores, currentController);
+  renderEclipseForecast(satellites);
   renderSatelliteTable(satellites, heartbeatMap, scores, currentController);
   renderRouting(controllerState.routing_table || {});
   renderMigrations(migrations);
@@ -70,7 +72,7 @@ function renderKpis(satellites, heartbeats, controller, migrations) {
 }
 
 function renderNetwork(satellites, distances, topology, scores, controller) {
-  const ids = Object.keys(satellites).sort();
+  const ids = Object.keys(satellites).sort(compareSatelliteIds);
   const linksGroup = $("networkLinks");
   const nodesGroup = $("networkNodes");
   linksGroup.replaceChildren();
@@ -96,14 +98,18 @@ function renderNetwork(satellites, distances, topology, scores, controller) {
     const point = positions[id];
     const illumination = satellite.illumination?.state === "shadow" ? "shadow" : "sunlit";
     const group = svg("g", { class: `satellite-node ${illumination}`, transform: `translate(${point.x} ${point.y})` });
-    group.appendChild(svg("rect", { x: -26, y: -7, width: 16, height: 14, rx: 2, class: "node-wing" }));
-    group.appendChild(svg("rect", { x: 10, y: -7, width: 16, height: 14, rx: 2, class: "node-wing" }));
-    if (id === controller) group.appendChild(svg("circle", { r: 24, class: "controller-ring" }));
-    group.appendChild(svg("circle", { r: 14, class: "node-core" }));
-    const label = svg("text", { x: 0, y: 39, "text-anchor": "middle", class: "node-label" });
+    if (id === controller) group.appendChild(svg("circle", { r: 20, class: "controller-ring" }));
+    const icon = svg("svg", {
+      x: -16, y: -16, width: 32, height: 32,
+      viewBox: "0 -960 960 960", class: "material-satellite-icon",
+      "aria-hidden": "true",
+    });
+    icon.appendChild(svg("path", { d: MATERIAL_SATELLITE_ALT_PATH }));
+    group.appendChild(icon);
+    const label = svg("text", { x: 0, y: 31, "text-anchor": "middle", class: "node-label" });
     label.textContent = id;
     group.appendChild(label);
-    const score = svg("text", { x: 0, y: 53, "text-anchor": "middle", class: "node-score" });
+    const score = svg("text", { x: 0, y: 45, "text-anchor": "middle", class: "node-score" });
     score.textContent = scores[id] ? `score ${formatNumber(scores[id].score, 1)}` : "score —";
     group.appendChild(score);
     const title = svg("title");
@@ -114,17 +120,48 @@ function renderNetwork(satellites, distances, topology, scores, controller) {
 }
 
 function projectPositions(ids, satellites) {
-  const cx = 500, cy = 220, rx = 270, ry = 155;
   const raw = ids.map((id, index) => {
     const position = satellites[id]?.position_km || {};
-    const x = Number(position.x), y = Number(position.y);
-    if (Number.isFinite(x) && Number.isFinite(y) && Math.hypot(x, y) > 0) {
-      const angle = Math.atan2(y, x);
-      return { id, angle };
-    }
-    return { id, angle: (index / ids.length) * Math.PI * 2 - Math.PI / 2 };
+    const projected = projectVector(position);
+    return { id, angle: projected?.angle ?? (index / ids.length) * Math.PI * 2 - Math.PI / 2 };
   });
-  return Object.fromEntries(raw.map(({ id, angle }) => [id, { x: cx + Math.cos(angle) * rx, y: cy - Math.sin(angle) * ry }]));
+  return Object.fromEntries(raw.map(({ id, angle }) => [id, pointOnOrbit(angle)]));
+}
+
+function renderEclipseForecast(satellites) {
+  const horizonSeconds = 90 * 60;
+  const rows = Object.keys(satellites).sort(compareSatelliteIds).map((id) => {
+    const illumination = satellites[id]?.illumination || {};
+    const isSunlit = illumination.state === "sunlight";
+    const seconds = Number(isSunlit ? illumination.seconds_until_eclipse : illumination.seconds_until_sunlight);
+    const knownTransition = Number.isFinite(seconds) && seconds >= 0;
+    const transitionPercent = knownTransition ? Math.min(100, seconds / horizonSeconds * 100) : 100;
+    const action = isSunlit ? "entra in ombra" : "esce dall'ombra";
+    const stateLabel = isSunlit ? "LUCE" : "OMBRA";
+    const stateClass = isSunlit ? "sun-to-shadow" : "shadow-to-sun";
+    const detail = knownTransition ? `${action} tra ${formatDuration(seconds)}` : "transizione non disponibile";
+    return `<div class="forecast-row ${stateClass}">
+      <div class="forecast-name"><strong>${escapeHtml(id)}</strong><span>${stateLabel}</span></div>
+      <div class="forecast-track" title="${escapeHtml(detail)}">
+        <span class="forecast-segment forecast-current" style="width:${transitionPercent}%"></span>
+        <span class="forecast-segment forecast-next" style="left:${transitionPercent}%;width:${100 - transitionPercent}%"></span>
+        <span class="forecast-now"></span>
+        ${knownTransition && transitionPercent < 100 ? `<span class="forecast-transition" style="left:${transitionPercent}%"></span>` : ""}
+      </div>
+      <div class="forecast-detail">${escapeHtml(detail)}</div>
+    </div>`;
+  });
+  $("eclipseForecast").innerHTML = rows.length ? rows.join("") : `<div class="empty-state">Nessuna previsione disponibile</div>`;
+}
+
+function projectVector(position) {
+  const x = Number(position?.x), y = Number(position?.y);
+  if (!Number.isFinite(x) || !Number.isFinite(y) || Math.hypot(x, y) === 0) return null;
+  return { angle: Math.atan2(y, x) };
+}
+
+function pointOnOrbit(angle) {
+  return { x: 500 + Math.cos(angle) * 270, y: 220 - Math.sin(angle) * 155 };
 }
 
 function deriveLinks(ids, distances) {
@@ -135,7 +172,7 @@ function deriveLinks(ids, distances) {
       .sort((a, b) => Number(a[1]) - Number(b[1]))
       .slice(0, 2);
     candidates.forEach(([target]) => {
-      const [a, b] = [source, target].sort();
+      const [a, b] = [source, target].sort(compareSatelliteIds);
       pairs.set(`${a}:${b}`, { source: a, target: b, derived: true });
     });
   });
@@ -143,7 +180,7 @@ function deriveLinks(ids, distances) {
 }
 
 function renderSatelliteTable(satellites, heartbeats, scores, controller) {
-  const rows = Object.keys(satellites).sort().map((id) => {
+  const rows = Object.keys(satellites).sort(compareSatelliteIds).map((id) => {
     const sat = satellites[id] || {};
     const hb = heartbeats[id] || {};
     const metric = scores[id] || {};
@@ -221,6 +258,15 @@ function findController(heartbeats, evaluation) {
 function heartbeatAge(heartbeat) {
   const timestamp = Date.parse(heartbeat?.received_at || "");
   return Number.isFinite(timestamp) ? (Date.now() - timestamp) / 1000 : Infinity;
+}
+
+function compareSatelliteIds(left, right) {
+  const leftNumber = Number(String(left).match(/\d+$/)?.[0]);
+  const rightNumber = Number(String(right).match(/\d+$/)?.[0]);
+  if (Number.isFinite(leftNumber) && Number.isFinite(rightNumber)) {
+    return leftNumber - rightNumber || String(left).localeCompare(String(right));
+  }
+  return String(left).localeCompare(String(right));
 }
 
 function formatNumber(value, digits = 1) {

@@ -8,7 +8,7 @@ from typing import Any
 
 
 def load_constellation_config(path: str | Path) -> dict[str, Any]:
-    """Carica la configurazione e verifica l'invariante dei cinque satelliti."""
+    """Carica la configurazione e ne verifica consistenza e identificatori."""
 
     config_path = Path(path)
     if not config_path.is_file():
@@ -18,8 +18,19 @@ def load_constellation_config(path: str | Path) -> dict[str, Any]:
 
     satellites = data.get("satellites", [])
     expected = data.get("constellation", {}).get("satellite_count")
-    if expected != 5 or len(satellites) != expected:
-        raise ValueError("La configurazione deve descrivere esattamente 5 satelliti")
+    if not isinstance(expected, int) or isinstance(expected, bool) or expected <= 0:
+        raise ValueError("satellite_count deve essere un intero maggiore di zero")
+    if len(satellites) != expected:
+        raise ValueError(
+            f"La configurazione dichiara {expected} satelliti ma ne descrive "
+            f"{len(satellites)}"
+        )
     if any("id" not in satellite for satellite in satellites):
         raise ValueError("Ogni satellite deve avere un identificatore")
+    satellite_ids = [satellite["id"] for satellite in satellites]
+    if len(set(satellite_ids)) != expected:
+        raise ValueError("Gli identificatori dei satelliti devono essere unici")
+    controller_id = data.get("constellation", {}).get("controller_satellite_id")
+    if controller_id not in satellite_ids:
+        raise ValueError("controller_satellite_id deve riferirsi a un satellite noto")
     return data

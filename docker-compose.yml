@@ -95,6 +95,51 @@ services:
     ports:
       - "8105:5000"
 
+  satellite-6:
+    <<: *satellite-agent
+    environment:
+      <<: *satellite-environment
+      SATELLITE_ID: SAT-6
+      CONTROLLER_ENABLED: "false"
+    ports:
+      - "8106:5000"
+
+  satellite-7:
+    <<: *satellite-agent
+    environment:
+      <<: *satellite-environment
+      SATELLITE_ID: SAT-7
+      CONTROLLER_ENABLED: "false"
+    ports:
+      - "8107:5000"
+
+  satellite-8:
+    <<: *satellite-agent
+    environment:
+      <<: *satellite-environment
+      SATELLITE_ID: SAT-8
+      CONTROLLER_ENABLED: "false"
+    ports:
+      - "8108:5000"
+
+  satellite-9:
+    <<: *satellite-agent
+    environment:
+      <<: *satellite-environment
+      SATELLITE_ID: SAT-9
+      CONTROLLER_ENABLED: "false"
+    ports:
+      - "8109:5000"
+
+  satellite-10:
+    <<: *satellite-agent
+    environment:
+      <<: *satellite-environment
+      SATELLITE_ID: SAT-10
+      CONTROLLER_ENABLED: "false"
+    ports:
+      - "8110:5000"
+
   controller:
     build:
       context: .
@@ -138,7 +183,7 @@ services:
     volumes:
       - ./logs:/app/logs:ro
     ports:
-      - "8080:5000"
+      - "${DASHBOARD_PORT:-8081}:5000"
     depends_on:
       simulator:
         condition: service_healthy

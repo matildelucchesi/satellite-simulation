@@ -28,7 +28,7 @@ class SimulatorApiTests(unittest.TestCase):
         response = self.client.get("/api/v1/constellation")
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.get_json()["satellite_count"], 5)
+        self.assertEqual(response.get_json()["satellite_count"], 10)
 
     def test_unknown_satellite_returns_404(self):
         response = self.client.get("/api/v1/satellites/SAT-99")
@@ -36,13 +36,13 @@ class SimulatorApiTests(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_heartbeats_produce_scores_for_all_satellites(self):
-        for satellite_id in range(1, 6):
+        for satellite_id in range(1, 11):
             response = self.client.post(
                 "/api/v1/heartbeats",
                 json={
                     "id": satellite_id,
                     "time_to_eclipse": satellite_id * 100,
-                    "neighbors": 4,
+                    "neighbors": 9,
                     "cpu": satellite_id * 5,
                     "controller": satellite_id == 1,
                 },
@@ -54,9 +54,9 @@ class SimulatorApiTests(unittest.TestCase):
         metrics_state = self.client.get("/api/v1/metrics").get_json()
 
         self.assertTrue(score_state["evaluation"]["ready"])
-        self.assertEqual(len(score_state["evaluation"]["scores"]), 5)
-        self.assertEqual(heartbeat_state["count"], 5)
-        self.assertEqual(metrics_state["heartbeat_count"], 5)
+        self.assertEqual(len(score_state["evaluation"]["scores"]), 10)
+        self.assertEqual(heartbeat_state["count"], 10)
+        self.assertEqual(metrics_state["heartbeat_count"], 10)
         self.assertEqual(metrics_state["controller_election_count"], 1)
         self.assertIsNotNone(
             metrics_state["last_selected_controller_satellite_id"]

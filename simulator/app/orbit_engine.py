@@ -30,7 +30,7 @@ class TrackedSatellite:
 
 def load_tle_file(
     path: str | Path,
-    expected_count: int = 5,
+    expected_count: int | None = None,
     satellite_ids: list[str] | None = None,
 ) -> tuple[Any, list[TrackedSatellite]]:
     """Carica e valida un file TLE nel formato nome + due righe."""
@@ -48,7 +48,7 @@ def load_tle_file(
         )
 
     count = len(lines) // 3
-    if count != expected_count:
+    if expected_count is not None and count != expected_count:
         raise ValueError(
             f"Il file TLE contiene {count} satelliti; ne erano attesi {expected_count}"
         )
@@ -269,23 +269,77 @@ class ConstellationSimulator:
         is_sunlit: bool,
     ) -> dict[str, Any]:
         if not is_sunlit:
-            self._eclipse_cache.pop(tracked.satellite_id, None)
+            cached = self._eclipse_cache.get(tracked.satellite_id)
+            if (
+                cached is None
+                or cached.get("state") != "shadow"
+                or cached["valid_until"] <= current_time
+            ):
+                next_sunlight = self._find_next_sunlight(
+                    tracked.satellite, current_time
+                )
+                cached = {
+                    "state": "shadow",
+                    "next_sunlight": next_sunlight,
+                    "valid_until": (
+                        next_sunlight
+                        if next_sunlight is not None
+                        else current_time + timedelta(minutes=5)
+                    ),
+                }
+                self._eclipse_cache[tracked.satellite_id] = cached
+            next_sunlight = cached["next_sunlight"]
+            seconds_until_sunlight = (
+                max(0.0, (next_sunlight - current_time).total_seconds())
+                if next_sunlight is not None
+                else None
+            )
             return {
                 "state": "shadow",
                 "is_sunlit": False,
                 "seconds_until_eclipse": 0.0,
                 "next_eclipse_at": None,
+                "next_eclipse_position_km": None,
+                "seconds_until_sunlight": (
+                    round(seconds_until_sunlight, 3)
+                    if seconds_until_sunlight is not None
+                    else None
+                ),
+                "next_sunlight_at": (
+                    _isoformat(next_sunlight) if next_sunlight else None
+                ),
             }
 
         cached = self._eclipse_cache.get(tracked.satellite_id)
-        if cached is None or cached["valid_until"] <= current_time:
+        if (
+            cached is None
+            or cached.get("state") != "sunlight"
+            or cached["valid_until"] <= current_time
+        ):
             next_eclipse = self._find_next_eclipse(tracked.satellite, current_time)
+            next_eclipse_position = (
+                _vector(
+                    np.asarray(
+                        tracked.satellite.at(
+                            self.timescale.from_datetime(next_eclipse)
+                        ).xyz.km,
+                        dtype=float,
+                    )
+                )
+                if next_eclipse is not None
+                else None
+            )
             valid_until = (
                 next_eclipse
                 if next_eclipse is not None
                 else current_time + timedelta(minutes=5)
             )
-            cached = {"next_eclipse": next_eclipse, "valid_until": valid_until}
+            cached = {
+                "state": "sunlight",
+                "next_eclipse": next_eclipse,
+                "next_eclipse_position_km": next_eclipse_position,
+                "valid_until": valid_until,
+            }
             self._eclipse_cache[tracked.satellite_id] = cached
 
         next_eclipse = cached["next_eclipse"]
@@ -299,6 +353,11 @@ class ConstellationSimulator:
             "is_sunlit": True,
             "seconds_until_eclipse": round(seconds, 3) if seconds is not None else None,
             "next_eclipse_at": _isoformat(next_eclipse) if next_eclipse else None,
+            "next_eclipse_position_km": deepcopy(
+                cached.get("next_eclipse_position_km")
+            ),
+            "seconds_until_sunlight": None,
+            "next_sunlight_at": None,
         }
 
     def _find_next_eclipse(
@@ -316,6 +375,26 @@ class ConstellationSimulator:
         event_times, states = find_discrete(start, end, sunlight)
         for event_time, state in zip(event_times, states):
             if not bool(state):
+                result = event_time.utc_datetime().astimezone(timezone.utc)
+                if result > current_time:
+                    return result
+        return None
+
+    def _find_next_sunlight(
+        self, satellite: EarthSatellite, current_time: datetime
+    ) -> datetime | None:
+        start = self.timescale.from_datetime(current_time)
+        end = self.timescale.from_datetime(
+            current_time + timedelta(hours=self.eclipse_search_hours)
+        )
+
+        def sunlight(time: Any) -> Any:
+            return satellite.at(time).is_sunlit(self.ephemeris)
+
+        sunlight.step_days = 60.0 / 86_400.0
+        event_times, states = find_discrete(start, end, sunlight)
+        for event_time, state in zip(event_times, states):
+            if bool(state):
                 result = event_time.utc_datetime().astimezone(timezone.utc)
                 if result > current_time:
                     return result
