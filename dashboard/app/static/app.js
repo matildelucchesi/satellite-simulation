@@ -38,8 +38,14 @@ function render(data) {
   const evaluation = (data.scores || {}).evaluation || {};
   const scores = evaluation.scores || {};
   const controllerState = data.controller_state || {};
+  const startupController = data.startup_controller || {};
   const migrations = data.migrations || {};
-  const currentController = findController(heartbeatMap, evaluation);
+  const currentController = findController(
+    heartbeatMap,
+    evaluation,
+    controllerState,
+    startupController,
+  );
   const displayedMigration = selectDisplayedMigration(migrations);
 
   renderKpis(satellites, heartbeatMap, currentController, migrations);
@@ -333,6 +339,7 @@ function migrationStepDefinition(name) {
     stop_source_controller: { kind: "default", badge: "STOP", title: "Controller sorgente arrestato" },
     shutdown_controller: { kind: "default", badge: "DOWN", title: "Microservizio Controller disattivato" },
     start_target_controller: { kind: "complete", badge: "START", title: "Controller avviato sul target" },
+    update_controller_host: { kind: "complete", badge: "HOST", title: "Host logico del Controller aggiornato" },
     rollback_stop_target: { kind: "failed", badge: "ROLLBACK", title: "Rollback: arresto target" },
     rollback_restore_controller: { kind: "failed", badge: "ROLLBACK", title: "Rollback: ripristino Controller" },
     rollback_resume_source: { kind: "failed", badge: "ROLLBACK", title: "Rollback: ripresa sorgente" },
@@ -515,9 +522,14 @@ function showErrors(errors) {
   banner.classList.remove("hidden");
 }
 
-function findController(heartbeats, evaluation) {
+function findController(heartbeats, evaluation, controllerState = {}, startupController = {}) {
   const reported = Object.entries(heartbeats).filter(([, heartbeat]) => heartbeat.controller).map(([id]) => id);
-  return reported.length === 1 ? reported[0] : evaluation.current_controller_satellite_id || null;
+  if (reported.length === 1) return reported[0];
+  const controllerHost = controllerState.host_satellite_id;
+  if (controllerHost && controllerHost !== "UNASSIGNED") return controllerHost;
+  return evaluation.current_controller_satellite_id
+    || (startupController.status === "active" ? startupController.selected_satellite_id : null)
+    || null;
 }
 
 function heartbeatAge(heartbeat) {

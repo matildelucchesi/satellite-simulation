@@ -8,6 +8,7 @@ from .metrics import MetricsManager
 from .migration_manager import MigrationManager, MigrationManagerError
 from .orbit_engine import ConstellationSimulator
 from .score_manager import ScoreManager, ScoreManagerError
+from .startup_controller import StartupControllerManager
 
 
 def create_api_blueprint(
@@ -16,6 +17,7 @@ def create_api_blueprint(
     score_manager: ScoreManager,
     migration_manager: MigrationManager,
     metrics_manager: MetricsManager,
+    startup_controller_manager: StartupControllerManager,
 ) -> Blueprint:
     """Crea le route iniettando esplicitamente i casi d'uso richiesti."""
 
@@ -77,6 +79,10 @@ def create_api_blueprint(
     @api.get("/api/v1/scores")
     def scores():
         return jsonify(score_manager.snapshot())
+
+    @api.get("/api/v1/startup-controller")
+    def startup_controller():
+        return jsonify(startup_controller_manager.snapshot())
 
     @api.route("/api/v1/migrations", methods=["GET", "POST"])
     def migrations():

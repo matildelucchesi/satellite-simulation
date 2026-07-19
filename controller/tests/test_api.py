@@ -40,8 +40,19 @@ class ControllerApiTests(unittest.TestCase):
                 "heartbeats",
                 "sequence_number",
                 "timestamp",
+                "host_satellite_id",
             },
         )
+
+    def test_host_can_be_assigned_after_startup_election(self):
+        updated = self.client.post("/host", json={"satellite_id": "SAT-4"})
+        health = self.client.get("/health")
+        state = self.client.get("/state")
+
+        self.assertEqual(updated.status_code, 200)
+        self.assertEqual(updated.get_json()["host_satellite_id"], "SAT-4")
+        self.assertEqual(health.get_json()["host_satellite_id"], "SAT-4")
+        self.assertEqual(state.get_json()["host_satellite_id"], "SAT-4")
 
     def test_checkpoint_restore_and_shutdown(self):
         self.client.post("/heartbeat", json=heartbeat())

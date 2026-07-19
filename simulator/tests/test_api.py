@@ -35,6 +35,25 @@ class SimulatorApiTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 404)
 
+    def test_startup_controller_is_minimum_sunlight_above_two_minutes(self):
+        response = self.client.get("/api/v1/startup-controller")
+        startup = response.get_json()
+        constellation = self.simulator.snapshot()["satellites"]
+        eligible = {
+            satellite_id: satellite["illumination"]["seconds_until_eclipse"]
+            for satellite_id, satellite in constellation.items()
+            if satellite["illumination"]["state"] == "sunlight"
+            and satellite["illumination"]["seconds_until_eclipse"] > 120
+        }
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(eligible)
+        self.assertEqual(
+            startup["selected_satellite_id"],
+            min(eligible, key=lambda satellite_id: eligible[satellite_id]),
+        )
+        self.assertGreater(startup["selected_time_to_eclipse_seconds"], 120)
+
     def test_heartbeats_produce_scores_for_all_satellites(self):
         for satellite_id in range(1, 8):
             response = self.client.post(

@@ -9,7 +9,6 @@ from .service import ControllerService, ControllerStateError
 
 def create_api_blueprint(
     service_name: str,
-    host_satellite_id: str,
     controller: ControllerService,
 ) -> Blueprint:
     api = Blueprint("controller_api", __name__)
@@ -20,7 +19,7 @@ def create_api_blueprint(
         return jsonify(
             {
                 "service": service_name,
-                "host_satellite_id": host_satellite_id,
+                "host_satellite_id": controller.host_satellite_id,
                 "status": "ok" if active else "shutdown",
                 "active": active,
                 "quiesced": controller.quiesced,
@@ -51,7 +50,23 @@ def create_api_blueprint(
 
     @api.get("/state")
     def state():
-        return jsonify(controller.snapshot())
+        return jsonify(
+            {
+                **controller.snapshot(),
+                "host_satellite_id": controller.host_satellite_id,
+            }
+        )
+
+    @api.post("/host")
+    def update_host():
+        payload = request.get_json(silent=True)
+        if payload is None:
+            return jsonify({"error": "invalid_json"}), 400
+        try:
+            result = controller.set_host_satellite(payload.get("satellite_id"))
+        except ControllerStateError as exc:
+            return jsonify({"error": "invalid_host", "message": str(exc)}), 400
+        return jsonify(result), 200
 
     @api.post("/checkpoint")
     def checkpoint():

@@ -548,6 +548,7 @@ class MigrationManager:
         context["controller_shutdown"] = False
         self._start_target(migration)
         context["target_started"] = True
+        self._set_controller_host(migration, migration["target_satellite_id"])
         migration["metrics"]["downtime_ms"] = round(
             (monotonic() - context["downtime_started"]) * 1000, 3
         )
@@ -599,6 +600,7 @@ class MigrationManager:
         context["controller_quiesced"] = False
         self._start_target(migration)
         context["target_started"] = True
+        self._set_controller_host(migration, migration["target_satellite_id"])
         migration["metrics"]["downtime_ms"] = round(
             (monotonic() - context["downtime_started"]) * 1000, 3
         )
@@ -701,6 +703,18 @@ class MigrationManager:
             "POST",
             f"{source_url}/stop_controller",
             None,
+            {200},
+        )
+
+    def _set_controller_host(
+        self, migration: dict[str, Any], satellite_id: str
+    ) -> None:
+        self._call_step(
+            migration,
+            "update_controller_host",
+            "POST",
+            f"{self.config.controller_url}/host",
+            {"satellite_id": satellite_id},
             {200},
         )
 
@@ -809,6 +823,9 @@ class MigrationManager:
                     f"{source_url}/start_controller",
                     None,
                     {200},
+                )
+                self._set_controller_host(
+                    migration, migration["source_satellite_id"]
                 )
         except Exception:
             succeeded = False

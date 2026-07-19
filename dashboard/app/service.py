@@ -34,6 +34,9 @@ class DashboardDataService:
             "scores": f"{self.simulator_url}/api/v1/scores",
             "heartbeats": f"{self.simulator_url}/api/v1/heartbeats",
             "migrations": f"{self.simulator_url}/api/v1/migrations",
+            "startup_controller": (
+                f"{self.simulator_url}/api/v1/startup-controller"
+            ),
             "controller_state": f"{self.controller_url}/state",
             "controller_health": f"{self.controller_url}/health",
         }
@@ -165,4 +168,3 @@ def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace(
         "+00:00", "Z"
     )
-

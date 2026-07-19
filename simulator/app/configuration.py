@@ -31,6 +31,9 @@ def load_constellation_config(path: str | Path) -> dict[str, Any]:
     if len(set(satellite_ids)) != expected:
         raise ValueError("Gli identificatori dei satelliti devono essere unici")
     controller_id = data.get("constellation", {}).get("controller_satellite_id")
-    if controller_id not in satellite_ids:
+    if controller_id != "AUTO" and controller_id not in satellite_ids:
         raise ValueError("controller_satellite_id deve riferirsi a un satellite noto")
+    initial_controller = data.get("constellation", {}).get("initial_controller")
+    if controller_id == "AUTO" and not isinstance(initial_controller, dict):
+        raise ValueError("initial_controller è obbligatorio quando il Controller è AUTO")
     return data

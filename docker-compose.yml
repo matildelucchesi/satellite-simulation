@@ -16,6 +16,7 @@ x-satellite-agent: &satellite-agent
     STATE_SYNC_INTERVAL_SECONDS: ${STATE_SYNC_INTERVAL_SECONDS:-1}
     HEARTBEAT_INTERVAL_SECONDS: ${HEARTBEAT_INTERVAL_SECONDS:-5}
     HTTP_REQUEST_TIMEOUT_SECONDS: ${HTTP_REQUEST_TIMEOUT_SECONDS:-2}
+    CONTROLLER_ENABLED: "false"
   volumes:
     - ./config:/app/config:ro
     - ./logs:/app/logs
@@ -55,7 +56,6 @@ services:
     environment:
       <<: *satellite-environment
       SATELLITE_ID: SAT-1
-      CONTROLLER_ENABLED: "true"
     ports:
       - "8101:5000"
 
@@ -64,7 +64,6 @@ services:
     environment:
       <<: *satellite-environment
       SATELLITE_ID: SAT-2
-      CONTROLLER_ENABLED: "false"
     ports:
       - "8102:5000"
 
@@ -73,7 +72,6 @@ services:
     environment:
       <<: *satellite-environment
       SATELLITE_ID: SAT-3
-      CONTROLLER_ENABLED: "false"
     ports:
       - "8103:5000"
 
@@ -82,7 +80,6 @@ services:
     environment:
       <<: *satellite-environment
       SATELLITE_ID: SAT-4
-      CONTROLLER_ENABLED: "false"
     ports:
       - "8104:5000"
 
@@ -91,7 +88,6 @@ services:
     environment:
       <<: *satellite-environment
       SATELLITE_ID: SAT-5
-      CONTROLLER_ENABLED: "false"
     ports:
       - "8105:5000"
 
@@ -100,7 +96,6 @@ services:
     environment:
       <<: *satellite-environment
       SATELLITE_ID: SAT-6
-      CONTROLLER_ENABLED: "false"
     ports:
       - "8106:5000"
 
@@ -109,7 +104,6 @@ services:
     environment:
       <<: *satellite-environment
       SATELLITE_ID: SAT-7
-      CONTROLLER_ENABLED: "false"
     ports:
       - "8107:5000"
 
@@ -122,8 +116,7 @@ services:
     environment:
       SERVICE_NAME: controller
       SERVICE_PORT: "5000"
-      HOST_SATELLITE_ID: SAT-1
-      HOST_SATELLITE_URL: http://satellite-1:5000
+      HOST_SATELLITE_ID: UNASSIGNED
       CONFIG_PATH: /app/config/constellation.json
       CHECKPOINT_PATH: /app/state/controller-checkpoint.json
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
@@ -134,7 +127,7 @@ services:
     ports:
       - "8001:5000"
     depends_on:
-      satellite-1:
+      simulator:
         condition: service_healthy
     networks:
       - satellite-network

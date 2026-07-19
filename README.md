@@ -9,8 +9,9 @@ del Controller, metriche e dashboard in tempo reale.
 - `simulator`: coordinatore headless che propaga i TLE con Skyfield e conserva
   lo stato corrente della costellazione.
 - `satellite_agent`: immagine riutilizzata per i sette agenti satellitari.
-- `controller`: microservizio Controller associato logicamente a `SAT-1`.
-- `dashboard`: base per la futura interfaccia di monitoraggio.
+- `controller`: microservizio Controller associato dinamicamente al satellite
+  eletto dal Simulator.
+- `dashboard`: interfaccia di monitoraggio in tempo reale.
 - `common`: configurazioni e utilità condivise tra i servizi.
 - `config`: configurazione JSON della costellazione.
 - `logs`: destinazione locale dei log generati dai container.
@@ -30,6 +31,7 @@ Endpoint iniziali:
 - Score globali: `http://localhost:8000/api/v1/scores`
 - Heartbeat ricevuti: `http://localhost:8000/api/v1/heartbeats`
 - Migrazioni raccomandate: `http://localhost:8000/api/v1/migrations`
+- Elezione iniziale: `http://localhost:8000/api/v1/startup-controller`
 - Controller: `http://localhost:8001/health`
 - Dashboard: `http://localhost:8081/health`
 - Interfaccia Dashboard: `http://localhost:8081/`
@@ -50,6 +52,7 @@ API del Controller:
 - `GET /heartbeat`: elenco degli heartbeat ricevuti; accetta `?id=SAT-1`.
 - `POST /heartbeat`: ricezione degli heartbeat dai Satellite Agent.
 - `GET /state`: topologia, routing table, heartbeat e versione dello stato.
+- `POST /host`: aggiornamento del satellite che ospita logicamente il Controller.
 - `POST /checkpoint`: serializzazione e salvataggio atomico dello stato.
 - `POST /restore`: ripristino dal JSON inviato o dall'ultimo file salvato.
 - `POST /shutdown`: checkpoint e disattivazione logica del Controller.
@@ -81,6 +84,14 @@ secondo e invia un heartbeat periodico al `score_manager` del Simulator;
 eventuali errori di consegna restano visibili in `GET /status` senza
 interrompere l'agente. I pesi `w1`...`w4`, il TTL degli heartbeat e le soglie di
 migrazione sono configurabili in `config/scoring.json`.
+
+All'avvio nessun Satellite Agent ospita il Controller. Il Simulator attende il
+primo stato orbitale, considera soltanto i satelliti in luce con piu di 120
+secondi prima dell'eclissi e sceglie quello con il tempo residuo minimo. Quindi
+attiva il Controller su quell'agente e disattiva esplicitamente tutti gli
+altri. La soglia e la strategia sono configurate nella sezione
+`initial_controller` di `config/constellation.json`; stato, candidati e scelta
+sono visibili in `GET /api/v1/startup-controller`.
 
 Il `migration_manager` esegue in modo asincrono una migrazione alla volta. Il
 protocollo, gli URL REST, timeout e retry sono configurabili in

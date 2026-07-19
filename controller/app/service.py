@@ -110,6 +110,7 @@ class ControllerService:
         self,
         checkpoint_path: str | Path,
         checkpoint_repository: CheckpointRepository | None = None,
+        host_satellite_id: str = "UNASSIGNED",
     ) -> None:
         self._checkpoint_repository = checkpoint_repository or (
             JsonFileCheckpointRepository(checkpoint_path)
@@ -119,6 +120,23 @@ class ControllerService:
         self._state = ControllerState.empty()
         self._active = True
         self._quiesced = False
+        self._host_satellite_id = _validate_host_satellite_id(host_satellite_id)
+
+    @property
+    def host_satellite_id(self) -> str:
+        with self._lock:
+            return self._host_satellite_id
+
+    def set_host_satellite(self, satellite_id: Any) -> dict[str, Any]:
+        normalized = _validate_host_satellite_id(satellite_id)
+        with self._lock:
+            previous = self._host_satellite_id
+            self._host_satellite_id = normalized
+            return {
+                "status": "updated",
+                "previous_host_satellite_id": previous,
+                "host_satellite_id": normalized,
+            }
 
     @property
     def active(self) -> bool:
@@ -363,3 +381,14 @@ def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace(
         "+00:00", "Z"
     )
+
+
+def _validate_host_satellite_id(value: Any) -> str:
+    if not isinstance(value, str):
+        raise ControllerStateError("satellite_id deve essere una stringa")
+    normalized = value.strip().upper()
+    if normalized == "UNASSIGNED":
+        return normalized
+    if not normalized.startswith("SAT-") or not normalized[4:].isdigit():
+        raise ControllerStateError("satellite_id deve avere formato SAT-N")
+    return normalized

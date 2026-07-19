@@ -118,6 +118,13 @@ class ControllerServiceTests(unittest.TestCase):
 
         self.assertEqual(restored, expected)
 
+    def test_host_satellite_can_be_updated_dynamically(self):
+        result = self.controller.set_host_satellite("SAT-7")
+
+        self.assertEqual(result["previous_host_satellite_id"], "UNASSIGNED")
+        self.assertEqual(result["host_satellite_id"], "SAT-7")
+        self.assertEqual(self.controller.host_satellite_id, "SAT-7")
+
 
 if __name__ == "__main__":
     unittest.main()

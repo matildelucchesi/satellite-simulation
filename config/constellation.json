@@ -2,10 +2,15 @@
   "constellation": {
     "name": "starlink-simulation",
     "satellite_count": 7,
-    "controller_satellite_id": "SAT-1"
+    "controller_satellite_id": "AUTO",
+    "initial_controller": {
+      "strategy": "minimum_remaining_sunlight",
+      "minimum_sunlight_seconds": 120,
+      "retry_seconds": 1
+    }
   },
   "satellites": [
-    {"id": "SAT-1", "name": "STARLINK-5426", "controller": true},
+    {"id": "SAT-1", "name": "STARLINK-5426", "controller": false},
     {"id": "SAT-2", "name": "STARLINK-3779", "controller": false},
     {"id": "SAT-3", "name": "STARLINK-3136", "controller": false},
     {"id": "SAT-4", "name": "STARLINK-4104", "controller": false},

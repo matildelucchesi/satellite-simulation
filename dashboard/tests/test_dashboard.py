@@ -14,6 +14,10 @@ class DashboardDataServiceTests(unittest.TestCase):
             "/api/v1/scores": {"evaluation": {"scores": {}}},
             "/api/v1/heartbeats": {"heartbeats": {}},
             "/api/v1/migrations": {"migrations": []},
+            "/api/v1/startup-controller": {
+                "status": "active",
+                "selected_satellite_id": "SAT-2",
+            },
             "/state": {"topology": {}, "routing_table": {}},
             "/health": {"status": "ok"},
         }
@@ -35,6 +39,9 @@ class DashboardDataServiceTests(unittest.TestCase):
 
         self.assertIn("constellation", snapshot)
         self.assertIn("controller_state", snapshot)
+        self.assertEqual(
+            snapshot["startup_controller"]["selected_satellite_id"], "SAT-2"
+        )
         self.assertEqual(snapshot["errors"], [])
 
 
