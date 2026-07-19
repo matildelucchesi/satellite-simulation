@@ -168,28 +168,47 @@ class ScoreManager:
             )
             return
 
+        controller_ids = [
+            satellite_id
+            for satellite_id in self.satellite_ids
+            if self._heartbeats[satellite_id]["controller"]
+        ]
+        if len(controller_ids) != 1:
+            reason = (
+                "controller_not_reported"
+                if not controller_ids
+                else "multiple_controllers_reported"
+            )
+            self._evaluation = self._empty_evaluation(
+                reason,
+                reported_controllers=controller_ids,
+            )
+            return
+        current_controller = controller_ids[0]
+
         distances = self._constellation_state.get("distances_km", {})
         if not isinstance(distances, dict) or not distances:
             self._evaluation = self._empty_evaluation("waiting_for_constellation")
+            return
+        controller_distances = distances.get(current_controller)
+        if not isinstance(controller_distances, dict):
+            self._evaluation = self._empty_evaluation(
+                "waiting_for_distances",
+                missing_distances=list(self.satellite_ids),
+                current_controller=current_controller,
+            )
             return
 
         scores: dict[str, dict[str, Any]] = {}
         missing_distances: list[str] = []
         for satellite_id in self.satellite_ids:
-            satellite_distances = distances.get(satellite_id)
-            if not isinstance(satellite_distances, dict):
-                missing_distances.append(satellite_id)
-                continue
-            other_distances = [
-                float(value)
-                for target_id, value in satellite_distances.items()
-                if target_id != satellite_id
-                and target_id in self.satellite_ids
-                and isinstance(value, (int, float))
-                and not isinstance(value, bool)
-                and math.isfinite(value)
-            ]
-            if len(other_distances) != len(self.satellite_ids) - 1:
+            distance_from_controller = controller_distances.get(satellite_id)
+            if (
+                isinstance(distance_from_controller, bool)
+                or not isinstance(distance_from_controller, (int, float))
+                or not math.isfinite(distance_from_controller)
+                or distance_from_controller < 0
+            ):
                 missing_distances.append(satellite_id)
                 continue
 
@@ -197,7 +216,7 @@ class ScoreManager:
             time_to_eclipse = heartbeat["time_to_eclipse"]
             t_value = float(time_to_eclipse) if time_to_eclipse is not None else 0.0
             n_value = int(heartbeat["neighbors"])
-            d_value = sum(other_distances) / len(other_distances)
+            d_value = float(distance_from_controller)
             l_value = float(heartbeat["cpu"])
             weights = self.config.weights
             score = (
@@ -216,28 +235,20 @@ class ScoreManager:
 
         if missing_distances:
             self._evaluation = self._empty_evaluation(
-                "waiting_for_distances", missing_distances=missing_distances
+                "waiting_for_distances",
+                missing_distances=missing_distances,
+                current_controller=current_controller,
             )
             return
 
         selected_id = sorted(
             scores, key=lambda item: (-scores[item]["score"], item)
         )[0]
-        controller_ids = [
-            item for item in self.satellite_ids if self._heartbeats[item]["controller"]
-        ]
-        current_controller = controller_ids[0] if len(controller_ids) == 1 else None
         migration_required = False
         score_delta: float | None = None
         reason = "best_candidate_is_current_controller"
 
-        if current_controller is None:
-            reason = (
-                "controller_not_reported"
-                if not controller_ids
-                else "multiple_controllers_reported"
-            )
-        elif selected_id != current_controller:
+        if selected_id != current_controller:
             score_delta = scores[selected_id]["score"] - scores[current_controller]["score"]
             if score_delta < self.config.minimum_score_improvement:
                 reason = "improvement_below_threshold"
@@ -254,6 +265,8 @@ class ScoreManager:
             "scores": scores,
             "selected_satellite_id": selected_id,
             "current_controller_satellite_id": current_controller,
+            "distance_reference_satellite_id": current_controller,
+            "reported_controller_satellite_ids": [current_controller],
             "score_delta": round(score_delta, 6) if score_delta is not None else None,
             "migration_required": migration_required,
             "missing_heartbeats": [],
@@ -298,7 +311,11 @@ class ScoreManager:
             "evaluated_at": _isoformat(datetime.now(timezone.utc)),
             "scores": {},
             "selected_satellite_id": None,
-            "current_controller_satellite_id": None,
+            "current_controller_satellite_id": details.get("current_controller"),
+            "distance_reference_satellite_id": details.get("current_controller"),
+            "reported_controller_satellite_ids": details.get(
+                "reported_controllers", []
+            ),
             "score_delta": None,
             "migration_required": False,
             "missing_heartbeats": details.get("missing", []),

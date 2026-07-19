@@ -85,6 +85,13 @@ eventuali errori di consegna restano visibili in `GET /status` senza
 interrompere l'agente. I pesi `w1`...`w4`, il TTL degli heartbeat e le soglie di
 migrazione sono configurabili in `config/scoring.json`.
 
+Lo score di ogni candidato viene sempre calcolato rispetto al satellite che
+ospita il Controller in quel momento: `D` e la distanza diretta tra il
+Controller corrente e il candidato. Se gli heartbeat non identificano
+esattamente un Controller, lo scoring resta in attesa e non puo richiedere una
+migrazione. Dopo un handover, il nuovo Controller diventa automaticamente il
+nuovo riferimento per tutti gli score.
+
 All'avvio nessun Satellite Agent ospita il Controller. Il Simulator attende il
 primo stato orbitale, considera soltanto i satelliti in luce con piu di 120
 secondi prima dell'eclissi e sceglie quello con il tempo residuo minimo. Quindi

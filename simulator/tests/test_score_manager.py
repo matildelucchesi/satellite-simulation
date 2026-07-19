@@ -85,14 +85,40 @@ class ScoreManagerTests(unittest.TestCase):
 
         evaluation = self.manager.snapshot()["evaluation"]
 
-        self.assertEqual(evaluation["scores"]["SAT-1"]["score"], 95.0)
+        self.assertEqual(evaluation["scores"]["SAT-1"]["score"], 110.0)
         self.assertEqual(evaluation["scores"]["SAT-2"]["score"], 190.0)
+        self.assertEqual(evaluation["scores"]["SAT-1"]["D"], 0.0)
+        self.assertEqual(evaluation["scores"]["SAT-3"]["D"], 200.0)
+        self.assertEqual(evaluation["distance_reference_satellite_id"], "SAT-1")
         self.assertEqual(evaluation["selected_satellite_id"], "SAT-2")
         self.assertTrue(evaluation["migration_required"])
         latest = self.migrations.snapshot()["latest"]
         self.assertEqual(latest["source_satellite_id"], "SAT-1")
         self.assertEqual(latest["target_satellite_id"], "SAT-2")
         self.assertEqual(latest["mode"], "hot")
+
+    def test_waits_when_there_is_no_unique_controller_reference(self):
+        self.manager.record_heartbeat(heartbeat(1, 100, 10))
+        self.manager.record_heartbeat(heartbeat(2, 200, 20))
+        self.manager.record_heartbeat(heartbeat(3, 150, 30))
+
+        evaluation = self.manager.snapshot()["evaluation"]
+
+        self.assertFalse(evaluation["ready"])
+        self.assertEqual(evaluation["reason"], "controller_not_reported")
+        self.assertEqual(evaluation["scores"], {})
+
+    def test_recalculates_distances_from_the_new_controller(self):
+        self.manager.record_heartbeat(heartbeat(1, 100, 10))
+        self.manager.record_heartbeat(heartbeat(2, 200, 20, controller=True))
+        self.manager.record_heartbeat(heartbeat(3, 150, 30))
+
+        evaluation = self.manager.snapshot()["evaluation"]
+
+        self.assertEqual(evaluation["distance_reference_satellite_id"], "SAT-2")
+        self.assertEqual(evaluation["scores"]["SAT-1"]["D"], 100.0)
+        self.assertEqual(evaluation["scores"]["SAT-2"]["D"], 0.0)
+        self.assertEqual(evaluation["scores"]["SAT-3"]["D"], 100.0)
 
     def test_weights_are_loaded_from_json_file(self):
         with TemporaryDirectory() as directory:
