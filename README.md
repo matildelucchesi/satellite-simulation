@@ -96,3 +96,10 @@ La Dashboard Flask aggrega Simulator e Controller tramite `/api/dashboard` e
 aggiorna ogni secondo una rete SVG, tabella satelliti, routing table, heartbeat,
 score, luce/ombra, migrazioni e stream degli eventi. Non usa CDN o librerie
 frontend esterne ed è quindi disponibile anche senza accesso Internet.
+
+Il modulo Metrics del Simulator registra automaticamente heartbeat ed elezioni
+del Controller e aggrega numero di migrazioni, ACK, downtime e durata degli
+handover. `GET /api/v1/metrics` restituisce lo snapshot JSON corrente. Gli
+endpoint `/api/v1/metrics/export.json` e `/api/v1/metrics/export.csv` scaricano
+lo stesso snapshot nei due formati; il tempo totale viene calcolato dall'avvio
+del processo Simulator.

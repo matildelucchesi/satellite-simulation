@@ -9,7 +9,7 @@ import os
 from pathlib import Path
 from typing import Any
 
-from flask import Flask, jsonify, request
+from flask import Flask, Response, jsonify, request
 
 from common.settings import ServiceSettings
 
@@ -18,6 +18,7 @@ from .migration_manager import (
     MigrationManager,
     MigrationManagerError,
 )
+from .metrics import MetricsManager
 from .orbit_engine import ConstellationSimulator
 from .score_manager import ScoreManager, ScoreManagerConfig, ScoreManagerError
 
@@ -54,10 +55,12 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
         config=MigrationConfig.from_file(migration_config_path),
         satellite_ids=satellite_ids,
     )
+    metrics_manager = MetricsManager(migration_manager.snapshot)
     score_manager = ScoreManager(
         satellite_ids=satellite_ids,
         config=ScoreManagerConfig.from_file(scoring_config_path),
         migration_notifier=migration_manager.notify_migration,
+        evaluation_listener=metrics_manager.record_election,
     )
 
     simulator = ConstellationSimulator(
@@ -71,6 +74,7 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
     app.extensions["constellation_simulator"] = simulator
     app.extensions["score_manager"] = score_manager
     app.extensions["migration_manager"] = migration_manager
+    app.extensions["metrics_manager"] = metrics_manager
 
     if app.config["SIMULATOR_AUTOSTART"]:
         migration_manager.start()
@@ -122,6 +126,7 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
             heartbeat = score_manager.record_heartbeat(payload)
         except ScoreManagerError as exc:
             return jsonify({"error": "invalid_heartbeat", "message": str(exc)}), 400
+        metrics_manager.record_heartbeat()
         return jsonify(
             {
                 "status": "accepted",
@@ -165,6 +170,37 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
         if state is None:
             return jsonify({"error": "migration_not_found"}), 404
         return jsonify(state)
+
+    @app.get("/api/v1/metrics")
+    def metrics():
+        return jsonify(metrics_manager.snapshot())
+
+    @app.get("/api/v1/metrics/export")
+    @app.get("/api/v1/metrics/export.<export_format>")
+    def export_metrics(export_format: str | None = None):
+        selected_format = (export_format or request.args.get("format", "json")).lower()
+        if selected_format == "json":
+            response = jsonify(metrics_manager.snapshot())
+            response.headers["Content-Disposition"] = (
+                'attachment; filename="simulation-metrics.json"'
+            )
+            return response
+        if selected_format == "csv":
+            return Response(
+                metrics_manager.to_csv(),
+                mimetype="text/csv",
+                headers={
+                    "Content-Disposition": (
+                        'attachment; filename="simulation-metrics.csv"'
+                    )
+                },
+            )
+        return jsonify(
+            {
+                "error": "unsupported_format",
+                "message": "I formati supportati sono json e csv",
+            }
+        ), 400
 
     return app
 

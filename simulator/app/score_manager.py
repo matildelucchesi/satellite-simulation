@@ -9,6 +9,7 @@ import json
 import math
 from pathlib import Path
 from threading import RLock
+from time import monotonic
 from typing import Any, Callable
 from uuid import uuid4
 
@@ -96,6 +97,7 @@ class ScoreManager:
         satellite_ids: list[str],
         config: ScoreManagerConfig,
         migration_notifier: Callable[[dict[str, Any]], None],
+        evaluation_listener: Callable[[dict[str, Any], float], None] | None = None,
     ) -> None:
         normalized_ids = [_canonical_satellite_id(value) for value in satellite_ids]
         if not normalized_ids or len(set(normalized_ids)) != len(normalized_ids):
@@ -103,6 +105,7 @@ class ScoreManager:
         self.satellite_ids = normalized_ids
         self.config = config
         self._migration_notifier = migration_notifier
+        self._evaluation_listener = evaluation_listener
         self._lock = RLock()
         self._heartbeats: dict[str, dict[str, Any]] = {}
         self._heartbeat_times: dict[str, datetime] = {}
@@ -150,6 +153,7 @@ class ScoreManager:
             }
 
     def _evaluate_locked(self, now: datetime) -> None:
+        evaluation_started = monotonic()
         missing = [item for item in self.satellite_ids if item not in self._heartbeats]
         stale = [
             item
@@ -272,6 +276,12 @@ class ScoreManager:
             self._last_notification_at = now
             self._last_notification_pair = (current_controller, selected_id)
 
+        if self._evaluation_listener is not None:
+            self._evaluation_listener(
+                deepcopy(self._evaluation),
+                (monotonic() - evaluation_started) * 1000,
+            )
+
     def _cooldown_active(self, now: datetime, source: str, target: str) -> bool:
         if self._last_notification_at is None:
             return False
@@ -357,4 +367,3 @@ def _isoformat(value: datetime) -> str:
     return value.astimezone(timezone.utc).isoformat(timespec="milliseconds").replace(
         "+00:00", "Z"
     )
-

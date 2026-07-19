@@ -51,10 +51,16 @@ class SimulatorApiTests(unittest.TestCase):
 
         score_state = self.client.get("/api/v1/scores").get_json()
         heartbeat_state = self.client.get("/api/v1/heartbeats").get_json()
+        metrics_state = self.client.get("/api/v1/metrics").get_json()
 
         self.assertTrue(score_state["evaluation"]["ready"])
         self.assertEqual(len(score_state["evaluation"]["scores"]), 5)
         self.assertEqual(heartbeat_state["count"], 5)
+        self.assertEqual(metrics_state["heartbeat_count"], 5)
+        self.assertEqual(metrics_state["controller_election_count"], 1)
+        self.assertIsNotNone(
+            metrics_state["last_selected_controller_satellite_id"]
+        )
 
     def test_manual_migration_can_be_queued_and_inspected(self):
         queued = self.client.post(
@@ -72,6 +78,38 @@ class SimulatorApiTests(unittest.TestCase):
         self.assertEqual(migration.status_code, 200)
         self.assertEqual(migration.get_json()["mode"], "cold")
         self.assertEqual(migration.get_json()["status"], "queued")
+
+    def test_metrics_count_heartbeats_and_export_json_and_csv(self):
+        for satellite_id in range(1, 3):
+            response = self.client.post(
+                "/api/v1/heartbeats",
+                json={
+                    "id": satellite_id,
+                    "time_to_eclipse": 300,
+                    "neighbors": 4,
+                    "cpu": 20,
+                    "controller": satellite_id == 1,
+                },
+            )
+            self.assertEqual(response.status_code, 202)
+
+        metrics = self.client.get("/api/v1/metrics")
+        json_export = self.client.get("/api/v1/metrics/export.json")
+        csv_export = self.client.get("/api/v1/metrics/export.csv")
+
+        self.assertEqual(metrics.status_code, 200)
+        self.assertEqual(metrics.get_json()["heartbeat_count"], 2)
+        self.assertEqual(json_export.status_code, 200)
+        self.assertIn("simulation-metrics.json", json_export.headers["Content-Disposition"])
+        self.assertEqual(csv_export.status_code, 200)
+        self.assertTrue(csv_export.mimetype.startswith("text/csv"))
+        self.assertIn(b"average_handover_time_ms", csv_export.data)
+
+    def test_metrics_reject_unsupported_export_format(self):
+        response = self.client.get("/api/v1/metrics/export.xml")
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.get_json()["error"], "unsupported_format")
 
 
 if __name__ == "__main__":
