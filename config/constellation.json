@@ -1,0 +1,15 @@
+{
+  "constellation": {
+    "name": "starlink-simulation",
+    "satellite_count": 5,
+    "controller_satellite_id": "SAT-1"
+  },
+  "satellites": [
+    {"id": "SAT-1", "name": "Satellite 1", "controller": true},
+    {"id": "SAT-2", "name": "Satellite 2", "controller": false},
+    {"id": "SAT-3", "name": "Satellite 3", "controller": false},
+    {"id": "SAT-4", "name": "Satellite 4", "controller": false},
+    {"id": "SAT-5", "name": "Satellite 5", "controller": false}
+  ]
+}
+

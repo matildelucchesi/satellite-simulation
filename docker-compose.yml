@@ -1,0 +1,135 @@
+name: satellite-simulation
+
+x-satellite-agent: &satellite-agent
+  build:
+    context: .
+    dockerfile: satellite_agent/Dockerfile
+  image: satellite-simulation/satellite-agent:local
+  restart: unless-stopped
+  environment: &satellite-environment
+    SERVICE_NAME: satellite-agent
+    SERVICE_PORT: "5000"
+    CONFIG_PATH: /app/config/constellation.json
+    LOG_LEVEL: ${LOG_LEVEL:-INFO}
+  volumes:
+    - ./config:/app/config:ro
+    - ./logs:/app/logs
+  networks:
+    - satellite-network
+
+services:
+  simulator:
+    build:
+      context: .
+      dockerfile: simulator/Dockerfile
+    image: satellite-simulation/simulator:local
+    restart: unless-stopped
+    environment:
+      SERVICE_NAME: simulator
+      SERVICE_PORT: "5000"
+      CONFIG_PATH: /app/config/constellation.json
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      SIMULATOR_TICK_SECONDS: ${SIMULATOR_TICK_SECONDS:-1}
+    volumes:
+      - ./config:/app/config:ro
+      - ./logs:/app/logs
+    ports:
+      - "8000:5000"
+    networks:
+      - satellite-network
+
+  satellite-1:
+    <<: *satellite-agent
+    environment:
+      <<: *satellite-environment
+      SATELLITE_ID: SAT-1
+      CONTROLLER_ENABLED: "true"
+    ports:
+      - "8101:5000"
+
+  satellite-2:
+    <<: *satellite-agent
+    environment:
+      <<: *satellite-environment
+      SATELLITE_ID: SAT-2
+      CONTROLLER_ENABLED: "false"
+    ports:
+      - "8102:5000"
+
+  satellite-3:
+    <<: *satellite-agent
+    environment:
+      <<: *satellite-environment
+      SATELLITE_ID: SAT-3
+      CONTROLLER_ENABLED: "false"
+    ports:
+      - "8103:5000"
+
+  satellite-4:
+    <<: *satellite-agent
+    environment:
+      <<: *satellite-environment
+      SATELLITE_ID: SAT-4
+      CONTROLLER_ENABLED: "false"
+    ports:
+      - "8104:5000"
+
+  satellite-5:
+    <<: *satellite-agent
+    environment:
+      <<: *satellite-environment
+      SATELLITE_ID: SAT-5
+      CONTROLLER_ENABLED: "false"
+    ports:
+      - "8105:5000"
+
+  controller:
+    build:
+      context: .
+      dockerfile: controller/Dockerfile
+    image: satellite-simulation/controller:local
+    restart: unless-stopped
+    environment:
+      SERVICE_NAME: controller
+      SERVICE_PORT: "5000"
+      HOST_SATELLITE_ID: SAT-1
+      HOST_SATELLITE_URL: http://satellite-1:5000
+      CONFIG_PATH: /app/config/constellation.json
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    volumes:
+      - ./config:/app/config:ro
+      - ./logs:/app/logs
+    ports:
+      - "8001:5000"
+    depends_on:
+      satellite-1:
+        condition: service_healthy
+    networks:
+      - satellite-network
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: dashboard/Dockerfile
+    image: satellite-simulation/dashboard:local
+    restart: unless-stopped
+    environment:
+      SERVICE_NAME: dashboard
+      SERVICE_PORT: "5000"
+      SIMULATOR_URL: http://simulator:5000
+      CONTROLLER_URL: http://controller:5000
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    ports:
+      - "8080:5000"
+    depends_on:
+      simulator:
+        condition: service_healthy
+      controller:
+        condition: service_healthy
+    networks:
+      - satellite-network
+
+networks:
+  satellite-network:
+    driver: bridge
+
