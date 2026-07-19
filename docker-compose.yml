@@ -12,7 +12,7 @@ x-satellite-agent: &satellite-agent
     CONFIG_PATH: /app/config/constellation.json
     LOG_LEVEL: ${LOG_LEVEL:-INFO}
     SIMULATOR_URL: http://simulator:5000
-    HEARTBEAT_URL: http://controller:5000/heartbeat
+    HEARTBEAT_URL: http://simulator:5000/api/v1/heartbeats
     STATE_SYNC_INTERVAL_SECONDS: ${STATE_SYNC_INTERVAL_SECONDS:-1}
     HEARTBEAT_INTERVAL_SECONDS: ${HEARTBEAT_INTERVAL_SECONDS:-5}
     HTTP_REQUEST_TIMEOUT_SECONDS: ${HTTP_REQUEST_TIMEOUT_SECONDS:-2}
@@ -37,6 +37,7 @@ services:
       SERVICE_PORT: "5000"
       CONFIG_PATH: /app/config/constellation.json
       TLE_PATH: /app/config/starlink.tle
+      SCORING_CONFIG_PATH: /app/config/scoring.json
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
       SIMULATOR_TICK_SECONDS: ${SIMULATOR_TICK_SECONDS:-1}
       ECLIPSE_SEARCH_HOURS: ${ECLIPSE_SEARCH_HOURS:-24}

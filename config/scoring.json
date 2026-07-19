@@ -1,0 +1,13 @@
+{
+  "weights": {
+    "w1": 1.0,
+    "w2": 100.0,
+    "w3": 0.01,
+    "w4": 1.0
+  },
+  "heartbeat_ttl_seconds": 15,
+  "migration": {
+    "minimum_score_improvement": 25.0,
+    "cooldown_seconds": 60
+  }
+}

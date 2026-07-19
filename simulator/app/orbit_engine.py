@@ -10,7 +10,7 @@ import math
 from pathlib import Path
 from threading import Event, RLock, Thread
 from time import monotonic
-from typing import Any
+from typing import Any, Callable
 
 import numpy as np
 from skyfield.api import EarthSatellite, Loader, wgs84
@@ -81,6 +81,7 @@ class ConstellationSimulator:
         constellation_name: str = "starlink-simulation",
         tick_seconds: float = 1.0,
         eclipse_search_hours: float = 24.0,
+        state_listener: Callable[[dict[str, Any]], None] | None = None,
     ) -> None:
         if tick_seconds <= 0:
             raise ValueError("tick_seconds deve essere maggiore di zero")
@@ -90,6 +91,7 @@ class ConstellationSimulator:
         self.constellation_name = constellation_name
         self.tick_seconds = tick_seconds
         self.eclipse_search_hours = eclipse_search_hours
+        self.state_listener = state_listener
         self.timescale, self.satellites = load_tle_file(
             tle_path, expected_count=len(satellite_ids), satellite_ids=satellite_ids
         )
@@ -187,6 +189,11 @@ class ConstellationSimulator:
         with self._lock:
             self._state = snapshot
             self._last_error = None
+        if self.state_listener is not None:
+            try:
+                self.state_listener(deepcopy(snapshot))
+            except Exception:  # pragma: no cover - isolamento del coordinatore
+                LOGGER.exception("Il listener dello stato della costellazione è fallito")
         return deepcopy(snapshot)
 
     def _run(self) -> None:
@@ -321,4 +328,3 @@ def _isoformat(value: datetime) -> str:
     return value.astimezone(timezone.utc).isoformat(timespec="milliseconds").replace(
         "+00:00", "Z"
     )
-

@@ -28,6 +28,9 @@ Endpoint iniziali:
 - Stato costellazione: `http://localhost:8000/api/v1/constellation`
 - Elenco satelliti: `http://localhost:8000/api/v1/satellites`
 - Singolo satellite: `http://localhost:8000/api/v1/satellites/SAT-1`
+- Score globali: `http://localhost:8000/api/v1/scores`
+- Heartbeat ricevuti: `http://localhost:8000/api/v1/heartbeats`
+- Migrazioni raccomandate: `http://localhost:8000/api/v1/migrations`
 - Controller: `http://localhost:8001/health`
 - Dashboard: `http://localhost:8080/health`
 - Satelliti SAT-1 ... SAT-5: porte `8101` ... `8105`, percorso `/health`
@@ -65,6 +68,7 @@ locale e `config/starlink.tle`; puo essere sostituito mantenendo il formato a
 tre righe e un totale esatto di cinque satelliti.
 
 Ogni Satellite Agent recupera inoltre il proprio stato dal Simulator ogni
-secondo e invia un heartbeat periodico a `HEARTBEAT_URL`. Il Controller accetta
-gli heartbeat e li inserisce nello stato versionato; eventuali errori di
-consegna restano visibili in `GET /status` senza interrompere l'agente.
+secondo e invia un heartbeat periodico al `score_manager` del Simulator;
+eventuali errori di consegna restano visibili in `GET /status` senza
+interrompere l'agente. I pesi `w1`...`w4`, il TTL degli heartbeat e le soglie di
+migrazione sono configurabili in `config/scoring.json`.

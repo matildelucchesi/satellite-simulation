@@ -9,11 +9,13 @@ import os
 from pathlib import Path
 from typing import Any
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 
 from common.settings import ServiceSettings
 
+from .migration_manager import MigrationManager
 from .orbit_engine import ConstellationSimulator
+from .score_manager import ScoreManager, ScoreManagerConfig, ScoreManagerError
 
 
 def create_app(test_config: dict[str, Any] | None = None) -> Flask:
@@ -27,6 +29,7 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
         TLE_PATH=os.getenv("TLE_PATH", "/app/config/starlink.tle"),
         SIMULATOR_TICK_SECONDS=float(os.getenv("SIMULATOR_TICK_SECONDS", "1")),
         ECLIPSE_SEARCH_HOURS=float(os.getenv("ECLIPSE_SEARCH_HOURS", "24")),
+        SCORING_CONFIG_PATH=os.getenv("SCORING_CONFIG_PATH"),
         SIMULATOR_AUTOSTART=os.getenv("SIMULATOR_AUTOSTART", "true").lower()
         in {"1", "true", "yes"},
     )
@@ -36,6 +39,15 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
     logging.basicConfig(level=settings.log_level.upper())
     constellation_config = _read_constellation_config(app.config["CONFIG_PATH"])
     satellite_ids = [item["id"] for item in constellation_config["satellites"]]
+    scoring_config_path = app.config["SCORING_CONFIG_PATH"] or str(
+        Path(app.config["CONFIG_PATH"]).with_name("scoring.json")
+    )
+    migration_manager = MigrationManager()
+    score_manager = ScoreManager(
+        satellite_ids=satellite_ids,
+        config=ScoreManagerConfig.from_file(scoring_config_path),
+        migration_notifier=migration_manager.notify_migration,
+    )
 
     simulator = ConstellationSimulator(
         tle_path=app.config["TLE_PATH"],
@@ -43,8 +55,11 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
         constellation_name=constellation_config["constellation"]["name"],
         tick_seconds=app.config["SIMULATOR_TICK_SECONDS"],
         eclipse_search_hours=app.config["ECLIPSE_SEARCH_HOURS"],
+        state_listener=score_manager.update_constellation,
     )
     app.extensions["constellation_simulator"] = simulator
+    app.extensions["score_manager"] = score_manager
+    app.extensions["migration_manager"] = migration_manager
 
     if app.config["SIMULATOR_AUTOSTART"]:
         simulator.start()
@@ -83,6 +98,33 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
             return jsonify({"error": "satellite_not_found"}), 404
         return jsonify(satellite)
 
+    @app.route("/api/v1/heartbeats", methods=["GET", "POST"])
+    def heartbeats():
+        if request.method == "GET":
+            return jsonify(score_manager.heartbeat_snapshot())
+        payload = request.get_json(silent=True)
+        if payload is None:
+            return jsonify({"error": "invalid_json"}), 400
+        try:
+            heartbeat = score_manager.record_heartbeat(payload)
+        except ScoreManagerError as exc:
+            return jsonify({"error": "invalid_heartbeat", "message": str(exc)}), 400
+        return jsonify(
+            {
+                "status": "accepted",
+                "heartbeat": heartbeat,
+                "evaluation": score_manager.snapshot()["evaluation"],
+            }
+        ), 202
+
+    @app.get("/api/v1/scores")
+    def scores():
+        return jsonify(score_manager.snapshot())
+
+    @app.get("/api/v1/migrations")
+    def migrations():
+        return jsonify(migration_manager.snapshot())
+
     return app
 
 
@@ -100,4 +142,3 @@ def _read_constellation_config(path: str | Path) -> dict[str, Any]:
     if any("id" not in satellite for satellite in satellites):
         raise ValueError("Ogni satellite deve avere un identificatore")
     return data
-

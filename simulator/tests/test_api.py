@@ -34,7 +34,27 @@ class SimulatorApiTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 404)
 
+    def test_heartbeats_produce_scores_for_all_satellites(self):
+        for satellite_id in range(1, 6):
+            response = self.client.post(
+                "/api/v1/heartbeats",
+                json={
+                    "id": satellite_id,
+                    "time_to_eclipse": satellite_id * 100,
+                    "neighbors": 4,
+                    "cpu": satellite_id * 5,
+                    "controller": satellite_id == 1,
+                },
+            )
+            self.assertEqual(response.status_code, 202)
+
+        score_state = self.client.get("/api/v1/scores").get_json()
+        heartbeat_state = self.client.get("/api/v1/heartbeats").get_json()
+
+        self.assertTrue(score_state["evaluation"]["ready"])
+        self.assertEqual(len(score_state["evaluation"]["scores"]), 5)
+        self.assertEqual(heartbeat_state["count"], 5)
+
 
 if __name__ == "__main__":
     unittest.main()
-
