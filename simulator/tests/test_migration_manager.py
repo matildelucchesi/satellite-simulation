@@ -117,6 +117,14 @@ class MigrationManagerTests(unittest.TestCase):
         ready = manager.migration_snapshot(migration_id)
         self.assertEqual(ready["status"], "queued")
         self.assertEqual(ready["metrics"]["alignment_wait_ms"], 60000.0)
+        self.assertEqual(
+            [event["name"] for event in ready["events"]],
+            [
+                "target_selected",
+                "contact_alignment_started",
+                "contact_window_ready",
+            ],
+        )
 
     def test_contact_interruption_resets_the_sixty_second_alignment(self):
         manager = MigrationManager(
@@ -132,6 +140,10 @@ class MigrationManagerTests(unittest.TestCase):
         waiting = manager.migration_snapshot(migration_id)
         self.assertEqual(waiting["status"], "waiting_for_contact")
         self.assertEqual(waiting["contact_window"]["reset_count"], 1)
+        self.assertIn(
+            "contact_alignment_reset",
+            [event["name"] for event in waiting["events"]],
+        )
 
         manager.update_constellation(constellation(92))
 
@@ -169,6 +181,14 @@ class MigrationManagerTests(unittest.TestCase):
         self.assertEqual(migration["metrics"]["updates_during_transfer"], 3)
         self.assertTrue(migration["metrics"]["controller_restore_ack"])
         self.assertIsNotNone(migration["metrics"]["downtime_ms"])
+        ack_step = next(
+            step
+            for step in migration["metrics"]["steps"]
+            if step["name"] == "transfer_final_state_and_wait_target_ack"
+        )
+        self.assertIsNotNone(ack_step["started_at"])
+        self.assertIsNotNone(ack_step["completed_at"])
+        self.assertEqual(ack_step["http_status"], 200)
 
     def test_cold_migration_transfers_frozen_state_and_waits_for_ack(self):
         transport = FakeTransport()

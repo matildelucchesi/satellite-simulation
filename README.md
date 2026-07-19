@@ -108,8 +108,10 @@ aggiorna ogni secondo una rete SVG, tabella satelliti, routing table, heartbeat,
 score, luce/ombra, migrazioni e stream degli eventi. Accanto alla rete mostra
 per ogni satellite il conto alla rovescia e l'orario della prossima transizione;
 source e target delle migrazioni del Controller sono evidenziati anche nel
-grafo. Non usa CDN o librerie frontend esterne ed è quindi disponibile anche
-senza accesso Internet.
+grafo. Sotto la rete, una timeline mostra gli istanti assoluti e relativi di
+selezione, allineamento, checkpoint, trasferimento, ACK, cutover ed eventuale
+rollback fino al completamento. Non usa CDN o librerie frontend esterne ed è
+quindi disponibile anche senza accesso Internet.
 
 Il modulo Metrics del Simulator registra automaticamente heartbeat ed elezioni
 del Controller e aggrega numero di migrazioni, ACK, downtime e durata degli

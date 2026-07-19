@@ -45,6 +45,7 @@ function render(data) {
   renderKpis(satellites, heartbeatMap, currentController, migrations);
   renderMigrationRoute(displayedMigration);
   renderNetwork(satellites, constellation.distances_km || {}, controllerState.topology || {}, scores, currentController, displayedMigration);
+  renderMigrationTimeline(displayedMigration);
   renderTransitionTable(satellites);
   renderSatelliteTable(satellites, heartbeatMap, scores, currentController);
   renderRouting(controllerState.routing_table || {});
@@ -222,6 +223,164 @@ function insetSegment(source, target, inset) {
   };
 }
 
+function renderMigrationTimeline(migration) {
+  const container = $("migrationTimeline");
+  const summary = $("migrationTimelineSummary");
+  const status = $("migrationTimelineStatus");
+  if (!migration) {
+    status.textContent = "Nessuna migrazione";
+    summary.classList.add("hidden");
+    summary.replaceChildren();
+    container.innerHTML = `<div class="empty-state boxed">La timeline apparirà quando verrà selezionato un satellite target</div>`;
+    return;
+  }
+
+  const labels = migrationStatusLabels();
+  const contact = migration.contact_window || {};
+  const metrics = migration.metrics || {};
+  status.textContent = labels[migration.status] || migration.status || "—";
+  summary.classList.remove("hidden");
+  summary.innerHTML = [
+    ["Percorso", `${migration.source_satellite_id || "—"} → ${migration.target_satellite_id || "—"}`],
+    ["Modalità", String(migration.mode || "—").toUpperCase()],
+    ["Allineamento", `${formatNumber(contact.continuous_alignment_seconds, 0)} / ${formatNumber(contact.required_alignment_seconds, 0)} s`],
+    ["Handover", metrics.duration_ms == null ? "—" : `${formatNumber(metrics.duration_ms, 1)} ms`],
+  ].map(([label, value]) => `<div class="timeline-summary-item"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`).join("");
+
+  const entries = buildMigrationTimeline(migration);
+  container.innerHTML = entries.length
+    ? entries.map((entry) => renderTimelineItem(entry, migration.created_at)).join("")
+    : `<div class="empty-state boxed">Nessuna fase registrata</div>`;
+}
+
+function buildMigrationTimeline(migration) {
+  const entries = [];
+  const terminalEvents = [];
+  let order = 0;
+  const add = (timestamp, kind, badge, title, detail = "") => {
+    if (!timestamp) return;
+    entries.push({ timestamp, kind, badge, title, detail, order: order++ });
+  };
+
+  (migration.events || []).forEach((event) => {
+    if (["migration_completed", "migration_failed"].includes(event.name)) {
+      terminalEvents.push(event);
+      return;
+    }
+    const route = `${migration.source_satellite_id || "—"} → ${migration.target_satellite_id || "—"}`;
+    const definitions = {
+      target_selected: ["default", "SELECT", "Satellite target selezionato", route],
+      contact_alignment_started: ["contact", "ALIGN", "Inizio allineamento", `Distanza ${formatNumber(event.distance_km, 1)} km`],
+      contact_alignment_reset: ["failed", "RESET", "Allineamento interrotto", `${event.reason || "contatto perso"} · distanza ${formatNumber(event.distance_km, 1)} km`],
+      contact_window_ready: ["contact", "READY", "Contact window completata", `${formatNumber(event.continuous_alignment_seconds, 0)} secondi continui`],
+      migration_started: ["default", "START", `Avvio ${String(event.mode || migration.mode || "").toUpperCase()} Migration`, route],
+      migration_completed: ["complete", "DONE", "Migrazione completata", `Controller attivo su ${migration.target_satellite_id || "—"}`],
+      migration_failed: ["failed", "ERROR", "Migrazione fallita", event.error || migration.error || "Errore non specificato"],
+    };
+    const definition = definitions[event.name];
+    if (definition) add(event.timestamp, ...definition);
+  });
+
+  (migration.metrics?.steps || []).forEach((step) => {
+    const startedAt = step.started_at || step.timestamp;
+    const completedAt = step.completed_at || step.timestamp;
+    if (step.name === "transfer_final_state_and_wait_target_ack") {
+      add(startedAt, "send", "SEND", "Invio final state al target", `${migration.source_satellite_id || "—"} → ${migration.target_satellite_id || "—"} · seq ${migration.metrics?.final_sequence_number ?? "—"}`);
+      add(completedAt, step.status === "ok" ? "ack" : "failed", step.status === "ok" ? "ACK" : "NO ACK", step.status === "ok" ? "ACK target ricevuto" : "ACK target non ricevuto", stepResultDetail(step));
+      return;
+    }
+    if (step.name === "transfer_state_and_wait_ack") {
+      add(startedAt, "send", "SEND", "Invio stato al Controller", `Restore sequence ${migration.metrics?.final_sequence_number ?? "—"}`);
+      add(completedAt, step.status === "ok" ? "ack" : "failed", step.status === "ok" ? "ACK" : "NO ACK", step.status === "ok" ? "ACK restore ricevuto" : "ACK restore non ricevuto", stepResultDetail(step));
+      return;
+    }
+    const definition = migrationStepDefinition(step.name);
+    add(completedAt, step.status === "failed" ? "failed" : definition.kind, definition.badge, definition.title, stepResultDetail(step));
+  });
+
+  terminalEvents.forEach((event) => {
+    if (event.name === "migration_completed") {
+      add(event.timestamp, "complete", "DONE", "Migrazione completata", `Controller attivo su ${migration.target_satellite_id || "—"}`);
+    } else {
+      add(event.timestamp, "failed", "ERROR", "Migrazione fallita", event.error || migration.error || "Errore non specificato");
+    }
+  });
+
+  if (migration.status === "waiting_for_contact") {
+    const contact = migration.contact_window || {};
+    add(
+      contact.last_observed_at || migration.created_at,
+      "contact",
+      "LIVE",
+      `Allineamento ${formatNumber(contact.continuous_alignment_seconds, 0)} / ${formatNumber(contact.required_alignment_seconds, 0)} s`,
+      `${contact.reason || "in attesa"} · distanza ${formatNumber(contact.current_distance_km, 1)} km`,
+    );
+  }
+
+  return entries.sort((left, right) => {
+    const delta = Date.parse(left.timestamp) - Date.parse(right.timestamp);
+    return Number.isFinite(delta) && delta !== 0 ? delta : left.order - right.order;
+  });
+}
+
+function migrationStepDefinition(name) {
+  const definitions = {
+    initial_checkpoint: { kind: "default", badge: "STATE", title: "Checkpoint iniziale acquisito" },
+    final_checkpoint: { kind: "default", badge: "DELTA", title: "Checkpoint finale / delta acquisito" },
+    cold_final_checkpoint: { kind: "default", badge: "STATE", title: "Checkpoint definitivo acquisito" },
+    request_target_migration: { kind: "send", badge: "PREP", title: "Target preparato alla migrazione" },
+    quiesce_source_controller: { kind: "default", badge: "FREEZE", title: "Controller sorgente in quiescenza" },
+    stop_source_controller: { kind: "default", badge: "STOP", title: "Controller sorgente arrestato" },
+    shutdown_controller: { kind: "default", badge: "DOWN", title: "Microservizio Controller disattivato" },
+    start_target_controller: { kind: "complete", badge: "START", title: "Controller avviato sul target" },
+    rollback_stop_target: { kind: "failed", badge: "ROLLBACK", title: "Rollback: arresto target" },
+    rollback_restore_controller: { kind: "failed", badge: "ROLLBACK", title: "Rollback: ripristino Controller" },
+    rollback_resume_source: { kind: "failed", badge: "ROLLBACK", title: "Rollback: ripresa sorgente" },
+    rollback_start_source: { kind: "failed", badge: "ROLLBACK", title: "Rollback: riavvio sorgente" },
+  };
+  return definitions[name] || {
+    kind: "default",
+    badge: "STEP",
+    title: String(name || "fase").replaceAll("_", " "),
+  };
+}
+
+function stepResultDetail(step) {
+  const status = step.http_status == null ? "HTTP —" : `HTTP ${step.http_status}`;
+  const duration = `${formatNumber(step.duration_ms, 1)} ms`;
+  const attemptCount = Number(step.attempts) || 1;
+  const attempts = `${attemptCount} tentativ${attemptCount === 1 ? "o" : "i"}`;
+  return `${status} · ${duration} · ${attempts}${step.error ? ` · ${step.error}` : ""}`;
+}
+
+function renderTimelineItem(entry, origin) {
+  return `<article class="timeline-item ${escapeHtml(entry.kind)}">
+    <time class="timeline-time" datetime="${escapeHtml(entry.timestamp)}" title="${escapeHtml(formatFullTimestamp(entry.timestamp))}">
+      ${escapeHtml(formatTimelineTime(entry.timestamp))}
+      <small>${escapeHtml(formatTimelineDate(entry.timestamp))}</small>
+    </time>
+    <div class="timeline-rail"><span class="timeline-dot"></span></div>
+    <div class="timeline-card">
+      <div class="timeline-card-header">
+        <span class="timeline-badge">${escapeHtml(entry.badge)}</span>
+        <strong>${escapeHtml(entry.title)}</strong>
+        <span class="timeline-relative">${escapeHtml(formatRelativeTime(entry.timestamp, origin))}</span>
+      </div>
+      ${entry.detail ? `<p>${escapeHtml(entry.detail)}</p>` : ""}
+    </div>
+  </article>`;
+}
+
+function migrationStatusLabels() {
+  return {
+    waiting_for_contact: "Allineamento",
+    queued: "In coda",
+    in_progress: "Migrazione in corso",
+    completed: "Completata",
+    failed: "Fallita",
+  };
+}
+
 function projectPositions(ids, satellites) {
   const raw = ids.map((id, index) => {
     const position = satellites[id]?.position_km || {};
@@ -393,6 +552,42 @@ function formatTransitionClock(timestamp) {
   return Number.isNaN(date.getTime())
     ? "—"
     : date.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+}
+
+function formatTimelineTime(timestamp) {
+  const date = new Date(timestamp);
+  if (Number.isNaN(date.getTime())) return "—";
+  const clock = date.toLocaleTimeString("it-IT", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
+  return `${clock}.${String(date.getMilliseconds()).padStart(3, "0")}`;
+}
+
+function formatTimelineDate(timestamp) {
+  const date = new Date(timestamp);
+  return Number.isNaN(date.getTime())
+    ? "—"
+    : date.toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit", year: "numeric" });
+}
+
+function formatFullTimestamp(timestamp) {
+  const date = new Date(timestamp);
+  return Number.isNaN(date.getTime()) ? "—" : date.toLocaleString("it-IT");
+}
+
+function formatRelativeTime(timestamp, origin) {
+  const delta = Date.parse(timestamp) - Date.parse(origin);
+  if (!Number.isFinite(delta)) return "—";
+  const sign = delta < 0 ? "−" : "+";
+  const absoluteSeconds = Math.abs(delta) / 1000;
+  const minutes = Math.floor(absoluteSeconds / 60);
+  const seconds = absoluteSeconds - minutes * 60;
+  return minutes
+    ? `${sign}${minutes}m ${seconds.toFixed(3)}s`
+    : `${sign}${seconds.toFixed(3)}s`;
 }
 
 function formatClock(timestamp) {

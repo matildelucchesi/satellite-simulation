@@ -242,6 +242,7 @@ class MigrationManager:
             if equivalent is not None:
                 return equivalent["migration_id"]
             required_alignment = self.config.contact_window.required_alignment_seconds
+            created_at = _utc_now()
             migration = {
                 "migration_id": identifier,
                 "mode": selected_mode,
@@ -250,11 +251,19 @@ class MigrationManager:
                 "status": (
                     "queued" if required_alignment == 0 else "waiting_for_contact"
                 ),
-                "created_at": _utc_now(),
+                "created_at": created_at,
                 "started_at": None,
                 "completed_at": None,
                 "recommendation": deepcopy(recommendation),
                 "error": None,
+                "events": [
+                    {
+                        "name": "target_selected",
+                        "timestamp": created_at,
+                        "source_satellite_id": source,
+                        "target_satellite_id": target,
+                    }
+                ],
                 "metrics": {
                     "duration_ms": None,
                     "alignment_wait_ms": None,
@@ -332,6 +341,18 @@ class MigrationManager:
                 if not observation.eligible or sample_gap_invalid:
                     if alignment_started is not None:
                         window["reset_count"] += 1
+                        migration["events"].append(
+                            {
+                                "name": "contact_alignment_reset",
+                                "timestamp": _isoformat(observed_at),
+                                "reason": (
+                                    "sample_gap_exceeded"
+                                    if sample_gap_invalid
+                                    else observation.reason
+                                ),
+                                "distance_km": window["current_distance_km"],
+                            }
+                        )
                     alignment_started = None
                     window["alignment_started_at"] = None
                     window["continuous_alignment_seconds"] = 0.0
@@ -340,6 +361,13 @@ class MigrationManager:
                 elif alignment_started is None:
                     alignment_started = observed_at
                     window["alignment_started_at"] = _isoformat(observed_at)
+                    migration["events"].append(
+                        {
+                            "name": "contact_alignment_started",
+                            "timestamp": _isoformat(observed_at),
+                            "distance_km": window["current_distance_km"],
+                        }
+                    )
 
                 window["last_observed_at"] = _isoformat(observed_at)
                 if alignment_started is None:
@@ -355,6 +383,13 @@ class MigrationManager:
 
                 window["reason"] = "contact_window_ready"
                 window["ready_at"] = _isoformat(observed_at)
+                migration["events"].append(
+                    {
+                        "name": "contact_window_ready",
+                        "timestamp": window["ready_at"],
+                        "continuous_alignment_seconds": round(elapsed, 3),
+                    }
+                )
                 migration["metrics"]["alignment_wait_ms"] = round(
                     elapsed * 1000, 3
                 )
@@ -412,6 +447,13 @@ class MigrationManager:
                 return
             migration["status"] = "in_progress"
             migration["started_at"] = _utc_now()
+            migration["events"].append(
+                {
+                    "name": "migration_started",
+                    "timestamp": migration["started_at"],
+                    "mode": migration["mode"],
+                }
+            )
             self._active_migration_id = migration_id
             mode = migration["mode"]
 
@@ -432,6 +474,12 @@ class MigrationManager:
             with self._lock:
                 migration["status"] = "completed"
                 migration["completed_at"] = _utc_now()
+                migration["events"].append(
+                    {
+                        "name": "migration_completed",
+                        "timestamp": migration["completed_at"],
+                    }
+                )
                 migration["metrics"]["duration_ms"] = round(
                     (monotonic() - started) * 1000, 3
                 )
@@ -441,6 +489,13 @@ class MigrationManager:
                 migration["status"] = "failed"
                 migration["error"] = str(exc)
                 migration["completed_at"] = _utc_now()
+                migration["events"].append(
+                    {
+                        "name": "migration_failed",
+                        "timestamp": migration["completed_at"],
+                        "error": str(exc),
+                    }
+                )
                 migration["metrics"]["duration_ms"] = round(
                     (monotonic() - started) * 1000, 3
                 )
@@ -659,6 +714,7 @@ class MigrationManager:
         expected_statuses: set[int],
     ) -> RestResponse:
         started = monotonic()
+        started_at = _utc_now()
         last_error: Exception | None = None
         for attempt in range(1, self.config.max_retries + 2):
             try:
@@ -673,6 +729,7 @@ class MigrationManager:
                         f"{name}: atteso HTTP {sorted(expected_statuses)}, "
                         f"ricevuto HTTP {response.status}"
                     )
+                completed_at = _utc_now()
                 migration["metrics"]["steps"].append(
                     {
                         "name": name,
@@ -680,7 +737,9 @@ class MigrationManager:
                         "http_status": response.status,
                         "attempts": attempt,
                         "duration_ms": round((monotonic() - started) * 1000, 3),
-                        "timestamp": _utc_now(),
+                        "started_at": started_at,
+                        "completed_at": completed_at,
+                        "timestamp": completed_at,
                     }
                 )
                 migration["metrics"]["retries"] += attempt - 1
@@ -691,6 +750,7 @@ class MigrationManager:
                     sleep(self.config.retry_delay_seconds)
 
         migration["metrics"]["retries"] += self.config.max_retries
+        completed_at = _utc_now()
         migration["metrics"]["steps"].append(
             {
                 "name": name,
@@ -698,7 +758,9 @@ class MigrationManager:
                 "http_status": None,
                 "attempts": self.config.max_retries + 1,
                 "duration_ms": round((monotonic() - started) * 1000, 3),
-                "timestamp": _utc_now(),
+                "started_at": started_at,
+                "completed_at": completed_at,
+                "timestamp": completed_at,
                 "error": str(last_error),
             }
         )

@@ -60,6 +60,8 @@ class DashboardApiTests(unittest.TestCase):
         self.assertIn(b"transitionRows", response.data)
         self.assertIn(b"migrationRoute", response.data)
         self.assertIn(b"migrationTransfer", response.data)
+        self.assertIn(b"migrationTimeline", response.data)
+        self.assertIn(b"migrationTimelineStatus", response.data)
 
     def test_dashboard_api_returns_json(self):
         response = self.client.get("/api/dashboard")
