@@ -109,11 +109,17 @@ class ControllerService:
         self._lock = RLock()
         self._state = ControllerState.empty()
         self._active = True
+        self._quiesced = False
 
     @property
     def active(self) -> bool:
         with self._lock:
             return self._active
+
+    @property
+    def quiesced(self) -> bool:
+        with self._lock:
+            return self._quiesced
 
     def snapshot(self) -> dict[str, Any]:
         with self._lock:
@@ -145,6 +151,8 @@ class ControllerService:
         with self._lock:
             if not self._active:
                 raise RuntimeError("Il Controller è arrestato")
+            if self._quiesced:
+                raise RuntimeError("Il Controller è in quiescenza")
             self._state.heartbeats[satellite_id] = record
             self._update_topology(satellite_id, record)
             self._rebuild_routing_table()
@@ -183,7 +191,38 @@ class ControllerService:
         with self._lock:
             self._state = restored
             self._active = True
+            self._quiesced = False
             return self._state.to_dict()
+
+    def quiesce(self) -> dict[str, Any]:
+        """Blocca nuove mutazioni mantenendo leggibile lo stato corrente."""
+
+        with self._lock:
+            if not self._active:
+                raise RuntimeError("Il Controller è arrestato")
+            changed = not self._quiesced
+            self._quiesced = True
+            return {
+                "status": "quiesced",
+                "changed": changed,
+                "sequence_number": self._state.sequence_number,
+                "timestamp": self._state.timestamp,
+            }
+
+    def resume(self) -> dict[str, Any]:
+        """Riapre le mutazioni, usato anche dal rollback della Hot Migration."""
+
+        with self._lock:
+            if not self._active:
+                raise RuntimeError("Il Controller è arrestato")
+            changed = self._quiesced
+            self._quiesced = False
+            return {
+                "status": "active",
+                "changed": changed,
+                "sequence_number": self._state.sequence_number,
+                "timestamp": self._state.timestamp,
+            }
 
     def shutdown(self) -> dict[str, Any]:
         """Salva lo stato e disattiva le operazioni mutabili del Controller."""
@@ -192,6 +231,7 @@ class ControllerService:
         with self._lock:
             changed = self._active
             self._active = False
+            self._quiesced = False
         return {
             "status": "shutdown",
             "changed": changed,
@@ -325,4 +365,3 @@ def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace(
         "+00:00", "Z"
     )
-

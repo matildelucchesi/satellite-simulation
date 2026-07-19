@@ -41,6 +41,7 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
                 "host_satellite_id": app.config["HOST_SATELLITE_ID"],
                 "status": "ok" if active else "shutdown",
                 "active": active,
+                "quiesced": controller.quiesced,
             }
         ), 200 if active else 503
 
@@ -97,5 +98,20 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
         result = controller.shutdown()
         return jsonify(result), 202
 
-    return app
+    @app.post("/quiesce")
+    def quiesce():
+        try:
+            result = controller.quiesce()
+        except RuntimeError as exc:
+            return jsonify({"error": "controller_shutdown", "message": str(exc)}), 409
+        return jsonify(result), 200
 
+    @app.post("/resume")
+    def resume():
+        try:
+            result = controller.resume()
+        except RuntimeError as exc:
+            return jsonify({"error": "controller_shutdown", "message": str(exc)}), 409
+        return jsonify(result), 200
+
+    return app

@@ -77,7 +77,21 @@ class ControllerServiceTests(unittest.TestCase):
         self.controller.record_heartbeat(heartbeat(4))
         self.assertIn("SAT-4", self.controller.snapshot()["heartbeats"])
 
+    def test_quiesce_freezes_updates_until_resume(self):
+        self.controller.record_heartbeat(heartbeat(1))
+        sequence = self.controller.snapshot()["sequence_number"]
+
+        result = self.controller.quiesce()
+        with self.assertRaises(RuntimeError):
+            self.controller.record_heartbeat(heartbeat(2))
+        checkpoint = self.controller.checkpoint()
+        self.controller.resume()
+        self.controller.record_heartbeat(heartbeat(2))
+
+        self.assertEqual(result["status"], "quiesced")
+        self.assertEqual(checkpoint["sequence_number"], sequence)
+        self.assertEqual(self.controller.snapshot()["sequence_number"], sequence + 1)
+
 
 if __name__ == "__main__":
     unittest.main()
-

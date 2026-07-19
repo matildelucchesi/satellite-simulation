@@ -107,6 +107,19 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
             return jsonify({"error": "migration_rejected", "message": str(exc)}), 409
         return jsonify(migration), 202
 
+    @app.post("/receive_controller_state")
+    def receive_controller_state():
+        payload = request.get_json(silent=True)
+        if payload is None:
+            return jsonify({"error": "invalid_json"}), 400
+        try:
+            acknowledgement = agent.receive_controller_state(payload)
+        except AgentValidationError as exc:
+            return jsonify(
+                {"error": "controller_state_rejected", "message": str(exc)}
+            ), 409
+        return jsonify(acknowledgement), 200
+
     return app
 
 
@@ -115,4 +128,3 @@ def _env_bool(name: str, default: bool) -> bool:
     if value is None:
         return default
     return value.lower() in {"1", "true", "yes", "on"}
-

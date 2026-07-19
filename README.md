@@ -42,6 +42,8 @@ API di ogni Satellite Agent:
 - `POST /receive_state`: ricezione push dello stato orbitale.
 - `POST /start_controller` e `POST /stop_controller`: ciclo di vita logico del Controller.
 - `POST /migration_request`: accettazione di una migrazione del Controller.
+- `POST /receive_controller_state`: ricezione del final state e ACK `200` della
+  Hot Migration.
 
 API del Controller:
 
@@ -51,6 +53,8 @@ API del Controller:
 - `POST /checkpoint`: serializzazione e salvataggio atomico dello stato.
 - `POST /restore`: ripristino dal JSON inviato o dall'ultimo file salvato.
 - `POST /shutdown`: checkpoint e disattivazione logica del Controller.
+- `POST /quiesce` e `POST /resume`: freeze temporaneo delle mutazioni durante
+  il cutover Hot e ripresa in caso di rollback.
 
 Per arrestare lo stack:
 
@@ -78,3 +82,11 @@ protocollo, gli URL REST, timeout e retry sono configurabili in
 `config/migration.json`. `POST /api/v1/migrations` permette inoltre di avviare
 manualmente una migrazione `cold` o `hot`; `GET /api/v1/migrations/<id>` espone
 stato, ACK, tempi, downtime, byte trasferiti, retry e risultato del rollback.
+La Hot Migration usa una pre-copy iniziale, mette brevemente il source in
+quiescenza, acquisisce un secondo checkpoint con gli aggiornamenti intervenuti,
+attende l'ACK `200` del target sul final sequence number e solo allora esegue
+stop del source e attivazione definitiva del target.
+La Cold Migration mette subito il source in quiescenza, lo arresta, acquisisce
+il checkpoint definitivo, attende lo stesso ACK `200` dal target e soltanto
+dopo esegue restore e attivazione. In caso di errore il checkpoint viene
+ripristinato e il source viene riavviato.

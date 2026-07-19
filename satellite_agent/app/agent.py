@@ -196,7 +196,10 @@ class SatelliteAgent:
         with self._lock:
             changed = not self._controller_running
             self._controller_running = True
-            if self._migration and self._migration["status"] == "accepted":
+            if self._migration and self._migration["status"] in {
+                "accepted",
+                "final_state_received",
+            }:
                 self._migration["status"] = "activated"
                 self._migration["activated_at"] = _utc_now()
             return {
@@ -246,6 +249,53 @@ class SatelliteAgent:
             }
             self._migration = migration
             return deepcopy(migration)
+
+    def receive_controller_state(self, payload: dict[str, Any]) -> dict[str, Any]:
+        """Memorizza il final state della Hot Migration e restituisce l'ACK."""
+
+        if not isinstance(payload, dict):
+            raise AgentValidationError("Il corpo deve essere un oggetto JSON")
+        migration_id = str(payload.get("migration_id", "")).strip()
+        controller_state = payload.get("controller_state")
+        if not migration_id:
+            raise AgentValidationError("migration_id è obbligatorio")
+        if not isinstance(controller_state, dict):
+            raise AgentValidationError("controller_state deve essere un oggetto JSON")
+        required = {
+            "topology",
+            "routing_table",
+            "heartbeats",
+            "sequence_number",
+            "timestamp",
+        }
+        missing = required - controller_state.keys()
+        if missing:
+            raise AgentValidationError(
+                "Campi Controller mancanti: " + ", ".join(sorted(missing))
+            )
+        sequence = controller_state["sequence_number"]
+        if isinstance(sequence, bool) or not isinstance(sequence, int) or sequence < 0:
+            raise AgentValidationError("sequence_number deve essere un intero non negativo")
+
+        with self._lock:
+            if self._migration is None or self._migration["migration_id"] != migration_id:
+                raise AgentValidationError("Migrazione non preparata o migration_id errato")
+            initial_state = self._migration.get("controller_state") or {}
+            initial_sequence = initial_state.get("sequence_number", -1)
+            if sequence < initial_sequence:
+                raise AgentValidationError(
+                    "Il final state è precedente al checkpoint iniziale"
+                )
+            self._migration["controller_state"] = deepcopy(controller_state)
+            self._migration["status"] = "final_state_received"
+            self._migration["final_state_received_at"] = _utc_now()
+            self._migration["final_sequence_number"] = sequence
+            return {
+                "status": "ack",
+                "migration_id": migration_id,
+                "satellite_id": self.satellite_id,
+                "sequence_number": sequence,
+            }
 
     def build_heartbeat(self) -> dict[str, Any]:
         with self._lock:
@@ -347,4 +397,3 @@ def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace(
         "+00:00", "Z"
     )
-

@@ -50,7 +50,32 @@ class SatelliteAgentApiTests(unittest.TestCase):
         self.assertEqual(response.status_code, 202)
         self.assertEqual(response.get_json()["status"], "accepted")
 
+    def test_final_controller_state_returns_http_200_ack(self):
+        self.client.post(
+            "/migration_request",
+            json={
+                "migration_id": "migration-1",
+                "source_satellite_id": "SAT-1",
+                "target_satellite_id": "SAT-3",
+            },
+        )
+        response = self.client.post(
+            "/receive_controller_state",
+            json={
+                "migration_id": "migration-1",
+                "controller_state": {
+                    "topology": {"nodes": {}, "links": []},
+                    "routing_table": {},
+                    "heartbeats": {},
+                    "sequence_number": 7,
+                    "timestamp": "2026-07-19T10:00:05Z",
+                },
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json()["status"], "ack")
+
 
 if __name__ == "__main__":
     unittest.main()
-

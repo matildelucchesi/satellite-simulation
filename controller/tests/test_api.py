@@ -56,7 +56,17 @@ class ControllerApiTests(unittest.TestCase):
         self.assertEqual(rejected.status_code, 503)
         self.assertEqual(restored.status_code, 200)
 
+    def test_quiesce_and_resume_endpoints(self):
+        quiesced = self.client.post("/quiesce")
+        rejected = self.client.post("/heartbeat", json=heartbeat())
+        resumed = self.client.post("/resume")
+        accepted = self.client.post("/heartbeat", json=heartbeat())
+
+        self.assertEqual(quiesced.status_code, 200)
+        self.assertEqual(rejected.status_code, 503)
+        self.assertEqual(resumed.status_code, 200)
+        self.assertEqual(accepted.status_code, 202)
+
 
 if __name__ == "__main__":
     unittest.main()
-

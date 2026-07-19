@@ -240,8 +240,14 @@ class MigrationManager:
                     "duration_ms": None,
                     "downtime_ms": None,
                     "state_bytes": 0,
+                    "initial_state_bytes": 0,
+                    "final_state_bytes": 0,
+                    "initial_sequence_number": None,
+                    "final_sequence_number": None,
+                    "updates_during_transfer": None,
                     "retries": 0,
                     "ack_received": False,
+                    "controller_restore_ack": False,
                     "steps": [],
                     "rollback_attempted": False,
                     "rollback_succeeded": None,
@@ -312,6 +318,7 @@ class MigrationManager:
             "target_started": False,
             "source_stopped": False,
             "controller_shutdown": False,
+            "controller_quiesced": False,
             "downtime_started": None,
         }
         try:
@@ -325,8 +332,6 @@ class MigrationManager:
                 migration["metrics"]["duration_ms"] = round(
                     (monotonic() - started) * 1000, 3
                 )
-                if mode == "hot":
-                    migration["metrics"]["downtime_ms"] = 0.0
         except Exception as exc:
             rollback_succeeded = self._rollback(migration, context)
             with self._lock:
@@ -345,8 +350,29 @@ class MigrationManager:
     def _execute_cold(
         self, migration: dict[str, Any], context: dict[str, Any]
     ) -> None:
-        checkpoint = self._checkpoint_controller(migration)
+        self._call_step(
+            migration,
+            "quiesce_source_controller",
+            "POST",
+            f"{self.config.controller_url}/quiesce",
+            None,
+            {200},
+        )
+        context["controller_quiesced"] = True
+        context["downtime_started"] = monotonic()
+
+        self._stop_source(migration)
+        context["source_stopped"] = True
+
+        checkpoint = self._checkpoint_controller(
+            migration,
+            step_name="cold_final_checkpoint",
+            bytes_metric="final_state_bytes",
+        )
         context["checkpoint"] = checkpoint
+        final_sequence = _checkpoint_sequence(checkpoint)
+        migration["metrics"]["final_sequence_number"] = final_sequence
+
         self._call_step(
             migration,
             "shutdown_controller",
@@ -356,11 +382,12 @@ class MigrationManager:
             {202},
         )
         context["controller_shutdown"] = True
-        context["downtime_started"] = monotonic()
-        self._stop_source(migration)
-        context["source_stopped"] = True
+        context["controller_quiesced"] = False
+
         self._prepare_target(migration, checkpoint)
+        self._transfer_final_state(migration, checkpoint)
         self._restore_controller(migration, checkpoint)
+        context["controller_shutdown"] = False
         self._start_target(migration)
         context["target_started"] = True
         migration["metrics"]["downtime_ms"] = round(
@@ -370,19 +397,63 @@ class MigrationManager:
     def _execute_hot(
         self, migration: dict[str, Any], context: dict[str, Any]
     ) -> None:
-        checkpoint = self._checkpoint_controller(migration)
-        context["checkpoint"] = checkpoint
-        self._prepare_target(migration, checkpoint)
-        self._restore_controller(migration, checkpoint)
-        self._start_target(migration)
-        context["target_started"] = True
+        initial_checkpoint = self._checkpoint_controller(
+            migration,
+            step_name="initial_checkpoint",
+            bytes_metric="initial_state_bytes",
+        )
+        context["checkpoint"] = initial_checkpoint
+        initial_sequence = _checkpoint_sequence(initial_checkpoint)
+        migration["metrics"]["initial_sequence_number"] = initial_sequence
+        self._prepare_target(migration, initial_checkpoint)
+
+        self._call_step(
+            migration,
+            "quiesce_source_controller",
+            "POST",
+            f"{self.config.controller_url}/quiesce",
+            None,
+            {200},
+        )
+        context["controller_quiesced"] = True
+        context["downtime_started"] = monotonic()
+
+        final_checkpoint = self._checkpoint_controller(
+            migration,
+            step_name="final_checkpoint",
+            bytes_metric="final_state_bytes",
+        )
+        context["checkpoint"] = final_checkpoint
+        final_sequence = _checkpoint_sequence(final_checkpoint)
+        if final_sequence < initial_sequence:
+            raise MigrationProtocolError(
+                "Il sequence number del final state è precedente al checkpoint iniziale"
+            )
+        migration["metrics"]["final_sequence_number"] = final_sequence
+        migration["metrics"]["updates_during_transfer"] = (
+            final_sequence - initial_sequence
+        )
+        self._transfer_final_state(migration, final_checkpoint)
+
         self._stop_source(migration)
         context["source_stopped"] = True
+        self._restore_controller(migration, final_checkpoint)
+        context["controller_quiesced"] = False
+        self._start_target(migration)
+        context["target_started"] = True
+        migration["metrics"]["downtime_ms"] = round(
+            (monotonic() - context["downtime_started"]) * 1000, 3
+        )
 
-    def _checkpoint_controller(self, migration: dict[str, Any]) -> dict[str, Any]:
+    def _checkpoint_controller(
+        self,
+        migration: dict[str, Any],
+        step_name: str = "checkpoint_controller",
+        bytes_metric: str | None = None,
+    ) -> dict[str, Any]:
         response = self._call_step(
             migration,
-            "checkpoint_controller",
+            step_name,
             "POST",
             f"{self.config.controller_url}/checkpoint",
             None,
@@ -392,7 +463,9 @@ class MigrationManager:
         if not isinstance(checkpoint, dict):
             raise MigrationProtocolError("Il Controller non ha restituito un checkpoint")
         serialized = json.dumps(checkpoint, separators=(",", ":")).encode("utf-8")
-        migration["metrics"]["state_bytes"] = len(serialized)
+        migration["metrics"]["state_bytes"] += len(serialized)
+        if bytes_metric is not None:
+            migration["metrics"][bytes_metric] = len(serialized)
         return checkpoint
 
     def _prepare_target(
@@ -424,6 +497,31 @@ class MigrationManager:
             {"checkpoint": checkpoint},
             {200},
         )
+        migration["metrics"]["controller_restore_ack"] = True
+        if migration["mode"] == "cold":
+            migration["metrics"]["ack_received"] = True
+
+    def _transfer_final_state(
+        self, migration: dict[str, Any], checkpoint: dict[str, Any]
+    ) -> None:
+        target_url = self.config.agent_url(migration["target_satellite_id"])
+        response = self._call_step(
+            migration,
+            "transfer_final_state_and_wait_target_ack",
+            "POST",
+            f"{target_url}/receive_controller_state",
+            {
+                "migration_id": migration["migration_id"],
+                "controller_state": checkpoint,
+            },
+            {200},
+        )
+        acknowledged_sequence = response.payload.get("sequence_number")
+        expected_sequence = _checkpoint_sequence(checkpoint)
+        if acknowledged_sequence != expected_sequence:
+            raise MigrationProtocolError(
+                "L'ACK del target non conferma il final sequence number"
+            )
         migration["metrics"]["ack_received"] = True
 
     def _start_target(self, migration: dict[str, Any]) -> None:
@@ -528,6 +626,15 @@ class MigrationManager:
                     {"checkpoint": checkpoint},
                     {200},
                 )
+            elif context.get("controller_quiesced"):
+                self._call_step(
+                    migration,
+                    "rollback_resume_source",
+                    "POST",
+                    f"{self.config.controller_url}/resume",
+                    None,
+                    {200},
+                )
             if context.get("source_stopped"):
                 source_url = self.config.agent_url(migration["source_satellite_id"])
                 self._call_step(
@@ -541,6 +648,13 @@ class MigrationManager:
         except Exception:
             succeeded = False
         return succeeded
+
+
+def _checkpoint_sequence(checkpoint: dict[str, Any]) -> int:
+    sequence = checkpoint.get("sequence_number")
+    if isinstance(sequence, bool) or not isinstance(sequence, int) or sequence < 0:
+        raise MigrationProtocolError("Checkpoint privo di sequence number valido")
+    return sequence
 
 
 def _canonical_satellite_id(value: Any) -> str:
@@ -578,4 +692,3 @@ def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace(
         "+00:00", "Z"
     )
-

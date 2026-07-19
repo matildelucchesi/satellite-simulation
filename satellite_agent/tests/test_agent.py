@@ -92,6 +92,40 @@ class SatelliteAgentTests(unittest.TestCase):
         self.assertEqual(migration["status"], "accepted")
         self.assertEqual(migration["target_satellite_id"], "SAT-3")
 
+    def test_acknowledges_final_controller_state(self):
+        migration = self.agent.accept_migration(
+            {
+                "migration_id": "migration-1",
+                "source_satellite_id": "SAT-1",
+                "target_satellite_id": "SAT-3",
+                "controller_state": {
+                    "topology": {"nodes": {}, "links": []},
+                    "routing_table": {},
+                    "heartbeats": {},
+                    "sequence_number": 4,
+                    "timestamp": "2026-07-19T10:00:00Z",
+                },
+            }
+        )
+        acknowledgement = self.agent.receive_controller_state(
+            {
+                "migration_id": migration["migration_id"],
+                "controller_state": {
+                    "topology": {"nodes": {}, "links": []},
+                    "routing_table": {},
+                    "heartbeats": {},
+                    "sequence_number": 7,
+                    "timestamp": "2026-07-19T10:00:05Z",
+                },
+            }
+        )
+
+        self.assertEqual(acknowledgement["status"], "ack")
+        self.assertEqual(acknowledgement["sequence_number"], 7)
+        self.assertEqual(
+            self.agent.status()["migration"]["status"], "final_state_received"
+        )
+
     @patch("app.agent.psutil.cpu_percent", return_value=28.0)
     @patch("app.agent.urlopen")
     def test_sends_heartbeat_as_json(self, mocked_urlopen, _cpu_percent):
