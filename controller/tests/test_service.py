@@ -125,6 +125,18 @@ class ControllerServiceTests(unittest.TestCase):
         self.assertEqual(result["host_satellite_id"], "SAT-7")
         self.assertEqual(self.controller.host_satellite_id, "SAT-7")
 
+    def test_host_update_rewrites_controller_flags_immediately(self):
+        self.controller.record_heartbeat(heartbeat(1))
+        self.controller.record_heartbeat(heartbeat(3))
+
+        self.controller.set_host_satellite("SAT-3")
+        state = self.controller.snapshot()
+
+        self.assertFalse(state["heartbeats"]["SAT-1"]["controller"])
+        self.assertTrue(state["heartbeats"]["SAT-3"]["controller"])
+        self.assertFalse(state["topology"]["nodes"]["SAT-1"]["controller"])
+        self.assertTrue(state["topology"]["nodes"]["SAT-3"]["controller"])
+
 
 if __name__ == "__main__":
     unittest.main()

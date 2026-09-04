@@ -1,154 +1,272 @@
 # Satellite Network Simulation
 
-Simulazione modulare di una costellazione di sette satelliti ispirata a
-Starlink, con propagazione orbitale, agenti indipendenti, elezione e migrazione
-del Controller, metriche e dashboard in tempo reale.
+A containerised simulation of a seven-satellite network inspired by Starlink. The project propagates real TLE orbital data, models inter-satellite links and eclipse conditions, elects a logical Controller, and moves that Controller between satellites using comparable **hot** and **cold** migration protocols. It is built as a repeatable experiment: select a migration mode and a number of completed handovers, inspect the live dashboard, and compare the generated reports.
 
-## Componenti
+> This is a distributed-systems simulation, not flight software. The Controller is a logical service whose placement is represented by the satellite agent currently hosting it; the orbital geometry is physically modelled.
 
-- `simulator`: coordinatore headless che propaga i TLE con Skyfield e conserva
-  lo stato corrente della costellazione.
-- `satellite_agent`: immagine riutilizzata per i sette agenti satellitari.
-- `controller`: microservizio Controller associato dinamicamente al satellite
-  eletto dal Simulator.
-- `dashboard`: interfaccia di monitoraggio in tempo reale.
-- `common`: configurazioni e utilità condivise tra i servizi.
-- `config`: configurazione JSON della costellazione.
-- `logs`: destinazione locale dei log generati dai container.
+## What it demonstrates
 
-## Avvio
+- **Orbital awareness:** Skyfield propagates local TLE data and calculates GCRS position and velocity, WGS84 coordinates, sunlight/shadow state, time to eclipse, and pairwise distances.
+- **Dynamic topology:** an inter-satellite link (ISL) exists only when satellites satisfy the configured distance and Earth line-of-sight constraints.
+- **Controller placement:** seven independent agents collect orbital state and send heartbeats; the Simulator elects a Controller host and migrates it before its host enters eclipse.
+- **Comparable handovers:** the same geometry and candidate-selection rules govern hot and cold migrations, allowing objective comparison of duration, downtime, acknowledgements, alignment, and rollback.
+
+The default scenario includes seven satellites (`SAT-1` through `SAT-7`) selected from a Starlink 2022-175 launch in a roughly 53-degree shell. The simulation starts at `2026-07-20T23:57:30Z`.
+
+## Architecture
+
+```text
+                         +------------------------------+
+                         |           Dashboard          |
+                         | live SVG view, tables, events |
+                         +---------------+--------------+
+                                         | aggregates REST data
+                                         v
+ +----------------+    orbital state   +-------------------+    checkpoint/state   +----------------+
+ | Satellite      | <----------------> |     Simulator     | <-------------------> |   Controller   |
+ | agents SAT-1..7| -- heartbeats ---> | scoring, election | <--- heartbeats ----- | topology/routes |
+ +----------------+                    | migrations/reports|                       +----------------+
+        ^                              +-------------------+
+        |                                        |
+        +-------- migration REST protocol -------+
+                 (source and target agents)
+```
+
+| Component | Responsibility |
+| --- | --- |
+| `simulator` | Flask service and headless coordinator. Runs the orbital clock, retains the latest constellation snapshot, evaluates candidate scores, controls Controller election/migration, and exports metrics. |
+| `satellite_agent` | Reusable Flask image instantiated seven times. It polls its orbital record, sends heartbeats, and exposes logical Controller lifecycle and migration endpoints. |
+| `controller` | Flask microservice that maintains heartbeat-derived topology, routing table, sequence number, host satellite, and atomic checkpoints. |
+| `dashboard` | Flask UI which concurrently aggregates Simulator and Controller data. Its dependency-free frontend refreshes twice per second. |
+| `common` | Shared environment-based settings. |
+| `config` | Versioned constellation, TLE, scoring, and migration parameters. |
+| `logs` | Host-mounted location for logs and completed-experiment JSON/PDF reports. |
+| `state` | Host-mounted location for the Controller checkpoint. |
+
+Every service has an `app/__init__.py` composition root that constructs its dependencies. Flask routes in `app/routes.py` are thin HTTP/JSON adapters; application logic lives in modules including `orbit_engine`, `score_manager`, `migration_manager`, `experiment_manager`, `agent`, and `service`. HTTP and filesystem interactions use dedicated adapters, making the core behaviours testable without live containers.
+
+## Simulation lifecycle
+
+1. At startup the orbital clock is paused and the Dashboard asks for `hot` or `cold` mode and a migration limit (1–100; UI default: 3).
+2. The Simulator resets state, starts TLE propagation, and agents poll their state every second. By default, agents heartbeat every five seconds.
+3. The initial-election manager waits for a sunlit satellite with more than 300 seconds remaining before eclipse and at least one reachable neighbour. It selects the eligible satellite with the **least** remaining sunlight, stops hosting on all others, activates the selected agent, and records the logical host in the Controller.
+4. Heartbeats contain CPU use, time to eclipse, Controller status, and current physical-neighbour IDs. The Controller builds topology/routing data from them; the Simulator maintains a separate cache for scoring.
+5. Before the current host reaches eclipse, the scoring manager selects the best eligible physical neighbour and queues a handover when it passes the configured improvement and cooldown rules.
+6. The migration first establishes a continuous contact window. Source and target must remain within 5,500 km, with clear line of sight, for 60 consecutive seconds. Broken contact or a sample gap above 2.5 seconds resets alignment.
+7. The asynchronous migration requires a final `200 OK` acknowledgement from the target before cutover. Failures trigger rollback and remain visible in the event timeline.
+8. Once the requested number of migrations completes, the Simulator stops the clock and writes `metrics-<mode>-<timestamp>.json` and `.pdf` to `logs/`. APIs and Dashboard remain available. **New simulation** logically resets the scenario without rebuilding Docker.
+
+## Orbital and link model
+
+The Simulator updates an in-memory JSON snapshot every `SIMULATOR_TICK_SECONDS` (one second by default). Per-satellite state includes:
+
+- GCRS `position_km`, `velocity_km_s`, and scalar speed;
+- WGS84 latitude, longitude, and altitude;
+- illumination (`sunlight` or `shadow`) and time to the next eclipse;
+- distance from every other satellite;
+- `physical_neighbors`, `physical_neighbor_count`, and constellation-wide `physical_links`.
+
+TLE data is local, so orbital-data downloads are unnecessary. To substitute a constellation, provide a valid three-line-per-object TLE and keep its object count aligned with `satellite_count` and the satellite IDs in `config/constellation.json`.
+
+Controller scoring is always relative to the **current** host. It uses weights `w1`–`w4` from `config/scoring.json` and considers only an unambiguous current Controller and physically reachable targets. The default eclipse trigger combines 60 seconds of required contact alignment, a 90-second protocol budget, and a 60-second safety margin: 210 seconds. The target must have sufficient remaining sunlight and satisfy the link conditions. The migration manager maintains a completion deadline so it cancels or rolls back rather than completing after the source enters shadow.
+
+## Controller handover protocols
+
+Only one migration is active at a time. Both protocols record every REST step with timestamps, status, HTTP result, retries, transferred bytes, duration, and downtime. Retrieve the full operation at `GET /api/v1/migrations/<migration_id>`.
+
+### Hot migration
+
+1. The source registers the outgoing request; the target remains passive and is prepared with an initial checkpoint (**pre-copy**).
+2. After the contact channel is aligned, the Controller is briefly quiesced and a second checkpoint captures the final delta.
+3. The target receives final Controller state and must return `200 OK` for the expected final sequence number.
+4. Only then is the source stopped, the central Controller service restored, the target agent activated, and the logical host updated.
+
+The channel established for pre-copy is reused for the delta; it is not aligned a second time.
+
+### Cold migration
+
+1. The source request is registered and the target is prepared passively.
+2. The Controller is quiesced, a complete checkpoint is taken, and the source is stopped/shut down before transferring state.
+3. The target acknowledges that state with `200 OK`; the Controller is restored, the target starts it, and the host is updated.
+
+Cold migration therefore interrupts service for longer, while hot migration copies its initial working set before cutover. When any required action or acknowledgement fails, the manager restores the checkpoint and attempts to resume/restart the source; the migration is retained as `failed` with its rollback outcome.
+
+## Timing and measurement model
+
+`config/migration.json` controls REST timeouts/retries, contact constraints, and a deterministic parametric timing model. The model does not change migration ordering or geometry; it determines the simulated duration of the actual protocol phases.
+
+It models:
+
+- ISL base/distance latency, link processing, bandwidth, and bounded bandwidth variation;
+- Controller working-set size (base, per-satellite, per-route); hot migration uses `hot_delta_fraction` for the delta;
+- serialization/deserialization throughput, checkpoint/control/staging/startup processing, and per-satellite CPU load;
+- bounded Gaussian jitter seeded by `timing_model.seed`.
+
+Given the same seed, topology, and migration order, timing results are reproducible. Per-migration `metrics.timing_model` stores the real inputs and phase plan, including aggregate contributor totals. The PDF reads those values directly, ensuring it matches the JSON exactly. Default parameters produce a handover of roughly 6–7 seconds and 3–4 seconds of downtime, in addition to the 60-second geometric contact alignment.
+
+## Dashboard
+
+Open [http://localhost:8081/](http://localhost:8081/) after startup. It refreshes every 500 ms and offers:
+
+- SVG network view with physical links, migration source/target highlights, eclipse countdowns, and transition times;
+- satellite, route, heartbeat, candidate-score, and migration tables;
+- event stream built from migration steps, heartbeats, upstream errors, and local logs;
+- handover timeline for selection, alignment, checkpoints, transfers, acknowledgement, cutover, and rollback;
+- experiment controls plus JSON/PDF export listing and preview.
+
+The frontend uses no CDN or external JavaScript library, allowing offline operation once Docker images are present locally.
+
+## Prerequisites
+
+- Docker Engine with Docker Compose v2 (`docker compose`)
+- The local ports documented below must be available
+
+Python is required only for running tests outside Docker. Each service supplies its compatible runtime dependencies in its own `requirements.txt`.
+
+## Quick start
 
 ```bash
 docker compose up --build
 ```
 
-Endpoint iniziali:
+Visit [http://localhost:8081/](http://localhost:8081/), choose an experiment mode and migration limit, and inspect the run. Verify Simulator readiness with:
 
-- Simulator: `http://localhost:8000/health`
-- Stato costellazione: `http://localhost:8000/api/v1/constellation`
-- Elenco satelliti: `http://localhost:8000/api/v1/satellites`
-- Singolo satellite: `http://localhost:8000/api/v1/satellites/SAT-1`
-- Score globali: `http://localhost:8000/api/v1/scores`
-- Heartbeat ricevuti: `http://localhost:8000/api/v1/heartbeats`
-- Migrazioni raccomandate: `http://localhost:8000/api/v1/migrations`
-- Elezione iniziale: `http://localhost:8000/api/v1/startup-controller`
-- Controller: `http://localhost:8001/health`
-- Dashboard: `http://localhost:8081/health`
-- Interfaccia Dashboard: `http://localhost:8081/`
-- Satelliti SAT-1 ... SAT-7: porte `8101` ... `8107`, percorso `/health`
+```bash
+curl http://localhost:8000/health
+```
 
-API di ogni Satellite Agent:
-
-- `GET /status`: stato locale, Controller, sincronizzazione e heartbeat.
-- `GET /position`: ultima posizione ricevuta dal Simulator.
-- `POST /receive_state`: ricezione push dello stato orbitale.
-- `POST /start_controller` e `POST /stop_controller`: ciclo di vita logico del Controller.
-- `POST /migration_request`: accettazione di una migrazione del Controller.
-- `POST /receive_controller_state`: ricezione del final state e ACK `200` della
-  Hot Migration.
-
-API del Controller:
-
-- `GET /heartbeat`: elenco degli heartbeat ricevuti; accetta `?id=SAT-1`.
-- `POST /heartbeat`: ricezione degli heartbeat dai Satellite Agent.
-- `GET /state`: topologia, routing table, heartbeat e versione dello stato.
-- `POST /host`: aggiornamento del satellite che ospita logicamente il Controller.
-- `POST /checkpoint`: serializzazione e salvataggio atomico dello stato.
-- `POST /restore`: ripristino dal JSON inviato o dall'ultimo file salvato.
-- `POST /shutdown`: checkpoint e disattivazione logica del Controller.
-- `POST /quiesce` e `POST /resume`: freeze temporaneo delle mutazioni durante
-  il cutover Hot e ripresa in caso di rollback.
-
-Per arrestare lo stack:
+Stop the stack with:
 
 ```bash
 docker compose down
 ```
 
-## Stato prodotto dal Simulator
+The bind-mounted `logs/` and `state/` directories are kept by `docker compose down`. Clear them only when you intentionally want to discard reports or the last Controller checkpoint.
 
-Il Simulator aggiorna ogni secondo uno snapshot JSON in memoria. Ogni satellite
-espone posizione e velocita nel riferimento inerziale GCRS, coordinate
-geodetiche WGS84, velocita scalare, stato `sunlight`/`shadow`, tempo alla
-prossima entrata in ombra e distanza da tutti gli altri satelliti. Il file TLE
-locale e `config/starlink.tle`; puo essere sostituito mantenendo il formato a
-tre righe e un numero di satelliti coerente con `satellite_count` in
-`config/constellation.json`.
-La selezione predefinita usa sette Starlink del guscio a circa 53 gradi con
-piani orbitali e fasi differenti. I due satelliti aggiunti occupano gli
-intervalli più ampi tra quelli originali, così le posizioni proiettate restano
-ben distribuite lungo l'orbita.
+## Service ports
 
-Ogni Satellite Agent recupera inoltre il proprio stato dal Simulator ogni
-secondo e invia un heartbeat periodico al `score_manager` del Simulator;
-eventuali errori di consegna restano visibili in `GET /status` senza
-interrompere l'agente. I pesi `w1`...`w4`, il TTL degli heartbeat e le soglie di
-migrazione sono configurabili in `config/scoring.json`.
+| Service | Host address | Purpose |
+| --- | --- | --- |
+| Simulator | `http://localhost:8000` | Orbital state, experiments, scores, migrations, metrics |
+| Controller | `http://localhost:8001` | Controller state, checkpoints, heartbeats |
+| Dashboard | `http://localhost:8081` | Web UI and aggregation (`DASHBOARD_PORT` is configurable) |
+| `SAT-1` to `SAT-7` | `http://localhost:8101` to `http://localhost:8107` | Individual satellite-agent APIs |
 
-Lo score di ogni candidato viene sempre calcolato rispetto al satellite che
-ospita il Controller in quel momento: `D` e la distanza diretta tra il
-Controller corrente e il candidato. Se gli heartbeat non identificano
-esattamente un Controller, lo scoring resta in attesa e non puo richiedere una
-migrazione. Dopo un handover, il nuovo Controller diventa automaticamente il
-nuovo riferimento per tutti gli score.
+## Public APIs
 
-All'avvio nessun Satellite Agent ospita il Controller. Il Simulator attende il
-primo stato orbitale, considera soltanto i satelliti in luce con piu di 120
-secondi prima dell'eclissi e sceglie quello con il tempo residuo minimo. Quindi
-attiva il Controller su quell'agente e disattiva esplicitamente tutti gli
-altri. La soglia e la strategia sono configurate nella sezione
-`initial_controller` di `config/constellation.json`; stato, candidati e scelta
-sono visibili in `GET /api/v1/startup-controller`.
+### Simulator (`localhost:8000`)
 
-Il `migration_manager` esegue in modo asincrono una migrazione alla volta. Il
-protocollo, gli URL REST, timeout e retry sono configurabili in
-`config/migration.json`. `POST /api/v1/migrations` permette inoltre di avviare
-manualmente una migrazione `cold` o `hot`; `GET /api/v1/migrations/<id>` espone
-stato, ACK, tempi, downtime, byte trasferiti, retry e risultato del rollback.
-Prima di entrare nella coda di esecuzione, ogni migrazione resta nello stato
-`waiting_for_contact`: sorgente e destinazione devono mantenere per 60 secondi
-consecutivi una distanza non superiore a 5.500 km e linea di vista libera dalla
-Terra. Un'interruzione del contatto o un intervallo eccessivo fra gli snapshot
-azzera l'allineamento. Durata, distanza, causa dell'attesa e numero di reset
-sono esposti nel campo `contact_window` della migrazione; soglie e durata sono
-configurabili in `config/migration.json`.
-La Hot Migration usa una pre-copy iniziale, mette brevemente il source in
-quiescenza, acquisisce un secondo checkpoint con gli aggiornamenti intervenuti,
-attende l'ACK `200` del target sul final sequence number e solo allora esegue
-stop del source e attivazione definitiva del target.
-La Cold Migration mette subito il source in quiescenza, lo arresta, acquisisce
-il checkpoint definitivo, attende lo stesso ACK `200` dal target e soltanto
-dopo esegue restore e attivazione. In caso di errore il checkpoint viene
-ripristinato e il source viene riavviato.
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/health` | Readiness, run state, and last error. |
+| `GET` | `/api/v1/constellation` | Full latest orbital/topology snapshot. |
+| `GET` | `/api/v1/satellites` | All satellite records. |
+| `GET` | `/api/v1/satellites/SAT-1` | One satellite record. |
+| `GET`/`POST` | `/api/v1/heartbeats` | List or submit heartbeats; posts are ignored while no experiment runs. |
+| `GET` | `/api/v1/scores` | Candidate scores and migration evaluation. |
+| `GET` | `/api/v1/startup-controller` | Initial-election status, candidates, and host. |
+| `GET`/`POST` | `/api/v1/migrations` | List migrations or queue one manually. |
+| `GET` | `/api/v1/migrations/<id>` | Migration contact status, events, and metrics. |
+| `GET`/`POST` | `/api/v1/experiment` | Read state or start an experiment. |
+| `POST` | `/api/v1/experiment/reset` | Return to the paused initial scenario. |
+| `GET` | `/api/v1/metrics` | Aggregate experiment metrics. |
+| `GET` | `/api/v1/metrics/export.json` | Download current metrics as JSON. |
+| `GET` | `/api/v1/metrics/export.csv` | Download current metrics as CSV. |
 
-La Dashboard Flask aggrega Simulator e Controller tramite `/api/dashboard` e
-aggiorna ogni secondo una rete SVG, tabella satelliti, routing table, heartbeat,
-score, luce/ombra, migrazioni e stream degli eventi. Accanto alla rete mostra
-per ogni satellite il conto alla rovescia e l'orario della prossima transizione;
-source e target delle migrazioni del Controller sono evidenziati anche nel
-grafo. Sotto la rete, una timeline mostra gli istanti assoluti e relativi di
-selezione, allineamento, checkpoint, trasferimento, ACK, cutover ed eventuale
-rollback fino al completamento. Non usa CDN o librerie frontend esterne ed è
-quindi disponibile anche senza accesso Internet.
+Start an experiment with:
 
-Il modulo Metrics del Simulator registra automaticamente heartbeat ed elezioni
-del Controller e aggrega numero di migrazioni, ACK, downtime e durata degli
-handover. `GET /api/v1/metrics` restituisce lo snapshot JSON corrente. Gli
-endpoint `/api/v1/metrics/export.json` e `/api/v1/metrics/export.csv` scaricano
-lo stesso snapshot nei due formati; il tempo totale viene calcolato dall'avvio
-del processo Simulator.
+```bash
+curl -X POST http://localhost:8000/api/v1/experiment \
+  -H "Content-Type: application/json" \
+  -d '{"mode":"hot","migration_limit":3}'
+```
 
-## Architettura dei moduli
+A manual migration (only while the experiment runs) needs a payload such as:
 
-Ogni container usa una composition root in `app/__init__.py`: qui vengono lette
-le impostazioni, costruiti i servizi e iniettate le dipendenze. Le route Flask
-sono isolate in `app/routes.py` e traducono soltanto HTTP/JSON verso i casi
-d'uso. La logica applicativa resta nei moduli `service`, `agent`,
-`score_manager`, `migration_manager`, `metrics` e `orbit_engine`.
+```json
+{
+  "source_satellite_id": "SAT-1",
+  "target_satellite_id": "SAT-2",
+  "mode": "hot"
+}
+```
 
-Le dipendenze infrastrutturali sono dietro porte esplicite: il Satellite Agent
-usa `AgentHttpTransport`, mentre il Controller usa `CheckpointRepository`.
-Gli adapter correnti sono basati sulla standard library (`urllib` e filesystem)
-e possono essere sostituiti nei test o da implementazioni future senza cambiare
-la logica applicativa. La configurazione della costellazione è gestita dal
-modulo dedicato `simulator/app/configuration.py`.
+### Satellite agent (`localhost:8101`–`8107`)
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/health` | Agent identity and worker status. |
+| `GET` | `/status` | Local Controller, sync, heartbeat, and migration state. |
+| `GET` | `/position` | Last Simulator state; returns `503` before first sync. |
+| `POST` | `/receive_state` | Accept individual or full orbital snapshot. |
+| `POST` | `/start_controller`, `/stop_controller` | Start/stop logical Controller hosting. |
+| `POST` | `/migration_request` | Register outbound handover; allowed only for current host. |
+| `POST` | `/prepare_migration` | Prepare passive target with initial state. |
+| `POST` | `/receive_controller_state` | Receive final state and return required `200 OK`. |
+| `POST` | `/reset_simulation` | Clear volatile state while retaining workers. |
+
+### Controller (`localhost:8001`)
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/health` | Active/quiesced state and logical host. |
+| `GET`/`POST` | `/heartbeat` | List (optional `?id=SAT-1`) or accept a heartbeat. |
+| `GET` | `/state` | Topology, routes, heartbeats, sequence number, timestamp, host. |
+| `POST` | `/host` | Set host with `{"satellite_id":"SAT-1"}`. |
+| `POST` | `/checkpoint` | Atomically save state to `state/controller-checkpoint.json`. |
+| `POST` | `/restore` | Restore supplied JSON or the last checkpoint. |
+| `POST` | `/shutdown` | Checkpoint and logically deactivate. |
+| `POST` | `/quiesce`, `/resume` | Pause/resume mutations around cutover. |
+| `POST` | `/reset_simulation` | Clear state and reset host to `UNASSIGNED`. |
+
+### Dashboard (`localhost:8081`)
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/` | Monitoring UI. |
+| `GET` | `/api/dashboard` | Aggregated resilient upstream snapshot. |
+| `GET` | `/api/exports` | Available automatic JSON/PDF reports. |
+| `GET` | `/exports/<filename>` | Download a listed report (`?download=1` forces attachment). |
+| `POST` | `/api/experiment` | Proxy experiment start to the Simulator. |
+| `POST` | `/api/experiment/reset` | Proxy logical reset. |
+| `GET` | `/health` | Dashboard health. |
+
+## Configuration
+
+Configuration is mounted read-only into the containers.
+
+| File | Key settings |
+| --- | --- |
+| `config/constellation.json` | Satellite IDs/names, count, fixed simulation start, initial-election strategy. |
+| `config/starlink.tle` | Local source orbital elements. |
+| `config/scoring.json` | Score weights, heartbeat TTL, improvement/cooldown, eclipse safety rules. |
+| `config/migration.json` | Mode, agent endpoint template, retries, contact constraints, execution budget, timing model. |
+| `.env.example` | Logging, tick intervals, request timeouts, and Dashboard port defaults. |
+
+To override the Compose defaults, copy `.env.example` to `.env`, edit the desired values, and recreate the stack. Important variables include `SIMULATOR_TICK_SECONDS`, `ECLIPSE_SEARCH_HOURS`, `STATE_SYNC_INTERVAL_SECONDS`, `HEARTBEAT_INTERVAL_SECONDS`, `HTTP_REQUEST_TIMEOUT_SECONDS`, `UPSTREAM_TIMEOUT_SECONDS`, and `DASHBOARD_PORT`.
+
+## Reports and metrics
+
+`GET /api/v1/metrics` returns experiment time, completed/failed migration and heartbeat counts, acknowledgements, total/average downtime, average handover and contact-alignment time, and Controller-election measurements. On automatic completion, the JSON report retains the full migration records. The PDF provides a human-readable summary and phase-level timing explanation.
+
+Reports are named `metrics-hot-YYYYMMDD-HHMMSS.{json,pdf}` or `metrics-cold-YYYYMMDD-HHMMSS.{json,pdf}`. They appear in the Dashboard Export section and remain on the host in `logs/`.
+
+## Tests
+
+The repository has unit/API tests for the orbit engine, contact windows, timing model, scoring, initial election, migration protocols, reports, and the four Flask services. With the required dependencies installed, run each suite from its service directory:
+
+```bash
+cd simulator
+python -m unittest discover -s tests -v
+
+cd ../controller
+python -m unittest discover -s tests -v
+
+cd ../satellite_agent
+python -m unittest discover -s tests -v
+
+cd ../dashboard
+python -m unittest discover -s tests -v
+```
+
+The Compose workflow is recommended for end-to-end execution because it provides the intended service names, private network, mounts, and inter-service URLs.

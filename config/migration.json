@@ -5,6 +5,51 @@
   "request_timeout_seconds": 5,
   "max_retries": 2,
   "retry_delay_seconds": 0.5,
+  "protocol_phase_delay_seconds": 0,
+  "execution_budget_seconds": 90,
+  "timing_model": {
+    "enabled": true,
+    "seed": 20260726,
+    "network": {
+      "base_link_latency_ms": 90,
+      "distance_latency_ms_per_1000_km": 3,
+      "link_processing_ms": 45,
+      "bandwidth_mbps": 130,
+      "bandwidth_variation_percent": 8
+    },
+    "state": {
+      "base_state_bytes": 5000000,
+      "per_satellite_state_bytes": 180000,
+      "per_route_state_bytes": 5000,
+      "hot_delta_fraction": 0.16
+    },
+    "processing": {
+      "serialization_throughput_mbps": 180,
+      "deserialization_throughput_mbps": 150,
+      "control_processing_ms": 55,
+      "checkpoint_processing_ms": 300,
+      "target_processing_ms": 130,
+      "startup_base_ms": 1000,
+      "synchronization_base_ms": 350,
+      "precopy_synchronization_ms": 1100,
+      "cold_target_staging_ms": 800,
+      "cpu_penalty_factor": 0.75,
+      "cpu_variation_percent": 4
+    },
+    "satellite_cpu_load_percent": {
+      "SAT-1": 26,
+      "SAT-2": 31,
+      "SAT-3": 35,
+      "SAT-4": 29,
+      "SAT-5": 38,
+      "SAT-6": 33,
+      "SAT-7": 27
+    },
+    "jitter": {
+      "gaussian_noise_stddev_ms": 120,
+      "gaussian_noise_limit_ms": 300
+    }
+  },
   "contact_window": {
     "required_alignment_seconds": 60,
     "max_distance_km": 5500,

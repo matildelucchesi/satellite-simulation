@@ -26,6 +26,9 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
         CONTROLLER_ENABLED=_env_bool("CONTROLLER_ENABLED", False),
         SIMULATOR_URL=os.getenv("SIMULATOR_URL", "http://simulator:5000"),
         HEARTBEAT_URL=os.getenv("HEARTBEAT_URL", "http://controller:5000/heartbeat"),
+        CONTROLLER_HEARTBEAT_URL=os.getenv(
+            "CONTROLLER_HEARTBEAT_URL", "http://controller:5000/heartbeat"
+        ),
         STATE_SYNC_INTERVAL_SECONDS=float(
             os.getenv("STATE_SYNC_INTERVAL_SECONDS", "1")
         ),
@@ -46,6 +49,7 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
         controller_enabled=app.config["CONTROLLER_ENABLED"],
         simulator_url=app.config["SIMULATOR_URL"],
         heartbeat_url=app.config["HEARTBEAT_URL"],
+        controller_heartbeat_url=app.config["CONTROLLER_HEARTBEAT_URL"],
         state_sync_interval_seconds=app.config["STATE_SYNC_INTERVAL_SECONDS"],
         heartbeat_interval_seconds=app.config["HEARTBEAT_INTERVAL_SECONDS"],
         request_timeout_seconds=app.config["HTTP_REQUEST_TIMEOUT_SECONDS"],

@@ -17,6 +17,8 @@ from skyfield.api import EarthSatellite, Loader, wgs84
 from skyfield.searchlib import find_discrete
 from skyfield_data import get_skyfield_data_path
 
+from .contact_window import ContactWindowConfig, evaluate_contact
+
 LOGGER = logging.getLogger(__name__)
 
 
@@ -81,7 +83,9 @@ class ConstellationSimulator:
         constellation_name: str = "starlink-simulation",
         tick_seconds: float = 1.0,
         eclipse_search_hours: float = 24.0,
+        simulation_start_at: datetime | None = None,
         state_listener: Callable[[dict[str, Any]], None] | None = None,
+        contact_window_config: ContactWindowConfig | None = None,
     ) -> None:
         if tick_seconds <= 0:
             raise ValueError("tick_seconds deve essere maggiore di zero")
@@ -91,7 +95,15 @@ class ConstellationSimulator:
         self.constellation_name = constellation_name
         self.tick_seconds = tick_seconds
         self.eclipse_search_hours = eclipse_search_hours
+        if simulation_start_at is not None and simulation_start_at.tzinfo is None:
+            raise ValueError("simulation_start_at deve includere il fuso orario")
+        self.simulation_start_at = (
+            simulation_start_at.astimezone(timezone.utc)
+            if simulation_start_at is not None
+            else None
+        )
         self.state_listener = state_listener
+        self.contact_window_config = contact_window_config
         self.timescale, self.satellites = load_tle_file(
             tle_path, expected_count=len(satellite_ids), satellite_ids=satellite_ids
         )
@@ -105,6 +117,7 @@ class ConstellationSimulator:
         self._state: dict[str, Any] = {}
         self._last_error: str | None = None
         self._eclipse_cache: dict[str, dict[str, Any]] = {}
+        self._clock_started_at: float | None = None
 
     @property
     def running(self) -> bool:
@@ -126,6 +139,7 @@ class ConstellationSimulator:
         if self.running:
             return
         self._stop_event.clear()
+        self._clock_started_at = monotonic()
         self.update()
         self._thread = Thread(
             target=self._run,
@@ -141,6 +155,18 @@ class ConstellationSimulator:
         thread = self._thread
         if thread is not None and thread.is_alive():
             thread.join(timeout=timeout)
+        self._thread = None
+
+    def reset(self) -> dict[str, Any]:
+        """Riporta il clock e lo stato orbitale all'istante iniziale configurato."""
+
+        self.stop()
+        with self._lock:
+            self._state = {}
+            self._last_error = None
+            self._eclipse_cache = {}
+            self._clock_started_at = None
+        return self.update(self.simulation_start_at)
 
     def close(self) -> None:
         """Arresta il worker e chiude il file delle effemeridi."""
@@ -162,7 +188,7 @@ class ConstellationSimulator:
     def update(self, at: datetime | None = None) -> dict[str, Any]:
         """Propaga tutti i TLE allo stesso istante e sostituisce lo snapshot."""
 
-        current_time = at or datetime.now(timezone.utc)
+        current_time = at or self._simulation_now()
         if current_time.tzinfo is None:
             raise ValueError("L'istante di simulazione deve includere il fuso orario")
         current_time = current_time.astimezone(timezone.utc)
@@ -191,6 +217,7 @@ class ConstellationSimulator:
             "satellites": satellites_state,
             "distances_km": distances,
         }
+        self._add_physical_topology(snapshot)
 
         with self._lock:
             self._state = snapshot
@@ -201,6 +228,51 @@ class ConstellationSimulator:
             except Exception:  # pragma: no cover - isolamento del coordinatore
                 LOGGER.exception("Il listener dello stato della costellazione è fallito")
         return deepcopy(snapshot)
+
+    def _simulation_now(self) -> datetime:
+        if self.simulation_start_at is None:
+            return datetime.now(timezone.utc)
+        clock_started_at = self._clock_started_at
+        elapsed_seconds = (
+            max(0.0, monotonic() - clock_started_at)
+            if clock_started_at is not None
+            else 0.0
+        )
+        return self.simulation_start_at + timedelta(seconds=elapsed_seconds)
+
+    def _add_physical_topology(self, snapshot: dict[str, Any]) -> None:
+        """Aggiunge i collegamenti ISL che rispettano distanza e linea di vista."""
+
+        if self.contact_window_config is None:
+            return
+        satellites = snapshot["satellites"]
+        satellite_ids = list(satellites)
+        neighbors = {satellite_id: [] for satellite_id in satellite_ids}
+        links: list[dict[str, Any]] = []
+        for source_index, source_id in enumerate(satellite_ids):
+            for target_id in satellite_ids[source_index + 1 :]:
+                observation = evaluate_contact(
+                    snapshot,
+                    source_id,
+                    target_id,
+                    self.contact_window_config,
+                )
+                if not observation.eligible:
+                    continue
+                neighbors[source_id].append(target_id)
+                neighbors[target_id].append(source_id)
+                links.append(
+                    {
+                        "source": source_id,
+                        "target": target_id,
+                        "distance_km": round(observation.distance_km or 0.0, 3),
+                        "line_of_sight": observation.line_of_sight,
+                    }
+                )
+        for satellite_id, state in satellites.items():
+            state["physical_neighbors"] = neighbors[satellite_id]
+            state["physical_neighbor_count"] = len(neighbors[satellite_id])
+        snapshot["physical_links"] = links
 
     def _run(self) -> None:
         next_tick = monotonic() + self.tick_seconds

@@ -13,6 +13,7 @@ x-satellite-agent: &satellite-agent
     LOG_LEVEL: ${LOG_LEVEL:-INFO}
     SIMULATOR_URL: http://simulator:5000
     HEARTBEAT_URL: http://simulator:5000/api/v1/heartbeats
+    CONTROLLER_HEARTBEAT_URL: http://controller:5000/heartbeat
     STATE_SYNC_INTERVAL_SECONDS: ${STATE_SYNC_INTERVAL_SECONDS:-1}
     HEARTBEAT_INTERVAL_SECONDS: ${HEARTBEAT_INTERVAL_SECONDS:-5}
     HTTP_REQUEST_TIMEOUT_SECONDS: ${HTTP_REQUEST_TIMEOUT_SECONDS:-2}
@@ -24,6 +25,8 @@ x-satellite-agent: &satellite-agent
     - satellite-network
   depends_on:
     simulator:
+      condition: service_healthy
+    controller:
       condition: service_healthy
 
 services:

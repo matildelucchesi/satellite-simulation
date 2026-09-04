@@ -45,11 +45,18 @@ def create_api_blueprint(service_name: str, agent: SatelliteAgent) -> Blueprint:
 
     @api.post("/start_controller")
     def start_controller():
-        return jsonify(agent.start_controller())
+        try:
+            return jsonify(agent.start_controller())
+        except AgentValidationError as exc:
+            return jsonify({"error": "controller_not_ready", "message": str(exc)}), 409
 
     @api.post("/stop_controller")
     def stop_controller():
         return jsonify(agent.stop_controller())
+
+    @api.post("/reset_simulation")
+    def reset_simulation():
+        return jsonify(agent.reset_simulation())
 
     @api.post("/migration_request")
     def migration_request():
@@ -57,7 +64,18 @@ def create_api_blueprint(service_name: str, agent: SatelliteAgent) -> Blueprint:
         if payload is None:
             return jsonify({"error": "invalid_json"}), 400
         try:
-            migration = agent.accept_migration(payload)
+            migration = agent.request_migration(payload)
+        except AgentValidationError as exc:
+            return jsonify({"error": "migration_rejected", "message": str(exc)}), 409
+        return jsonify(migration), 202
+
+    @api.post("/prepare_migration")
+    def prepare_migration():
+        payload = request.get_json(silent=True)
+        if payload is None:
+            return jsonify({"error": "invalid_json"}), 400
+        try:
+            migration = agent.prepare_migration(payload)
         except AgentValidationError as exc:
             return jsonify({"error": "migration_rejected", "message": str(exc)}), 409
         return jsonify(migration), 202

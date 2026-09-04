@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -36,4 +37,16 @@ def load_constellation_config(path: str | Path) -> dict[str, Any]:
     initial_controller = data.get("constellation", {}).get("initial_controller")
     if controller_id == "AUTO" and not isinstance(initial_controller, dict):
         raise ValueError("initial_controller è obbligatorio quando il Controller è AUTO")
+    simulation_start_at = data.get("constellation", {}).get("simulation_start_at")
+    if simulation_start_at is not None:
+        if not isinstance(simulation_start_at, str):
+            raise ValueError("simulation_start_at deve essere una data ISO 8601")
+        try:
+            parsed_start = datetime.fromisoformat(
+                simulation_start_at.replace("Z", "+00:00")
+            )
+        except ValueError as exc:
+            raise ValueError("simulation_start_at deve essere una data ISO 8601") from exc
+        if parsed_start.tzinfo is None:
+            raise ValueError("simulation_start_at deve includere il fuso orario")
     return data

@@ -9,6 +9,7 @@ import math
 from threading import Event, RLock, Thread
 from typing import Any, Callable
 
+from .contact_window import ContactWindowConfig, evaluate_contact
 from .migration_manager import RestTransport, UrllibRestTransport
 
 
@@ -17,6 +18,7 @@ class StartupControllerConfig:
     strategy: str
     minimum_sunlight_seconds: float
     retry_seconds: float
+    require_contact_candidate: bool = True
 
     @classmethod
     def from_dict(cls, payload: Any) -> "StartupControllerConfig":
@@ -32,13 +34,17 @@ class StartupControllerConfig:
             "minimum_sunlight_seconds",
         )
         retry = _positive_number(payload.get("retry_seconds", 1), "retry_seconds")
-        return cls(strategy, minimum, retry)
+        require_contact = payload.get("require_contact_candidate", True)
+        if not isinstance(require_contact, bool):
+            raise ValueError("require_contact_candidate deve essere booleano")
+        return cls(strategy, minimum, retry, require_contact)
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "strategy": self.strategy,
             "minimum_sunlight_seconds": self.minimum_sunlight_seconds,
             "retry_seconds": self.retry_seconds,
+            "require_contact_candidate": self.require_contact_candidate,
         }
 
 
@@ -53,6 +59,7 @@ class StartupControllerManager:
         controller_url: str,
         transport: RestTransport | None = None,
         request_timeout_seconds: float = 2.0,
+        contact_window_config: ContactWindowConfig | None = None,
     ) -> None:
         if not satellite_ids or len(set(satellite_ids)) != len(satellite_ids):
             raise ValueError("Gli ID dei satelliti iniziali devono essere unici")
@@ -62,6 +69,7 @@ class StartupControllerManager:
         self.controller_url = controller_url.rstrip("/")
         self.transport = transport or UrllibRestTransport()
         self.request_timeout_seconds = request_timeout_seconds
+        self.contact_window_config = contact_window_config
         self._lock = RLock()
         self._wake_event = Event()
         self._stop_event = Event()
@@ -99,6 +107,26 @@ class StartupControllerManager:
         self._wake_event.set()
         if self._thread is not None and self._thread.is_alive():
             self._thread.join(timeout=timeout)
+        self._thread = None
+
+    def reset(self) -> None:
+        """Dimentica l'elezione precedente per ripetere lo scenario iniziale."""
+
+        self.stop()
+        with self._lock:
+            self._state = {
+                "strategy": self.config.strategy,
+                "minimum_sunlight_seconds": self.config.minimum_sunlight_seconds,
+                "status": "waiting_for_orbital_state",
+                "selected_satellite_id": None,
+                "selected_time_to_eclipse_seconds": None,
+                "eligible_candidates": [],
+                "selected_at": None,
+                "activated_at": None,
+                "activation_attempts": 0,
+                "last_error": None,
+            }
+        self._wake_event.clear()
 
     def update_constellation(self, snapshot: dict[str, Any]) -> None:
         with self._lock:
@@ -108,6 +136,8 @@ class StartupControllerManager:
                 snapshot,
                 self.satellite_ids,
                 self.config.minimum_sunlight_seconds,
+                self.contact_window_config,
+                self.config.require_contact_candidate,
             )
             self._state["eligible_candidates"] = deepcopy(candidates)
             if not candidates:
@@ -203,6 +233,8 @@ def _eligible_candidates(
     snapshot: dict[str, Any],
     satellite_ids: list[str],
     minimum_sunlight_seconds: float,
+    contact_window_config: ContactWindowConfig | None,
+    require_contact_candidate: bool,
 ) -> list[dict[str, Any]]:
     satellites = snapshot.get("satellites", {})
     candidates: list[dict[str, Any]] = []
@@ -218,10 +250,33 @@ def _eligible_candidates(
             or float(seconds) <= minimum_sunlight_seconds
         ):
             continue
+        reachable_neighbors: list[str] = []
+        handover_targets: list[str] = []
+        if contact_window_config is not None:
+            reachable_neighbors = [
+                target_id
+                for target_id in satellite_ids
+                if target_id != satellite_id
+                and evaluate_contact(
+                    snapshot,
+                    satellite_id,
+                    target_id,
+                    contact_window_config,
+                ).eligible
+            ]
+            handover_targets = [
+                target_id
+                for target_id in reachable_neighbors
+                if _remaining_sunlight(snapshot, target_id) > float(seconds)
+            ]
+            if require_contact_candidate and not reachable_neighbors:
+                continue
         candidates.append(
             {
                 "satellite_id": satellite_id,
                 "seconds_until_eclipse": round(float(seconds), 3),
+                "reachable_neighbors": reachable_neighbors,
+                "handover_target_neighbors": handover_targets,
                 "constellation_order": order,
             }
         )
@@ -234,6 +289,20 @@ def _eligible_candidates(
     for candidate in candidates:
         candidate.pop("constellation_order", None)
     return candidates
+
+
+def _remaining_sunlight(snapshot: dict[str, Any], satellite_id: str) -> float:
+    satellite = snapshot.get("satellites", {}).get(satellite_id, {})
+    illumination = satellite.get("illumination", {})
+    seconds = illumination.get("seconds_until_eclipse")
+    if (
+        illumination.get("state") != "sunlight"
+        or isinstance(seconds, bool)
+        or not isinstance(seconds, (int, float))
+        or not math.isfinite(seconds)
+    ):
+        return -1.0
+    return float(seconds)
 
 
 def _positive_number(value: Any, name: str) -> float:

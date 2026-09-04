@@ -132,6 +132,12 @@ class ControllerService:
         with self._lock:
             previous = self._host_satellite_id
             self._host_satellite_id = normalized
+            for satellite_id, heartbeat in self._state.heartbeats.items():
+                heartbeat["controller"] = satellite_id == normalized
+            for satellite_id, node in self._state.topology.get("nodes", {}).items():
+                if isinstance(node, dict):
+                    node["controller"] = satellite_id == normalized
+            self._touch()
             return {
                 "status": "updated",
                 "previous_host_satellite_id": previous,
@@ -151,6 +157,16 @@ class ControllerService:
     def snapshot(self) -> dict[str, Any]:
         with self._lock:
             return self._state.to_dict()
+
+    def reset_simulation(self) -> dict[str, Any]:
+        """Ripristina lo stato iniziale senza riavviare il processo Flask."""
+
+        with self._lock:
+            self._state = ControllerState.empty()
+            self._active = True
+            self._quiesced = False
+            self._host_satellite_id = "UNASSIGNED"
+        return {"status": "reset", "host_satellite_id": "UNASSIGNED"}
 
     def heartbeat_snapshot(self, satellite_id: str | None = None) -> dict[str, Any]:
         with self._lock:

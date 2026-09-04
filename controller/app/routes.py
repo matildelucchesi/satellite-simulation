@@ -68,6 +68,10 @@ def create_api_blueprint(
             return jsonify({"error": "invalid_host", "message": str(exc)}), 400
         return jsonify(result), 200
 
+    @api.post("/reset_simulation")
+    def reset_simulation():
+        return jsonify(controller.reset_simulation()), 200
+
     @api.post("/checkpoint")
     def checkpoint():
         state = controller.checkpoint()

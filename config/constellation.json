@@ -2,20 +2,22 @@
   "constellation": {
     "name": "starlink-simulation",
     "satellite_count": 7,
+    "simulation_start_at": "2026-07-20T23:57:30Z",
     "controller_satellite_id": "AUTO",
     "initial_controller": {
       "strategy": "minimum_remaining_sunlight",
-      "minimum_sunlight_seconds": 120,
-      "retry_seconds": 1
+      "minimum_sunlight_seconds": 300,
+      "retry_seconds": 1,
+      "require_contact_candidate": true
     }
   },
   "satellites": [
-    {"id": "SAT-1", "name": "STARLINK-5426", "controller": false},
-    {"id": "SAT-2", "name": "STARLINK-3779", "controller": false},
-    {"id": "SAT-3", "name": "STARLINK-3136", "controller": false},
-    {"id": "SAT-4", "name": "STARLINK-4104", "controller": false},
-    {"id": "SAT-5", "name": "STARLINK-3825", "controller": false},
-    {"id": "SAT-6", "name": "STARLINK-5264", "controller": false},
-    {"id": "SAT-7", "name": "STARLINK-5129", "controller": false}
+    {"id": "SAT-1", "name": "STARLINK-5446", "controller": false},
+    {"id": "SAT-2", "name": "STARLINK-5471", "controller": false},
+    {"id": "SAT-3", "name": "STARLINK-5444", "controller": false},
+    {"id": "SAT-4", "name": "STARLINK-5451", "controller": false},
+    {"id": "SAT-5", "name": "STARLINK-5465", "controller": false},
+    {"id": "SAT-6", "name": "STARLINK-5439", "controller": false},
+    {"id": "SAT-7", "name": "STARLINK-5433", "controller": false}
   ]
 }

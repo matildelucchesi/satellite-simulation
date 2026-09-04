@@ -24,6 +24,28 @@ class MetricsManager:
         self._heartbeat_count = 0
         self._election_times_ms: list[float] = []
         self._last_selected_satellite_id: str | None = None
+        self._experiment_mode: str | None = None
+        self._migration_limit: int | None = None
+        self._finished_at: str | None = None
+        self._finished_monotonic: float | None = None
+
+    def reset(self, mode: str, migration_limit: int) -> None:
+        with self._lock:
+            self._started_monotonic = monotonic()
+            self._started_at = _utc_now()
+            self._heartbeat_count = 0
+            self._election_times_ms = []
+            self._last_selected_satellite_id = None
+            self._experiment_mode = mode
+            self._migration_limit = migration_limit
+            self._finished_at = None
+            self._finished_monotonic = None
+
+    def finish(self) -> None:
+        with self._lock:
+            if self._finished_at is None:
+                self._finished_at = _utc_now()
+                self._finished_monotonic = monotonic()
 
     def record_heartbeat(self) -> None:
         """Registra un heartbeat validato e accettato dal Simulator."""
@@ -66,10 +88,15 @@ class MetricsManager:
             heartbeat_count = self._heartbeat_count
             election_times = list(self._election_times_ms)
             selected = self._last_selected_satellite_id
-            elapsed = monotonic() - self._started_monotonic
+            elapsed = (
+                self._finished_monotonic or monotonic()
+            ) - self._started_monotonic
 
         return {
+            "experiment_mode": self._experiment_mode,
+            "migration_limit": self._migration_limit,
             "simulation_started_at": self._started_at,
+            "simulation_finished_at": self._finished_at,
             "generated_at": _utc_now(),
             "simulation_time_seconds": round(elapsed, 3),
             "migration_count": len(migrations),

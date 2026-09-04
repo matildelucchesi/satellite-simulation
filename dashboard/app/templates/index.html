@@ -25,10 +25,17 @@
             <strong id="connectionLabel">Connessione…</strong>
             <small id="lastUpdate">In attesa del primo snapshot</small>
           </div>
+          <button id="newSimulationButton" class="ghost-button" type="button">Nuova simulazione</button>
         </div>
       </header>
 
       <main>
+        <section id="experimentBanner" class="experiment-banner" aria-live="polite">
+          <div><span>ESPERIMENTO</span><strong id="experimentMode">In attesa</strong></div>
+          <div><span>PROGRESSO</span><strong id="experimentProgress">0 / — migrazioni</strong></div>
+          <div><span>STATO</span><strong id="experimentStatus">Da configurare</strong></div>
+          <div><span>EXPORT</span><strong id="experimentExports">—</strong></div>
+        </section>
         <section class="kpi-grid" aria-label="Indicatori principali">
           <article class="kpi-card accent-cyan">
             <span>Satelliti online</span>
@@ -94,6 +101,7 @@
               <div id="migrationRoute" class="migration-route idle" aria-live="polite">
                 <span class="migration-route-label">TRASFERIMENTO CONTROLLER</span>
                 <strong>Nessun trasferimento registrato</strong>
+                <p class="migration-reason">La motivazione della selezione apparirà quando verrà scelto un satellite destinazione.</p>
               </div>
               <div class="network-stage">
                 <svg id="networkSvg" viewBox="0 0 1000 440" role="img" aria-label="Topologia della rete satellitare">
@@ -147,6 +155,19 @@
           <div id="migrationTimelineSummary" class="migration-timeline-summary hidden"></div>
           <div id="migrationTimeline" class="migration-timeline" aria-live="polite">
             <div class="empty-state boxed">La timeline apparirà quando verrà selezionato un satellite target</div>
+          </div>
+        </section>
+
+        <section class="panel export-panel" aria-labelledby="exportsTitle">
+          <div class="panel-heading compact">
+            <div><p class="eyebrow">METRICS EXPORT</p><h2 id="exportsTitle">File esportati</h2></div>
+            <span id="exportCount" class="counter">0 file</span>
+          </div>
+          <div class="table-wrap small-table">
+            <table>
+              <thead><tr><th>File</th><th>Formato</th><th>Creato</th><th>Dimensione</th><th>Azioni</th></tr></thead>
+              <tbody id="exportRows"><tr><td colspan="5" class="empty-state">Nessun export disponibile</td></tr></tbody>
+            </table>
           </div>
         </section>
 
@@ -208,6 +229,31 @@
           </div>
         </section>
       </main>
+    </div>
+    <div id="experimentModal" class="experiment-modal" role="dialog" aria-modal="true" aria-labelledby="experimentTitle">
+      <form id="experimentForm" class="experiment-dialog">
+        <p class="eyebrow">NUOVO ESPERIMENTO</p>
+        <h2 id="experimentTitle">Configura la simulazione</h2>
+        <p class="experiment-description">Scegli il protocollo da misurare. Ogni prova riparte dallo stesso istante orbitale e salva automaticamente JSON e PDF.</p>
+        <fieldset class="mode-selector">
+          <legend>Modalità di migrazione</legend>
+          <label><input type="radio" name="migrationMode" value="hot" checked><span><strong>Hot migration</strong><small>Pre-copy e update finale, downtime ridotto</small></span></label>
+          <label><input type="radio" name="migrationMode" value="cold"><span><strong>Cold migration</strong><small>Stop, checkpoint definitivo e restore</small></span></label>
+        </fieldset>
+        <label class="limit-field" for="migrationLimit">Numero di migrazioni completate</label>
+        <input id="migrationLimit" name="migrationLimit" type="number" min="1" max="100" value="3" required>
+        <p id="experimentFormError" class="form-error hidden" role="alert"></p>
+        <button id="startExperimentButton" class="primary-button" type="submit">Avvia simulazione</button>
+      </form>
+    </div>
+    <div id="exportPreviewModal" class="export-preview-modal hidden" role="dialog" aria-modal="true" aria-labelledby="exportPreviewTitle">
+      <div class="export-preview-dialog">
+        <div class="panel-heading compact">
+          <div><p class="eyebrow">ANTEPRIMA EXPORT</p><h2 id="exportPreviewTitle">Export</h2></div>
+          <button id="closeExportPreview" class="ghost-button" type="button">Chiudi</button>
+        </div>
+        <div id="exportPreviewContent" class="export-preview-content">Caricamento…</div>
+      </div>
     </div>
     <script src="{{ url_for('static', filename='app.js') }}" defer></script>
   </body>

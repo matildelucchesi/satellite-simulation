@@ -82,10 +82,31 @@ class SatelliteAgentTests(unittest.TestCase):
                 "id": 3,
                 "time_to_eclipse": 540,
                 "neighbors": 6,
+                "neighbor_ids": [
+                    "SAT-1",
+                    "SAT-2",
+                    "SAT-4",
+                    "SAT-5",
+                    "SAT-6",
+                    "SAT-7",
+                ],
                 "cpu": 28,
                 "controller": False,
             },
         )
+
+    @patch("app.agent.psutil.cpu_percent", return_value=28.0)
+    def test_heartbeat_uses_only_physical_neighbors_when_available(
+        self, _cpu_percent
+    ):
+        state = orbital_state()
+        state["physical_neighbors"] = ["SAT-1", "SAT-6"]
+        self.agent.receive_state(state)
+
+        heartbeat = self.agent.build_heartbeat()
+
+        self.assertEqual(heartbeat["neighbors"], 2)
+        self.assertEqual(heartbeat["neighbor_ids"], ["SAT-1", "SAT-6"])
 
     def test_controller_lifecycle_is_idempotent(self):
         first = self.agent.start_controller()
@@ -96,19 +117,32 @@ class SatelliteAgentTests(unittest.TestCase):
         self.assertFalse(second["changed"])
         self.assertFalse(stopped["controller"])
 
-    def test_accepts_controller_migration(self):
-        migration = self.agent.accept_migration(
+    def test_controller_requests_outbound_migration(self):
+        self.agent.start_controller()
+        migration = self.agent.request_migration(
             {
-                "source_satellite_id": "SAT-1",
-                "target_satellite_id": "SAT-3",
+                "source_satellite_id": "SAT-3",
+                "target_satellite_id": "SAT-7",
             }
         )
 
-        self.assertEqual(migration["status"], "accepted")
-        self.assertEqual(migration["target_satellite_id"], "SAT-3")
+        self.assertEqual(migration["status"], "requested")
+        self.assertEqual(migration["direction"], "outbound")
+        self.assertEqual(migration["target_satellite_id"], "SAT-7")
+
+    def test_non_controller_cannot_request_outbound_migration(self):
+        with self.assertRaisesRegex(
+            Exception, "solo dal satellite che ospita il Controller"
+        ):
+            self.agent.request_migration(
+                {
+                    "source_satellite_id": "SAT-3",
+                    "target_satellite_id": "SAT-7",
+                }
+            )
 
     def test_acknowledges_final_controller_state(self):
-        migration = self.agent.accept_migration(
+        migration = self.agent.prepare_migration(
             {
                 "migration_id": "migration-1",
                 "source_satellite_id": "SAT-1",
@@ -141,6 +175,70 @@ class SatelliteAgentTests(unittest.TestCase):
             self.agent.status()["migration"]["status"], "final_state_received"
         )
 
+    def test_target_cannot_start_controller_before_final_update(self):
+        self.agent.prepare_migration(
+            {
+                "migration_id": "migration-early-start",
+                "source_satellite_id": "SAT-1",
+                "target_satellite_id": "SAT-3",
+                "controller_state": {
+                    "topology": {"nodes": {}, "links": []},
+                    "routing_table": {},
+                    "heartbeats": {},
+                    "sequence_number": 4,
+                    "timestamp": "2026-07-19T10:00:00Z",
+                },
+            }
+        )
+
+        with self.assertRaisesRegex(Exception, "update finale"):
+            self.agent.start_controller()
+        self.assertFalse(self.agent.status()["controller"])
+
+    def test_target_activation_rewrites_migrated_controller_flags(self):
+        initial = {
+            "topology": {"nodes": {}, "links": []},
+            "routing_table": {},
+            "heartbeats": {},
+            "sequence_number": 4,
+            "timestamp": "2026-07-19T10:00:00Z",
+        }
+        self.agent.prepare_migration(
+            {
+                "migration_id": "migration-1",
+                "source_satellite_id": "SAT-1",
+                "target_satellite_id": "SAT-3",
+                "controller_state": initial,
+            }
+        )
+        final_state = {
+            "topology": {
+                "nodes": {
+                    "SAT-1": {"controller": True},
+                    "SAT-3": {"controller": False},
+                },
+                "links": [],
+            },
+            "routing_table": {},
+            "heartbeats": {
+                "SAT-1": {"controller": True},
+                "SAT-3": {"controller": False},
+            },
+            "sequence_number": 7,
+            "timestamp": "2026-07-19T10:00:05Z",
+        }
+        self.agent.receive_controller_state(
+            {"migration_id": "migration-1", "controller_state": final_state}
+        )
+
+        self.agent.start_controller()
+        migrated = self.agent.status()["migration"]["controller_state"]
+
+        self.assertFalse(migrated["heartbeats"]["SAT-1"]["controller"])
+        self.assertTrue(migrated["heartbeats"]["SAT-3"]["controller"])
+        self.assertFalse(migrated["topology"]["nodes"]["SAT-1"]["controller"])
+        self.assertTrue(migrated["topology"]["nodes"]["SAT-3"]["controller"])
+
     @patch("app.agent.psutil.cpu_percent", return_value=28.0)
     def test_sends_heartbeat_as_json(self, _cpu_percent):
         transport = FakeTransport()
@@ -157,6 +255,32 @@ class SatelliteAgentTests(unittest.TestCase):
         self.assertEqual(payload["neighbors"], 6)
         self.assertEqual(method, "POST")
         self.assertIsNotNone(agent.status()["heartbeat"]["last_sent_at"])
+
+    @patch("app.agent.psutil.cpu_percent", return_value=28.0)
+    def test_sends_heartbeat_to_simulator_and_controller(self, _cpu_percent):
+        transport = FakeTransport()
+        agent = SatelliteAgent(
+            "SAT-3",
+            heartbeat_url="http://simulator:5000/api/v1/heartbeats",
+            controller_heartbeat_url="http://controller:5000/heartbeat",
+            transport=transport,
+        )
+        state = orbital_state()
+        state["physical_neighbors"] = ["SAT-1", "SAT-6"]
+        agent.receive_state(state)
+
+        agent.send_heartbeat()
+
+        calls = [call for call in transport.calls if call[0] == "POST"]
+        self.assertEqual(len(calls), 2)
+        self.assertEqual(
+            {call[1] for call in calls},
+            {
+                "http://simulator:5000/api/v1/heartbeats",
+                "http://controller:5000/heartbeat",
+            },
+        )
+        self.assertTrue(all(call[2]["neighbor_ids"] == ["SAT-1", "SAT-6"] for call in calls))
 
     def test_synchronizes_state_from_simulator(self):
         transport = FakeTransport(get_payload=orbital_state())

@@ -41,6 +41,8 @@ class FakeTransport:
             return RestResponse(202, {"status": "shutdown"}, 16)
         if url.endswith("/migration_request"):
             return RestResponse(202, {"status": "accepted"}, 16)
+        if url.endswith("/prepare_migration"):
+            return RestResponse(202, {"status": "prepared"}, 16)
         if url.endswith("/receive_controller_state"):
             sequence = payload["controller_state"]["sequence_number"]
             return RestResponse(
@@ -49,6 +51,23 @@ class FakeTransport:
                 32,
             )
         return RestResponse(200, {"status": "ok"}, 16)
+
+
+class InspectingTransport(FakeTransport):
+    def __init__(self):
+        super().__init__()
+        self.manager = None
+        self.migration_id = None
+        self.observed_live_step = False
+
+    def request(self, method, url, payload, timeout):
+        if self.manager is not None and self.migration_id is not None:
+            migration = self.manager.migration_snapshot(self.migration_id)
+            self.observed_live_step = self.observed_live_step or any(
+                step["status"] == "in_progress"
+                for step in migration["metrics"]["steps"]
+            )
+        return super().request(method, url, payload, timeout)
 
 
 def config(alignment_seconds=0.0):
@@ -85,6 +104,50 @@ def constellation(second, in_contact=True):
 
 
 class MigrationManagerTests(unittest.TestCase):
+    def test_expires_when_contact_alignment_leaves_insufficient_execution_time(self):
+        manager = MigrationManager(
+            config(alignment_seconds=60), ["SAT-1", "SAT-2"], FakeTransport()
+        )
+        migration_id = manager.enqueue(
+            "SAT-1",
+            "SAT-2",
+            recommendation={
+                "completion_deadline_at": "2026-07-19T10:01:00Z",
+            },
+        )
+
+        for second in range(61):
+            manager.update_constellation(constellation(second))
+
+        migration = manager.migration_snapshot(migration_id)
+        self.assertEqual(migration["status"], "expired")
+        self.assertEqual(
+            migration["contact_window"]["reason"],
+            "insufficient_time_before_deadline",
+        )
+        self.assertEqual(
+            migration["events"][-1]["name"],
+            "migration_expired_before_execution",
+        )
+
+    def test_does_not_start_a_queued_protocol_after_its_deadline(self):
+        transport = FakeTransport()
+        manager = MigrationManager(config(), ["SAT-1", "SAT-2"], transport)
+        migration_id = manager.enqueue(
+            "SAT-1",
+            "SAT-2",
+            recommendation={
+                "completion_deadline_at": "2020-01-01T00:00:00Z",
+            },
+        )
+
+        manager._execute(migration_id)
+
+        migration = manager.migration_snapshot(migration_id)
+        self.assertEqual(migration["status"], "failed")
+        self.assertIn("Deadline di completamento superata", migration["error"])
+        self.assertEqual(transport.calls, [])
+
     def test_repeated_recommendation_reuses_pending_alignment(self):
         manager = MigrationManager(
             config(alignment_seconds=60), ["SAT-1", "SAT-2"], FakeTransport()
@@ -95,6 +158,30 @@ class MigrationManagerTests(unittest.TestCase):
 
         self.assertEqual(second, first)
         self.assertEqual(manager.snapshot()["count"], 1)
+
+    def test_only_one_handover_can_be_pending(self):
+        manager = MigrationManager(
+            config(alignment_seconds=60),
+            ["SAT-1", "SAT-2", "SAT-3"],
+            FakeTransport(),
+        )
+
+        first = manager.enqueue("SAT-1", "SAT-2", "hot")
+        second = manager.enqueue("SAT-1", "SAT-3", "hot")
+
+        self.assertEqual(second, first)
+        self.assertEqual(manager.snapshot()["count"], 1)
+
+    def test_rest_step_is_visible_while_it_is_running(self):
+        transport = InspectingTransport()
+        manager = MigrationManager(config(), ["SAT-1", "SAT-2"], transport)
+        migration_id = manager.enqueue("SAT-1", "SAT-2", "hot")
+        transport.manager = manager
+        transport.migration_id = migration_id
+
+        manager.process_next()
+
+        self.assertTrue(transport.observed_live_step)
 
     def test_requires_sixty_seconds_of_continuous_contact_before_queueing(self):
         manager = MigrationManager(
@@ -152,6 +239,10 @@ class MigrationManagerTests(unittest.TestCase):
     def test_hot_migration_syncs_final_state_before_stopping_source(self):
         transport = FakeTransport()
         manager = MigrationManager(config(), ["SAT-1", "SAT-2"], transport)
+        handovers = []
+        manager.set_handover_listener(
+            lambda source, target: handovers.append((source, target))
+        )
         migration_id = manager.enqueue("SAT-1", "SAT-2", "hot")
 
         manager.process_next()
@@ -165,12 +256,18 @@ class MigrationManagerTests(unittest.TestCase):
         ]
         quiesce_index = urls.index("http://controller:5000/quiesce")
         ack_index = urls.index("http://satellite-2:5000/receive_controller_state")
+        request_index = urls.index("http://satellite-1:5000/migration_request")
+        passive_index = urls.index("http://satellite-2:5000/stop_controller")
+        prepare_index = urls.index("http://satellite-2:5000/prepare_migration")
         stop_index = urls.index("http://satellite-1:5000/stop_controller")
         restore_index = urls.index("http://controller:5000/restore")
         start_index = urls.index("http://satellite-2:5000/start_controller")
         host_index = urls.index("http://controller:5000/host")
         self.assertEqual(migration["status"], "completed")
         self.assertTrue(migration["metrics"]["ack_received"])
+        self.assertLess(request_index, passive_index)
+        self.assertLess(passive_index, prepare_index)
+        self.assertLess(prepare_index, ack_index)
         self.assertLess(quiesce_index, checkpoint_indices[1])
         self.assertLess(checkpoint_indices[1], ack_index)
         self.assertLess(ack_index, stop_index)
@@ -191,10 +288,35 @@ class MigrationManagerTests(unittest.TestCase):
         self.assertIsNotNone(ack_step["started_at"])
         self.assertIsNotNone(ack_step["completed_at"])
         self.assertEqual(ack_step["http_status"], 200)
+        self.assertEqual(handovers, [("SAT-1", "SAT-2")])
+
+    def test_hot_delta_reuses_channel_without_a_second_alignment(self):
+        manager = MigrationManager(
+            config(alignment_seconds=60), ["SAT-1", "SAT-2"], FakeTransport()
+        )
+        migration_id = manager.enqueue("SAT-1", "SAT-2", "hot")
+        for second in range(61):
+            manager.update_constellation(constellation(second))
+
+        self.assertTrue(manager.process_next())
+        migration = manager.migration_snapshot(migration_id)
+        event_names = [event["name"] for event in migration["events"]]
+
+        self.assertEqual(migration["status"], "completed")
+        self.assertEqual(event_names.count("contact_alignment_started"), 1)
+        self.assertEqual(event_names.count("contact_window_ready"), 1)
+        self.assertEqual(event_names.count("delta_channel_reused"), 1)
+        self.assertEqual(migration["metrics"]["alignment_count"], 1)
+        self.assertTrue(migration["contact_window"]["channel_established"])
+        self.assertTrue(migration["contact_window"]["channel_reused_for_delta"])
 
     def test_cold_migration_transfers_frozen_state_and_waits_for_ack(self):
         transport = FakeTransport()
         manager = MigrationManager(config(), ["SAT-1", "SAT-2"], transport)
+        handovers = []
+        manager.set_handover_listener(
+            lambda source, target: handovers.append((source, target))
+        )
         migration_id = manager.enqueue("SAT-1", "SAT-2", "cold")
 
         manager.process_next()
@@ -202,6 +324,9 @@ class MigrationManagerTests(unittest.TestCase):
         migration = manager.migration_snapshot(migration_id)
         urls = [call[1] for call in transport.calls]
         quiesce_index = urls.index("http://controller:5000/quiesce")
+        request_index = urls.index("http://satellite-1:5000/migration_request")
+        passive_index = urls.index("http://satellite-2:5000/stop_controller")
+        prepare_index = urls.index("http://satellite-2:5000/prepare_migration")
         stop_index = urls.index("http://satellite-1:5000/stop_controller")
         checkpoint_index = urls.index("http://controller:5000/checkpoint")
         shutdown_index = urls.index("http://controller:5000/shutdown")
@@ -210,8 +335,12 @@ class MigrationManagerTests(unittest.TestCase):
         start_index = urls.index("http://satellite-2:5000/start_controller")
         host_index = urls.index("http://controller:5000/host")
         self.assertEqual(migration["status"], "completed")
+        self.assertLess(request_index, quiesce_index)
+        self.assertLess(request_index, stop_index)
+        self.assertLess(passive_index, quiesce_index)
+        self.assertLess(prepare_index, quiesce_index)
         self.assertLess(quiesce_index, stop_index)
-        self.assertLess(stop_index, checkpoint_index)
+        self.assertLess(checkpoint_index, stop_index)
         self.assertLess(checkpoint_index, shutdown_index)
         self.assertLess(shutdown_index, ack_index)
         self.assertLess(ack_index, restore_index)
@@ -221,6 +350,13 @@ class MigrationManagerTests(unittest.TestCase):
         self.assertEqual(migration["metrics"]["final_sequence_number"], 4)
         self.assertIsNotNone(migration["metrics"]["downtime_ms"])
         self.assertGreater(migration["metrics"]["state_bytes"], 0)
+        self.assertEqual(handovers, [("SAT-1", "SAT-2")])
+        ack_step = next(
+            step
+            for step in migration["metrics"]["steps"]
+            if step["name"] == "transfer_complete_state_and_wait_target_ack"
+        )
+        self.assertEqual(ack_step["http_status"], 200)
 
     def test_cold_migration_rolls_back_when_target_ack_is_missing(self):
         transport = FakeTransport(target_ack_status=202)

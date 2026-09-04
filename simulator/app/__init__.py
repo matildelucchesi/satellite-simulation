@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import atexit
+from datetime import datetime
 import logging
 import os
 from pathlib import Path
@@ -13,7 +14,13 @@ from flask import Flask
 from common.settings import ServiceSettings
 
 from .configuration import load_constellation_config
-from .migration_manager import MigrationConfig, MigrationManager
+from .experiment_manager import ExperimentManager
+from .migration_manager import (
+    MigrationConfig,
+    MigrationManager,
+    MigrationProtocolError,
+    UrllibRestTransport,
+)
 from .metrics import MetricsManager
 from .orbit_engine import ConstellationSimulator
 from .routes import create_api_blueprint
@@ -34,6 +41,7 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
         ECLIPSE_SEARCH_HOURS=float(os.getenv("ECLIPSE_SEARCH_HOURS", "24")),
         SCORING_CONFIG_PATH=os.getenv("SCORING_CONFIG_PATH"),
         MIGRATION_CONFIG_PATH=os.getenv("MIGRATION_CONFIG_PATH"),
+        LOG_DIR=os.getenv("LOG_DIR", "/app/logs"),
         SIMULATOR_AUTOSTART=os.getenv("SIMULATOR_AUTOSTART", "true").lower()
         in {"1", "true", "yes"},
     )
@@ -60,21 +68,45 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
         config=ScoreManagerConfig.from_file(scoring_config_path),
         migration_notifier=migration_manager.notify_migration,
         evaluation_listener=metrics_manager.record_election,
+        required_contact_seconds=(
+            migration_config.contact_window.required_alignment_seconds
+        ),
+        migration_execution_budget_seconds=(
+            migration_config.execution_budget_seconds
+        ),
+        contact_window_config=migration_config.contact_window,
+        migration_state_provider=migration_manager.snapshot,
     )
+    migration_manager.set_handover_listener(
+        score_manager.record_controller_handover
+    )
+    startup_controller_config = StartupControllerConfig.from_dict(
+        constellation_config["constellation"]["initial_controller"]
+    )
+    minimum_safe_startup_sunlight = (
+        migration_config.contact_window.required_alignment_seconds
+        + migration_config.execution_budget_seconds
+        + score_manager.config.handover_safety_margin_seconds
+    )
+    if startup_controller_config.minimum_sunlight_seconds < minimum_safe_startup_sunlight:
+        raise ValueError(
+            "initial_controller.minimum_sunlight_seconds deve essere almeno "
+            f"{minimum_safe_startup_sunlight:g} secondi per coprire allineamento, "
+            "migrazione e margine di sicurezza"
+        )
     startup_controller_manager = StartupControllerManager(
         satellite_ids=satellite_ids,
-        config=StartupControllerConfig.from_dict(
-            constellation_config["constellation"]["initial_controller"]
-        ),
+        config=startup_controller_config,
         agent_url=migration_config.agent_url,
         controller_url=migration_config.controller_url,
         request_timeout_seconds=migration_config.request_timeout_seconds,
+        contact_window_config=migration_config.contact_window,
     )
 
     def update_coordinators(snapshot: dict[str, Any]) -> None:
         startup_controller_manager.update_constellation(snapshot)
-        score_manager.update_constellation(snapshot)
         migration_manager.update_constellation(snapshot)
+        score_manager.update_constellation(snapshot)
 
     simulator = ConstellationSimulator(
         tle_path=app.config["TLE_PATH"],
@@ -82,13 +114,50 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
         constellation_name=constellation_config["constellation"]["name"],
         tick_seconds=app.config["SIMULATOR_TICK_SECONDS"],
         eclipse_search_hours=app.config["ECLIPSE_SEARCH_HOURS"],
+        simulation_start_at=_parse_simulation_start(
+            constellation_config["constellation"].get("simulation_start_at")
+        ),
         state_listener=update_coordinators,
+        contact_window_config=migration_config.contact_window,
+    )
+
+    def reset_remote_components() -> None:
+        custom_resetter = app.config.get("EXPERIMENT_REMOTE_RESETTER")
+        if custom_resetter is not None:
+            custom_resetter()
+            return
+        transport = UrllibRestTransport()
+        targets = [
+            f"{migration_config.controller_url}/reset_simulation",
+            *[
+                f"{migration_config.agent_url(satellite_id)}/reset_simulation"
+                for satellite_id in satellite_ids
+            ],
+        ]
+        for target in targets:
+            response = transport.request(
+                "POST", target, None, migration_config.request_timeout_seconds
+            )
+            if response.status != 200:
+                raise MigrationProtocolError(
+                    f"Reset logico rifiutato da {target}: HTTP {response.status}"
+                )
+
+    experiment_manager = ExperimentManager(
+        simulator=simulator,
+        score_manager=score_manager,
+        migration_manager=migration_manager,
+        metrics_manager=metrics_manager,
+        startup_controller_manager=startup_controller_manager,
+        export_dir=app.config["LOG_DIR"],
+        remote_resetter=reset_remote_components,
     )
     app.extensions["constellation_simulator"] = simulator
     app.extensions["score_manager"] = score_manager
     app.extensions["migration_manager"] = migration_manager
     app.extensions["metrics_manager"] = metrics_manager
     app.extensions["startup_controller_manager"] = startup_controller_manager
+    app.extensions["experiment_manager"] = experiment_manager
     app.register_blueprint(
         create_api_blueprint(
             settings.name,
@@ -97,15 +166,20 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
             migration_manager,
             metrics_manager,
             startup_controller_manager,
+            experiment_manager,
+            app.config["SIMULATOR_AUTOSTART"],
         )
     )
 
     if app.config["SIMULATOR_AUTOSTART"]:
-        startup_controller_manager.start()
-        migration_manager.start()
-        simulator.start()
-        atexit.register(startup_controller_manager.stop)
-        atexit.register(migration_manager.stop)
+        experiment_manager.prepare()
+        atexit.register(experiment_manager.close)
         atexit.register(simulator.close)
 
     return app
+
+
+def _parse_simulation_start(value: str | None) -> datetime | None:
+    if value is None:
+        return None
+    return datetime.fromisoformat(value.replace("Z", "+00:00"))

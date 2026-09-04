@@ -2,3 +2,4 @@ Flask>=3.0,<4.0
 numpy>=1.26,<3.0
 skyfield>=1.49,<2.0
 skyfield-data>=7.0,<8.0
+reportlab>=4.2,<5.0

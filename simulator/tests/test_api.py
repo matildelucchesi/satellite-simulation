@@ -1,6 +1,7 @@
 """Test dell'API REST del Simulator."""
 
 from pathlib import Path
+from datetime import datetime, timezone
 import unittest
 
 from app import create_app
@@ -29,30 +30,24 @@ class SimulatorApiTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get_json()["satellite_count"], 7)
+        self.assertGreaterEqual(len(response.get_json()["physical_links"]), 10)
 
     def test_unknown_satellite_returns_404(self):
         response = self.client.get("/api/v1/satellites/SAT-99")
 
         self.assertEqual(response.status_code, 404)
 
-    def test_startup_controller_is_minimum_sunlight_above_two_minutes(self):
+    def test_startup_controller_is_satellite_closest_to_eclipse_after_two_minutes(self):
         response = self.client.get("/api/v1/startup-controller")
         startup = response.get_json()
-        constellation = self.simulator.snapshot()["satellites"]
-        eligible = {
-            satellite_id: satellite["illumination"]["seconds_until_eclipse"]
-            for satellite_id, satellite in constellation.items()
-            if satellite["illumination"]["state"] == "sunlight"
-            and satellite["illumination"]["seconds_until_eclipse"] > 120
-        }
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(eligible)
-        self.assertEqual(
-            startup["selected_satellite_id"],
-            min(eligible, key=lambda satellite_id: eligible[satellite_id]),
-        )
-        self.assertGreater(startup["selected_time_to_eclipse_seconds"], 120)
+        self.assertTrue(startup["eligible_candidates"])
+        selected = startup["eligible_candidates"][0]
+        self.assertEqual(startup["selected_satellite_id"], selected["satellite_id"])
+        self.assertEqual(startup["selected_satellite_id"], "SAT-1")
+        self.assertGreater(startup["selected_time_to_eclipse_seconds"], 300)
+        self.assertTrue(selected["reachable_neighbors"])
 
     def test_heartbeats_produce_scores_for_all_satellites(self):
         for satellite_id in range(1, 8):
@@ -131,6 +126,15 @@ class SimulatorApiTests(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.get_json()["error"], "unsupported_format")
 
+    def test_experiment_api_validates_mode_and_limit(self):
+        invalid = self.client.post(
+            "/api/v1/experiment", json={"mode": "warm", "migration_limit": 3}
+        )
+        state = self.client.get("/api/v1/experiment")
+
+        self.assertEqual(invalid.status_code, 409)
+        self.assertEqual(state.status_code, 200)
+        self.assertEqual(state.get_json()["status"], "awaiting_configuration")
 
 if __name__ == "__main__":
     unittest.main()

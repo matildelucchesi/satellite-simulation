@@ -39,6 +39,7 @@ class SatelliteAgent:
         controller_enabled: bool = False,
         simulator_url: str = "",
         heartbeat_url: str = "",
+        controller_heartbeat_url: str = "",
         state_sync_interval_seconds: float = 1.0,
         heartbeat_interval_seconds: float = 5.0,
         request_timeout_seconds: float = 2.0,
@@ -55,6 +56,7 @@ class SatelliteAgent:
         self.satellite_id = satellite_id
         self.simulator_url = simulator_url.rstrip("/")
         self.heartbeat_url = heartbeat_url
+        self.controller_heartbeat_url = controller_heartbeat_url
         self.state_sync_interval_seconds = state_sync_interval_seconds
         self.heartbeat_interval_seconds = heartbeat_interval_seconds
         self.request_timeout_seconds = request_timeout_seconds
@@ -186,7 +188,14 @@ class SatelliteAgent:
                 },
                 "heartbeat": {
                     "interval_seconds": self.heartbeat_interval_seconds,
-                    "destination": self.heartbeat_url or None,
+                    "destinations": [
+                        destination
+                        for destination in (
+                            self.heartbeat_url,
+                            self.controller_heartbeat_url,
+                        )
+                        if destination
+                    ],
                     "latest": deepcopy(self._latest_heartbeat),
                     "last_sent_at": self._last_heartbeat_sent_at,
                     "last_error": self._last_heartbeat_error,
@@ -196,14 +205,36 @@ class SatelliteAgent:
 
     def start_controller(self) -> dict[str, Any]:
         with self._lock:
+            if (
+                not self._controller_running
+                and self._migration
+                and self._migration.get("direction") == "inbound"
+                and self._migration.get("status") not in {
+                    "final_state_received",
+                    "activated",
+                }
+            ):
+                raise AgentValidationError(
+                    "Il Controller può essere attivato sul target solo dopo "
+                    "la ricezione dell'update finale"
+                )
             changed = not self._controller_running
             self._controller_running = True
-            if self._migration and self._migration["status"] in {
-                "accepted",
-                "final_state_received",
-            }:
+            if self._migration and self._migration["status"] == "final_state_received":
                 self._migration["status"] = "activated"
                 self._migration["activated_at"] = _utc_now()
+                controller_state = self._migration.get("controller_state")
+                if isinstance(controller_state, dict):
+                    for satellite_id, heartbeat in controller_state.get(
+                        "heartbeats", {}
+                    ).items():
+                        if isinstance(heartbeat, dict):
+                            heartbeat["controller"] = satellite_id == self.satellite_id
+                    for satellite_id, node in controller_state.get(
+                        "topology", {}
+                    ).get("nodes", {}).items():
+                        if isinstance(node, dict):
+                            node["controller"] = satellite_id == self.satellite_id
             return {
                 "id": self.satellite_id,
                 "controller": True,
@@ -214,13 +245,78 @@ class SatelliteAgent:
         with self._lock:
             changed = self._controller_running
             self._controller_running = False
+            if (
+                changed
+                and self._migration
+                and self._migration.get("direction") == "outbound"
+            ):
+                self._migration["status"] = (
+                    "source_stopped"
+                    if self._migration.get("mode") == "cold"
+                    else "source_stopped_after_delta"
+                )
+                self._migration["stopped_at"] = _utc_now()
             return {
                 "id": self.satellite_id,
                 "controller": False,
                 "changed": changed,
             }
 
-    def accept_migration(self, payload: dict[str, Any]) -> dict[str, Any]:
+    def reset_simulation(self) -> dict[str, Any]:
+        """Azzera lo stato volatile mantenendo attivi i worker del container."""
+
+        with self._lock:
+            self._orbital_state = None
+            self._state_received_at = None
+            self._source_generated_at = None
+            self._controller_running = False
+            self._migration = None
+            self._latest_heartbeat = None
+            self._last_heartbeat_sent_at = None
+            self._last_heartbeat_error = None
+            self._last_sync_at = None
+            self._last_sync_error = None
+        return {"id": self.satellite_id, "status": "reset"}
+
+    def request_migration(self, payload: dict[str, Any]) -> dict[str, Any]:
+        """Registra sul satellite Controller la richiesta di migrazione in uscita."""
+
+        if not isinstance(payload, dict):
+            raise AgentValidationError("Il corpo deve essere un oggetto JSON")
+        source_id = str(
+            payload.get("source_satellite_id", self.satellite_id)
+        ).strip().upper()
+        target_id = str(payload.get("target_satellite_id", "")).strip().upper()
+        if source_id != self.satellite_id:
+            raise AgentValidationError(
+                f"La richiesta deve essere avviata da {source_id}, non da {self.satellite_id}"
+            )
+        if not target_id:
+            raise AgentValidationError("target_satellite_id è obbligatorio")
+        if target_id == self.satellite_id:
+            raise AgentValidationError("Sorgente e destinazione devono essere diverse")
+
+        with self._lock:
+            if not self._controller_running:
+                raise AgentValidationError(
+                    "La migration_request può essere avviata solo dal satellite "
+                    "che ospita il Controller"
+                )
+            migration = {
+                "migration_id": str(payload.get("migration_id") or uuid4()),
+                "source_satellite_id": self.satellite_id,
+                "target_satellite_id": target_id,
+                "mode": str(payload.get("mode", "hot")).lower(),
+                "direction": "outbound",
+                "status": "requested",
+                "requested_at": _utc_now(),
+            }
+            self._migration = migration
+            return deepcopy(migration)
+
+    def prepare_migration(self, payload: dict[str, Any]) -> dict[str, Any]:
+        """Prepara il target senza attivare il Controller."""
+
         if not isinstance(payload, dict):
             raise AgentValidationError("Il corpo deve essere un oggetto JSON")
         source_id = str(payload.get("source_satellite_id", "")).strip().upper()
@@ -245,7 +341,8 @@ class SatelliteAgent:
                 "migration_id": str(payload.get("migration_id") or uuid4()),
                 "source_satellite_id": source_id,
                 "target_satellite_id": self.satellite_id,
-                "status": "accepted",
+                "direction": "inbound",
+                "status": "prepared",
                 "requested_at": _utc_now(),
                 "controller_state": deepcopy(payload.get("controller_state")),
             }
@@ -253,7 +350,7 @@ class SatelliteAgent:
             return deepcopy(migration)
 
     def receive_controller_state(self, payload: dict[str, Any]) -> dict[str, Any]:
-        """Memorizza il final state della Hot Migration e restituisce l'ACK."""
+        """Memorizza lo stato finale della migrazione e restituisce l'ACK."""
 
         if not isinstance(payload, dict):
             raise AgentValidationError("Il corpo deve essere un oggetto JSON")
@@ -282,6 +379,8 @@ class SatelliteAgent:
         with self._lock:
             if self._migration is None or self._migration["migration_id"] != migration_id:
                 raise AgentValidationError("Migrazione non preparata o migration_id errato")
+            if self._migration.get("direction") != "inbound":
+                raise AgentValidationError("Il satellite non è il target della migrazione")
             initial_state = self._migration.get("controller_state") or {}
             initial_sequence = initial_state.get("sequence_number", -1)
             if sequence < initial_sequence:
@@ -306,25 +405,39 @@ class SatelliteAgent:
 
         time_to_eclipse: int | None = None
         neighbors = 0
+        neighbor_ids: list[str] = []
         if orbital_state:
             seconds = orbital_state.get("illumination", {}).get(
                 "seconds_until_eclipse"
             )
             if isinstance(seconds, (int, float)) and math.isfinite(seconds):
                 time_to_eclipse = max(0, round(seconds))
-            distances = orbital_state.get("distances_km", {})
-            neighbors = sum(
-                1
-                for satellite_id, distance in distances.items()
-                if satellite_id != self.satellite_id
-                and isinstance(distance, (int, float))
-                and math.isfinite(distance)
-            )
+            physical_neighbors = orbital_state.get("physical_neighbors")
+            if isinstance(physical_neighbors, list):
+                neighbor_ids = sorted(
+                    {
+                        str(satellite_id).strip().upper()
+                        for satellite_id in physical_neighbors
+                        if str(satellite_id).strip().upper() != self.satellite_id
+                    }
+                )
+                neighbors = len(neighbor_ids)
+            else:
+                distances = orbital_state.get("distances_km", {})
+                neighbor_ids = sorted(
+                    satellite_id
+                    for satellite_id, distance in distances.items()
+                    if satellite_id != self.satellite_id
+                    and isinstance(distance, (int, float))
+                    and math.isfinite(distance)
+                )
+                neighbors = len(neighbor_ids)
 
         heartbeat = {
             "id": _heartbeat_id(self.satellite_id),
             "time_to_eclipse": time_to_eclipse,
             "neighbors": neighbors,
+            "neighbor_ids": neighbor_ids,
             "cpu": round(float(psutil.cpu_percent(interval=0.1))),
             "controller": controller_running,
         }
@@ -335,24 +448,36 @@ class SatelliteAgent:
     def send_heartbeat(self) -> dict[str, Any]:
         heartbeat = self.build_heartbeat()
         LOGGER.info("heartbeat=%s", json.dumps(heartbeat, separators=(",", ":")))
-        if not self.heartbeat_url:
+        destinations = list(
+            dict.fromkeys(
+                destination
+                for destination in (
+                    self.heartbeat_url,
+                    self.controller_heartbeat_url,
+                )
+                if destination
+            )
+        )
+        if not destinations:
             return heartbeat
 
-        try:
-            status = self.transport.post_json(
-                self.heartbeat_url,
-                heartbeat,
-                self.request_timeout_seconds,
-            )
-            if not 200 <= status < 300:
-                raise RuntimeError(f"Heartbeat rifiutato con HTTP {status}")
-            with self._lock:
-                self._last_heartbeat_sent_at = _utc_now()
-                self._last_heartbeat_error = None
-        except Exception as exc:
-            with self._lock:
-                self._last_heartbeat_error = str(exc)
-            raise
+        errors: list[str] = []
+        for destination in destinations:
+            try:
+                status = self.transport.post_json(
+                    destination,
+                    heartbeat,
+                    self.request_timeout_seconds,
+                )
+                if not 200 <= status < 300:
+                    raise RuntimeError(f"HTTP {status}")
+            except Exception as exc:
+                errors.append(f"{destination}: {exc}")
+        with self._lock:
+            self._last_heartbeat_sent_at = _utc_now()
+            self._last_heartbeat_error = "; ".join(errors) if errors else None
+        if errors:
+            raise RuntimeError(self._last_heartbeat_error)
         return heartbeat
 
     def sync_from_simulator(self) -> dict[str, Any]:

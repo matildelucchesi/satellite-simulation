@@ -54,6 +54,18 @@ class ControllerApiTests(unittest.TestCase):
         self.assertEqual(health.get_json()["host_satellite_id"], "SAT-4")
         self.assertEqual(state.get_json()["host_satellite_id"], "SAT-4")
 
+    def test_reset_clears_state_and_host(self):
+        self.client.post("/heartbeat", json=heartbeat())
+        self.client.post("/host", json={"satellite_id": "SAT-4"})
+
+        reset = self.client.post("/reset_simulation")
+        state = self.client.get("/state").get_json()
+
+        self.assertEqual(reset.status_code, 200)
+        self.assertEqual(state["host_satellite_id"], "UNASSIGNED")
+        self.assertEqual(state["sequence_number"], 0)
+        self.assertEqual(state["heartbeats"], {})
+
     def test_checkpoint_restore_and_shutdown(self):
         self.client.post("/heartbeat", json=heartbeat())
         checkpoint_response = self.client.post("/checkpoint")

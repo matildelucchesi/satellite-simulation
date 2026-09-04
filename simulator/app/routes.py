@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from flask import Blueprint, Response, jsonify, request
 
+from .experiment_manager import ExperimentManager, ExperimentManagerError
 from .metrics import MetricsManager
 from .migration_manager import MigrationManager, MigrationManagerError
 from .orbit_engine import ConstellationSimulator
@@ -18,6 +19,8 @@ def create_api_blueprint(
     migration_manager: MigrationManager,
     metrics_manager: MetricsManager,
     startup_controller_manager: StartupControllerManager,
+    experiment_manager: ExperimentManager,
+    enforce_experiment_state: bool = True,
 ) -> Blueprint:
     """Crea le route iniettando esplicitamente i casi d'uso richiesti."""
 
@@ -63,6 +66,8 @@ def create_api_blueprint(
         payload = request.get_json(silent=True)
         if payload is None:
             return jsonify({"error": "invalid_json"}), 400
+        if enforce_experiment_state and experiment_manager.snapshot()["status"] != "running":
+            return jsonify({"status": "ignored", "reason": "simulation_not_running"}), 202
         try:
             heartbeat = score_manager.record_heartbeat(payload)
         except ScoreManagerError as exc:
@@ -87,6 +92,10 @@ def create_api_blueprint(
     @api.route("/api/v1/migrations", methods=["GET", "POST"])
     def migrations():
         if request.method == "POST":
+            if enforce_experiment_state and experiment_manager.snapshot()["status"] != "running":
+                return jsonify(
+                    {"error": "simulation_not_running", "message": "Avvia prima una simulazione"}
+                ), 409
             payload = request.get_json(silent=True)
             if payload is None:
                 return jsonify({"error": "invalid_json"}), 400
@@ -109,6 +118,30 @@ def create_api_blueprint(
                 }
             ), 202
         return jsonify(migration_manager.snapshot())
+
+    @api.route("/api/v1/experiment", methods=["GET", "POST"])
+    def experiment():
+        if request.method == "GET":
+            return jsonify(experiment_manager.snapshot())
+        payload = request.get_json(silent=True)
+        if payload is None:
+            return jsonify({"error": "invalid_json"}), 400
+        try:
+            state = experiment_manager.start(
+                payload.get("mode"), payload.get("migration_limit")
+            )
+        except ExperimentManagerError as exc:
+            return jsonify({"error": "experiment_rejected", "message": str(exc)}), 409
+        except Exception as exc:
+            return jsonify({"error": "experiment_start_failed", "message": str(exc)}), 503
+        return jsonify(state), 201
+
+    @api.post("/api/v1/experiment/reset")
+    def reset_experiment():
+        try:
+            return jsonify(experiment_manager.reset()), 200
+        except Exception as exc:
+            return jsonify({"error": "experiment_reset_failed", "message": str(exc)}), 503
 
     @api.get("/api/v1/migrations/<migration_id>")
     def migration(migration_id: str):

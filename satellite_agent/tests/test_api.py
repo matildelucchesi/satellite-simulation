@@ -38,21 +38,36 @@ class SatelliteAgentApiTests(unittest.TestCase):
         self.assertTrue(started.get_json()["controller"])
         self.assertFalse(stopped.get_json()["controller"])
 
+    def test_reset_clears_controller_and_migration_state(self):
+        self.client.post("/start_controller")
+        self.client.post(
+            "/migration_request",
+            json={"source_satellite_id": "SAT-3", "target_satellite_id": "SAT-7"},
+        )
+
+        reset = self.client.post("/reset_simulation")
+        status = self.client.get("/status").get_json()
+
+        self.assertEqual(reset.status_code, 200)
+        self.assertFalse(status["controller"])
+        self.assertIsNone(status["migration"])
+
     def test_migration_endpoint(self):
+        self.client.post("/start_controller")
         response = self.client.post(
             "/migration_request",
             json={
-                "source_satellite_id": "SAT-1",
-                "target_satellite_id": "SAT-3",
+                "source_satellite_id": "SAT-3",
+                "target_satellite_id": "SAT-7",
             },
         )
 
         self.assertEqual(response.status_code, 202)
-        self.assertEqual(response.get_json()["status"], "accepted")
+        self.assertEqual(response.get_json()["status"], "requested")
 
     def test_final_controller_state_returns_http_200_ack(self):
         self.client.post(
-            "/migration_request",
+            "/prepare_migration",
             json={
                 "migration_id": "migration-1",
                 "source_satellite_id": "SAT-1",
@@ -75,6 +90,21 @@ class SatelliteAgentApiTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get_json()["status"], "ack")
+
+    def test_target_start_is_rejected_before_final_update(self):
+        prepared = self.client.post(
+            "/prepare_migration",
+            json={
+                "migration_id": "migration-not-ready",
+                "source_satellite_id": "SAT-1",
+                "target_satellite_id": "SAT-3",
+            },
+        )
+        started = self.client.post("/start_controller")
+
+        self.assertEqual(prepared.status_code, 202)
+        self.assertEqual(started.status_code, 409)
+        self.assertIn("update finale", started.get_json()["message"])
 
 
 if __name__ == "__main__":

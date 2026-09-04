@@ -3,20 +3,21 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from dataclasses import dataclass
-from datetime import datetime, timezone
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta, timezone
 import json
 import math
 from pathlib import Path
 from queue import Empty, Queue
 from threading import Event, RLock, Thread
 from time import monotonic, sleep
-from typing import Any, Protocol
+from typing import Any, Callable, Protocol
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 from uuid import uuid4
 
 from .contact_window import ContactWindowConfig, evaluate_contact
+from .timing_model import MigrationTimingConfig, MigrationTimingModel
 
 
 class MigrationManagerError(ValueError):
@@ -36,6 +37,11 @@ class MigrationConfig:
     max_retries: int
     retry_delay_seconds: float
     contact_window: ContactWindowConfig
+    phase_delay_seconds: float = 0.0
+    execution_budget_seconds: float = 90.0
+    timing_model: MigrationTimingConfig = field(
+        default_factory=MigrationTimingConfig
+    )
 
     @classmethod
     def from_file(cls, path: str | Path) -> "MigrationConfig":
@@ -82,6 +88,17 @@ class MigrationConfig:
             contact_window=ContactWindowConfig.from_dict(
                 payload.get("contact_window")
             ),
+            phase_delay_seconds=_non_negative_number(
+                payload.get("protocol_phase_delay_seconds", 0),
+                "protocol_phase_delay_seconds",
+            ),
+            execution_budget_seconds=_positive_number(
+                payload.get("execution_budget_seconds", 90),
+                "execution_budget_seconds",
+            ),
+            timing_model=MigrationTimingConfig.from_dict(
+                payload.get("timing_model")
+            ),
         )
 
     def agent_url(self, satellite_id: str) -> str:
@@ -97,6 +114,9 @@ class MigrationConfig:
             "max_retries": self.max_retries,
             "retry_delay_seconds": self.retry_delay_seconds,
             "contact_window": self.contact_window.to_dict(),
+            "protocol_phase_delay_seconds": self.phase_delay_seconds,
+            "execution_budget_seconds": self.execution_budget_seconds,
+            "timing_model": self.timing_model.to_dict(),
         }
 
 
@@ -170,6 +190,10 @@ class MigrationManager:
         self._migrations: dict[str, dict[str, Any]] = {}
         self._migration_order: list[str] = []
         self._active_migration_id: str | None = None
+        self._latest_constellation_state: dict[str, Any] = {}
+        self._default_mode = config.default_mode
+        self._handover_listener: Callable[[str, str], None] | None = None
+        self._timing_model = MigrationTimingModel(config.timing_model)
 
     @property
     def running(self) -> bool:
@@ -191,6 +215,35 @@ class MigrationManager:
         thread = self._thread
         if thread is not None and thread.is_alive():
             thread.join(timeout=timeout)
+        self._thread = None
+
+    @property
+    def default_mode(self) -> str:
+        with self._lock:
+            return self._default_mode
+
+    def set_handover_listener(
+        self, listener: Callable[[str, str], None] | None
+    ) -> None:
+        """Registra l'osservatore aggiornato atomicamente dopo il cutover."""
+
+        with self._lock:
+            self._handover_listener = listener
+
+    def reset(self, default_mode: str | None = None) -> None:
+        """Svuota coda e storico, predisponendo una nuova prova."""
+
+        selected_mode = str(default_mode or self.config.default_mode).lower()
+        if selected_mode not in {"cold", "hot"}:
+            raise MigrationManagerError("default_mode deve essere cold oppure hot")
+        self.stop()
+        with self._lock:
+            self._queue = Queue()
+            self._migrations = {}
+            self._migration_order = []
+            self._active_migration_id = None
+            self._latest_constellation_state = {}
+            self._default_mode = selected_mode
 
     def notify_migration(self, recommendation: dict[str, Any]) -> str:
         """Riceve la selezione dello score manager e accoda il protocollo."""
@@ -198,7 +251,7 @@ class MigrationManager:
         return self.enqueue(
             source_satellite_id=recommendation.get("source_satellite_id"),
             target_satellite_id=recommendation.get("target_satellite_id"),
-            mode=recommendation.get("mode", self.config.default_mode),
+            mode=recommendation.get("mode", self.default_mode),
             recommendation=recommendation,
             migration_id=recommendation.get("migration_id"),
         )
@@ -213,7 +266,7 @@ class MigrationManager:
     ) -> str:
         source = _canonical_satellite_id(source_satellite_id)
         target = _canonical_satellite_id(target_satellite_id)
-        selected_mode = str(mode or self.config.default_mode).lower()
+        selected_mode = str(mode or self.default_mode).lower()
         if source not in self.satellite_ids or target not in self.satellite_ids:
             raise MigrationManagerError("Sorgente o destinazione fuori costellazione")
         if source == target:
@@ -225,26 +278,22 @@ class MigrationManager:
         with self._lock:
             if identifier in self._migrations:
                 return identifier
-            equivalent = next(
+            open_migration = next(
                 (
                     migration
                     for migration in self._migrations.values()
-                    if migration["status"] in {
-                        "waiting_for_contact",
-                        "queued",
-                        "in_progress",
-                    }
-                    and migration["source_satellite_id"] == source
-                    and migration["target_satellite_id"] == target
+                    if migration["status"]
+                    in {"waiting_for_contact", "queued", "in_progress"}
                 ),
                 None,
             )
-            if equivalent is not None:
-                return equivalent["migration_id"]
+            if open_migration is not None:
+                return open_migration["migration_id"]
             required_alignment = self.config.contact_window.required_alignment_seconds
             created_at = _utc_now()
             migration = {
                 "migration_id": identifier,
+                "sequence": len(self._migration_order) + 1,
                 "mode": selected_mode,
                 "source_satellite_id": source,
                 "target_satellite_id": target,
@@ -267,6 +316,7 @@ class MigrationManager:
                 "metrics": {
                     "duration_ms": None,
                     "alignment_wait_ms": None,
+                    "alignment_count": 0,
                     "downtime_ms": None,
                     "state_bytes": 0,
                     "initial_state_bytes": 0,
@@ -277,6 +327,7 @@ class MigrationManager:
                     "retries": 0,
                     "ack_received": False,
                     "controller_restore_ack": False,
+                    "timing_model": None,
                     "steps": [],
                     "rollback_attempted": False,
                     "rollback_succeeded": None,
@@ -292,18 +343,25 @@ class MigrationManager:
                     "ready_at": None,
                     "continuous_alignment_seconds": 0.0,
                     "reset_count": 0,
+                    "channel_established": required_alignment == 0,
+                    "channel_established_at": created_at if required_alignment == 0 else None,
+                    "channel_reused_for_delta": False,
                 },
             }
             self._migrations[identifier] = migration
             self._migration_order.append(identifier)
+            latest_constellation = deepcopy(self._latest_constellation_state)
             if migration["status"] == "queued":
                 self._queue.put(identifier)
+        if migration["status"] == "waiting_for_contact" and latest_constellation:
+            self.update_constellation(latest_constellation)
         return identifier
 
     def update_constellation(self, snapshot: dict[str, Any]) -> None:
         """Avanza l'allineamento solo con contatto geometrico continuo."""
 
         with self._lock:
+            self._latest_constellation_state = deepcopy(snapshot)
             waiting = [
                 migration
                 for migration in self._migrations.values()
@@ -381,6 +439,15 @@ class MigrationManager:
                     window["reason"] = "alignment_in_progress"
                     continue
 
+                if self._completion_deadline_exceeded(
+                    migration,
+                    observed_at + timedelta(
+                        seconds=self.config.execution_budget_seconds
+                    ),
+                ):
+                    self._expire_before_execution(migration, observed_at)
+                    continue
+
                 window["reason"] = "contact_window_ready"
                 window["ready_at"] = _isoformat(observed_at)
                 migration["events"].append(
@@ -390,6 +457,9 @@ class MigrationManager:
                         "continuous_alignment_seconds": round(elapsed, 3),
                     }
                 )
+                window["channel_established"] = True
+                window["channel_established_at"] = window["ready_at"]
+                migration["metrics"]["alignment_count"] = 1
                 migration["metrics"]["alignment_wait_ms"] = round(
                     elapsed * 1000, 3
                 )
@@ -417,7 +487,7 @@ class MigrationManager:
             ]
             return {
                 "running": self.running,
-                "config": self.config.to_dict(),
+                "config": {**self.config.to_dict(), "default_mode": self._default_mode},
                 "count": len(ordered),
                 "active_migration_id": self._active_migration_id,
                 "latest": deepcopy(ordered[-1]) if ordered else None,
@@ -456,6 +526,10 @@ class MigrationManager:
             )
             self._active_migration_id = migration_id
             mode = migration["mode"]
+            timing_snapshot = deepcopy(self._latest_constellation_state)
+            migration["metrics"]["timing_model"] = self._timing_model.plan(
+                migration, timing_snapshot
+            )
 
         started = monotonic()
         context: dict[str, Any] = {
@@ -467,10 +541,12 @@ class MigrationManager:
             "downtime_started": None,
         }
         try:
+            self._ensure_completion_deadline(migration, "start_protocol")
             if mode == "cold":
                 self._execute_cold(migration, context)
             else:
                 self._execute_hot(migration, context)
+            self._ensure_completion_deadline(migration, "complete_protocol")
             with self._lock:
                 migration["status"] = "completed"
                 migration["completed_at"] = _utc_now()
@@ -508,6 +584,9 @@ class MigrationManager:
     def _execute_cold(
         self, migration: dict[str, Any], context: dict[str, Any]
     ) -> None:
+        # La richiesta deve essere emessa dalla sorgente finché ospita ancora
+        # il Controller. Prepariamo quindi il target prima di fermare SAT src.
+        self._prepare_cold_target(migration)
         self._call_step(
             migration,
             "quiesce_source_controller",
@@ -517,10 +596,6 @@ class MigrationManager:
             {200},
         )
         context["controller_quiesced"] = True
-        context["downtime_started"] = monotonic()
-
-        self._stop_source(migration)
-        context["source_stopped"] = True
 
         checkpoint = self._checkpoint_controller(
             migration,
@@ -531,6 +606,11 @@ class MigrationManager:
         final_sequence = _checkpoint_sequence(checkpoint)
         migration["metrics"]["final_sequence_number"] = final_sequence
 
+        # Il checkpoint è completo e il Controller è quiescente: inizia il
+        # downtime della Cold migration e la sorgente può essere arrestata.
+        context["downtime_started"] = monotonic()
+        self._stop_source(migration)
+        context["source_stopped"] = True
         self._call_step(
             migration,
             "shutdown_controller",
@@ -542,8 +622,9 @@ class MigrationManager:
         context["controller_shutdown"] = True
         context["controller_quiesced"] = False
 
-        self._prepare_target(migration, checkpoint)
-        self._transfer_final_state(migration, checkpoint)
+        # Qui avviene l'unico trasferimento di stato della Cold migration. La
+        # risposta HTTP 200 è l'ACK emesso dal Satellite Agent destinazione.
+        self._transfer_complete_cold_state(migration, checkpoint)
         self._restore_controller(migration, checkpoint)
         context["controller_shutdown"] = False
         self._start_target(migration)
@@ -556,6 +637,7 @@ class MigrationManager:
     def _execute_hot(
         self, migration: dict[str, Any], context: dict[str, Any]
     ) -> None:
+        self._ensure_completion_deadline(migration, "initial_checkpoint")
         initial_checkpoint = self._checkpoint_controller(
             migration,
             step_name="initial_checkpoint",
@@ -564,8 +646,10 @@ class MigrationManager:
         context["checkpoint"] = initial_checkpoint
         initial_sequence = _checkpoint_sequence(initial_checkpoint)
         migration["metrics"]["initial_sequence_number"] = initial_sequence
+        self._ensure_completion_deadline(migration, "prepare_target")
         self._prepare_target(migration, initial_checkpoint)
 
+        self._ensure_completion_deadline(migration, "quiesce_source")
         self._call_step(
             migration,
             "quiesce_source_controller",
@@ -577,6 +661,7 @@ class MigrationManager:
         context["controller_quiesced"] = True
         context["downtime_started"] = monotonic()
 
+        self._ensure_completion_deadline(migration, "final_checkpoint")
         final_checkpoint = self._checkpoint_controller(
             migration,
             step_name="final_checkpoint",
@@ -592,18 +677,73 @@ class MigrationManager:
         migration["metrics"]["updates_during_transfer"] = (
             final_sequence - initial_sequence
         )
+        self._ensure_completion_deadline(migration, "transfer_final_state")
+        migration["contact_window"]["channel_reused_for_delta"] = True
+        migration["events"].append(
+            {
+                "name": "delta_channel_reused",
+                "timestamp": _utc_now(),
+                "channel_established_at": migration["contact_window"].get(
+                    "channel_established_at"
+                ),
+            }
+        )
         self._transfer_final_state(migration, final_checkpoint)
 
+        self._ensure_completion_deadline(migration, "cutover")
         self._stop_source(migration)
         context["source_stopped"] = True
+        self._ensure_completion_deadline(migration, "restore_controller")
         self._restore_controller(migration, final_checkpoint)
         context["controller_quiesced"] = False
+        self._ensure_completion_deadline(migration, "start_target")
         self._start_target(migration)
         context["target_started"] = True
+        self._ensure_completion_deadline(migration, "update_controller_host")
         self._set_controller_host(migration, migration["target_satellite_id"])
         migration["metrics"]["downtime_ms"] = round(
             (monotonic() - context["downtime_started"]) * 1000, 3
         )
+
+    def _completion_deadline(self, migration: dict[str, Any]) -> datetime | None:
+        recommendation = migration.get("recommendation")
+        if not isinstance(recommendation, dict):
+            return None
+        return _parse_timestamp(recommendation.get("completion_deadline_at"))
+
+    def _completion_deadline_exceeded(
+        self, migration: dict[str, Any], moment: datetime
+    ) -> bool:
+        deadline = self._completion_deadline(migration)
+        return deadline is not None and moment > deadline
+
+    def _expire_before_execution(
+        self, migration: dict[str, Any], observed_at: datetime
+    ) -> None:
+        deadline = self._completion_deadline(migration)
+        migration["status"] = "expired"
+        migration["error"] = "Tempo insufficiente per completare la migrazione prima della deadline"
+        migration["completed_at"] = _isoformat(observed_at)
+        migration["contact_window"]["reason"] = "insufficient_time_before_deadline"
+        migration["events"].append(
+            {
+                "name": "migration_expired_before_execution",
+                "timestamp": migration["completed_at"],
+                "completion_deadline_at": _isoformat(deadline) if deadline else None,
+            }
+        )
+
+    def _ensure_completion_deadline(
+        self, migration: dict[str, Any], phase: str
+    ) -> None:
+        deadline = self._completion_deadline(migration)
+        if deadline is None:
+            return
+        if datetime.now(timezone.utc) > deadline:
+            raise MigrationProtocolError(
+                "Deadline di completamento superata prima della fase "
+                f"{phase}: {_isoformat(deadline)}"
+            )
 
     def _checkpoint_controller(
         self,
@@ -631,12 +771,14 @@ class MigrationManager:
     def _prepare_target(
         self, migration: dict[str, Any], checkpoint: dict[str, Any]
     ) -> None:
+        self._request_source_migration(migration)
+        self._ensure_target_passive(migration)
         target_url = self.config.agent_url(migration["target_satellite_id"])
         self._call_step(
             migration,
-            "request_target_migration",
+            "transfer_initial_state_to_target",
             "POST",
-            f"{target_url}/migration_request",
+            f"{target_url}/prepare_migration",
             {
                 "migration_id": migration["migration_id"],
                 "source_satellite_id": migration["source_satellite_id"],
@@ -644,6 +786,52 @@ class MigrationManager:
                 "controller_state": checkpoint,
             },
             {202},
+        )
+
+    def _prepare_cold_target(self, migration: dict[str, Any]) -> None:
+        """Scambia solo i messaggi di controllo prima del freeze Cold."""
+
+        self._request_source_migration(migration)
+        self._ensure_target_passive(migration)
+        target_url = self.config.agent_url(migration["target_satellite_id"])
+        self._call_step(
+            migration,
+            "prepare_target_for_cold_migration",
+            "POST",
+            f"{target_url}/prepare_migration",
+            {
+                "migration_id": migration["migration_id"],
+                "source_satellite_id": migration["source_satellite_id"],
+                "target_satellite_id": migration["target_satellite_id"],
+            },
+            {202},
+        )
+
+    def _request_source_migration(self, migration: dict[str, Any]) -> None:
+        source_url = self.config.agent_url(migration["source_satellite_id"])
+        self._call_step(
+            migration,
+            "request_source_migration",
+            "POST",
+            f"{source_url}/migration_request",
+            {
+                "migration_id": migration["migration_id"],
+                "source_satellite_id": migration["source_satellite_id"],
+                "target_satellite_id": migration["target_satellite_id"],
+                "mode": migration["mode"],
+            },
+            {202},
+        )
+
+    def _ensure_target_passive(self, migration: dict[str, Any]) -> None:
+        target_url = self.config.agent_url(migration["target_satellite_id"])
+        self._call_step(
+            migration,
+            "ensure_target_passive",
+            "POST",
+            f"{target_url}/stop_controller",
+            None,
+            {200},
         )
 
     def _restore_controller(
@@ -658,16 +846,35 @@ class MigrationManager:
             {200},
         )
         migration["metrics"]["controller_restore_ack"] = True
-        if migration["mode"] == "cold":
-            migration["metrics"]["ack_received"] = True
 
     def _transfer_final_state(
         self, migration: dict[str, Any], checkpoint: dict[str, Any]
     ) -> None:
+        self._transfer_state_and_wait_target_ack(
+            migration,
+            checkpoint,
+            "transfer_final_state_and_wait_target_ack",
+        )
+
+    def _transfer_complete_cold_state(
+        self, migration: dict[str, Any], checkpoint: dict[str, Any]
+    ) -> None:
+        self._transfer_state_and_wait_target_ack(
+            migration,
+            checkpoint,
+            "transfer_complete_state_and_wait_target_ack",
+        )
+
+    def _transfer_state_and_wait_target_ack(
+        self,
+        migration: dict[str, Any],
+        checkpoint: dict[str, Any],
+        step_name: str,
+    ) -> None:
         target_url = self.config.agent_url(migration["target_satellite_id"])
         response = self._call_step(
             migration,
-            "transfer_final_state_and_wait_target_ack",
+            step_name,
             "POST",
             f"{target_url}/receive_controller_state",
             {
@@ -717,6 +924,10 @@ class MigrationManager:
             {"satellite_id": satellite_id},
             {200},
         )
+        with self._lock:
+            listener = self._handover_listener
+        if listener is not None:
+            listener(migration["source_satellite_id"], satellite_id)
 
     def _call_step(
         self,
@@ -730,7 +941,30 @@ class MigrationManager:
         started = monotonic()
         started_at = _utc_now()
         last_error: Exception | None = None
+        live_step = {
+            "name": name,
+            "status": "in_progress",
+            "http_status": None,
+            "attempts": 0,
+            "duration_ms": None,
+            "started_at": started_at,
+            "completed_at": None,
+            "timestamp": started_at,
+            "error": None,
+        }
+        with self._lock:
+            migration["metrics"]["steps"].append(live_step)
+        timing_plan = migration["metrics"].get("timing_model") or {}
+        simulated_delay_seconds, timing_breakdown = self._timing_model.delay_for_step(
+            timing_plan, name
+        )
+        live_step["timing_contributions_ms"] = timing_breakdown
+        if simulated_delay_seconds:
+            sleep(simulated_delay_seconds)
+
         for attempt in range(1, self.config.max_retries + 2):
+            with self._lock:
+                live_step["attempts"] = attempt
             try:
                 response = self.transport.request(
                     method,
@@ -744,40 +978,41 @@ class MigrationManager:
                         f"ricevuto HTTP {response.status}"
                     )
                 completed_at = _utc_now()
-                migration["metrics"]["steps"].append(
-                    {
-                        "name": name,
-                        "status": "ok",
-                        "http_status": response.status,
-                        "attempts": attempt,
-                        "duration_ms": round((monotonic() - started) * 1000, 3),
-                        "started_at": started_at,
-                        "completed_at": completed_at,
-                        "timestamp": completed_at,
-                    }
-                )
-                migration["metrics"]["retries"] += attempt - 1
+                with self._lock:
+                    live_step.update(
+                        {
+                            "status": "ok",
+                            "http_status": response.status,
+                            "attempts": attempt,
+                            "duration_ms": round(
+                                (monotonic() - started) * 1000, 3
+                            ),
+                            "completed_at": completed_at,
+                            "timestamp": completed_at,
+                            "error": None,
+                        }
+                    )
+                    migration["metrics"]["retries"] += attempt - 1
                 return response
             except Exception as exc:
                 last_error = exc
                 if attempt <= self.config.max_retries:
                     sleep(self.config.retry_delay_seconds)
 
-        migration["metrics"]["retries"] += self.config.max_retries
         completed_at = _utc_now()
-        migration["metrics"]["steps"].append(
-            {
-                "name": name,
-                "status": "failed",
-                "http_status": None,
-                "attempts": self.config.max_retries + 1,
-                "duration_ms": round((monotonic() - started) * 1000, 3),
-                "started_at": started_at,
-                "completed_at": completed_at,
-                "timestamp": completed_at,
-                "error": str(last_error),
-            }
-        )
+        with self._lock:
+            migration["metrics"]["retries"] += self.config.max_retries
+            live_step.update(
+                {
+                    "status": "failed",
+                    "http_status": None,
+                    "attempts": self.config.max_retries + 1,
+                    "duration_ms": round((monotonic() - started) * 1000, 3),
+                    "completed_at": completed_at,
+                    "timestamp": completed_at,
+                    "error": str(last_error),
+                }
+            )
         raise MigrationProtocolError(f"Passo {name} fallito: {last_error}")
 
     def _rollback(

@@ -13,6 +13,8 @@ from time import monotonic
 from typing import Any, Callable
 from uuid import uuid4
 
+from .contact_window import ContactWindowConfig, evaluate_contact
+
 
 class ScoreManagerError(ValueError):
     """Errore di configurazione o heartbeat non valido."""
@@ -55,6 +57,8 @@ class ScoreManagerConfig:
     heartbeat_ttl_seconds: float
     minimum_score_improvement: float
     migration_cooldown_seconds: float
+    handover_safety_margin_seconds: float = 60.0
+    minimum_target_sunlight_seconds: float = 120.0
 
     @classmethod
     def from_file(cls, path: str | Path) -> "ScoreManagerConfig":
@@ -64,6 +68,7 @@ class ScoreManagerConfig:
         with config_path.open(encoding="utf-8") as stream:
             payload = json.load(stream)
         migration = payload.get("migration", {})
+        eclipse_handover = migration.get("eclipse_handover", {})
         return cls(
             weights=ScoreWeights.from_dict(payload.get("weights")),
             heartbeat_ttl_seconds=_positive_number(
@@ -76,6 +81,14 @@ class ScoreManagerConfig:
             migration_cooldown_seconds=_non_negative_number(
                 migration.get("cooldown_seconds"), "cooldown_seconds"
             ),
+            handover_safety_margin_seconds=_non_negative_number(
+                eclipse_handover.get("safety_margin_seconds", 60),
+                "safety_margin_seconds",
+            ),
+            minimum_target_sunlight_seconds=_non_negative_number(
+                eclipse_handover.get("minimum_target_sunlight_seconds", 120),
+                "minimum_target_sunlight_seconds",
+            ),
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -85,6 +98,12 @@ class ScoreManagerConfig:
             "migration": {
                 "minimum_score_improvement": self.minimum_score_improvement,
                 "cooldown_seconds": self.migration_cooldown_seconds,
+                "eclipse_handover": {
+                    "safety_margin_seconds": self.handover_safety_margin_seconds,
+                    "minimum_target_sunlight_seconds": (
+                        self.minimum_target_sunlight_seconds
+                    ),
+                },
             },
         }
 
@@ -98,6 +117,10 @@ class ScoreManager:
         config: ScoreManagerConfig,
         migration_notifier: Callable[[dict[str, Any]], None],
         evaluation_listener: Callable[[dict[str, Any], float], None] | None = None,
+        required_contact_seconds: float = 60.0,
+        migration_execution_budget_seconds: float = 90.0,
+        contact_window_config: ContactWindowConfig | None = None,
+        migration_state_provider: Callable[[], dict[str, Any]] | None = None,
     ) -> None:
         normalized_ids = [_canonical_satellite_id(value) for value in satellite_ids]
         if not normalized_ids or len(set(normalized_ids)) != len(normalized_ids):
@@ -106,6 +129,15 @@ class ScoreManager:
         self.config = config
         self._migration_notifier = migration_notifier
         self._evaluation_listener = evaluation_listener
+        self.required_contact_seconds = _non_negative_number(
+            required_contact_seconds, "required_contact_seconds"
+        )
+        self.migration_execution_budget_seconds = _positive_number(
+            migration_execution_budget_seconds,
+            "migration_execution_budget_seconds",
+        )
+        self.contact_window_config = contact_window_config
+        self._migration_state_provider = migration_state_provider
         self._lock = RLock()
         self._heartbeats: dict[str, dict[str, Any]] = {}
         self._heartbeat_times: dict[str, datetime] = {}
@@ -115,6 +147,40 @@ class ScoreManager:
         )
         self._last_notification_at: datetime | None = None
         self._last_notification_pair: tuple[str, str] | None = None
+        self._enabled = True
+        self._authoritative_controller_id: str | None = None
+
+    def reset(self, enabled: bool = False) -> None:
+        """Azzera heartbeat, valutazioni e memoria delle elezioni."""
+
+        with self._lock:
+            self._heartbeats = {}
+            self._heartbeat_times = {}
+            self._constellation_state = {}
+            self._evaluation = self._empty_evaluation("waiting_for_data")
+            self._last_notification_at = None
+            self._last_notification_pair = None
+            self._enabled = enabled
+            self._authoritative_controller_id = None
+
+    def set_enabled(self, enabled: bool) -> None:
+        with self._lock:
+            self._enabled = bool(enabled)
+
+    def record_controller_handover(
+        self, source_satellite_id: str, target_satellite_id: str
+    ) -> None:
+        """Rende immediato il cambio host senza attendere il prossimo heartbeat."""
+
+        source = _canonical_satellite_id(source_satellite_id)
+        target = _canonical_satellite_id(target_satellite_id)
+        if source not in self.satellite_ids or target not in self.satellite_ids:
+            raise ScoreManagerError("Handover fuori dalla costellazione")
+        with self._lock:
+            self._authoritative_controller_id = target
+            for satellite_id, heartbeat in self._heartbeats.items():
+                heartbeat["controller"] = satellite_id == target
+            self._evaluate_locked(datetime.now(timezone.utc))
 
     def record_heartbeat(self, payload: dict[str, Any]) -> dict[str, Any]:
         heartbeat = _validate_heartbeat(payload)
@@ -127,6 +193,10 @@ class ScoreManager:
         record["satellite_id"] = satellite_id
         record["received_at"] = _isoformat(now)
         with self._lock:
+            if self._authoritative_controller_id is not None:
+                record["controller"] = (
+                    satellite_id == self._authoritative_controller_id
+                )
             self._heartbeats[satellite_id] = record
             self._heartbeat_times[satellite_id] = now
             self._evaluate_locked(now)
@@ -141,6 +211,9 @@ class ScoreManager:
         with self._lock:
             return {
                 "config": self.config.to_dict(),
+                "authoritative_controller_satellite_id": (
+                    self._authoritative_controller_id
+                ),
                 "heartbeats": deepcopy(self._heartbeats),
                 "evaluation": deepcopy(self._evaluation),
             }
@@ -241,22 +314,94 @@ class ScoreManager:
             )
             return
 
-        selected_id = sorted(
-            scores, key=lambda item: (-scores[item]["score"], item)
-        )[0]
+        handover_trigger_seconds = (
+            self.required_contact_seconds
+            + self.migration_execution_budget_seconds
+            + self.config.handover_safety_margin_seconds
+        )
+        controller_time_to_eclipse = scores[current_controller]["T"]
+        controller_in_eclipse = controller_time_to_eclipse <= 0
+        handover_due = controller_time_to_eclipse <= handover_trigger_seconds
+        candidate_eligibility: dict[str, dict[str, Any]] = {}
+        eligible_targets: list[str] = []
+        target_required_sunlight = max(
+            self.config.minimum_target_sunlight_seconds,
+            handover_trigger_seconds,
+        )
+        for satellite_id in self.satellite_ids:
+            if satellite_id == current_controller:
+                continue
+            reasons: list[str] = []
+            target_sunlight = scores[satellite_id]["T"]
+            if target_sunlight < target_required_sunlight:
+                reasons.append("insufficient_target_sunlight")
+
+            contact_payload: dict[str, Any] = {
+                "eligible": None,
+                "reason": "not_evaluated",
+                "distance_km": scores[satellite_id]["D"],
+                "line_of_sight": None,
+            }
+            if self.contact_window_config is not None:
+                observation = evaluate_contact(
+                    self._constellation_state,
+                    current_controller,
+                    satellite_id,
+                    self.contact_window_config,
+                )
+                contact_payload = {
+                    "eligible": observation.eligible,
+                    "reason": observation.reason,
+                    "distance_km": (
+                        round(observation.distance_km, 3)
+                        if observation.distance_km is not None
+                        else None
+                    ),
+                    "line_of_sight": observation.line_of_sight,
+                }
+            if contact_payload["eligible"] is False:
+                reasons.append(str(contact_payload["reason"]))
+            eligible = not reasons
+            candidate_eligibility[satellite_id] = {
+                "eligible": eligible,
+                "reasons": reasons,
+                "target_sunlight_seconds": target_sunlight,
+                "required_target_sunlight_seconds": target_required_sunlight,
+                "contact": contact_payload,
+            }
+            if eligible:
+                eligible_targets.append(satellite_id)
+
+        ranked_targets = sorted(
+            eligible_targets,
+            key=lambda item: (-scores[item]["score"], item),
+        )
+        selected_id = ranked_targets[0] if ranked_targets else None
         migration_required = False
         score_delta: float | None = None
-        reason = "best_candidate_is_current_controller"
+        reason = "controller_eclipse_not_imminent"
 
-        if selected_id != current_controller:
+        if selected_id is None:
+            reason = (
+                "waiting_for_contact_candidate"
+                if handover_due
+                else "no_eligible_target"
+            )
+        else:
             score_delta = scores[selected_id]["score"] - scores[current_controller]["score"]
-            if score_delta < self.config.minimum_score_improvement:
-                reason = "improvement_below_threshold"
-            elif self._cooldown_active(now, current_controller, selected_id):
+            if not handover_due:
+                reason = "controller_eclipse_not_imminent"
+            elif self._handover_open():
+                reason = "handover_already_pending"
+            elif self._cooldown_active(now):
                 reason = "migration_cooldown"
             else:
                 migration_required = True
-                reason = "higher_score"
+                reason = (
+                    "controller_in_eclipse_recovery"
+                    if controller_in_eclipse
+                    else "controller_eclipse_approaching"
+                )
 
         self._evaluation = {
             "ready": True,
@@ -269,12 +414,29 @@ class ScoreManager:
             "reported_controller_satellite_ids": [current_controller],
             "score_delta": round(score_delta, 6) if score_delta is not None else None,
             "migration_required": migration_required,
+            "handover_due": handover_due,
+            "handover_trigger_seconds": round(handover_trigger_seconds, 3),
+            "required_contact_seconds": round(self.required_contact_seconds, 3),
+            "migration_execution_budget_seconds": round(
+                self.migration_execution_budget_seconds, 3
+            ),
+            "controller_time_to_eclipse_seconds": controller_time_to_eclipse,
+            "controller_in_eclipse": controller_in_eclipse,
+            "candidate_eligibility": candidate_eligibility,
             "missing_heartbeats": [],
             "stale_heartbeats": [],
             "missing_distances": [],
         }
 
-        if migration_required and current_controller is not None:
+        if migration_required and current_controller is not None and self._enabled:
+            completion_window_seconds = (
+                self.required_contact_seconds
+                + self.migration_execution_budget_seconds
+                + self.config.handover_safety_margin_seconds
+                if controller_in_eclipse
+                else controller_time_to_eclipse
+                - self.config.handover_safety_margin_seconds
+            )
             notification = {
                 "migration_id": str(uuid4()),
                 "source_satellite_id": current_controller,
@@ -283,6 +445,38 @@ class ScoreManager:
                 "score_delta": round(score_delta or 0.0, 6),
                 "source_score": scores[current_controller]["score"],
                 "target_score": scores[selected_id]["score"],
+                "source_time_to_eclipse_seconds": controller_time_to_eclipse,
+                "target_time_to_eclipse_seconds": scores[selected_id]["T"],
+                "required_contact_seconds": self.required_contact_seconds,
+                "handover_safety_margin_seconds": (
+                    self.config.handover_safety_margin_seconds
+                ),
+                "migration_execution_budget_seconds": (
+                    self.migration_execution_budget_seconds
+                ),
+                "source_eclipse_at": _isoformat(
+                    now + timedelta(seconds=controller_time_to_eclipse)
+                ),
+                "completion_deadline_at": _isoformat(
+                    now + timedelta(seconds=completion_window_seconds)
+                ),
+                "alignment_complete_not_before": _isoformat(
+                    now + timedelta(seconds=self.required_contact_seconds)
+                ),
+                "estimated_margin_after_alignment_seconds": round(
+                    (
+                        self.config.handover_safety_margin_seconds
+                        if controller_in_eclipse
+                        else controller_time_to_eclipse
+                        - self.required_contact_seconds
+                        - self.migration_execution_budget_seconds
+                    ),
+                    3,
+                ),
+                "emergency_recovery": controller_in_eclipse,
+                "contact": deepcopy(
+                    candidate_eligibility[selected_id]["contact"]
+                ),
                 "timestamp": _isoformat(now),
             }
             self._migration_notifier(notification)
@@ -295,13 +489,21 @@ class ScoreManager:
                 (monotonic() - evaluation_started) * 1000,
             )
 
-    def _cooldown_active(self, now: datetime, source: str, target: str) -> bool:
+    def _cooldown_active(self, now: datetime) -> bool:
         if self._last_notification_at is None:
-            return False
-        if self._last_notification_pair != (source, target):
             return False
         return now - self._last_notification_at < timedelta(
             seconds=self.config.migration_cooldown_seconds
+        )
+
+    def _handover_open(self) -> bool:
+        if self._migration_state_provider is None:
+            return False
+        state = self._migration_state_provider()
+        return any(
+            migration.get("status")
+            in {"waiting_for_contact", "queued", "in_progress"}
+            for migration in state.get("migrations", [])
         )
 
     def _empty_evaluation(self, reason: str, **details: Any) -> dict[str, Any]:
@@ -318,6 +520,19 @@ class ScoreManager:
             ),
             "score_delta": None,
             "migration_required": False,
+            "handover_due": False,
+            "handover_trigger_seconds": round(
+                self.required_contact_seconds
+                + self.migration_execution_budget_seconds
+                + self.config.handover_safety_margin_seconds,
+                3,
+            ),
+            "required_contact_seconds": round(self.required_contact_seconds, 3),
+            "migration_execution_budget_seconds": round(
+                self.migration_execution_budget_seconds, 3
+            ),
+            "controller_time_to_eclipse_seconds": None,
+            "candidate_eligibility": {},
             "missing_heartbeats": details.get("missing", []),
             "stale_heartbeats": details.get("stale", []),
             "missing_distances": details.get("missing_distances", []),

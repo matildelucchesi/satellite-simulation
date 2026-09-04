@@ -37,6 +37,7 @@ class DashboardDataService:
             "startup_controller": (
                 f"{self.simulator_url}/api/v1/startup-controller"
             ),
+            "experiment": f"{self.simulator_url}/api/v1/experiment",
             "controller_state": f"{self.controller_url}/state",
             "controller_health": f"{self.controller_url}/health",
         }
@@ -61,8 +62,48 @@ class DashboardDataService:
             "generated_at": _utc_now(),
             **results,
             "logs": logs,
+            "exports": self.list_exports(),
             "errors": errors,
         }
+
+    def list_exports(self) -> list[dict[str, Any]]:
+        """Elenca in modo sicuro gli export automatici disponibili."""
+        if not self.log_dir.is_dir():
+            return []
+
+        exports: list[dict[str, Any]] = []
+        for path in self.log_dir.glob("metrics-*.*"):
+            if not path.is_file() or path.suffix.lower() not in {".json", ".pdf"}:
+                continue
+            try:
+                stat = path.stat()
+            except OSError:
+                continue
+            exports.append(
+                {
+                    "filename": path.name,
+                    "format": path.suffix[1:].upper(),
+                    "size_bytes": stat.st_size,
+                    "created_at": datetime.fromtimestamp(
+                        stat.st_mtime, tz=timezone.utc
+                    )
+                    .isoformat(timespec="seconds")
+                    .replace("+00:00", "Z"),
+                }
+            )
+        return sorted(exports, key=lambda item: item["created_at"], reverse=True)
+
+    def export_path(self, filename: str) -> Path | None:
+        """Restituisce solo file export consentiti, evitando path traversal."""
+        candidate = Path(filename)
+        if (
+            candidate.name != filename
+            or not filename.startswith("metrics-")
+            or candidate.suffix.lower() not in {".json", ".pdf"}
+        ):
+            return None
+        path = self.log_dir / candidate.name
+        return path if path.is_file() else None
 
     def _fetch_json(self, url: str) -> dict[str, Any]:
         request = Request(url, headers={"Accept": "application/json"}, method="GET")
@@ -71,6 +112,28 @@ class DashboardDataService:
         if not isinstance(payload, dict):
             raise ValueError(f"Risposta non valida da {url}")
         return payload
+
+    def start_experiment(self, payload: dict[str, Any]) -> dict[str, Any]:
+        return self._send_json("/api/v1/experiment", payload)
+
+    def reset_experiment(self) -> dict[str, Any]:
+        return self._send_json("/api/v1/experiment/reset", {})
+
+    def _send_json(self, path: str, payload: dict[str, Any]) -> dict[str, Any]:
+        body = json.dumps(payload).encode("utf-8")
+        request = Request(
+            f"{self.simulator_url}{path}",
+            data=body,
+            headers={"Accept": "application/json", "Content-Type": "application/json"},
+            method="POST",
+        )
+        with urlopen(
+            request, timeout=max(15.0, self.request_timeout_seconds)
+        ) as response:
+            result = json.loads(response.read().decode("utf-8"))
+        if not isinstance(result, dict):
+            raise ValueError("Risposta non valida dal Simulator")
+        return result
 
     def _collect_logs(
         self, results: dict[str, Any], errors: list[dict[str, str]]

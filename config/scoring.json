@@ -8,6 +8,10 @@
   "heartbeat_ttl_seconds": 15,
   "migration": {
     "minimum_score_improvement": 25.0,
-    "cooldown_seconds": 60
+    "cooldown_seconds": 60,
+    "eclipse_handover": {
+      "safety_margin_seconds": 60,
+      "minimum_target_sunlight_seconds": 240
+    }
   }
 }
