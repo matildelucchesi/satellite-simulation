@@ -23,25 +23,25 @@ The default scenario includes seven satellites (`SAT-1` through `SAT-7`) selecte
                                          | aggregates REST data
                                          v
  +----------------+    orbital state   +-------------------+    checkpoint/state   +----------------+
- | Satellite      | <----------------> |     Simulator     | <-------------------> |   Controller   |
- | agents SAT-1..7| -- heartbeats ---> | scoring, election | <--- heartbeats ----- | topology/routes |
+ | Satellite      | <----------------> |     Simulator     |                       | Controller REST |
+ | agents SAT-1..7| -- heartbeats ---> | scoring, election |                       | gateway         |
  +----------------+                    | migrations/reports|                       +----------------+
         ^                              +-------------------+
         |                                        |
         +-------- migration REST protocol -------+
-                 (source and target agents)
+        |        (source and target agents)       |
+        +--- active satellite runs Controller ----+
 ```
 
 | Component | Responsibility |
 | --- | --- |
 | `simulator` | Flask service and headless coordinator. Runs the orbital clock, retains the latest constellation snapshot, evaluates candidate scores, controls Controller election/migration, and exports metrics. |
-| `satellite_agent` | Reusable Flask image instantiated seven times. It polls its orbital record, sends heartbeats, and exposes logical Controller lifecycle and migration endpoints. |
-| `controller` | Flask microservice that maintains heartbeat-derived topology, routing table, sequence number, host satellite, and atomic checkpoints. |
+| `satellite_agent` | Reusable Flask image instantiated seven times. It polls its orbital record, sends heartbeats, exposes migration endpoints, and contains a dormant Controller instance that is activated when that satellite is elected. |
+| `controller` | Flask REST gateway that forwards heartbeat, topology, routing, and checkpoint operations to the active satellite's Controller instance. |
 | `dashboard` | Flask UI which concurrently aggregates Simulator and Controller data. Its dependency-free frontend refreshes twice per second. |
 | `common` | Shared environment-based settings. |
 | `config` | Versioned constellation, TLE, scoring, and migration parameters. |
 | `logs` | Host-mounted location for logs and completed-experiment JSON/PDF reports. |
-| `state` | Host-mounted location for the Controller checkpoint. |
 
 Every service has an `app/__init__.py` composition root that constructs its dependencies. Flask routes in `app/routes.py` are thin HTTP/JSON adapters; application logic lives in modules including `orbit_engine`, `score_manager`, `migration_manager`, `experiment_manager`, `agent`, and `service`. HTTP and filesystem interactions use dedicated adapters, making the core behaviours testable without live containers.
 
@@ -49,8 +49,8 @@ Every service has an `app/__init__.py` composition root that constructs its depe
 
 1. At startup the orbital clock is paused and the Dashboard asks for `hot` or `cold` mode and a migration limit (1–100; UI default: 3).
 2. The Simulator resets state, starts TLE propagation, and agents poll their state every second. By default, agents heartbeat every five seconds.
-3. The initial-election manager waits for a sunlit satellite with more than 300 seconds remaining before eclipse and at least one reachable neighbour. It selects the eligible satellite with the **least** remaining sunlight, stops hosting on all others, activates the selected agent, and records the logical host in the Controller.
-4. Heartbeats contain CPU use, time to eclipse, Controller status, and current physical-neighbour IDs. The Controller builds topology/routing data from them; the Simulator maintains a separate cache for scoring.
+3. The initial-election manager waits for a sunlit satellite with more than 300 seconds remaining before eclipse and at least one reachable neighbour. It selects the eligible satellite with the **least** remaining sunlight, stops Controller instances on all others, activates the selected satellite's local Controller instance, and records the host in the gateway.
+4. Heartbeats contain CPU use, time to eclipse, Controller status, and current physical-neighbour IDs. The gateway forwards them to the active satellite's Controller instance, which builds topology/routing data; the Simulator maintains a separate cache for scoring.
 5. Before the current host reaches eclipse, the scoring manager selects the best eligible physical neighbour and queues a handover when it passes the configured improvement and cooldown rules.
 6. The migration first establishes a continuous contact window. Source and target must remain within 5,500 km, with clear line of sight, for 60 consecutive seconds. Broken contact or a sample gap above 2.5 seconds resets alignment.
 7. The asynchronous migration requires a final `200 OK` acknowledgement from the target before cutover. Failures trigger rollback and remain visible in the event timeline.
@@ -79,7 +79,7 @@ Only one migration is active at a time. Both protocols record every REST step wi
 1. The source registers the outgoing request; the target remains passive and is prepared with an initial checkpoint (**pre-copy**).
 2. After the contact channel is aligned, the Controller is briefly quiesced and a second checkpoint captures the final delta.
 3. The target receives final Controller state and must return `200 OK` for the expected final sequence number.
-4. Only then is the source stopped, the central Controller service restored, the target agent activated, and the logical host updated.
+4. Only then is the source Controller instance stopped, the checkpoint restored into the target's local Controller instance, that instance activated, and the gateway host updated.
 
 The channel established for pre-copy is reused for the delta; it is not aligned a second time.
 
@@ -141,14 +141,14 @@ Stop the stack with:
 docker compose down
 ```
 
-The bind-mounted `logs/` and `state/` directories are kept by `docker compose down`. Clear them only when you intentionally want to discard reports or the last Controller checkpoint.
+The bind-mounted `logs/` directory is kept by `docker compose down`. Controller checkpoints are stored in each satellite container and transferred to the target during handover.
 
 ## Service ports
 
 | Service | Host address | Purpose |
 | --- | --- | --- |
 | Simulator | `http://localhost:8000` | Orbital state, experiments, scores, migrations, metrics |
-| Controller | `http://localhost:8001` | Controller state, checkpoints, heartbeats |
+| Controller gateway | `http://localhost:8001` | Proxied state, checkpoints, and heartbeats for the active satellite Controller |
 | Dashboard | `http://localhost:8081` | Web UI and aggregation (`DASHBOARD_PORT` is configurable) |
 | `SAT-1` to `SAT-7` | `http://localhost:8101` to `http://localhost:8107` | Individual satellite-agent APIs |
 
@@ -199,7 +199,8 @@ A manual migration (only while the experiment runs) needs a payload such as:
 | `GET` | `/status` | Local Controller, sync, heartbeat, and migration state. |
 | `GET` | `/position` | Last Simulator state; returns `503` before first sync. |
 | `POST` | `/receive_state` | Accept individual or full orbital snapshot. |
-| `POST` | `/start_controller`, `/stop_controller` | Start/stop logical Controller hosting. |
+| `POST` | `/start_controller`, `/stop_controller` | Activate/deactivate the Controller instance hosted in this satellite agent. |
+| `GET`/`POST` | `/controller/...` | Local Controller API, active only while this satellite hosts the Controller. |
 | `POST` | `/migration_request` | Register outbound handover; allowed only for current host. |
 | `POST` | `/prepare_migration` | Prepare passive target with initial state. |
 | `POST` | `/receive_controller_state` | Receive final state and return required `200 OK`. |
@@ -213,7 +214,7 @@ A manual migration (only while the experiment runs) needs a payload such as:
 | `GET`/`POST` | `/heartbeat` | List (optional `?id=SAT-1`) or accept a heartbeat. |
 | `GET` | `/state` | Topology, routes, heartbeats, sequence number, timestamp, host. |
 | `POST` | `/host` | Set host with `{"satellite_id":"SAT-1"}`. |
-| `POST` | `/checkpoint` | Atomically save state to `state/controller-checkpoint.json`. |
+| `POST` | `/checkpoint` | Atomically save this satellite's local Controller state before transfer. |
 | `POST` | `/restore` | Restore supplied JSON or the last checkpoint. |
 | `POST` | `/shutdown` | Checkpoint and logically deactivate. |
 | `POST` | `/quiesce`, `/resume` | Pause/resume mutations around cutover. |

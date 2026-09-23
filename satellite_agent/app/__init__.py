@@ -14,6 +14,11 @@ from common.settings import ServiceSettings
 from .agent import SatelliteAgent
 from .routes import create_api_blueprint
 
+try:
+    from controller_core.routes import create_api_blueprint as create_controller_blueprint
+except ModuleNotFoundError:  # import usato dai test eseguiti dal repository
+    from controller.app.routes import create_api_blueprint as create_controller_blueprint
+
 
 def create_app(test_config: dict[str, Any] | None = None) -> Flask:
     """Crea l'API REST e i worker autonomi del satellite."""
@@ -56,6 +61,12 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
     )
     app.extensions["satellite_agent"] = agent
     app.register_blueprint(create_api_blueprint(settings.name, agent))
+    app.register_blueprint(
+        create_controller_blueprint(
+            f"controller-{agent.satellite_id.lower()}", agent.controller_service
+        ),
+        url_prefix="/controller",
+    )
 
     if app.config["AGENT_AUTOSTART"]:
         agent.start()

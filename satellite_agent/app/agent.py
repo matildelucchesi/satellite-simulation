@@ -15,6 +15,11 @@ from uuid import uuid4
 
 import psutil
 
+try:
+    from controller_core.service import ControllerService
+except ModuleNotFoundError:  # import usato dai test eseguiti dal repository
+    from controller.app.service import ControllerService
+
 from .transport import AgentHttpTransport, UrllibAgentHttpTransport
 
 LOGGER = logging.getLogger(__name__)
@@ -44,6 +49,7 @@ class SatelliteAgent:
         heartbeat_interval_seconds: float = 5.0,
         request_timeout_seconds: float = 2.0,
         transport: AgentHttpTransport | None = None,
+        controller_service: ControllerService | None = None,
     ) -> None:
         satellite_id = satellite_id.strip().upper()
         if not satellite_id or satellite_id == "UNASSIGNED":
@@ -61,6 +67,10 @@ class SatelliteAgent:
         self.heartbeat_interval_seconds = heartbeat_interval_seconds
         self.request_timeout_seconds = request_timeout_seconds
         self.transport = transport or UrllibAgentHttpTransport()
+        self.controller_service = controller_service or ControllerService(
+            f"/tmp/{self.satellite_id.lower()}-controller-checkpoint.json",
+            host_satellite_id=self.satellite_id,
+        )
 
         self._lock = RLock()
         self._stop_event = Event()
@@ -69,6 +79,10 @@ class SatelliteAgent:
         self._state_received_at: str | None = None
         self._source_generated_at: str | None = None
         self._controller_running = controller_enabled
+        if controller_enabled:
+            self.controller_service.activate()
+        else:
+            self.controller_service.shutdown()
         self._migration: dict[str, Any] | None = None
         self._latest_heartbeat: dict[str, Any] | None = None
         self._last_heartbeat_sent_at: str | None = None
@@ -179,6 +193,7 @@ class SatelliteAgent:
                 "id": self.satellite_id,
                 "running": self.running,
                 "controller": self._controller_running,
+                "controller_instance_active": self.controller_service.active,
                 "orbital_state": {
                     "available": self._orbital_state is not None,
                     "received_at": self._state_received_at,
@@ -219,6 +234,16 @@ class SatelliteAgent:
                     "la ricezione dell'update finale"
                 )
             changed = not self._controller_running
+            migration_state = (
+                self._migration.get("controller_state")
+                if self._migration and self._migration.get("direction") == "inbound"
+                else None
+            )
+            if isinstance(migration_state, dict):
+                self.controller_service.restore({"checkpoint": migration_state})
+            else:
+                self.controller_service.activate()
+            self.controller_service.set_host_satellite(self.satellite_id)
             self._controller_running = True
             if self._migration and self._migration["status"] == "final_state_received":
                 self._migration["status"] = "activated"
@@ -244,6 +269,8 @@ class SatelliteAgent:
     def stop_controller(self) -> dict[str, Any]:
         with self._lock:
             changed = self._controller_running
+            if self.controller_service.active:
+                self.controller_service.shutdown()
             self._controller_running = False
             if (
                 changed
@@ -270,6 +297,8 @@ class SatelliteAgent:
             self._state_received_at = None
             self._source_generated_at = None
             self._controller_running = False
+            self.controller_service.reset_simulation()
+            self.controller_service.shutdown()
             self._migration = None
             self._latest_heartbeat = None
             self._last_heartbeat_sent_at = None

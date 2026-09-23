@@ -168,6 +168,17 @@ class ControllerService:
             self._host_satellite_id = "UNASSIGNED"
         return {"status": "reset", "host_satellite_id": "UNASSIGNED"}
 
+    def activate(self) -> dict[str, Any]:
+        """Avvia questa istanza mantenendo lo stato già caricato."""
+        with self._lock:
+            self._active = True
+            self._quiesced = False
+            return {
+                "status": "active",
+                "host_satellite_id": self._host_satellite_id,
+                "sequence_number": self._state.sequence_number,
+            }
+
     def heartbeat_snapshot(self, satellite_id: str | None = None) -> dict[str, Any]:
         with self._lock:
             if satellite_id is None:
@@ -214,6 +225,7 @@ class ControllerService:
     def restore(self, payload: dict[str, Any] | None = None) -> dict[str, Any]:
         """Ripristina uno stato dal corpo JSON oppure dall'ultimo file salvato."""
 
+        defer_activation = bool(payload.get("defer_activation", False)) if payload else False
         if payload is None:
             restored = ControllerState.from_json(self._checkpoint_repository.load())
         else:
@@ -222,7 +234,7 @@ class ControllerService:
 
         with self._lock:
             self._state = restored
-            self._active = True
+            self._active = not defer_activation
             self._quiesced = False
             return self._state.to_dict()
 

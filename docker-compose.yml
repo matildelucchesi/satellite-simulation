@@ -120,13 +120,13 @@ services:
       SERVICE_NAME: controller
       SERVICE_PORT: "5000"
       HOST_SATELLITE_ID: UNASSIGNED
+      AGENT_URL_TEMPLATE: http://satellite-{satellite_number}:5000
+      REQUEST_TIMEOUT_SECONDS: ${HTTP_REQUEST_TIMEOUT_SECONDS:-2}
       CONFIG_PATH: /app/config/constellation.json
-      CHECKPOINT_PATH: /app/state/controller-checkpoint.json
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
     volumes:
       - ./config:/app/config:ro
       - ./logs:/app/logs
-      - ./state:/app/state
     ports:
       - "8001:5000"
     depends_on:

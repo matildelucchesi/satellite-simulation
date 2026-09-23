@@ -591,7 +591,7 @@ class MigrationManager:
             migration,
             "quiesce_source_controller",
             "POST",
-            f"{self.config.controller_url}/quiesce",
+            f"{self._controller_url_for(migration, migration['source_satellite_id'])}/quiesce",
             None,
             {200},
         )
@@ -615,7 +615,7 @@ class MigrationManager:
             migration,
             "shutdown_controller",
             "POST",
-            f"{self.config.controller_url}/shutdown",
+            f"{self._controller_url_for(migration, migration['source_satellite_id'])}/shutdown",
             None,
             {202},
         )
@@ -654,7 +654,7 @@ class MigrationManager:
             migration,
             "quiesce_source_controller",
             "POST",
-            f"{self.config.controller_url}/quiesce",
+            f"{self._controller_url_for(migration, migration['source_satellite_id'])}/quiesce",
             None,
             {200},
         )
@@ -755,7 +755,7 @@ class MigrationManager:
             migration,
             step_name,
             "POST",
-            f"{self.config.controller_url}/checkpoint",
+            f"{self._controller_url_for(migration, migration['source_satellite_id'])}/checkpoint",
             None,
             {201},
         )
@@ -841,8 +841,8 @@ class MigrationManager:
             migration,
             "transfer_state_and_wait_ack",
             "POST",
-            f"{self.config.controller_url}/restore",
-            {"checkpoint": checkpoint},
+            f"{self._controller_url_for(migration, migration['target_satellite_id'])}/restore",
+            {"checkpoint": checkpoint, "defer_activation": True},
             {200},
         )
         migration["metrics"]["controller_restore_ack"] = True
@@ -890,6 +890,11 @@ class MigrationManager:
                 "L'ACK del target non conferma il final sequence number"
             )
         migration["metrics"]["ack_received"] = True
+
+    def _controller_url_for(
+        self, migration: dict[str, Any], satellite_id: str
+    ) -> str:
+        return f"{self.config.agent_url(satellite_id)}/controller"
 
     def _start_target(self, migration: dict[str, Any]) -> None:
         target_url = self.config.agent_url(migration["target_satellite_id"])
@@ -1031,12 +1036,14 @@ class MigrationManager:
                     None,
                     {200},
                 )
-            if checkpoint is not None and context.get("controller_shutdown"):
+            if checkpoint is not None and (
+                context.get("controller_shutdown") or context.get("source_stopped")
+            ):
                 self._call_step(
                     migration,
                     "rollback_restore_controller",
                     "POST",
-                    f"{self.config.controller_url}/restore",
+                    f"{self._controller_url_for(migration, migration['source_satellite_id'])}/restore",
                     {"checkpoint": checkpoint},
                     {200},
                 )
@@ -1045,7 +1052,7 @@ class MigrationManager:
                     migration,
                     "rollback_resume_source",
                     "POST",
-                    f"{self.config.controller_url}/resume",
+                    f"{self._controller_url_for(migration, migration['source_satellite_id'])}/resume",
                     None,
                     {200},
                 )

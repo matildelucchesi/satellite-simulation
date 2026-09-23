@@ -238,6 +238,11 @@ class SatelliteAgentTests(unittest.TestCase):
         self.assertTrue(migrated["heartbeats"]["SAT-3"]["controller"])
         self.assertFalse(migrated["topology"]["nodes"]["SAT-1"]["controller"])
         self.assertTrue(migrated["topology"]["nodes"]["SAT-3"]["controller"])
+        self.assertTrue(self.agent.controller_service.active)
+        local_state = self.agent.controller_service.snapshot()
+        self.assertFalse(local_state["heartbeats"]["SAT-1"]["controller"])
+        self.assertTrue(local_state["heartbeats"]["SAT-3"]["controller"])
+        self.assertEqual(self.agent.controller_service.host_satellite_id, "SAT-3")
 
     @patch("app.agent.psutil.cpu_percent", return_value=28.0)
     def test_sends_heartbeat_as_json(self, _cpu_percent):

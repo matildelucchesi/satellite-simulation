@@ -252,15 +252,15 @@ class MigrationManagerTests(unittest.TestCase):
         checkpoint_indices = [
             index
             for index, url in enumerate(urls)
-            if url == "http://controller:5000/checkpoint"
+            if url == "http://satellite-1:5000/controller/checkpoint"
         ]
-        quiesce_index = urls.index("http://controller:5000/quiesce")
+        quiesce_index = urls.index("http://satellite-1:5000/controller/quiesce")
         ack_index = urls.index("http://satellite-2:5000/receive_controller_state")
         request_index = urls.index("http://satellite-1:5000/migration_request")
         passive_index = urls.index("http://satellite-2:5000/stop_controller")
         prepare_index = urls.index("http://satellite-2:5000/prepare_migration")
         stop_index = urls.index("http://satellite-1:5000/stop_controller")
-        restore_index = urls.index("http://controller:5000/restore")
+        restore_index = urls.index("http://satellite-2:5000/controller/restore")
         start_index = urls.index("http://satellite-2:5000/start_controller")
         host_index = urls.index("http://controller:5000/host")
         self.assertEqual(migration["status"], "completed")
@@ -274,7 +274,9 @@ class MigrationManagerTests(unittest.TestCase):
         self.assertLess(stop_index, restore_index)
         self.assertLess(restore_index, start_index)
         self.assertLess(start_index, host_index)
-        self.assertEqual(urls.count("http://controller:5000/checkpoint"), 2)
+        self.assertEqual(
+            urls.count("http://satellite-1:5000/controller/checkpoint"), 2
+        )
         self.assertEqual(migration["metrics"]["initial_sequence_number"], 4)
         self.assertEqual(migration["metrics"]["final_sequence_number"], 7)
         self.assertEqual(migration["metrics"]["updates_during_transfer"], 3)
@@ -323,15 +325,15 @@ class MigrationManagerTests(unittest.TestCase):
 
         migration = manager.migration_snapshot(migration_id)
         urls = [call[1] for call in transport.calls]
-        quiesce_index = urls.index("http://controller:5000/quiesce")
+        quiesce_index = urls.index("http://satellite-1:5000/controller/quiesce")
         request_index = urls.index("http://satellite-1:5000/migration_request")
         passive_index = urls.index("http://satellite-2:5000/stop_controller")
         prepare_index = urls.index("http://satellite-2:5000/prepare_migration")
         stop_index = urls.index("http://satellite-1:5000/stop_controller")
-        checkpoint_index = urls.index("http://controller:5000/checkpoint")
-        shutdown_index = urls.index("http://controller:5000/shutdown")
+        checkpoint_index = urls.index("http://satellite-1:5000/controller/checkpoint")
+        shutdown_index = urls.index("http://satellite-1:5000/controller/shutdown")
         ack_index = urls.index("http://satellite-2:5000/receive_controller_state")
-        restore_index = urls.index("http://controller:5000/restore")
+        restore_index = urls.index("http://satellite-2:5000/controller/restore")
         start_index = urls.index("http://satellite-2:5000/start_controller")
         host_index = urls.index("http://controller:5000/host")
         self.assertEqual(migration["status"], "completed")
@@ -370,7 +372,7 @@ class MigrationManagerTests(unittest.TestCase):
         self.assertEqual(migration["status"], "failed")
         self.assertFalse(migration["metrics"]["ack_received"])
         self.assertTrue(migration["metrics"]["rollback_succeeded"])
-        self.assertIn("http://controller:5000/restore", urls)
+        self.assertIn("http://satellite-1:5000/controller/restore", urls)
         self.assertIn("http://satellite-1:5000/start_controller", urls)
 
     def test_missing_http_200_ack_fails_and_records_rollback(self):
@@ -385,7 +387,7 @@ class MigrationManagerTests(unittest.TestCase):
         self.assertFalse(migration["metrics"]["ack_received"])
         self.assertTrue(migration["metrics"]["rollback_attempted"])
         urls = [call[1] for call in transport.calls]
-        self.assertIn("http://controller:5000/resume", urls)
+        self.assertIn("http://satellite-1:5000/controller/resume", urls)
 
 
 if __name__ == "__main__":
