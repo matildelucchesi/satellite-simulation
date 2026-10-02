@@ -1,0 +1,37 @@
+{
+  "release": "7.0.0",
+  "repository": "https://labs.etsi.org/rep/tfs/controller.git",
+  "tag": "v7.0.0",
+  "commit": "fb8707871eba26806cac7ac373c70b2bb5bd26fc",
+  "logical_components": ["context", "device", "pathcomp", "service", "nbi"],
+  "workload_images": ["context", "device", "pathcomp-frontend", "pathcomp-backend", "service", "nbi"],
+  "preinstalled_per_host_dependencies": ["cockroachdb", "nats", "kafka"],
+  "deployment": "experimental-docker-compose",
+  "state_isolation": "separate-compose-projects-networks-and-volumes",
+  "runtime_validation": "passed-2026-10-02",
+  "runtime_validation_checks": [
+    "sat-a-and-sat-b-compose-stacks-started",
+    "all-teraflow-workload-services-healthy",
+    "nbi-healthz-and-context-list-on-both-hosts",
+    "context-created-on-sat-a-absent-on-sat-b"
+  ],
+  "image_local_uncompressed_sizes_bytes": {
+    "context": 292481976,
+    "device": 526059550,
+    "pathcomp-frontend": 564801666,
+    "pathcomp-backend": 92165036,
+    "service": 272816348,
+    "nbi": 415383132,
+    "sum_per_image_bytes_with_repeated_shared_layers": 2167307708
+  },
+  "image_config_image_ids": {
+    "context": "sha256:1e5f589a1b198305ac41555ce6b39548940f34c0b69fca73e0b57d556151ded4",
+    "device": "sha256:e23e7b2f74fb765fe7f2fbb71ade48a6dc0964355c7e944c253b7c1c3f190744",
+    "pathcomp-frontend": "sha256:320992810dd5dd02100b72c88cef3cbf41ecea5e8370f2f711df1678894954ac",
+    "pathcomp-backend": "sha256:e17f6f08cdeae820d26616ad2ff2a5b1fc39e1c83b565e0885597f9698c08654",
+    "service": "sha256:0925aa4fd7fe013f9b271481853608b86f5a4843aa4368f9a0de1469992dcfc0",
+    "nbi": "sha256:4e787127caf54a5fde86b0dbe58d60cd128d656418f5ecbc7f142423c55dd7c9"
+  },
+  "image_id_semantics": "Docker image config IDs reported by docker image inspect; these are not registry manifest digests.",
+  "image_size_semantics": "Docker image inspect Size (unpacked layer bytes per image); not the wire-transfer byte count. Shared layers are counted repeatedly in the sum."
+}

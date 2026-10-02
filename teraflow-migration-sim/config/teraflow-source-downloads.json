@@ -1,0 +1,10 @@
+{
+  "commit": "fb8707871eba26806cac7ac373c70b2bb5bd26fc",
+  "archives_and_files_sha256": {
+    "tfs-src.tar.gz": "4223f04ca5370b92db49fd21059aa539369931878758ffd56bd068092a3fa371",
+    "tfs-proto.tar.gz": "d3935c456a7d0d4be8883dc33d0c6e21134aa6877299b9a1967c21944638c8a6",
+    "common_requirements.in": "13c0698eb7861b725cccca9ab3abff267d44708b17932fd5f0280bbd63ce7e07",
+    "common_requirements_py313.in": "898061f2a5ba91d688c6088d2be91bd9fc7892a945c9260665107cb7a8f9859b",
+    "LICENSE": "be1fb8250539a0c4d7a6dda260aafd125a892f05bb80e9ecb8555845c6beab32"
+  }
+}

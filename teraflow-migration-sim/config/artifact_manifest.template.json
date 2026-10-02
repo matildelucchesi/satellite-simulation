@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "status": "incomplete",
+  "controller": {
+    "release": "7.0.0",
+    "source_tag": "v7.0.0",
+    "source_commit": null,
+    "images": {
+      "context": {"image": null, "digest": null, "transferred_bytes": null},
+      "device": {"image": null, "digest": null, "transferred_bytes": null},
+      "pathcomp-frontend": {"image": null, "digest": null, "transferred_bytes": null},
+      "pathcomp-backend": {"image": null, "digest": null, "transferred_bytes": null},
+      "service": {"image": null, "digest": null, "transferred_bytes": null},
+      "nbi": {"image": null, "digest": null, "transferred_bytes": null}
+    },
+    "dependencies": [],
+    "dependency_policy": null
+  },
+  "operational_state": {
+    "contexts_bytes": null,
+    "topologies_bytes": null,
+    "devices_bytes": null,
+    "links_bytes": null,
+    "services_connections_policies_bytes": null,
+    "cold_snapshot_bytes": null,
+    "hot_initial_state_bytes": null,
+    "hot_final_delta_bytes": null,
+    "export_format": null,
+    "sha256": null
+  },
+  "timing_measurements_s": {
+    "cold_snapshot": null,
+    "hot_freeze": null,
+    "hot_delta_apply": null,
+    "controller_startup": null,
+    "api_restore": null,
+    "api_verification": null,
+    "ack_cutover": null
+  },
+  "resources": {
+    "measured_controller_cpu_cores": null,
+    "measured_controller_ram_gib": null,
+    "measured_controller_disk_gib": null
+  },
+  "measurement_method": null,
+  "measurement_date_utc": null,
+  "notes": "Populate from the exact Release 7 images, deployment manifests, exported state fixture and repeated timing measurements. Do not infer transfer bytes from unpacked local image size."
+}

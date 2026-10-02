@@ -52,7 +52,7 @@
   },
   "contact_window": {
     "required_alignment_seconds": 60,
-    "max_distance_km": 5500,
+    "max_distance_km": 1700,
     "require_line_of_sight": true,
     "earth_radius_km": 6378.137,
     "max_sample_gap_seconds": 2.5

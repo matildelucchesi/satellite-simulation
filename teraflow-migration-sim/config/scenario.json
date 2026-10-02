@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "project": "teraflow-sdn-controller-migration",
+  "orbital": {
+    "tle_file": "data/starlink_2026-10-01.tle",
+    "selected_constellation_file": "config/selected_constellation.json",
+    "nominal_shell_inclination_deg": 53.0,
+    "nominal_shell_altitude_km": 550.0,
+    "inclination_screen_deg": [52.5, 53.5],
+    "sgp4_mean_semi_major_axis_altitude_screening_km": [520.0, 580.0],
+    "raan_cluster_gap_deg": 1.5,
+    "plane_separation_deg": [10.0, 30.0],
+    "satellites_total": 17,
+    "satellites_per_plane": [6, 11],
+    "planes": 2,
+    "propagation_step_s": 1,
+    "propagation_duration_s": 86400,
+    "reference_epoch_utc": "2026-10-01T09:01:39.677069+00:00",
+    "selected_raan_centers_deg": [90.00469401379361, 110.02730776511369],
+    "selected_altitude_range_km": [521.9046, 540.0584],
+    "earth_occultation_model": "spherical",
+    "earth_radius_km": 6378.137
+  },
+  "fso": {
+    "max_range_km": 1700.0,
+    "alignment_s": 60,
+    "protocol": "TCP",
+    "useful_throughput_bps": [100000000, 1000000000, 10000000000],
+    "progress_timeout_s": 120,
+    "max_attempts": 3,
+    "restart_copy_from_zero_after_link_loss": true
+  },
+  "controller": {
+    "teraflow_release": "7.0.0",
+    "components": ["context", "device", "pathcomp", "service", "nbi"],
+    "workload_images": ["context", "device", "pathcomp-frontend", "pathcomp-backend", "service", "nbi"],
+    "dependency_policy": "preinstalled-independent-cockroachdb-nats-kafka-per-host",
+    "resource_profile": {"cpu_cores": 6, "ram_gib": 12, "disk_gib": 80},
+    "resource_reserve_fraction": 0.20,
+    "resource_reserve_sensitivity": [0.10, 0.30],
+    "resource_trigger_fraction": 0.80,
+    "resource_clear_fraction": 0.70,
+    "resource_persistence_s": 30,
+    "resource_clear_persistence_s": 60,
+    "resource_forecast_horizon_factor": 1.20,
+    "background_load_model": {
+      "type": "deterministic-linear-ramp",
+      "sat_a_cpu_ram_start_percent": 55,
+      "sat_a_cpu_ram_end_percent": 85,
+      "ramp_duration_horizons": 2,
+      "candidate_cpu_start_percent": 40,
+      "candidate_ram_start_percent": 45,
+      "sample_step_s": 1
+    },
+    "eclipse_trigger": "start when predicted time to SAT-A eclipse is within H; eclipse is a modeled operational deadline, not an automatic radio outage"
+  },
+  "score": {
+    "weights": {
+      "latency": 0.35,
+      "connectivity": 0.30,
+      "continuity": 0.20,
+      "resources": 0.15
+    },
+    "normalization": "latency=minmax-inverse-among-eligible-candidates-per-event; connectivity=reachable_nodes/total_nodes; continuity=min(time_to_outage/H,1); resources=weakest_post-placement_headroom_above_reserve_normalized_to_1",
+    "tie_break": ["shortest_fso_distance_km", "lowest_norad_id"]
+  },
+  "service_probe": {
+    "control_heartbeat_s": 5,
+    "ping_interval_s": 0.1,
+    "udp_rate_bps": 1000000,
+    "stable_recovery_successes": 10,
+    "link_policy": "data-plane-links-follow-orbital-geometry; controller-binding-moves-after-ack"
+  },
+  "sampling": {
+    "event_percentiles": [10, 50, 90],
+    "replicas_per_event_per_case": 1,
+    "paired_by_event_destination_and_trigger": true,
+    "primary_matrix": ["cold", "hot"],
+    "fault_trials_separate": true
+  }
+}

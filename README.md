@@ -11,6 +11,16 @@ A containerised simulation of a seven-satellite network inspired by Starlink. Th
 - **Controller placement:** seven independent agents collect orbital state and send heartbeats; the Simulator elects a Controller host and migrates it before its host enters eclipse.
 - **Comparable handovers:** the same geometry and candidate-selection rules govern hot and cold migrations, allowing objective comparison of duration, downtime, acknowledgements, alignment, and rollback.
 
+## Selected design: verify service traffic with Mininet and P4/BMv2
+
+The design for the TeraFlowSDN-based experiment includes two distinct traffic paths: control messages exchanged between the satellites/network elements and the active controller, and service packets forwarded between endpoint hosts through the managed network. The latter should be checked with an actual packet-forwarding data plane so that service recovery is measured independently from controller/API readiness.
+
+The selected data-plane testbed is **Mininet with BMv2 P4 switches**. Mininet creates a virtual network of hosts, links, and switches on one machine. BMv2 (Behavioral Model version 2) is a software switch that executes a P4-defined packet-processing pipeline. TeraFlowSDN acts as the SDN controller: its Device component and P4 southbound driver configure the BMv2 switches, while the L2NM P4 service handler represents an L2 connectivity service across them. Mininet supplies the emulated network; it is not itself the TeraFlowSDN controller or its P4 driver.
+
+In the experiment, two Mininet hosts act as service endpoints. After TeraFlowSDN provisions their path through the P4 switches, ping or a traffic generator sends packets between them. Following controller migration, these probes measure when forwarding succeeds again, along with packet loss and latency. This complements controller-side checks: an API response or migration ACK confirms controller state/readiness, whereas successful endpoint packets confirm that the service data plane forwards traffic. Existing switch rules may continue forwarding during a controller outage; the probe therefore measures actual service interruption rather than assuming it equals controller downtime.
+
+ETSI documentation lists P4 support for L2 packet connections, names BMv2 among tested devices, and describes an L2NM P4 service handler. ETSI's TFS#3 Hackfest report also describes a Mininet ring of P4 switches, a service between two endpoints, and ping-based latency measurement. These sources support the selected design, but do not by themselves confirm the exact deployment steps or compatibility with the selected TeraFlowSDN Release 7 image. That release-specific integration remains to be validated before implementation.
+
 The default scenario includes seven satellites (`SAT-1` through `SAT-7`) selected from a Starlink 2022-175 launch in a roughly 53-degree shell. The simulation starts at `2026-07-20T23:57:30Z`.
 
 ## Architecture
@@ -52,7 +62,7 @@ Every service has an `app/__init__.py` composition root that constructs its depe
 3. The initial-election manager waits for a sunlit satellite with more than 300 seconds remaining before eclipse and at least one reachable neighbour. It selects the eligible satellite with the **least** remaining sunlight, stops Controller instances on all others, activates the selected satellite's local Controller instance, and records the host in the gateway.
 4. Heartbeats contain CPU use, time to eclipse, Controller status, and current physical-neighbour IDs. The gateway forwards them to the active satellite's Controller instance, which builds topology/routing data; the Simulator maintains a separate cache for scoring.
 5. Before the current host reaches eclipse, the scoring manager selects the best eligible physical neighbour and queues a handover when it passes the configured improvement and cooldown rules.
-6. The migration first establishes a continuous contact window. Source and target must remain within 5,500 km, with clear line of sight, for 60 consecutive seconds. Broken contact or a sample gap above 2.5 seconds resets alignment.
+6. The migration first establishes a continuous contact window. Source and target must remain within 1,700 km, with clear line of sight, for 60 consecutive seconds. Broken contact or a sample gap above 2.5 seconds resets alignment. The 1,700 km limit is a model parameter informed by published Starlink Phase I link-range studies; it is not a certified range specification for a Starlink optical terminal.
 7. The asynchronous migration requires a final `200 OK` acknowledgement from the target before cutover. Failures trigger rollback and remain visible in the event timeline.
 8. Once the requested number of migrations completes, the Simulator stops the clock and writes `metrics-<mode>-<timestamp>.json` and `.pdf` to `logs/`. APIs and Dashboard remain available. **New simulation** logically resets the scenario without rebuilding Docker.
 
@@ -271,3 +281,11 @@ python -m unittest discover -s tests -v
 ```
 
 The Compose workflow is recommended for end-to-end execution because it provides the intended service names, private network, mounts, and inter-service URLs.
+
+## References
+
+- A. U. Chaudhry and H. Yanikomeroglu, “Temporary Laser Inter-Satellite Links in Free-Space Optical Satellite Networks,” *IEEE Open Journal of the Communications Society*, vol. 3, pp. 1413–1427, 2022, doi: [10.1109/OJCOMS.2022.3198391](https://doi.org/10.1109/OJCOMS.2022.3198391). The paper evaluates LISL ranges from 659.5 km to 5,016 km for a Starlink Phase I constellation model, including 1,700 km. The simulation adopts 1,700 km as its nominal maximum range; this is a modelling choice, not a Starlink terminal specification.
+- ETSI TeraFlowSDN, [Supported SBIs and Network Elements: P4](https://tfs.etsi.org/documentation/latest/supported_sbis_and_network_elements/) and [Supported Service Handlers: L2NM P4](https://tfs.etsi.org/documentation/latest/supported_service_handlers/). The documentation describes P4 L2 packet-connection configuration, lists BMv2 among tested devices, and lists the L2NM P4 service handler.
+- ETSI TeraFlowSDN, [TFS#3 Hackfest report](https://tfs.etsi.org/news/hackfest-3/), 24 October 2023. The report describes a Mininet-emulated ring of P4 switches, an endpoint-to-endpoint service, and ping-based latency measurement.
+- Mininet Project, [Overview](https://mininet.org/overview/). Mininet is described as an emulator for virtual hosts, switches, controllers, and links.
+- P4 Language Consortium, [Behavioral Model (BMv2)](https://github.com/p4lang/behavioral-model). BMv2 is the reference P4 software switch used to develop, test, and debug P4 data planes and control-plane software.

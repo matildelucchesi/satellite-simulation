@@ -35,7 +35,7 @@ class ContactWindowConfig:
                 "required_alignment_seconds",
             ),
             max_distance_km=_positive_number(
-                payload.get("max_distance_km", 5500), "max_distance_km"
+                payload.get("max_distance_km", 1700), "max_distance_km"
             ),
             require_line_of_sight=require_line_of_sight,
             earth_radius_km=_positive_number(

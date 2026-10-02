@@ -1,0 +1,458 @@
+{
+  "metadata": {
+    "catalog_count": 10681,
+    "screened_count": 66,
+    "screen": {
+      "inclination_deg": [
+        52.5,
+        53.5
+      ],
+      "screening_altitude_km": [
+        520.0,
+        580.0
+      ],
+      "raan_cluster_gap_deg": 1.5,
+      "minimum_plane_separation_deg": 10.0,
+      "maximum_plane_separation_deg": 30.0
+    },
+    "raan_groups": [
+      {
+        "center_deg": 2.6508550874555366,
+        "count": 1
+      },
+      {
+        "center_deg": 4.764294447740509,
+        "count": 1
+      },
+      {
+        "center_deg": 10.045115309607631,
+        "count": 3
+      },
+      {
+        "center_deg": 14.478579923643688,
+        "count": 1
+      },
+      {
+        "center_deg": 24.345898733136533,
+        "count": 1
+      },
+      {
+        "center_deg": 31.328011458303283,
+        "count": 1
+      },
+      {
+        "center_deg": 44.08584598849442,
+        "count": 1
+      },
+      {
+        "center_deg": 85.02704449767909,
+        "count": 1
+      },
+      {
+        "center_deg": 90.00469401379361,
+        "count": 6
+      },
+      {
+        "center_deg": 94.7078089698398,
+        "count": 3
+      },
+      {
+        "center_deg": 99.84305405602859,
+        "count": 5
+      },
+      {
+        "center_deg": 104.94026510756984,
+        "count": 1
+      },
+      {
+        "center_deg": 110.02730776511369,
+        "count": 11
+      },
+      {
+        "center_deg": 115.68028825842553,
+        "count": 1
+      },
+      {
+        "center_deg": 134.38155963081812,
+        "count": 2
+      },
+      {
+        "center_deg": 144.6608407299175,
+        "count": 1
+      },
+      {
+        "center_deg": 154.09398236252983,
+        "count": 2
+      },
+      {
+        "center_deg": 185.75767762775226,
+        "count": 1
+      },
+      {
+        "center_deg": 200.035591827995,
+        "count": 1
+      },
+      {
+        "center_deg": 220.06491553533874,
+        "count": 8
+      },
+      {
+        "center_deg": 223.23539318807582,
+        "count": 1
+      },
+      {
+        "center_deg": 264.2597337116037,
+        "count": 1
+      },
+      {
+        "center_deg": 275.0170460261839,
+        "count": 1
+      },
+      {
+        "center_deg": 287.7252900132414,
+        "count": 1
+      },
+      {
+        "center_deg": 302.9722682506785,
+        "count": 2
+      },
+      {
+        "center_deg": 309.90777402585263,
+        "count": 5
+      },
+      {
+        "center_deg": 333.5794597376693,
+        "count": 2
+      },
+      {
+        "center_deg": 339.4471054613293,
+        "count": 1
+      }
+    ],
+    "selected_plane_raan_centers_deg": [
+      90.00469401379361,
+      110.02730776511369
+    ],
+    "selected_plane_satellite_counts": [
+      6,
+      11
+    ],
+    "reference_epoch": {
+      "jd": 2461314.5,
+      "fraction": 0.37615367,
+      "iso_utc": "2026-10-01T09:01:39.677069+00:00"
+    },
+    "selected_tle_age_hours": {
+      "minimum": 9.971413671970367,
+      "maximum": 15.285780239850283
+    }
+  },
+  "satellites": [
+    {
+      "plane": 1,
+      "phase_rank": 1,
+      "name": "STARLINK-4780",
+      "norad_id": 53848,
+      "inclination_deg": 53.15033725257624,
+      "raan_deg": 89.74267925104593,
+      "eccentricity": 0.0001381,
+      "mean_motion_rev_day": 15.08839287,
+      "screening_altitude_km": 539.9998944751997,
+      "mean_anomaly_rad_at_epoch": 4.583466744527624,
+      "mean_motion_rad_min": 0.06583553360398418,
+      "epoch_jd": 2461313.5,
+      "epoch_jd_fraction": 0.75759452,
+      "raan_element_deg": 92.5453,
+      "mean_anomaly_rad_at_reference": 0.39298092919448635,
+      "tle_age_hours_at_reference": 14.845419589430094
+    },
+    {
+      "plane": 1,
+      "phase_rank": 2,
+      "name": "STARLINK-4794",
+      "norad_id": 53853,
+      "inclination_deg": 53.164500056347826,
+      "raan_deg": 89.70297742088259,
+      "eccentricity": 0.000187,
+      "mean_motion_rev_day": 15.08831241,
+      "screening_altitude_km": 540.0242951825958,
+      "mean_anomaly_rad_at_epoch": 4.630840216414507,
+      "mean_motion_rad_min": 0.06583518253100515,
+      "epoch_jd": 2461313.5,
+      "epoch_jd_fraction": 0.95262178,
+      "raan_element_deg": 91.6303,
+      "mean_anomaly_rad_at_reference": 0.8004940377837002,
+      "tle_age_hours_at_reference": 10.164765357971191
+    },
+    {
+      "plane": 1,
+      "phase_rank": 3,
+      "name": "STARLINK-4784",
+      "norad_id": 53839,
+      "inclination_deg": 53.161613367754406,
+      "raan_deg": 90.30031027110924,
+      "eccentricity": 0.0001637,
+      "mean_motion_rev_day": 15.08828609,
+      "screening_altitude_km": 540.0324199358538,
+      "mean_anomaly_rad_at_epoch": 4.449727399935055,
+      "mean_motion_rad_min": 0.06583506768834037,
+      "epoch_jd": 2461313.5,
+      "epoch_jd_fraction": 0.73924616,
+      "raan_element_deg": 93.1405,
+      "mean_anomaly_rad_at_reference": 1.9982969343089394,
+      "tle_age_hours_at_reference": 15.285780239850283
+    },
+    {
+      "plane": 1,
+      "phase_rank": 4,
+      "name": "STARLINK-4773",
+      "norad_id": 53838,
+      "inclination_deg": 53.14084530804975,
+      "raan_deg": 90.20748707707834,
+      "eccentricity": 0.0001213,
+      "mean_motion_rev_day": 15.08822985,
+      "screening_altitude_km": 540.0496738937263,
+      "mean_anomaly_rad_at_epoch": 4.6424937798300725,
+      "mean_motion_rad_min": 0.06583482229504753,
+      "epoch_jd": 2461313.5,
+      "epoch_jd_fraction": 0.93061021,
+      "raan_element_deg": 92.2039,
+      "mean_anomaly_rad_at_reference": 2.898671929474652,
+      "tle_age_hours_at_reference": 10.693043030798435
+    },
+    {
+      "plane": 1,
+      "phase_rank": 5,
+      "name": "STARLINK-4769",
+      "norad_id": 53843,
+      "inclination_deg": 53.15076565229027,
+      "raan_deg": 90.09729129950601,
+      "eccentricity": 0.000129,
+      "mean_motion_rev_day": 15.088288119999998,
+      "screening_altitude_km": 540.0318154528977,
+      "mean_anomaly_rad_at_epoch": 4.717918183455008,
+      "mean_motion_rad_min": 0.06583507654588631,
+      "epoch_jd": 2461313.5,
+      "epoch_jd_fraction": 0.92322141,
+      "raan_element_deg": 92.155,
+      "mean_anomaly_rad_at_reference": 3.674736243567743,
+      "tle_age_hours_at_reference": 10.870374239981174
+    },
+    {
+      "plane": 1,
+      "phase_rank": 6,
+      "name": "STARLINK-4777",
+      "norad_id": 53847,
+      "inclination_deg": 53.17408193132268,
+      "raan_deg": 89.97741822971601,
+      "eccentricity": 0.0001484,
+      "mean_motion_rev_day": 15.08833016,
+      "screening_altitude_km": 540.0188058733629,
+      "mean_anomaly_rad_at_epoch": 4.653286895924405,
+      "mean_motion_rad_min": 0.0658352599799907,
+      "epoch_jd": 2461313.5,
+      "epoch_jd_fraction": 0.90848031,
+      "raan_element_deg": 92.0639,
+      "mean_anomaly_rad_at_reference": 5.007721773162032,
+      "tle_age_hours_at_reference": 11.224160637706518
+    },
+    {
+      "plane": 2,
+      "phase_rank": 1,
+      "name": "STARLINK-5053",
+      "norad_id": 53913,
+      "inclination_deg": 53.1458275633493,
+      "raan_deg": 110.00128900486855,
+      "eccentricity": 0.0001981,
+      "mean_motion_rev_day": 15.088218180000002,
+      "screening_altitude_km": 540.0531449198834,
+      "mean_anomaly_rad_at_epoch": 4.869559370185283,
+      "mean_motion_rad_min": 0.06583477137506662,
+      "epoch_jd": 2461313.5,
+      "epoch_jd_fraction": 0.95818351,
+      "raan_element_deg": 111.8969,
+      "mean_anomaly_rad_at_reference": 0.5116989122161968,
+      "tle_age_hours_at_reference": 10.0312838293612
+    },
+    {
+      "plane": 2,
+      "phase_rank": 2,
+      "name": "STARLINK-5012",
+      "norad_id": 53918,
+      "inclination_deg": 53.169966138914965,
+      "raan_deg": 109.91689435307623,
+      "eccentricity": 0.0001507,
+      "mean_motion_rev_day": 15.08832882,
+      "screening_altitude_km": 540.0193594132097,
+      "mean_anomaly_rad_at_epoch": 4.6838109592125345,
+      "mean_motion_rad_min": 0.0658352541331377,
+      "epoch_jd": 2461313.5,
+      "epoch_jd_fraction": 0.81832072,
+      "raan_element_deg": 112.4448,
+      "mean_anomaly_rad_at_reference": 1.0192497936028317,
+      "tle_age_hours_at_reference": 13.387990795075893
+    },
+    {
+      "plane": 2,
+      "phase_rank": 3,
+      "name": "STARLINK-5004",
+      "norad_id": 53923,
+      "inclination_deg": 53.177453652070604,
+      "raan_deg": 109.86729796167899,
+      "eccentricity": 0.0001307,
+      "mean_motion_rev_day": 15.088283789999998,
+      "screening_altitude_km": 540.0330109602892,
+      "mean_anomaly_rad_at_epoch": 4.771110583068039,
+      "mean_motion_rad_min": 0.06583505765269716,
+      "epoch_jd": 2461313.5,
+      "epoch_jd_fraction": 0.9434392,
+      "raan_element_deg": 111.8033,
+      "mean_anomaly_rad_at_reference": 1.8112196274439967,
+      "tle_age_hours_at_reference": 10.385147273540497
+    },
+    {
+      "plane": 2,
+      "phase_rank": 4,
+      "name": "STARLINK-5002",
+      "norad_id": 53922,
+      "inclination_deg": 53.155823192862584,
+      "raan_deg": 109.80036869964552,
+      "eccentricity": 0.0001773,
+      "mean_motion_rev_day": 15.088307880000002,
+      "screening_altitude_km": 540.0255998045213,
+      "mean_anomaly_rad_at_epoch": 4.5492582911885355,
+      "mean_motion_rad_min": 0.06583516276515138,
+      "epoch_jd": 2461313.5,
+      "epoch_jd_fraction": 0.93606477,
+      "raan_element_deg": 111.7561,
+      "mean_anomaly_rad_at_reference": 2.28854822312789,
+      "tle_age_hours_at_reference": 10.562133595347404
+    },
+    {
+      "plane": 2,
+      "phase_rank": 5,
+      "name": "STARLINK-5054",
+      "norad_id": 53906,
+      "inclination_deg": 53.14435644949043,
+      "raan_deg": 109.76058708394606,
+      "eccentricity": 0.0001337,
+      "mean_motion_rev_day": 15.088324720000001,
+      "screening_altitude_km": 540.020564594005,
+      "mean_anomaly_rad_at_epoch": 4.675723103458793,
+      "mean_motion_rad_min": 0.06583523624351288,
+      "epoch_jd": 2461313.5,
+      "epoch_jd_fraction": 0.93237675,
+      "raan_element_deg": 111.742,
+      "mean_anomaly_rad_at_reference": 2.7646940025723623,
+      "tle_age_hours_at_reference": 10.650646079331636
+    },
+    {
+      "plane": 2,
+      "phase_rank": 6,
+      "name": "STARLINK-5169",
+      "norad_id": 54060,
+      "inclination_deg": 53.140269185551844,
+      "raan_deg": 109.68495687246627,
+      "eccentricity": 0.0001393,
+      "mean_motion_rev_day": 15.088283789999998,
+      "screening_altitude_km": 540.0331549277134,
+      "mean_anomaly_rad_at_epoch": 4.7025016901721415,
+      "mean_motion_rad_min": 0.06583505765269716,
+      "epoch_jd": 2461313.5,
+      "epoch_jd_fraction": 0.92869386,
+      "raan_element_deg": 111.6985,
+      "mean_anomaly_rad_at_reference": 3.1405055795205215,
+      "tle_age_hours_at_reference": 10.739035438746214
+    },
+    {
+      "plane": 2,
+      "phase_rank": 7,
+      "name": "STARLINK-5059",
+      "norad_id": 53912,
+      "inclination_deg": 53.146211071275566,
+      "raan_deg": 109.6524194578542,
+      "eccentricity": 0.0001254,
+      "mean_motion_rev_day": 15.08820088,
+      "screening_altitude_km": 540.058384763779,
+      "mean_anomaly_rad_at_epoch": 4.641099261757729,
+      "mean_motion_rad_min": 0.06583469588957647,
+      "epoch_jd": 2461313.5,
+      "epoch_jd_fraction": 0.8587705,
+      "raan_element_deg": 111.9951,
+      "mean_anomaly_rad_at_reference": 3.4245564680035017,
+      "tle_age_hours_at_reference": 12.417196076363325
+    },
+    {
+      "plane": 2,
+      "phase_rank": 8,
+      "name": "STARLINK-5011",
+      "norad_id": 53925,
+      "inclination_deg": 53.15741335151224,
+      "raan_deg": 109.60535779367571,
+      "eccentricity": 0.0001345,
+      "mean_motion_rev_day": 15.088258010000002,
+      "screening_altitude_km": 540.0409866853461,
+      "mean_anomaly_rad_at_epoch": 4.714823714691222,
+      "mean_motion_rad_min": 0.06583494516622689,
+      "epoch_jd": 2461313.5,
+      "epoch_jd_fraction": 0.92133935,
+      "raan_element_deg": 111.6739,
+      "mean_anomaly_rad_at_reference": 3.849979742375382,
+      "tle_age_hours_at_reference": 10.915543679147959
+    },
+    {
+      "plane": 2,
+      "phase_rank": 9,
+      "name": "STARLINK-5048",
+      "norad_id": 53911,
+      "inclination_deg": 53.1770570095665,
+      "raan_deg": 110.21969478374288,
+      "eccentricity": 0.0001457,
+      "mean_motion_rev_day": 15.08831226,
+      "screening_altitude_km": 540.0243890141219,
+      "mean_anomaly_rad_at_epoch": 4.711135833981758,
+      "mean_motion_rad_min": 0.06583518187650668,
+      "epoch_jd": 2461313.5,
+      "epoch_jd_fraction": 0.91035083,
+      "raan_element_deg": 112.3048,
+      "mean_anomaly_rad_at_reference": 4.8881878373150585,
+      "tle_age_hours_at_reference": 11.179268158972263
+    },
+    {
+      "plane": 2,
+      "phase_rank": 10,
+      "name": "STARLINK-5003",
+      "norad_id": 53905,
+      "inclination_deg": 53.17632444259642,
+      "raan_deg": 110.2403477305888,
+      "eccentricity": 5.87e-05,
+      "mean_motion_rev_day": 15.08825083,
+      "screening_altitude_km": 540.0433892290393,
+      "mean_anomaly_rad_at_epoch": 6.266021739315474,
+      "mean_motion_rad_min": 0.0658349138375668,
+      "epoch_jd": 2461313.5,
+      "epoch_jd_fraction": 0.84781515,
+      "raan_element_deg": 112.623,
+      "mean_anomaly_rad_at_reference": 6.088233437304083,
+      "tle_age_hours_at_reference": 12.68012447655201
+    },
+    {
+      "plane": 2,
+      "phase_rank": 11,
+      "name": "STARLINK-3527",
+      "norad_id": 51726,
+      "inclination_deg": 53.196818236350296,
+      "raan_deg": 111.55134187710108,
+      "eccentricity": 0.0001757,
+      "mean_motion_rev_day": 15.147761340000002,
+      "screening_altitude_km": 521.9046101083122,
+      "mean_anomaly_rad_at_epoch": 4.296709148424957,
+      "mean_motion_rad_min": 0.06609457742232706,
+      "epoch_jd": 2461313.5,
+      "epoch_jd_fraction": 0.9606781,
+      "raan_element_deg": 113.4477,
+      "mean_anomaly_rad_at_reference": 6.140979714316117,
+      "tle_age_hours_at_reference": 9.971413671970367
+    }
+  ]
+}

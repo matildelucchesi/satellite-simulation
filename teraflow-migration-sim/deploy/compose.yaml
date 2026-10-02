@@ -1,0 +1,155 @@
+# Experimental Docker Compose adaptation of ETSI TFS v7.0.0.
+# Launch twice with different project names and env files; never share state volumes.
+x-tfs-env: &tfs-env
+  LOG_LEVEL: INFO
+  CONTEXTSERVICE_SERVICE_HOST: contextservice
+  CONTEXTSERVICE_SERVICE_PORT_GRPC: "1010"
+  DEVICESERVICE_SERVICE_HOST: deviceservice
+  DEVICESERVICE_SERVICE_PORT_GRPC: "2020"
+  SERVICESERVICE_SERVICE_HOST: serviceservice
+  SERVICESERVICE_SERVICE_PORT_GRPC: "3030"
+  PATHCOMPSERVICE_SERVICE_HOST: pathcompservice
+  PATHCOMPSERVICE_SERVICE_PORT_GRPC: "10020"
+  KFK_SERVER_ADDRESS: kafka:9092
+
+x-grpc-health: &grpc-health
+  test: [CMD, python, -c, "import os,grpc; from grpc_health.v1 import health_pb2,health_pb2_grpc; s=health_pb2_grpc.HealthStub(grpc.insecure_channel('localhost:'+os.environ['TFS_HEALTH_PORT'])); r=s.Check(health_pb2.HealthCheckRequest(),timeout=5); assert r.status==health_pb2.HealthCheckResponse.SERVING"]
+  interval: 5s
+  timeout: 10s
+  start_period: 30s
+  retries: 30
+
+services:
+  cockroachdb:
+    image: cockroachdb/cockroach:latest-v22.2@sha256:c0f188df42c238314d61f67aca61455125ecaa3c81bf0ba0be793fde7229d3e9
+    entrypoint: [/cockroach/cockroach]
+    command: [start-single-node, --insecure, --listen-addr=0.0.0.0:26257, --http-addr=0.0.0.0:8080, --cache=256MiB, --max-sql-memory=256MiB]
+    volumes: [crdb-data:/cockroach/cockroach-data]
+    healthcheck:
+      test: [CMD, /cockroach/cockroach, sql, --insecure, --host=localhost:26257, --execute=SELECT 1]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  nats:
+    image: nats:2.9-alpine@sha256:d402af4147fc7ba334ecc45b1cb14a6f46f32ad6a36873fbd1a6a37ce42452dd
+    command: [--http_port, "8222"]
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, http://localhost:8222/healthz]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  kafka-volume-init:
+    image: apache/kafka:3.9.1@sha256:4ceccc577f03f51f6af8dbfda55194d0d892f4fa7913ffbded567ce3895622ed
+    user: "0:0"
+    entrypoint: [sh, -c]
+    command: ["chown 1000:1000 /var/lib/kafka/data"]
+    volumes: [kafka-data:/var/lib/kafka/data]
+
+  kafka:
+    image: apache/kafka:3.9.1@sha256:4ceccc577f03f51f6af8dbfda55194d0d892f4fa7913ffbded567ce3895622ed
+    environment:
+      KAFKA_NODE_ID: "1"
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: "1"
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: "0"
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+      KAFKA_HEAP_OPTS: -Xms256m -Xmx512m
+    volumes: [kafka-data:/var/lib/kafka/data]
+    depends_on:
+      kafka-volume-init: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, /opt/kafka/bin/kafka-topics.sh, --bootstrap-server, localhost:9092, --list]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 30s
+
+  contextservice:
+    image: tfs-migration/context:7.0.0-fb870787
+    environment:
+      <<: *tfs-env
+      TFS_HEALTH_PORT: "1010"
+      MB_BACKEND: nats
+      NATS_URI: nats://nats:4222
+      CRDB_URI: cockroachdb://root@cockroachdb:26257/tfs_context?sslmode=disable
+      CRDB_DATABASE: tfs_context
+      ALLOW_EXPLICIT_ADD_DEVICE_TO_TOPOLOGY: "FALSE"
+      ALLOW_EXPLICIT_ADD_LINK_TO_TOPOLOGY: "FALSE"
+    depends_on:
+      cockroachdb: {condition: service_healthy}
+      nats: {condition: service_healthy}
+    healthcheck: *grpc-health
+
+  deviceservice:
+    image: tfs-migration/device:7.0.0-fb870787
+    environment:
+      <<: *tfs-env
+      TFS_HEALTH_PORT: "2020"
+    depends_on:
+      contextservice: {condition: service_healthy}
+    healthcheck: *grpc-health
+
+  pathcomp-backend:
+    image: tfs-migration/pathcomp-backend:7.0.0-fb870787
+    healthcheck:
+      test: [CMD, curl, --fail, --silent, --output, /dev/null, --max-time, "5", http://localhost:8081/health]
+      interval: 5s
+      timeout: 10s
+      retries: 30
+
+  pathcompservice:
+    image: tfs-migration/pathcomp-frontend:7.0.0-fb870787
+    environment:
+      <<: *tfs-env
+      TFS_HEALTH_PORT: "10020"
+      PATHCOMP_BACKEND_HOST: pathcomp-backend
+      PATHCOMP_BACKEND_PORT: "8081"
+      ENABLE_FORECASTER: "NO"
+    depends_on:
+      contextservice: {condition: service_healthy}
+      pathcomp-backend: {condition: service_healthy}
+    healthcheck: *grpc-health
+
+  serviceservice:
+    image: tfs-migration/service:7.0.0-fb870787
+    environment:
+      <<: *tfs-env
+      TFS_HEALTH_PORT: "3030"
+    depends_on:
+      contextservice: {condition: service_healthy}
+      deviceservice: {condition: service_healthy}
+      pathcompservice: {condition: service_healthy}
+    healthcheck: *grpc-health
+
+  nbiservice:
+    image: tfs-migration/nbi:7.0.0-fb870787
+    environment:
+      <<: *tfs-env
+      FLASK_ENV: production
+      IETF_NETWORK_RENDERER: LIBYANG
+    ports: ["127.0.0.1:${NBI_PORT:?Set NBI_PORT in the satellite env file}:8080"]
+    depends_on:
+      contextservice: {condition: service_healthy}
+      deviceservice: {condition: service_healthy}
+      serviceservice: {condition: service_healthy}
+      kafka: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8080/healthz', timeout=5)"]
+      interval: 10s
+      timeout: 10s
+      start_period: 60s
+      retries: 30
+
+volumes:
+  crdb-data:
+  kafka-data:
