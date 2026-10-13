@@ -1,0 +1,107 @@
+--- a/src/service/service/service_handlers/p4_fabric_tna_l2_simple/p4_fabric_tna_l2_simple_service_handler.py
++++ b/src/service/service/service_handlers/p4_fabric_tna_l2_simple/p4_fabric_tna_l2_simple_service_handler.py
+@@ -406,75 +406,33 @@
+     def _is_host_facing_port(self, switch_name : str, port_id : int) -> bool:
+         return self._get_port_type_of_switch_port(switch_name, port_id) == PORT_TYPE_HOST
+ 
+-    def _create_rules(self, device_obj : Device, port_id : int, action : ConfigActionEnum): # type: ignore
++    def _create_rules(self, device_obj, port_id, action):
++        # Local migration-lab patch: next IDs are actual egress port IDs.
++        # L2 frames retain both host MACs; output_hashed selects a single port.
++        import hashlib
++        import json
+         dev_name = device_obj.name
+-
+-        # TODO: Fix
+-        next_id = 2 if port_id == 1 else 1
+-
+-        host_facing_port = self._is_host_facing_port(dev_name, port_id)
+-        LOGGER.info(f"\t | Service endpoint is host facing: {"True" if host_facing_port else "False"}")
+-
+-        rules  = []
+-
+-        try:
+-            ### Port setup rules
+-            if host_facing_port:
+-                rules += rules_set_up_port_host(
+-                    port=port_id,
+-                    vlan_id=self._get_vlan_id_of_switch_port(switch_name=dev_name, port_id=port_id),
+-                    action=action
+-                )
+-            else:
+-                rules += rules_set_up_port_switch(
+-                    port=port_id,
+-                    vlan_id=self._get_vlan_id_of_switch_port(switch_name=dev_name, port_id=port_id),
+-                    action=action
+-                )
+-        except Exception as ex:
+-            LOGGER.error("Error while creating port setup rules")
+-            raise Exception(ex)
+-
+-        fwd_list = self._get_fwd_list_of_switch_port(switch_name=dev_name, port_id=next_id)
+-        for mac_dst in fwd_list:
+-            LOGGER.info(f"Switch {dev_name} - Port {port_id} - Creating rule for destination MAC: {mac_dst}")
+-            try:
+-                ### Bridging rules
+-                rules += rules_set_up_fwd_bridging(
+-                    port_id=port_id,
+-                    vlan_id=self._get_vlan_id_of_switch_port(switch_name=dev_name, port_id=port_id),
+-                    eth_dst=mac_dst,
+-                    next_id=next_id,
+-                    action=action
+-                )
+-            except Exception as ex:
+-                LOGGER.error("Error while creating rule for bridging")
+-                raise Exception(ex)
+-
+-            src_list = self._get_fwd_list_of_switch_port(switch_name=dev_name, port_id=port_id)
+-            for mac_src in src_list:
+-                try:
+-                    ### Next profile for hashed routing
+-                    rules += rules_set_up_next_profile_hashed_routing(
+-                        port_id=port_id,
+-                        next_id=next_id,
+-                        eth_src=mac_src,
+-                        eth_dst=mac_dst,
+-                        action=action
+-                    )
+-                except Exception as ex:
+-                    LOGGER.error("Error while creating rule for next hashed profile")
+-                    raise Exception(ex)
+-
+-            try:
+-                ### Next hashed port
+-                rules += rules_set_up_next_hashed(
+-                    port_id=port_id,
+-                    next_id=next_id,
+-                    action=action
+-                )
+-            except Exception as ex:
+-                LOGGER.error("Error while creating rule for next hashed port")
+-                raise Exception(ex)
+-
+-        return rules
++        make = ConfigActionEnum.CONFIGACTION_SET
++        vlan = self._get_vlan_id_of_switch_port(dev_name, port_id)
++        setup = rules_set_up_port_host if self._is_host_facing_port(dev_name, port_id) else rules_set_up_port_switch
++        rules = setup(port=port_id, vlan_id=vlan, action=make)
++        destinations = self._get_fwd_list_of_switch_port(dev_name, port_id)
++        for mac in destinations:
++            rules += rules_set_up_fwd_bridging(port_id=port_id, vlan_id=vlan,
++                                              eth_dst=mac, next_id=port_id, action=make)
++        if destinations:
++            rules += rules_set_up_next_profile_hashed_output(port_id=port_id, next_id=port_id, action=make)
++            rules += rules_set_up_next_hashed(port_id=port_id, next_id=port_id, action=make)
++        # Stable device rule keys permit deletion/replay across fresh processes;
++        # upstream's process-global sequential cache does not identify a rule.
++        for rule in rules:
++            custom = rule['custom']
++            value = custom['resource_value']
++            value = json.loads(value) if isinstance(value, str) else value
++            base = custom['resource_key'].rsplit('[', 1)[0]
++            identity = json.dumps(value, sort_keys=True, separators=(',', ':')).encode()
++            index = int.from_bytes(hashlib.sha256(identity).digest()[:4], 'big') or 1
++            custom['resource_key'] = base + '[' + str(index) + ']'
++            rule['action'] = action
++        # Delete table references before their action-profile members.
++        return list(reversed(rules)) if action == ConfigActionEnum.CONFIGACTION_DELETE else rules

@@ -1,0 +1,3557 @@
+{
+  "ack": false,
+  "api_calls": {
+    "sat-a": [
+      {
+        "elapsed_s": 0.024768099887296557,
+        "method": "GET",
+        "path": "/contexts",
+        "started_monotonic": 1397460.4147155,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.01784129999577999,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/slices",
+        "started_monotonic": 1397460.4395002,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.01886660000309348,
+        "method": "GET",
+        "path": "/policyrules",
+        "started_monotonic": 1397460.4573484,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03158170008100569,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397460.4762225,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03344879997894168,
+        "method": "GET",
+        "path": "/devices",
+        "started_monotonic": 1397460.5078131,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03421139996498823,
+        "method": "GET",
+        "path": "/links",
+        "started_monotonic": 1397460.541447,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04671039991080761,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/services",
+        "started_monotonic": 1397460.5757766,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.02974869986064732,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7/connections",
+        "started_monotonic": 1397460.6225338,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.018914199899882078,
+        "method": "GET",
+        "path": "/contexts",
+        "started_monotonic": 1397460.8551197,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.014168400084599853,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/slices",
+        "started_monotonic": 1397460.8740549,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.014662800123915076,
+        "method": "GET",
+        "path": "/policyrules",
+        "started_monotonic": 1397460.8882324,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.025754299946129322,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397460.9029002,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.036940500140190125,
+        "method": "GET",
+        "path": "/devices",
+        "started_monotonic": 1397460.9286596,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.031554399989545345,
+        "method": "GET",
+        "path": "/links",
+        "started_monotonic": 1397460.9657253,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.02763309981673956,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/services",
+        "started_monotonic": 1397460.9973983,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.025351899908855557,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7/connections",
+        "started_monotonic": 1397461.025046,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.01686970004811883,
+        "method": "GET",
+        "path": "/contexts",
+        "started_monotonic": 1397461.0570385,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.013688199920579791,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/slices",
+        "started_monotonic": 1397461.0739259,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.0209695000667125,
+        "method": "GET",
+        "path": "/policyrules",
+        "started_monotonic": 1397461.0876195,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.022245500003919005,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397461.1085951,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.0329867999535054,
+        "method": "GET",
+        "path": "/devices",
+        "started_monotonic": 1397461.1308465,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.029749499866738915,
+        "method": "GET",
+        "path": "/links",
+        "started_monotonic": 1397461.1639298,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.028052299981936812,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/services",
+        "started_monotonic": 1397461.1937766,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.028653800021857023,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7/connections",
+        "started_monotonic": 1397461.2218433,
+        "status": 200
+      },
+      {
+        "elapsed_s": 5.320414700079709,
+        "method": "DELETE",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7",
+        "started_monotonic": 1397461.2539895,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04894100013189018,
+        "method": "DELETE",
+        "path": "/link/08ff9af0-7016-5986-abc2-27b8f419c63a",
+        "started_monotonic": 1397466.5745028,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04708719998598099,
+        "method": "DELETE",
+        "path": "/link/2984ccfc-0b9b-5716-a6bf-e390d041c51d",
+        "started_monotonic": 1397466.6234835,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04292970011010766,
+        "method": "DELETE",
+        "path": "/link/73ac1027-291b-522a-af8c-276b79cf997c",
+        "started_monotonic": 1397466.6706188,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04164159996435046,
+        "method": "DELETE",
+        "path": "/link/7d961ee0-353a-59b6-8776-6d2adf194b4f",
+        "started_monotonic": 1397466.7135897,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.048661099979653955,
+        "method": "DELETE",
+        "path": "/link/a796cdbb-3780-5466-83f0-8ef6b261f091",
+        "started_monotonic": 1397466.7552724,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04163510003127158,
+        "method": "DELETE",
+        "path": "/link/ca310af4-2e70-5328-9426-14cfe3058743",
+        "started_monotonic": 1397466.8039801,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04185819998383522,
+        "method": "DELETE",
+        "path": "/link/d0d8a2b7-df19-5708-871d-d13201cbb534",
+        "started_monotonic": 1397466.8458078,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04186839982867241,
+        "method": "DELETE",
+        "path": "/link/f97b4817-a19e-53f5-98cb-81e6e6d0e2b9",
+        "started_monotonic": 1397466.887796,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.052514399867504835,
+        "method": "DELETE",
+        "path": "/device/0349d74d-abd3-5fd5-a744-b7fe6ad4f456",
+        "started_monotonic": 1397466.9299117,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04339569993317127,
+        "method": "DELETE",
+        "path": "/device/066a8a8f-5054-5d27-93cb-027d33168ff4",
+        "started_monotonic": 1397466.9824689,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.06746820011176169,
+        "method": "DELETE",
+        "path": "/device/15851e36-6dff-573d-a974-ce83d79ce7a4",
+        "started_monotonic": 1397467.0259035,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04278699983842671,
+        "method": "DELETE",
+        "path": "/device/173da48c-bcb9-50d0-9cf5-1ba9762da1d2",
+        "started_monotonic": 1397467.0934103,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.045207600109279156,
+        "method": "DELETE",
+        "path": "/device/1abb2f2b-e859-54ac-9cbc-7154daa53925",
+        "started_monotonic": 1397467.136245,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.08502450003288686,
+        "method": "DELETE",
+        "path": "/device/37c8b228-467f-545a-becb-c90293434dcb",
+        "started_monotonic": 1397467.1815019,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.05146460002288222,
+        "method": "DELETE",
+        "path": "/device/3a68d6f6-c4be-518c-b59d-dae3d8272b8d",
+        "started_monotonic": 1397467.2665674,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.06258790008723736,
+        "method": "DELETE",
+        "path": "/device/4c1c070a-c0e6-5a33-be77-951961ed64f4",
+        "started_monotonic": 1397467.3180753,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.040572999976575375,
+        "method": "DELETE",
+        "path": "/device/6d39493a-617d-54aa-aa8b-91930581c2b9",
+        "started_monotonic": 1397467.3807574,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.08162919990718365,
+        "method": "DELETE",
+        "path": "/device/74dd61b5-22ec-5fc1-b3e9-7ed38c946398",
+        "started_monotonic": 1397467.4213713,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04242399986833334,
+        "method": "DELETE",
+        "path": "/device/a8d87244-5adb-5c45-8f9a-148c6008d4ba",
+        "started_monotonic": 1397467.503038,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.06801300006918609,
+        "method": "DELETE",
+        "path": "/device/b05c48c7-fd4e-519e-8dfe-4c2f16052413",
+        "started_monotonic": 1397467.545501,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.05757459998130798,
+        "method": "DELETE",
+        "path": "/device/b0ee1ac1-2567-5bb6-bd7c-9e54681df60c",
+        "started_monotonic": 1397467.6135534,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04047439992427826,
+        "method": "DELETE",
+        "path": "/device/e52f4461-50fa-5785-9352-898ef4ae9676",
+        "started_monotonic": 1397467.6711667,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03843249985948205,
+        "method": "DELETE",
+        "path": "/device/e65cd631-994c-5849-ab56-5904c0f55c3d",
+        "started_monotonic": 1397467.7117522,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04066509986296296,
+        "method": "DELETE",
+        "path": "/device/f7f1379d-0550-5a69-b6b5-9a7801028621",
+        "started_monotonic": 1397467.7502248,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.039174299919977784,
+        "method": "DELETE",
+        "path": "/device/ffca8322-e8a3-5833-8f17-300982a6a638",
+        "started_monotonic": 1397467.7909418,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.02281949995085597,
+        "method": "DELETE",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topology/d70ad060-7109-5b8a-8eb2-d77bf74e2c3a",
+        "started_monotonic": 1397467.8301742,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.01939819986000657,
+        "method": "DELETE",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13",
+        "started_monotonic": 1397467.8530528,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.046105700079351664,
+        "method": "POST",
+        "path": "/contexts",
+        "started_monotonic": 1397467.9021164,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.026910000015050173,
+        "method": "POST",
+        "path": "/context/admin/topologies",
+        "started_monotonic": 1397467.9482304,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.02914350014179945,
+        "method": "GET",
+        "path": "/contexts",
+        "started_monotonic": 1397467.9751503,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.020483599975705147,
+        "method": "POST",
+        "path": "/contexts",
+        "started_monotonic": 1397468.0043203,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.021867700153961778,
+        "method": "POST",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397468.0248361,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.056740800151601434,
+        "method": "POST",
+        "path": "/contexts",
+        "started_monotonic": 1397468.0468199,
+        "status": 200
+      },
+      {
+        "elapsed_s": 1.2196742999367416,
+        "method": "POST",
+        "path": "/devices",
+        "started_monotonic": 1397468.1038092,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03997359983623028,
+        "method": "GET",
+        "path": "/device/0349d74d-abd3-5fd5-a744-b7fe6ad4f456",
+        "started_monotonic": 1397469.3235021,
+        "status": 200
+      },
+      {
+        "elapsed_s": 1.1432357002049685,
+        "method": "POST",
+        "path": "/devices",
+        "started_monotonic": 1397469.3636893,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.021013000048696995,
+        "method": "GET",
+        "path": "/device/066a8a8f-5054-5d27-93cb-027d33168ff4",
+        "started_monotonic": 1397470.506945,
+        "status": 200
+      },
+      {
+        "elapsed_s": 1.085260400082916,
+        "method": "POST",
+        "path": "/devices",
+        "started_monotonic": 1397470.5280705,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.017682000063359737,
+        "method": "GET",
+        "path": "/device/15851e36-6dff-573d-a974-ce83d79ce7a4",
+        "started_monotonic": 1397471.613353,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.9620290000457317,
+        "method": "POST",
+        "path": "/devices",
+        "started_monotonic": 1397471.6312613,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.02074140007607639,
+        "method": "GET",
+        "path": "/device/173da48c-bcb9-50d0-9cf5-1ba9762da1d2",
+        "started_monotonic": 1397472.5933259,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.8482329999096692,
+        "method": "POST",
+        "path": "/devices",
+        "started_monotonic": 1397472.6141804,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.017220099922269583,
+        "method": "GET",
+        "path": "/device/1abb2f2b-e859-54ac-9cbc-7154daa53925",
+        "started_monotonic": 1397473.4624352,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.8922398998402059,
+        "method": "POST",
+        "path": "/devices",
+        "started_monotonic": 1397473.4797793,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.022122299997135997,
+        "method": "GET",
+        "path": "/device/37c8b228-467f-545a-becb-c90293434dcb",
+        "started_monotonic": 1397474.3720451,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.8806700999848545,
+        "method": "POST",
+        "path": "/devices",
+        "started_monotonic": 1397474.3944161,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.017773000057786703,
+        "method": "GET",
+        "path": "/device/3a68d6f6-c4be-518c-b59d-dae3d8272b8d",
+        "started_monotonic": 1397475.2751074,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.9585593999363482,
+        "method": "POST",
+        "path": "/devices",
+        "started_monotonic": 1397475.2929885,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.01670789998024702,
+        "method": "GET",
+        "path": "/device/4c1c070a-c0e6-5a33-be77-951961ed64f4",
+        "started_monotonic": 1397476.2515707,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.9457277997862548,
+        "method": "POST",
+        "path": "/devices",
+        "started_monotonic": 1397476.2684369,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.016319300048053265,
+        "method": "GET",
+        "path": "/device/6d39493a-617d-54aa-aa8b-91930581c2b9",
+        "started_monotonic": 1397477.2141974,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.9315802999772131,
+        "method": "POST",
+        "path": "/devices",
+        "started_monotonic": 1397477.230636,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.02154999994672835,
+        "method": "GET",
+        "path": "/device/74dd61b5-22ec-5fc1-b3e9-7ed38c946398",
+        "started_monotonic": 1397478.1622396,
+        "status": 200
+      },
+      {
+        "elapsed_s": 1.1604021999519318,
+        "method": "POST",
+        "path": "/devices",
+        "started_monotonic": 1397478.1839816,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.041871500201523304,
+        "method": "GET",
+        "path": "/device/a8d87244-5adb-5c45-8f9a-148c6008d4ba",
+        "started_monotonic": 1397479.3444082,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.8681002000812441,
+        "method": "POST",
+        "path": "/devices",
+        "started_monotonic": 1397479.386579,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.0220749001018703,
+        "method": "GET",
+        "path": "/device/b05c48c7-fd4e-519e-8dfe-4c2f16052413",
+        "started_monotonic": 1397480.254696,
+        "status": 200
+      },
+      {
+        "elapsed_s": 1.1756137998308986,
+        "method": "POST",
+        "path": "/devices",
+        "started_monotonic": 1397480.2768864,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.019630699884146452,
+        "method": "GET",
+        "path": "/device/b0ee1ac1-2567-5bb6-bd7c-9e54681df60c",
+        "started_monotonic": 1397481.4525228,
+        "status": 200
+      },
+      {
+        "elapsed_s": 1.1385854000691324,
+        "method": "POST",
+        "path": "/devices",
+        "started_monotonic": 1397481.4722785,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.052843299927189946,
+        "method": "GET",
+        "path": "/device/e52f4461-50fa-5785-9352-898ef4ae9676",
+        "started_monotonic": 1397482.6108853,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.34808959998190403,
+        "method": "POST",
+        "path": "/devices",
+        "started_monotonic": 1397482.663957,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.02308530011214316,
+        "method": "GET",
+        "path": "/device/e65cd631-994c-5849-ab56-5904c0f55c3d",
+        "started_monotonic": 1397483.0120678,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.32713530003093183,
+        "method": "POST",
+        "path": "/devices",
+        "started_monotonic": 1397483.0353643,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.0406425001565367,
+        "method": "GET",
+        "path": "/device/f7f1379d-0550-5a69-b6b5-9a7801028621",
+        "started_monotonic": 1397483.3625176,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.8795907001476735,
+        "method": "POST",
+        "path": "/devices",
+        "started_monotonic": 1397483.4034389,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03536969982087612,
+        "method": "GET",
+        "path": "/device/ffca8322-e8a3-5833-8f17-300982a6a638",
+        "started_monotonic": 1397484.2830497,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.033904799958691,
+        "method": "POST",
+        "path": "/links",
+        "started_monotonic": 1397484.3185799,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03136300016194582,
+        "method": "POST",
+        "path": "/links",
+        "started_monotonic": 1397484.3525931,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.05739890015684068,
+        "method": "POST",
+        "path": "/links",
+        "started_monotonic": 1397484.3840662,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.045713899889960885,
+        "method": "POST",
+        "path": "/links",
+        "started_monotonic": 1397484.4415635,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04059919994324446,
+        "method": "POST",
+        "path": "/links",
+        "started_monotonic": 1397484.487396,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04606379987671971,
+        "method": "POST",
+        "path": "/links",
+        "started_monotonic": 1397484.528077,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.029349000193178654,
+        "method": "POST",
+        "path": "/links",
+        "started_monotonic": 1397484.5742272,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04950869991444051,
+        "method": "POST",
+        "path": "/links",
+        "started_monotonic": 1397484.6038521,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.026213200064375997,
+        "method": "POST",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397484.6536494,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03097170009277761,
+        "method": "POST",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/services",
+        "started_monotonic": 1397484.6800205,
+        "status": 200
+      },
+      {
+        "elapsed_s": 6.602810699958354,
+        "method": "PUT",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7",
+        "started_monotonic": 1397484.711014,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.018762100022286177,
+        "method": "GET",
+        "path": "/contexts",
+        "started_monotonic": 1397491.3138581,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.01408760016784072,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/slices",
+        "started_monotonic": 1397491.3326422,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.013223499990999699,
+        "method": "GET",
+        "path": "/policyrules",
+        "started_monotonic": 1397491.3467369,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03140549990348518,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397491.3599664,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04628700017929077,
+        "method": "GET",
+        "path": "/devices",
+        "started_monotonic": 1397491.3914563,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03646209998987615,
+        "method": "GET",
+        "path": "/links",
+        "started_monotonic": 1397491.4378733,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.0327241001650691,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/services",
+        "started_monotonic": 1397491.4744719,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.0309540000744164,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7/connections",
+        "started_monotonic": 1397491.5072128,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.021671900060027838,
+        "method": "GET",
+        "path": "/contexts",
+        "started_monotonic": 1397491.7409654,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.014006199780851603,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/slices",
+        "started_monotonic": 1397491.7626589,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.014138400088995695,
+        "method": "GET",
+        "path": "/policyrules",
+        "started_monotonic": 1397491.7766709,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.029448800021782517,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397491.7908151,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.05234050005674362,
+        "method": "GET",
+        "path": "/devices",
+        "started_monotonic": 1397491.8202713,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03867710009217262,
+        "method": "GET",
+        "path": "/links",
+        "started_monotonic": 1397491.8727592,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.032135300105437636,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/services",
+        "started_monotonic": 1397491.9115584,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.033091100165620446,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7/connections",
+        "started_monotonic": 1397491.9437119,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.02037980011664331,
+        "method": "GET",
+        "path": "/contexts",
+        "started_monotonic": 1397596.809866,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.012805999955162406,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/slices",
+        "started_monotonic": 1397596.8302662,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.012513600056990981,
+        "method": "GET",
+        "path": "/policyrules",
+        "started_monotonic": 1397596.8430796,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.02588970004580915,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397596.855599,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03817060007713735,
+        "method": "GET",
+        "path": "/devices",
+        "started_monotonic": 1397596.8814963,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.033630199963226914,
+        "method": "GET",
+        "path": "/links",
+        "started_monotonic": 1397596.9198066,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03026210004463792,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/services",
+        "started_monotonic": 1397596.9535275,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.031341500114649534,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7/connections",
+        "started_monotonic": 1397596.9838081,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.01943419990129769,
+        "method": "GET",
+        "path": "/contexts",
+        "started_monotonic": 1397597.2179912,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.014386400114744902,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/slices",
+        "started_monotonic": 1397597.2374469,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.013146100100129843,
+        "method": "GET",
+        "path": "/policyrules",
+        "started_monotonic": 1397597.2518403,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.02430590009316802,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397597.2649915,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04460699995979667,
+        "method": "GET",
+        "path": "/devices",
+        "started_monotonic": 1397597.2893038,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03283270006068051,
+        "method": "GET",
+        "path": "/links",
+        "started_monotonic": 1397597.3340127,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04162229993380606,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/services",
+        "started_monotonic": 1397597.3669606,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03478970006108284,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7/connections",
+        "started_monotonic": 1397597.4085982,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.028913100017234683,
+        "method": "GET",
+        "path": "/contexts",
+        "started_monotonic": 1397619.4373991,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.01860770001076162,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/slices",
+        "started_monotonic": 1397619.4663356,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03840940003283322,
+        "method": "GET",
+        "path": "/policyrules",
+        "started_monotonic": 1397619.4849492,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03235700004734099,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397619.5233671,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04303569998592138,
+        "method": "GET",
+        "path": "/devices",
+        "started_monotonic": 1397619.5557303,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03845199989154935,
+        "method": "GET",
+        "path": "/links",
+        "started_monotonic": 1397619.59896,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.060118500143289566,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/services",
+        "started_monotonic": 1397619.6375419,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03441419987939298,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7/connections",
+        "started_monotonic": 1397619.6976791,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.021276799961924553,
+        "method": "GET",
+        "path": "/contexts",
+        "started_monotonic": 1397619.9363583,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.013213100144639611,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/slices",
+        "started_monotonic": 1397619.9576567,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.013952300185337663,
+        "method": "GET",
+        "path": "/policyrules",
+        "started_monotonic": 1397619.970877,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.030832499964162707,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397619.984836,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.0596622999291867,
+        "method": "GET",
+        "path": "/devices",
+        "started_monotonic": 1397620.0156759,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.0649342997930944,
+        "method": "GET",
+        "path": "/links",
+        "started_monotonic": 1397620.0755994,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.055078799836337566,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/services",
+        "started_monotonic": 1397620.1406334,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04753710003569722,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7/connections",
+        "started_monotonic": 1397620.1957336,
+        "status": 200
+      },
+      {
+        "elapsed_s": 7.72567389998585,
+        "method": "DELETE",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7",
+        "started_monotonic": 1397620.2489501,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.040899100014939904,
+        "method": "POST",
+        "path": "/links",
+        "started_monotonic": 1397627.9747786,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.05164900003001094,
+        "method": "POST",
+        "path": "/links",
+        "started_monotonic": 1397628.0156889,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.032958900090307,
+        "method": "PUT",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topology/d70ad060-7109-5b8a-8eb2-d77bf74e2c3a",
+        "started_monotonic": 1397628.0673659,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.030437699984759092,
+        "method": "POST",
+        "path": "/contexts",
+        "started_monotonic": 1397628.1025913,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.038416099967435,
+        "method": "POST",
+        "path": "/context/admin/topologies",
+        "started_monotonic": 1397628.1330686,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.02540540019981563,
+        "method": "GET",
+        "path": "/contexts",
+        "started_monotonic": 1397628.171495,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.031688999850302935,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/slices",
+        "started_monotonic": 1397628.1969226,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.024734900100156665,
+        "method": "GET",
+        "path": "/policyrules",
+        "started_monotonic": 1397628.2286435,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.032237600069493055,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397628.2533844,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.053745599929243326,
+        "method": "GET",
+        "path": "/devices",
+        "started_monotonic": 1397628.285651,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.05451839999295771,
+        "method": "GET",
+        "path": "/links",
+        "started_monotonic": 1397628.3396498,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.017994199879467487,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/services",
+        "started_monotonic": 1397628.3943286,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.08388760010711849,
+        "method": "POST",
+        "path": "/contexts",
+        "started_monotonic": 1397628.4149562,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.06064860010519624,
+        "method": "POST",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397628.4988729,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.056458800099790096,
+        "method": "PUT",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13",
+        "started_monotonic": 1397628.5595962,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.062288800021633506,
+        "method": "PUT",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topology/d70ad060-7109-5b8a-8eb2-d77bf74e2c3a",
+        "started_monotonic": 1397628.6163735,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.050875699846073985,
+        "method": "POST",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/services",
+        "started_monotonic": 1397628.6788538,
+        "status": 200
+      },
+      {
+        "elapsed_s": 7.610334599856287,
+        "method": "PUT",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7",
+        "started_monotonic": 1397628.7297561,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03195259999483824,
+        "method": "GET",
+        "path": "/contexts",
+        "started_monotonic": 1397636.3402165,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.039756800048053265,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/slices",
+        "started_monotonic": 1397636.3721916,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.022802700055763125,
+        "method": "GET",
+        "path": "/policyrules",
+        "started_monotonic": 1397636.4119566,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.0470337001606822,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397636.4347686,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.08083240012638271,
+        "method": "GET",
+        "path": "/devices",
+        "started_monotonic": 1397636.4818097,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.06611440004780889,
+        "method": "GET",
+        "path": "/links",
+        "started_monotonic": 1397636.5627906,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.05659839999862015,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/services",
+        "started_monotonic": 1397636.62907,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.056500800186768174,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7/connections",
+        "started_monotonic": 1397636.6856866,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.040507199941203,
+        "method": "GET",
+        "path": "/contexts",
+        "started_monotonic": 1397636.9456638,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03234850009903312,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/slices",
+        "started_monotonic": 1397636.9862245,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04067630018107593,
+        "method": "GET",
+        "path": "/policyrules",
+        "started_monotonic": 1397637.018581,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.0444539999589324,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397637.0592655,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.06291149999015033,
+        "method": "GET",
+        "path": "/devices",
+        "started_monotonic": 1397637.1037274,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.049088000087067485,
+        "method": "GET",
+        "path": "/links",
+        "started_monotonic": 1397637.1667974,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.06436009984463453,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/services",
+        "started_monotonic": 1397637.2160559,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04603059985674918,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7/connections",
+        "started_monotonic": 1397637.280434,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.0361778000369668,
+        "method": "GET",
+        "path": "/contexts",
+        "started_monotonic": 1397637.3945396,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.02367000002413988,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/slices",
+        "started_monotonic": 1397637.4307381,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.029146600048989058,
+        "method": "GET",
+        "path": "/policyrules",
+        "started_monotonic": 1397637.454415,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.05109760002233088,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397637.4835695,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.061325700022280216,
+        "method": "GET",
+        "path": "/devices",
+        "started_monotonic": 1397637.534672,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.05403839983046055,
+        "method": "GET",
+        "path": "/links",
+        "started_monotonic": 1397637.5961448,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04591299989260733,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/services",
+        "started_monotonic": 1397637.6503633,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.045038700103759766,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7/connections",
+        "started_monotonic": 1397637.6962958,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.045934699941426516,
+        "method": "GET",
+        "path": "/contexts",
+        "started_monotonic": 1397637.9446522,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.01955519989132881,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/slices",
+        "started_monotonic": 1397637.9906079,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.022644500015303493,
+        "method": "GET",
+        "path": "/policyrules",
+        "started_monotonic": 1397638.0101693,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.037964999908581376,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397638.0328214,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.07738060015253723,
+        "method": "GET",
+        "path": "/devices",
+        "started_monotonic": 1397638.0707919,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.06052800011821091,
+        "method": "GET",
+        "path": "/links",
+        "started_monotonic": 1397638.1483276,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04423470003530383,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/services",
+        "started_monotonic": 1397638.209026,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03839320014230907,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7/connections",
+        "started_monotonic": 1397638.2532783,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03847989998757839,
+        "method": "PUT",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topology/d70ad060-7109-5b8a-8eb2-d77bf74e2c3a",
+        "started_monotonic": 1397638.2978927,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.028863299870863557,
+        "method": "GET",
+        "path": "/contexts",
+        "started_monotonic": 1397638.336395,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.046038800152018666,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/slices",
+        "started_monotonic": 1397638.3652789,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.06163630005903542,
+        "method": "GET",
+        "path": "/policyrules",
+        "started_monotonic": 1397638.4113262,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.1047742001246661,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397638.4729731,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.07954820012673736,
+        "method": "GET",
+        "path": "/devices",
+        "started_monotonic": 1397638.5777564,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.059917200123891234,
+        "method": "GET",
+        "path": "/links",
+        "started_monotonic": 1397638.65746,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.06167250010184944,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/services",
+        "started_monotonic": 1397638.717544,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.07897289982065558,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7/connections",
+        "started_monotonic": 1397638.7792315,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.06818619999103248,
+        "method": "GET",
+        "path": "/contexts",
+        "started_monotonic": 1397639.0626966,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.054608300095424056,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/slices",
+        "started_monotonic": 1397639.1309034,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03855709987692535,
+        "method": "GET",
+        "path": "/policyrules",
+        "started_monotonic": 1397639.1855174,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.06828389992006123,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397639.2240819,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.07949699996970594,
+        "method": "GET",
+        "path": "/devices",
+        "started_monotonic": 1397639.2923749,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.0705889998935163,
+        "method": "GET",
+        "path": "/links",
+        "started_monotonic": 1397639.3720191,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04756380012258887,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/services",
+        "started_monotonic": 1397639.4427806,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04615629999898374,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7/connections",
+        "started_monotonic": 1397639.4903619,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03692539990879595,
+        "method": "GET",
+        "path": "/contexts",
+        "started_monotonic": 1397829.5485081,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04944720002822578,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/slices",
+        "started_monotonic": 1397829.5854549,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04064040002413094,
+        "method": "GET",
+        "path": "/policyrules",
+        "started_monotonic": 1397829.6349077,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04900559992529452,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397829.675556,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.06879430008120835,
+        "method": "GET",
+        "path": "/devices",
+        "started_monotonic": 1397829.7245679,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.05888039991259575,
+        "method": "GET",
+        "path": "/links",
+        "started_monotonic": 1397829.7935132,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04823280009441078,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/services",
+        "started_monotonic": 1397829.8525516,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.05490890005603433,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7/connections",
+        "started_monotonic": 1397829.900804,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.026254000142216682,
+        "method": "GET",
+        "path": "/contexts",
+        "started_monotonic": 1397830.1592863,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.015596099896356463,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/slices",
+        "started_monotonic": 1397830.1855697,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.019577800063416362,
+        "method": "GET",
+        "path": "/policyrules",
+        "started_monotonic": 1397830.2011735,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03509899997152388,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397830.2207581,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.05135959992185235,
+        "method": "GET",
+        "path": "/devices",
+        "started_monotonic": 1397830.2558637,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04305400000885129,
+        "method": "GET",
+        "path": "/links",
+        "started_monotonic": 1397830.3073461,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04146620002575219,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/services",
+        "started_monotonic": 1397830.3505815,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03078479995019734,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7/connections",
+        "started_monotonic": 1397830.3920874,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.023231600178405643,
+        "method": "POST",
+        "path": "/contexts",
+        "started_monotonic": 1397873.290473,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.025347299873828888,
+        "method": "POST",
+        "path": "/context/admin/topologies",
+        "started_monotonic": 1397873.3137139,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.02274089981801808,
+        "method": "GET",
+        "path": "/contexts",
+        "started_monotonic": 1397873.3390695,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.013874399941414595,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/slices",
+        "started_monotonic": 1397873.361828,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.01432140008546412,
+        "method": "GET",
+        "path": "/policyrules",
+        "started_monotonic": 1397873.3757107,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.034930899972096086,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397873.3900383,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03776909993030131,
+        "method": "GET",
+        "path": "/devices",
+        "started_monotonic": 1397873.4249745,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03915309999138117,
+        "method": "GET",
+        "path": "/links",
+        "started_monotonic": 1397873.4629059,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03069899999536574,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/services",
+        "started_monotonic": 1397873.502223,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.029889400117099285,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7/connections",
+        "started_monotonic": 1397873.5329379,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03763250005431473,
+        "method": "POST",
+        "path": "/contexts",
+        "started_monotonic": 1397873.5658328,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.05139870010316372,
+        "method": "POST",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397873.6034905,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.02352809999138117,
+        "method": "POST",
+        "path": "/contexts",
+        "started_monotonic": 1397903.0869773,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03413099981844425,
+        "method": "POST",
+        "path": "/context/admin/topologies",
+        "started_monotonic": 1397903.1105158,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.018561200005933642,
+        "method": "GET",
+        "path": "/contexts",
+        "started_monotonic": 1397903.1446564,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03224570001475513,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/slices",
+        "started_monotonic": 1397903.1632411,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.01163540012203157,
+        "method": "GET",
+        "path": "/policyrules",
+        "started_monotonic": 1397903.1954941,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.02622890006750822,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397903.2071369,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03707269998267293,
+        "method": "GET",
+        "path": "/devices",
+        "started_monotonic": 1397903.2333738,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03508879989385605,
+        "method": "GET",
+        "path": "/links",
+        "started_monotonic": 1397903.2705558,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.02944099996238947,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/services",
+        "started_monotonic": 1397903.3057656,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.033484400017187,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7/connections",
+        "started_monotonic": 1397903.335224,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.022419000044465065,
+        "method": "POST",
+        "path": "/contexts",
+        "started_monotonic": 1397903.3710798,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.0422006999142468,
+        "method": "POST",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397903.3935268,
+        "status": 200
+      }
+    ],
+    "sat-b": [
+      {
+        "elapsed_s": 0.0195333999581635,
+        "method": "GET",
+        "path": "/contexts",
+        "started_monotonic": 1397451.2282467,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.012902099872007966,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/slices",
+        "started_monotonic": 1397451.247803,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.013493899954482913,
+        "method": "GET",
+        "path": "/policyrules",
+        "started_monotonic": 1397451.2607124,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.035316399997100234,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397451.2742143,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03709630016237497,
+        "method": "GET",
+        "path": "/devices",
+        "started_monotonic": 1397451.3095381,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.031412299955263734,
+        "method": "GET",
+        "path": "/links",
+        "started_monotonic": 1397451.346747,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.026638299925252795,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/services",
+        "started_monotonic": 1397451.3782834,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.02686180011369288,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7/connections",
+        "started_monotonic": 1397451.4049473,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.01872259983792901,
+        "method": "GET",
+        "path": "/contexts",
+        "started_monotonic": 1397451.6348983,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.012035599909722805,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/slices",
+        "started_monotonic": 1397451.6536478,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.0129228001460433,
+        "method": "GET",
+        "path": "/policyrules",
+        "started_monotonic": 1397451.6656924,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.023667699890211225,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397451.6786233,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.036549200071021914,
+        "method": "GET",
+        "path": "/devices",
+        "started_monotonic": 1397451.7022992,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03352580009959638,
+        "method": "GET",
+        "path": "/links",
+        "started_monotonic": 1397451.7391014,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.02981900004670024,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/services",
+        "started_monotonic": 1397451.7727355,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.025735100032761693,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7/connections",
+        "started_monotonic": 1397451.8025699,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.018044399796053767,
+        "method": "GET",
+        "path": "/contexts",
+        "started_monotonic": 1397451.8369154,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.029648100025951862,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/slices",
+        "started_monotonic": 1397451.8550085,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.011201699962839484,
+        "method": "GET",
+        "path": "/policyrules",
+        "started_monotonic": 1397451.8846614,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.022422899957746267,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397451.8958741,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03914570016786456,
+        "method": "GET",
+        "path": "/devices",
+        "started_monotonic": 1397451.9183027,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03075789986178279,
+        "method": "GET",
+        "path": "/links",
+        "started_monotonic": 1397451.9575475,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.025029400130733848,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/services",
+        "started_monotonic": 1397451.9884223,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03848739992827177,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7/connections",
+        "started_monotonic": 1397452.0134666,
+        "status": 200
+      },
+      {
+        "elapsed_s": 6.634327400010079,
+        "method": "DELETE",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7",
+        "started_monotonic": 1397452.0545252,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.06779939983971417,
+        "method": "DELETE",
+        "path": "/link/08ff9af0-7016-5986-abc2-27b8f419c63a",
+        "started_monotonic": 1397458.688976,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.07393150008283556,
+        "method": "DELETE",
+        "path": "/link/2984ccfc-0b9b-5716-a6bf-e390d041c51d",
+        "started_monotonic": 1397458.7568305,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.08916290011256933,
+        "method": "DELETE",
+        "path": "/link/2c4e2839-4591-530c-b6a6-6b394052ee3a",
+        "started_monotonic": 1397458.8308152,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.08879449986852705,
+        "method": "DELETE",
+        "path": "/link/73ac1027-291b-522a-af8c-276b79cf997c",
+        "started_monotonic": 1397458.9200297,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.062171899946406484,
+        "method": "DELETE",
+        "path": "/link/7d961ee0-353a-59b6-8776-6d2adf194b4f",
+        "started_monotonic": 1397459.0088686,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.07629190012812614,
+        "method": "DELETE",
+        "path": "/link/a796cdbb-3780-5466-83f0-8ef6b261f091",
+        "started_monotonic": 1397459.0710929,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.0880670000333339,
+        "method": "DELETE",
+        "path": "/link/a96869a0-9290-5d82-8192-6cbe97f8ab1b",
+        "started_monotonic": 1397459.1474356,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.06262150011025369,
+        "method": "DELETE",
+        "path": "/link/ca310af4-2e70-5328-9426-14cfe3058743",
+        "started_monotonic": 1397459.2355509,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.0673469000030309,
+        "method": "DELETE",
+        "path": "/link/d0d8a2b7-df19-5708-871d-d13201cbb534",
+        "started_monotonic": 1397459.2982213,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.09242939995601773,
+        "method": "DELETE",
+        "path": "/link/f97b4817-a19e-53f5-98cb-81e6e6d0e2b9",
+        "started_monotonic": 1397459.3656505,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.07040379988029599,
+        "method": "DELETE",
+        "path": "/device/0349d74d-abd3-5fd5-a744-b7fe6ad4f456",
+        "started_monotonic": 1397459.4582354,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.052007999969646335,
+        "method": "DELETE",
+        "path": "/device/066a8a8f-5054-5d27-93cb-027d33168ff4",
+        "started_monotonic": 1397459.5286784,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.0509895000141114,
+        "method": "DELETE",
+        "path": "/device/15851e36-6dff-573d-a974-ce83d79ce7a4",
+        "started_monotonic": 1397459.5807427,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.0598175001796335,
+        "method": "DELETE",
+        "path": "/device/173da48c-bcb9-50d0-9cf5-1ba9762da1d2",
+        "started_monotonic": 1397459.6317744,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.06899429997429252,
+        "method": "DELETE",
+        "path": "/device/1abb2f2b-e859-54ac-9cbc-7154daa53925",
+        "started_monotonic": 1397459.6916335,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.05634000012651086,
+        "method": "DELETE",
+        "path": "/device/37c8b228-467f-545a-becb-c90293434dcb",
+        "started_monotonic": 1397459.7606668,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.05179649987258017,
+        "method": "DELETE",
+        "path": "/device/3a68d6f6-c4be-518c-b59d-dae3d8272b8d",
+        "started_monotonic": 1397459.8170475,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.05510660004802048,
+        "method": "DELETE",
+        "path": "/device/4c1c070a-c0e6-5a33-be77-951961ed64f4",
+        "started_monotonic": 1397459.8689025,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.044369000010192394,
+        "method": "DELETE",
+        "path": "/device/6d39493a-617d-54aa-aa8b-91930581c2b9",
+        "started_monotonic": 1397459.9240492,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04111480014398694,
+        "method": "DELETE",
+        "path": "/device/74dd61b5-22ec-5fc1-b3e9-7ed38c946398",
+        "started_monotonic": 1397459.968501,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.043350799940526485,
+        "method": "DELETE",
+        "path": "/device/a8d87244-5adb-5c45-8f9a-148c6008d4ba",
+        "started_monotonic": 1397460.0096547,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.049790099961683154,
+        "method": "DELETE",
+        "path": "/device/b05c48c7-fd4e-519e-8dfe-4c2f16052413",
+        "started_monotonic": 1397460.0530449,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04771630000323057,
+        "method": "DELETE",
+        "path": "/device/b0ee1ac1-2567-5bb6-bd7c-9e54681df60c",
+        "started_monotonic": 1397460.1028747,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.048613599967211485,
+        "method": "DELETE",
+        "path": "/device/e52f4461-50fa-5785-9352-898ef4ae9676",
+        "started_monotonic": 1397460.1506369,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04513649991713464,
+        "method": "DELETE",
+        "path": "/device/e65cd631-994c-5849-ab56-5904c0f55c3d",
+        "started_monotonic": 1397460.1993108,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.044893099926412106,
+        "method": "DELETE",
+        "path": "/device/f7f1379d-0550-5a69-b6b5-9a7801028621",
+        "started_monotonic": 1397460.2445064,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.049429900012910366,
+        "method": "DELETE",
+        "path": "/device/ffca8322-e8a3-5833-8f17-300982a6a638",
+        "started_monotonic": 1397460.2894413,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.051132099935784936,
+        "method": "DELETE",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topology/d70ad060-7109-5b8a-8eb2-d77bf74e2c3a",
+        "started_monotonic": 1397460.3389469,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.02439170004799962,
+        "method": "DELETE",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13",
+        "started_monotonic": 1397460.3901274,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.030511599965393543,
+        "method": "POST",
+        "path": "/contexts",
+        "started_monotonic": 1397799.2422138,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.035283900098875165,
+        "method": "POST",
+        "path": "/context/admin/topologies",
+        "started_monotonic": 1397799.272735,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04296949994750321,
+        "method": "GET",
+        "path": "/contexts",
+        "started_monotonic": 1397799.3080276,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.052122100023552775,
+        "method": "POST",
+        "path": "/contexts",
+        "started_monotonic": 1397799.3510171,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04031879990361631,
+        "method": "POST",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397799.4031682,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.037419999949634075,
+        "method": "POST",
+        "path": "/contexts",
+        "started_monotonic": 1397799.4435813,
+        "status": 200
+      },
+      {
+        "elapsed_s": 1.4416087998542935,
+        "method": "POST",
+        "path": "/devices",
+        "started_monotonic": 1397799.4811144,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.033958800137043,
+        "method": "GET",
+        "path": "/device/0349d74d-abd3-5fd5-a744-b7fe6ad4f456",
+        "started_monotonic": 1397800.9227415,
+        "status": 200
+      },
+      {
+        "elapsed_s": 1.265936000039801,
+        "method": "POST",
+        "path": "/devices",
+        "started_monotonic": 1397800.9568687,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.027061300119385123,
+        "method": "GET",
+        "path": "/device/066a8a8f-5054-5d27-93cb-027d33168ff4",
+        "started_monotonic": 1397802.2228271,
+        "status": 200
+      },
+      {
+        "elapsed_s": 1.140879100188613,
+        "method": "POST",
+        "path": "/devices",
+        "started_monotonic": 1397802.2500341,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.02765440009534359,
+        "method": "GET",
+        "path": "/device/15851e36-6dff-573d-a974-ce83d79ce7a4",
+        "started_monotonic": 1397803.3909403,
+        "status": 200
+      },
+      {
+        "elapsed_s": 1.1421274000313133,
+        "method": "POST",
+        "path": "/devices",
+        "started_monotonic": 1397803.4187872,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.025014499900862575,
+        "method": "GET",
+        "path": "/device/173da48c-bcb9-50d0-9cf5-1ba9762da1d2",
+        "started_monotonic": 1397804.5609373,
+        "status": 200
+      },
+      {
+        "elapsed_s": 1.1272613001056015,
+        "method": "POST",
+        "path": "/devices",
+        "started_monotonic": 1397804.5862264,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.018442200031131506,
+        "method": "GET",
+        "path": "/device/1abb2f2b-e859-54ac-9cbc-7154daa53925",
+        "started_monotonic": 1397805.7135076,
+        "status": 200
+      },
+      {
+        "elapsed_s": 1.1150364999193698,
+        "method": "POST",
+        "path": "/devices",
+        "started_monotonic": 1397805.7322468,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.024784399894997478,
+        "method": "GET",
+        "path": "/device/37c8b228-467f-545a-becb-c90293434dcb",
+        "started_monotonic": 1397806.8473022,
+        "status": 200
+      },
+      {
+        "elapsed_s": 1.4597340000327677,
+        "method": "POST",
+        "path": "/devices",
+        "started_monotonic": 1397806.8722337,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.025027599884197116,
+        "method": "GET",
+        "path": "/device/3a68d6f6-c4be-518c-b59d-dae3d8272b8d",
+        "started_monotonic": 1397808.3319935,
+        "status": 200
+      },
+      {
+        "elapsed_s": 1.5203919000923634,
+        "method": "POST",
+        "path": "/devices",
+        "started_monotonic": 1397808.3571758,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.02248940011486411,
+        "method": "GET",
+        "path": "/device/4c1c070a-c0e6-5a33-be77-951961ed64f4",
+        "started_monotonic": 1397809.877596,
+        "status": 200
+      },
+      {
+        "elapsed_s": 1.1673862000461668,
+        "method": "POST",
+        "path": "/devices",
+        "started_monotonic": 1397809.9002309,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.025147200096398592,
+        "method": "GET",
+        "path": "/device/6d39493a-617d-54aa-aa8b-91930581c2b9",
+        "started_monotonic": 1397811.0676429,
+        "status": 200
+      },
+      {
+        "elapsed_s": 1.2147248999681324,
+        "method": "POST",
+        "path": "/devices",
+        "started_monotonic": 1397811.0929667,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04364879988133907,
+        "method": "GET",
+        "path": "/device/74dd61b5-22ec-5fc1-b3e9-7ed38c946398",
+        "started_monotonic": 1397812.307713,
+        "status": 200
+      },
+      {
+        "elapsed_s": 1.3575874001253396,
+        "method": "POST",
+        "path": "/devices",
+        "started_monotonic": 1397812.3517331,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04423830006271601,
+        "method": "GET",
+        "path": "/device/a8d87244-5adb-5c45-8f9a-148c6008d4ba",
+        "started_monotonic": 1397813.7093471,
+        "status": 200
+      },
+      {
+        "elapsed_s": 1.1573451000731438,
+        "method": "POST",
+        "path": "/devices",
+        "started_monotonic": 1397813.7539139,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03008570009842515,
+        "method": "GET",
+        "path": "/device/b05c48c7-fd4e-519e-8dfe-4c2f16052413",
+        "started_monotonic": 1397814.9112813,
+        "status": 200
+      },
+      {
+        "elapsed_s": 1.138713699998334,
+        "method": "POST",
+        "path": "/devices",
+        "started_monotonic": 1397814.9415491,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.018916399916633964,
+        "method": "GET",
+        "path": "/device/b0ee1ac1-2567-5bb6-bd7c-9e54681df60c",
+        "started_monotonic": 1397816.0803074,
+        "status": 200
+      },
+      {
+        "elapsed_s": 1.1312935000751168,
+        "method": "POST",
+        "path": "/devices",
+        "started_monotonic": 1397816.0993957,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.021709599997848272,
+        "method": "GET",
+        "path": "/device/e52f4461-50fa-5785-9352-898ef4ae9676",
+        "started_monotonic": 1397817.2307079,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.8810537999961525,
+        "method": "POST",
+        "path": "/devices",
+        "started_monotonic": 1397817.2526668,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.034279300132766366,
+        "method": "GET",
+        "path": "/device/e65cd631-994c-5849-ab56-5904c0f55c3d",
+        "started_monotonic": 1397818.1337481,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.8367571998387575,
+        "method": "PUT",
+        "path": "/device/e65cd631-994c-5849-ab56-5904c0f55c3d",
+        "started_monotonic": 1397818.1685643,
+        "status": 200
+      },
+      {
+        "elapsed_s": 1.1917644999921322,
+        "method": "POST",
+        "path": "/devices",
+        "started_monotonic": 1397819.0056284,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.05558559997007251,
+        "method": "GET",
+        "path": "/device/f7f1379d-0550-5a69-b6b5-9a7801028621",
+        "started_monotonic": 1397820.1974175,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.9291111000347883,
+        "method": "PUT",
+        "path": "/device/f7f1379d-0550-5a69-b6b5-9a7801028621",
+        "started_monotonic": 1397820.2535701,
+        "status": 200
+      },
+      {
+        "elapsed_s": 1.2660139999352396,
+        "method": "POST",
+        "path": "/devices",
+        "started_monotonic": 1397821.1828256,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.025508100166916847,
+        "method": "GET",
+        "path": "/device/ffca8322-e8a3-5833-8f17-300982a6a638",
+        "started_monotonic": 1397822.4494007,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.06164059997536242,
+        "method": "POST",
+        "path": "/links",
+        "started_monotonic": 1397822.475048,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.035693899961188436,
+        "method": "POST",
+        "path": "/links",
+        "started_monotonic": 1397822.5368086,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03840139997191727,
+        "method": "POST",
+        "path": "/links",
+        "started_monotonic": 1397822.572836,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.09416199987754226,
+        "method": "POST",
+        "path": "/links",
+        "started_monotonic": 1397822.6113263,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.040171399945393205,
+        "method": "POST",
+        "path": "/links",
+        "started_monotonic": 1397822.7056099,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04400180000811815,
+        "method": "POST",
+        "path": "/links",
+        "started_monotonic": 1397822.7458985,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04503179993480444,
+        "method": "POST",
+        "path": "/links",
+        "started_monotonic": 1397822.7900227,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04982509999535978,
+        "method": "POST",
+        "path": "/links",
+        "started_monotonic": 1397822.8351699,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03419010015204549,
+        "method": "POST",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397822.8851827,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.07642580009996891,
+        "method": "POST",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/services",
+        "started_monotonic": 1397822.9195681,
+        "status": 200
+      },
+      {
+        "elapsed_s": 6.454523699823767,
+        "method": "PUT",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7",
+        "started_monotonic": 1397822.9960219,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.020977000007405877,
+        "method": "GET",
+        "path": "/contexts",
+        "started_monotonic": 1397830.5223763,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.014748499961569905,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/slices",
+        "started_monotonic": 1397830.5433699,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.028626899933442473,
+        "method": "GET",
+        "path": "/policyrules",
+        "started_monotonic": 1397830.5581253,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.031140600098297,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397830.5867587,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.052852499997243285,
+        "method": "GET",
+        "path": "/devices",
+        "started_monotonic": 1397830.617905,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.07960579986684024,
+        "method": "GET",
+        "path": "/links",
+        "started_monotonic": 1397830.6708657,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03304730006493628,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/services",
+        "started_monotonic": 1397830.7505782,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.035356600070372224,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7/connections",
+        "started_monotonic": 1397830.7836394,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.022346299840137362,
+        "method": "POST",
+        "path": "/contexts",
+        "started_monotonic": 1397830.8243432,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.023411499802023172,
+        "method": "POST",
+        "path": "/context/admin/topologies",
+        "started_monotonic": 1397830.8466976,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.01845810003578663,
+        "method": "GET",
+        "path": "/contexts",
+        "started_monotonic": 1397830.8701201,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.036116299917921424,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/slices",
+        "started_monotonic": 1397830.8885945,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.012746700085699558,
+        "method": "GET",
+        "path": "/policyrules",
+        "started_monotonic": 1397830.9247164,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.05362860020250082,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397830.9374701,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.06046730000525713,
+        "method": "GET",
+        "path": "/devices",
+        "started_monotonic": 1397830.9911073,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.0510945999994874,
+        "method": "GET",
+        "path": "/links",
+        "started_monotonic": 1397831.051726,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.049306799890473485,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/services",
+        "started_monotonic": 1397831.1029723,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.06799839995801449,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7/connections",
+        "started_monotonic": 1397831.1522973,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03580920002423227,
+        "method": "POST",
+        "path": "/contexts",
+        "started_monotonic": 1397831.2235194,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.0380617999471724,
+        "method": "POST",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397831.2593616,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.11297899996861815,
+        "method": "POST",
+        "path": "/links",
+        "started_monotonic": 1397831.2980049,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.06580520002171397,
+        "method": "POST",
+        "path": "/links",
+        "started_monotonic": 1397831.4111493,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04028400010429323,
+        "method": "PUT",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topology/d70ad060-7109-5b8a-8eb2-d77bf74e2c3a",
+        "started_monotonic": 1397831.4770779,
+        "status": 200
+      },
+      {
+        "elapsed_s": 6.52863399987109,
+        "method": "PUT",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7",
+        "started_monotonic": 1397831.5174648,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.02541669993661344,
+        "method": "GET",
+        "path": "/contexts",
+        "started_monotonic": 1397838.0642425,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.0170265999622643,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/slices",
+        "started_monotonic": 1397838.08968,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.016689700074493885,
+        "method": "GET",
+        "path": "/policyrules",
+        "started_monotonic": 1397838.106714,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.030703100143000484,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397838.1234107,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04987909994088113,
+        "method": "GET",
+        "path": "/devices",
+        "started_monotonic": 1397838.1541225,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04201840003952384,
+        "method": "GET",
+        "path": "/links",
+        "started_monotonic": 1397838.204127,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.050492400070652366,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/services",
+        "started_monotonic": 1397838.2463046,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.036275200080126524,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7/connections",
+        "started_monotonic": 1397838.2968183,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.05633799987845123,
+        "method": "GET",
+        "path": "/contexts",
+        "started_monotonic": 1397838.5368236,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03105139988474548,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/slices",
+        "started_monotonic": 1397838.5931849,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.030078399926424026,
+        "method": "GET",
+        "path": "/policyrules",
+        "started_monotonic": 1397838.6242453,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.060928599908947945,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397838.6543312,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.06921490002423525,
+        "method": "GET",
+        "path": "/devices",
+        "started_monotonic": 1397838.7152676,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.05181339988484979,
+        "method": "GET",
+        "path": "/links",
+        "started_monotonic": 1397838.7846343,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04825120000168681,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/services",
+        "started_monotonic": 1397838.8366138,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.05410569999366999,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7/connections",
+        "started_monotonic": 1397838.8848809,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.036504199961200356,
+        "method": "GET",
+        "path": "/contexts",
+        "started_monotonic": 1397838.99256,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.05723729985766113,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/slices",
+        "started_monotonic": 1397839.029088,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.024956899927929044,
+        "method": "GET",
+        "path": "/policyrules",
+        "started_monotonic": 1397839.0863338,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.07184270001016557,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397839.1112979,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.1225515000987798,
+        "method": "GET",
+        "path": "/devices",
+        "started_monotonic": 1397839.1831482,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.10011160001158714,
+        "method": "GET",
+        "path": "/links",
+        "started_monotonic": 1397839.3058506,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.05636930000036955,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/services",
+        "started_monotonic": 1397839.4061233,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.051468499936163425,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7/connections",
+        "started_monotonic": 1397839.462509,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.025591399986296892,
+        "method": "GET",
+        "path": "/contexts",
+        "started_monotonic": 1397839.7172427,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.016968399984762073,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/slices",
+        "started_monotonic": 1397839.7428794,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.029395799851045012,
+        "method": "GET",
+        "path": "/policyrules",
+        "started_monotonic": 1397839.7598552,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.030153699917718768,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397839.7892588,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04105570004321635,
+        "method": "GET",
+        "path": "/devices",
+        "started_monotonic": 1397839.8194186,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.037996700033545494,
+        "method": "GET",
+        "path": "/links",
+        "started_monotonic": 1397839.8606184,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03441590000875294,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/services",
+        "started_monotonic": 1397839.8987364,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.032946999883279204,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7/connections",
+        "started_monotonic": 1397839.9331732,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.037937300046905875,
+        "method": "GET",
+        "path": "/contexts",
+        "started_monotonic": 1397839.9752808,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.011829700088128448,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/slices",
+        "started_monotonic": 1397840.0132404,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.01197099988348782,
+        "method": "GET",
+        "path": "/policyrules",
+        "started_monotonic": 1397840.0250756,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.045063900062814355,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topologies",
+        "started_monotonic": 1397840.0370536,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.057237999979406595,
+        "method": "GET",
+        "path": "/devices",
+        "started_monotonic": 1397840.08214,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.034330699825659394,
+        "method": "GET",
+        "path": "/links",
+        "started_monotonic": 1397840.1394728,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.03798849997110665,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/services",
+        "started_monotonic": 1397840.1741567,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04974310006946325,
+        "method": "GET",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7/connections",
+        "started_monotonic": 1397840.2121641,
+        "status": 200
+      },
+      {
+        "elapsed_s": 13.61909140017815,
+        "method": "DELETE",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/service/c853520e-8776-5497-8d35-8a76147662e7",
+        "started_monotonic": 1397840.2655222,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.07090940000489354,
+        "method": "DELETE",
+        "path": "/link/08ff9af0-7016-5986-abc2-27b8f419c63a",
+        "started_monotonic": 1397853.8847355,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.061059199972078204,
+        "method": "DELETE",
+        "path": "/link/2984ccfc-0b9b-5716-a6bf-e390d041c51d",
+        "started_monotonic": 1397853.955702,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.07135669980198145,
+        "method": "DELETE",
+        "path": "/link/2c4e2839-4591-530c-b6a6-6b394052ee3a",
+        "started_monotonic": 1397854.0168145,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.06620420003309846,
+        "method": "DELETE",
+        "path": "/link/73ac1027-291b-522a-af8c-276b79cf997c",
+        "started_monotonic": 1397854.0882255,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.058436399791389704,
+        "method": "DELETE",
+        "path": "/link/7d961ee0-353a-59b6-8776-6d2adf194b4f",
+        "started_monotonic": 1397854.1546293,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.05628399993292987,
+        "method": "DELETE",
+        "path": "/link/a796cdbb-3780-5466-83f0-8ef6b261f091",
+        "started_monotonic": 1397854.2131381,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.055750000057742,
+        "method": "DELETE",
+        "path": "/link/a96869a0-9290-5d82-8192-6cbe97f8ab1b",
+        "started_monotonic": 1397854.2694683,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.06145539996214211,
+        "method": "DELETE",
+        "path": "/link/ca310af4-2e70-5328-9426-14cfe3058743",
+        "started_monotonic": 1397854.3252712,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.10960249998606741,
+        "method": "DELETE",
+        "path": "/link/d0d8a2b7-df19-5708-871d-d13201cbb534",
+        "started_monotonic": 1397854.3867914,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04831629991531372,
+        "method": "DELETE",
+        "path": "/link/f97b4817-a19e-53f5-98cb-81e6e6d0e2b9",
+        "started_monotonic": 1397854.4964669,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.06425360008142889,
+        "method": "DELETE",
+        "path": "/device/0349d74d-abd3-5fd5-a744-b7fe6ad4f456",
+        "started_monotonic": 1397854.5449502,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.07804800011217594,
+        "method": "DELETE",
+        "path": "/device/066a8a8f-5054-5d27-93cb-027d33168ff4",
+        "started_monotonic": 1397854.6092533,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.05510200001299381,
+        "method": "DELETE",
+        "path": "/device/15851e36-6dff-573d-a974-ce83d79ce7a4",
+        "started_monotonic": 1397854.6873542,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.055143700214102864,
+        "method": "DELETE",
+        "path": "/device/173da48c-bcb9-50d0-9cf5-1ba9762da1d2",
+        "started_monotonic": 1397854.7425091,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.049513000063598156,
+        "method": "DELETE",
+        "path": "/device/1abb2f2b-e859-54ac-9cbc-7154daa53925",
+        "started_monotonic": 1397854.7977062,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.053882500156760216,
+        "method": "DELETE",
+        "path": "/device/37c8b228-467f-545a-becb-c90293434dcb",
+        "started_monotonic": 1397854.8472713,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.046377799939364195,
+        "method": "DELETE",
+        "path": "/device/3a68d6f6-c4be-518c-b59d-dae3d8272b8d",
+        "started_monotonic": 1397854.9012008,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04816509992815554,
+        "method": "DELETE",
+        "path": "/device/4c1c070a-c0e6-5a33-be77-951961ed64f4",
+        "started_monotonic": 1397854.9476478,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.04632949992083013,
+        "method": "DELETE",
+        "path": "/device/6d39493a-617d-54aa-aa8b-91930581c2b9",
+        "started_monotonic": 1397854.9958611,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.058571700006723404,
+        "method": "DELETE",
+        "path": "/device/74dd61b5-22ec-5fc1-b3e9-7ed38c946398",
+        "started_monotonic": 1397855.0422403,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.07390440022572875,
+        "method": "DELETE",
+        "path": "/device/a8d87244-5adb-5c45-8f9a-148c6008d4ba",
+        "started_monotonic": 1397855.1008598,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.056454400066286325,
+        "method": "DELETE",
+        "path": "/device/b05c48c7-fd4e-519e-8dfe-4c2f16052413",
+        "started_monotonic": 1397855.1748151,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.06599260005168617,
+        "method": "DELETE",
+        "path": "/device/b0ee1ac1-2567-5bb6-bd7c-9e54681df60c",
+        "started_monotonic": 1397855.2313228,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.08341369987465441,
+        "method": "DELETE",
+        "path": "/device/e52f4461-50fa-5785-9352-898ef4ae9676",
+        "started_monotonic": 1397855.2974507,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.057924999855458736,
+        "method": "DELETE",
+        "path": "/device/e65cd631-994c-5849-ab56-5904c0f55c3d",
+        "started_monotonic": 1397855.3809166,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.057040000101551414,
+        "method": "DELETE",
+        "path": "/device/f7f1379d-0550-5a69-b6b5-9a7801028621",
+        "started_monotonic": 1397855.4388918,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.08221790008246899,
+        "method": "DELETE",
+        "path": "/device/ffca8322-e8a3-5833-8f17-300982a6a638",
+        "started_monotonic": 1397855.4959828,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.029384899884462357,
+        "method": "DELETE",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13/topology/d70ad060-7109-5b8a-8eb2-d77bf74e2c3a",
+        "started_monotonic": 1397855.5782769,
+        "status": 200
+      },
+      {
+        "elapsed_s": 0.02412769990041852,
+        "method": "DELETE",
+        "path": "/context/4270b8eb-9108-543a-a503-93e662160a13",
+        "started_monotonic": 1397855.6077282,
+        "status": 200
+      }
+    ]
+  },
+  "attempt": 2,
+  "baseline_observation_s": 30,
+  "baseline_path_available": true,
+  "baseline_service_available": false,
+  "bytes_received": 1823565400,
+  "bytes_sent": 1823565400,
+  "configured_rate_bps": 1000000000,
+  "created_utc": "2026-10-08T16:16:25.973868+00:00",
+  "directory": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\results\\runs\\run-bd559578930c4799b7c2e12afe326366",
+  "event": {
+    "contact_end_s": 6248,
+    "contact_window_s": 1870,
+    "deadline_s": 7571,
+    "deadline_window_s": 3193,
+    "event_id": "functional-53848-53913-4378",
+    "execution_purpose": "functional-calibration",
+    "sat_a": 53848,
+    "sat_b": 53913,
+    "trigger_causes": [
+      "functional_diagnostic"
+    ],
+    "trigger_s": 4378
+  },
+  "events": [
+    {
+      "causes": [
+        "functional_diagnostic"
+      ],
+      "elapsed_s": 30.00056580011733,
+      "id": 1,
+      "orbital_s": 4378.000566700008,
+      "phase": "trigger",
+      "timestamp_utc": "2026-10-08T16:18:19.001098+00:00"
+    },
+    {
+      "elapsed_s": 30.42367080016993,
+      "id": 2,
+      "orbital_s": 4378.42367170006,
+      "phase": "alignment",
+      "timestamp_utc": "2026-10-08T16:18:19.424204+00:00"
+    },
+    {
+      "elapsed_s": 90.48455619998276,
+      "id": 3,
+      "orbital_s": 4438.4845565001015,
+      "phase": "snapshot_initial",
+      "timestamp_utc": "2026-10-08T16:19:19.485087+00:00"
+    },
+    {
+      "artifact": {
+        "bytes": 1823463936,
+        "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\artifacts\\images-l2-patched-v2\\teraflow-v7-images.tar",
+        "sha256": "9fc2920c12e4cc8867cd34ad294f1c240acc34b181dd462ce69e5abd51531c00"
+      },
+      "elapsed_s": 93.60530699999072,
+      "id": 4,
+      "orbital_s": 4441.605307999998,
+      "payload": "teraflow-v7-images.tar",
+      "phase": "transfer",
+      "timestamp_utc": "2026-10-08T16:19:22.605839+00:00"
+    },
+    {
+      "elapsed_s": 110.61967870010994,
+      "id": 5,
+      "orbital_s": 4458.619679399999,
+      "payload": "teraflow-v7-images.tar",
+      "phase": "transfer_verified",
+      "receipt": {
+        "configured_rate_bps": 1000000000,
+        "elapsed_s": 14.609094799961895,
+        "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\results\\runs\\run-bd559578930c4799b7c2e12afe326366\\received\\teraflow-v7-images.tar",
+        "received_bytes": 1823463936,
+        "receiver_elapsed_s": 14.598252499941736,
+        "sent_bytes": 1823463936,
+        "sha256": "9fc2920c12e4cc8867cd34ad294f1c240acc34b181dd462ce69e5abd51531c00",
+        "tcp_retransmission_measurement": "unavailable on host transport",
+        "tcp_retransmissions": null,
+        "useful_throughput_bps": 998536301.3756368
+      },
+      "timestamp_utc": "2026-10-08T16:19:39.620211+00:00"
+    },
+    {
+      "artifact": {
+        "bytes": 85838,
+        "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\results\\runs\\run-bd559578930c4799b7c2e12afe326366\\operation\\snapshot-1.json",
+        "sha256": "40414d3cc79d2b41de0f2bd46ea7c66fa3f92f8db56b3aac8a5dc507c1e7a44d"
+      },
+      "elapsed_s": 113.21818490000442,
+      "id": 6,
+      "orbital_s": 4461.218186100014,
+      "payload": "snapshot-1.json",
+      "phase": "transfer",
+      "timestamp_utc": "2026-10-08T16:19:42.218711+00:00"
+    },
+    {
+      "elapsed_s": 113.2431880000513,
+      "id": 7,
+      "orbital_s": 4461.243188800057,
+      "payload": "snapshot-1.json",
+      "phase": "transfer_verified",
+      "receipt": {
+        "configured_rate_bps": 1000000000,
+        "elapsed_s": 0.01245539984665811,
+        "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\results\\runs\\run-bd559578930c4799b7c2e12afe326366\\received\\snapshot-1.json",
+        "received_bytes": 85838,
+        "receiver_elapsed_s": 0.0024753001052886248,
+        "sent_bytes": 85838,
+        "sha256": "40414d3cc79d2b41de0f2bd46ea7c66fa3f92f8db56b3aac8a5dc507c1e7a44d",
+        "tcp_retransmission_measurement": "unavailable on host transport",
+        "tcp_retransmissions": null,
+        "useful_throughput_bps": 55133035.346452445
+      },
+      "timestamp_utc": "2026-10-08T16:19:42.243717+00:00"
+    },
+    {
+      "elapsed_s": 113.25366160017438,
+      "id": 8,
+      "orbital_s": 4461.253661800176,
+      "phase": "target_start",
+      "timestamp_utc": "2026-10-08T16:19:42.254192+00:00"
+    },
+    {
+      "elapsed_s": 292.91241560014896,
+      "id": 9,
+      "orbital_s": 4640.912415900035,
+      "phase": "restore_initial",
+      "timestamp_utc": "2026-10-08T16:22:41.912945+00:00"
+    },
+    {
+      "elapsed_s": 323.1396270999685,
+      "id": 10,
+      "orbital_s": 4671.139627400087,
+      "phase": "freeze",
+      "timestamp_utc": "2026-10-08T16:23:12.140160+00:00"
+    },
+    {
+      "elapsed_s": 323.2230806001462,
+      "id": 11,
+      "orbital_s": 4671.223081500037,
+      "phase": "source_frozen",
+      "timestamp_utc": "2026-10-08T16:23:12.223614+00:00"
+    },
+    {
+      "artifact": {
+        "bytes": 15626,
+        "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\results\\runs\\run-bd559578930c4799b7c2e12afe326366\\operation\\delta-1.json",
+        "sha256": "c4347f68e69b4de851b8cf3536c2af4ef218e41167a324ee18132300ec299c09"
+      },
+      "elapsed_s": 324.1356743001379,
+      "id": 12,
+      "orbital_s": 4672.135675100144,
+      "payload": "delta-1.json",
+      "phase": "transfer",
+      "timestamp_utc": "2026-10-08T16:23:13.136207+00:00"
+    },
+    {
+      "elapsed_s": 324.17700410005637,
+      "id": 13,
+      "orbital_s": 4672.177004600177,
+      "payload": "delta-1.json",
+      "phase": "transfer_verified",
+      "receipt": {
+        "configured_rate_bps": 1000000000,
+        "elapsed_s": 0.02921409998089075,
+        "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\results\\runs\\run-bd559578930c4799b7c2e12afe326366\\received\\delta-1.json",
+        "received_bytes": 15626,
+        "receiver_elapsed_s": 0.0021866001188755035,
+        "sent_bytes": 15626,
+        "sha256": "c4347f68e69b4de851b8cf3536c2af4ef218e41167a324ee18132300ec299c09",
+        "tcp_retransmission_measurement": "unavailable on host transport",
+        "tcp_retransmissions": null,
+        "useful_throughput_bps": 4279029.649442188
+      },
+      "timestamp_utc": "2026-10-08T16:23:13.177539+00:00"
+    },
+    {
+      "elapsed_s": 324.18645650008693,
+      "id": 14,
+      "orbital_s": 4672.1864567000885,
+      "phase": "restore_delta",
+      "timestamp_utc": "2026-10-08T16:23:13.186995+00:00"
+    },
+    {
+      "elapsed_s": 331.7339449999854,
+      "id": 15,
+      "orbital_s": 4679.73394610011,
+      "phase": "verify",
+      "timestamp_utc": "2026-10-08T16:23:20.734474+00:00"
+    },
+    {
+      "attempt": 1,
+      "elapsed_s": 332.6363222000655,
+      "id": 16,
+      "orbital_s": 4680.636323400075,
+      "phase": "attempt_failed",
+      "reason": "API state equivalence failed: {'equivalent': False, 'mismatched_entity_types': ['connections'], 'actual': {'schema_version': 1, 'source_commit': 'fb8707871eba26806cac7ac373c70b2bb5bd26fc', 'entities': {'contexts': [{'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'name': 'migration-lab', 'service_ids': [{'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'service_uuid': {'uuid': 'c853520e-8776-5497-8d35-8a76147662e7'}}], 'slice_ids': [], 'topology_ids': [{'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}]}], 'devices': [{'components': [], 'controller_id': {}, 'device_config': {'config_rules': [{'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/address', 'resource_value': '172.25.0.3'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/port', 'resource_value': '52008'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/settings', 'resource_value': '{\"endpoints\": [], \"hw_ver\": \"BMv2\", \"id\": 8, \"name\": \"sat-53905\", \"p4bin\": \"/experiment/deploy/p4/bmv2.json\", \"p4info\": \"/experiment/deploy/p4/p4info.txt\", \"sw_ver\": \"simple_switch_grpc\", \"timeout\": 10, \"vendor\": \"P4.org\"}'}}]}, 'device_drivers': ['DEVICEDRIVER_P4'], 'device_endpoints': [], 'device_id': {'device_uuid': {'uuid': '0349d74d-abd3-5fd5-a744-b7fe6ad4f456'}}, 'device_operational_status': 'DEVICEOPERATIONALSTATUS_ENABLED', 'device_type': 'p4-switch', 'name': 'sat-53905'}, {'components': [], 'controller_id': {}, 'device_config': {'config_rules': [{'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/endpoints/endpoint[234a27b2-ca75-525e-89c6-ea70155b7454]', 'resource_value': '{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"234a27b2-ca75-525e-89c6-ea70155b7454\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/address', 'resource_value': '172.25.0.3'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/port', 'resource_value': '52011'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/settings', 'resource_value': '{\"endpoints\": [{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"234a27b2-ca75-525e-89c6-ea70155b7454\"}], \"hw_ver\": \"BMv2\", \"id\": 11, \"name\": \"sat-53912\", \"p4bin\": \"/experiment/deploy/p4/bmv2.json\", \"p4info\": \"/experiment/deploy/p4/p4info.txt\", \"sw_ver\": \"simple_switch_grpc\", \"timeout\": 10, \"vendor\": \"P4.org\"}'}}]}, 'device_drivers': ['DEVICEDRIVER_P4'], 'device_endpoints': [{'capabilities': {}, 'endpoint_id': {'device_id': {'device_uuid': {'uuid': '066a8a8f-5054-5d27-93cb-027d33168ff4'}}, 'endpoint_uuid': {'uuid': '234a27b2-ca75-525e-89c6-ea70155b7454'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}, 'endpoint_location': {}, 'endpoint_type': 'port', 'kpi_sample_types': [], 'name': '1'}], 'device_id': {'device_uuid': {'uuid': '066a8a8f-5054-5d27-93cb-027d33168ff4'}}, 'device_operational_status': 'DEVICEOPERATIONALSTATUS_ENABLED', 'device_type': 'p4-switch', 'name': 'sat-53912'}, {'components': [], 'controller_id': {}, 'device_config': {'config_rules': [{'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/address', 'resource_value': '172.25.0.3'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/port', 'resource_value': '52003'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/settings', 'resource_value': '{\"endpoints\": [], \"hw_ver\": \"BMv2\", \"id\": 3, \"name\": \"sat-53839\", \"p4bin\": \"/experiment/deploy/p4/bmv2.json\", \"p4info\": \"/experiment/deploy/p4/p4info.txt\", \"sw_ver\": \"simple_switch_grpc\", \"timeout\": 10, \"vendor\": \"P4.org\"}'}}]}, 'device_drivers': ['DEVICEDRIVER_P4'], 'device_endpoints': [], 'device_id': {'device_uuid': {'uuid': '15851e36-6dff-573d-a974-ce83d79ce7a4'}}, 'device_operational_status': 'DEVICEOPERATIONALSTATUS_ENABLED', 'device_type': 'p4-switch', 'name': 'sat-53839'}, {'components': [], 'controller_id': {}, 'device_config': {'config_rules': [{'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/endpoints/endpoint[053d81b9-195d-5b04-b02f-fadf0902bcef]', 'resource_value': '{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"053d81b9-195d-5b04-b02f-fadf0902bcef\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/address', 'resource_value': '172.25.0.3'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/port', 'resource_value': '52007'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/settings', 'resource_value': '{\"endpoints\": [{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"053d81b9-195d-5b04-b02f-fadf0902bcef\"}], \"hw_ver\": \"BMv2\", \"id\": 7, \"name\": \"sat-53853\", \"p4bin\": \"/experiment/deploy/p4/bmv2.json\", \"p4info\": \"/experiment/deploy/p4/p4info.txt\", \"sw_ver\": \"simple_switch_grpc\", \"timeout\": 10, \"vendor\": \"P4.org\"}'}}]}, 'device_drivers': ['DEVICEDRIVER_P4'], 'device_endpoints': [{'capabilities': {}, 'endpoint_id': {'device_id': {'device_uuid': {'uuid': '173da48c-bcb9-50d0-9cf5-1ba9762da1d2'}}, 'endpoint_uuid': {'uuid': '053d81b9-195d-5b04-b02f-fadf0902bcef'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}, 'endpoint_location': {}, 'endpoint_type': 'port', 'kpi_sample_types': [], 'name': '1'}], 'device_id': {'device_uuid': {'uuid': '173da48c-bcb9-50d0-9cf5-1ba9762da1d2'}}, 'device_operational_status': 'DEVICEOPERATIONALSTATUS_ENABLED', 'device_type': 'p4-switch', 'name': 'sat-53853'}, {'components': [], 'controller_id': {}, 'device_config': {'config_rules': [{'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/address', 'resource_value': '172.25.0.3'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/port', 'resource_value': '52017'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/settings', 'resource_value': '{\"endpoints\": [], \"hw_ver\": \"BMv2\", \"id\": 17, \"name\": \"sat-54060\", \"p4bin\": \"/experiment/deploy/p4/bmv2.json\", \"p4info\": \"/experiment/deploy/p4/p4info.txt\", \"sw_ver\": \"simple_switch_grpc\", \"timeout\": 10, \"vendor\": \"P4.org\"}'}}]}, 'device_drivers': ['DEVICEDRIVER_P4'], 'device_endpoints': [], 'device_id': {'device_uuid': {'uuid': '1abb2f2b-e859-54ac-9cbc-7154daa53925'}}, 'device_operational_status': 'DEVICEOPERATIONALSTATUS_ENABLED', 'device_type': 'p4-switch', 'name': 'sat-54060'}, {'components': [], 'controller_id': {}, 'device_config': {'config_rules': [{'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/endpoints/endpoint[822a7ac5-934a-51e0-9dfa-12f787eaf8ea]', 'resource_value': '{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"822a7ac5-934a-51e0-9dfa-12f787eaf8ea\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/address', 'resource_value': '172.25.0.3'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/port', 'resource_value': '52002'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/settings', 'resource_value': '{\"endpoints\": [{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"822a7ac5-934a-51e0-9dfa-12f787eaf8ea\"}], \"hw_ver\": \"BMv2\", \"id\": 2, \"name\": \"sat-53838\", \"p4bin\": \"/experiment/deploy/p4/bmv2.json\", \"p4info\": \"/experiment/deploy/p4/p4info.txt\", \"sw_ver\": \"simple_switch_grpc\", \"timeout\": 10, \"vendor\": \"P4.org\"}'}}]}, 'device_drivers': ['DEVICEDRIVER_P4'], 'device_endpoints': [{'capabilities': {}, 'endpoint_id': {'device_id': {'device_uuid': {'uuid': '37c8b228-467f-545a-becb-c90293434dcb'}}, 'endpoint_uuid': {'uuid': '822a7ac5-934a-51e0-9dfa-12f787eaf8ea'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}, 'endpoint_location': {}, 'endpoint_type': 'port', 'kpi_sample_types': [], 'name': '1'}], 'device_id': {'device_uuid': {'uuid': '37c8b228-467f-545a-becb-c90293434dcb'}}, 'device_operational_status': 'DEVICEOPERATIONALSTATUS_ENABLED', 'device_type': 'p4-switch', 'name': 'sat-53838'}, {'components': [], 'controller_id': {}, 'device_config': {'config_rules': [{'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/address', 'resource_value': '172.25.0.3'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/port', 'resource_value': '52013'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/settings', 'resource_value': '{\"endpoints\": [], \"hw_ver\": \"BMv2\", \"id\": 13, \"name\": \"sat-53918\", \"p4bin\": \"/experiment/deploy/p4/bmv2.json\", \"p4info\": \"/experiment/deploy/p4/p4info.txt\", \"sw_ver\": \"simple_switch_grpc\", \"timeout\": 10, \"vendor\": \"P4.org\"}'}}]}, 'device_drivers': ['DEVICEDRIVER_P4'], 'device_endpoints': [], 'device_id': {'device_uuid': {'uuid': '3a68d6f6-c4be-518c-b59d-dae3d8272b8d'}}, 'device_operational_status': 'DEVICEOPERATIONALSTATUS_ENABLED', 'device_type': 'p4-switch', 'name': 'sat-53918'}, {'components': [], 'controller_id': {}, 'device_config': {'config_rules': [{'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/address', 'resource_value': '172.25.0.3'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/port', 'resource_value': '52014'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/settings', 'resource_value': '{\"endpoints\": [], \"hw_ver\": \"BMv2\", \"id\": 14, \"name\": \"sat-53922\", \"p4bin\": \"/experiment/deploy/p4/bmv2.json\", \"p4info\": \"/experiment/deploy/p4/p4info.txt\", \"sw_ver\": \"simple_switch_grpc\", \"timeout\": 10, \"vendor\": \"P4.org\"}'}}]}, 'device_drivers': ['DEVICEDRIVER_P4'], 'device_endpoints': [], 'device_id': {'device_uuid': {'uuid': '4c1c070a-c0e6-5a33-be77-951961ed64f4'}}, 'device_operational_status': 'DEVICEOPERATIONALSTATUS_ENABLED', 'device_type': 'p4-switch', 'name': 'sat-53922'}, {'components': [], 'controller_id': {}, 'device_config': {'config_rules': [{'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/address', 'resource_value': '172.25.0.3'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/port', 'resource_value': '52015'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/settings', 'resource_value': '{\"endpoints\": [], \"hw_ver\": \"BMv2\", \"id\": 15, \"name\": \"sat-53923\", \"p4bin\": \"/experiment/deploy/p4/bmv2.json\", \"p4info\": \"/experiment/deploy/p4/p4info.txt\", \"sw_ver\": \"simple_switch_grpc\", \"timeout\": 10, \"vendor\": \"P4.org\"}'}}]}, 'device_drivers': ['DEVICEDRIVER_P4'], 'device_endpoints': [], 'device_id': {'device_uuid': {'uuid': '6d39493a-617d-54aa-aa8b-91930581c2b9'}}, 'device_operational_status': 'DEVICEOPERATIONALSTATUS_ENABLED', 'device_type': 'p4-switch', 'name': 'sat-53923'}, {'components': [], 'controller_id': {}, 'device_config': {'config_rules': [{'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/endpoints/endpoint[d1c5912b-d268-58a1-883d-d915199d5bd4]', 'resource_value': '{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"d1c5912b-d268-58a1-883d-d915199d5bd4\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/address', 'resource_value': '172.25.0.3'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/port', 'resource_value': '52005'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/settings', 'resource_value': '{\"endpoints\": [{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"d1c5912b-d268-58a1-883d-d915199d5bd4\"}], \"hw_ver\": \"BMv2\", \"id\": 5, \"name\": \"sat-53847\", \"p4bin\": \"/experiment/deploy/p4/bmv2.json\", \"p4info\": \"/experiment/deploy/p4/p4info.txt\", \"sw_ver\": \"simple_switch_grpc\", \"timeout\": 10, \"vendor\": \"P4.org\"}'}}]}, 'device_drivers': ['DEVICEDRIVER_P4'], 'device_endpoints': [{'capabilities': {}, 'endpoint_id': {'device_id': {'device_uuid': {'uuid': '74dd61b5-22ec-5fc1-b3e9-7ed38c946398'}}, 'endpoint_uuid': {'uuid': 'd1c5912b-d268-58a1-883d-d915199d5bd4'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}, 'endpoint_location': {}, 'endpoint_type': 'port', 'kpi_sample_types': [], 'name': '1'}], 'device_id': {'device_uuid': {'uuid': '74dd61b5-22ec-5fc1-b3e9-7ed38c946398'}}, 'device_operational_status': 'DEVICEOPERATIONALSTATUS_ENABLED', 'device_type': 'p4-switch', 'name': 'sat-53847'}, {'components': [], 'controller_id': {}, 'device_config': {'config_rules': [{'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/endpoints/endpoint[0de2aa27-87f3-584f-858c-7b3d7ec054be]', 'resource_value': '{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"2\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"0de2aa27-87f3-584f-858c-7b3d7ec054be\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/endpoints/endpoint[a01396b9-ae0e-5f68-934a-4d5dacf11b38]', 'resource_value': '{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"a01396b9-ae0e-5f68-934a-4d5dacf11b38\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/endpoints/endpoint[d478f12b-89f4-5e72-8896-0d3d51960a9b]', 'resource_value': '{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"3\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"d478f12b-89f4-5e72-8896-0d3d51960a9b\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/address', 'resource_value': '172.25.0.3'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/port', 'resource_value': '52001'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/settings', 'resource_value': '{\"endpoints\": [{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"a01396b9-ae0e-5f68-934a-4d5dacf11b38\"}, {\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"2\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"0de2aa27-87f3-584f-858c-7b3d7ec054be\"}, {\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"3\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"d478f12b-89f4-5e72-8896-0d3d51960a9b\"}], \"hw_ver\": \"BMv2\", \"id\": 1, \"name\": \"sat-51726\", \"p4bin\": \"/experiment/deploy/p4/bmv2.json\", \"p4info\": \"/experiment/deploy/p4/p4info.txt\", \"sw_ver\": \"simple_switch_grpc\", \"timeout\": 10, \"vendor\": \"P4.org\"}'}}]}, 'device_drivers': ['DEVICEDRIVER_P4'], 'device_endpoints': [{'capabilities': {}, 'endpoint_id': {'device_id': {'device_uuid': {'uuid': 'a8d87244-5adb-5c45-8f9a-148c6008d4ba'}}, 'endpoint_uuid': {'uuid': '0de2aa27-87f3-584f-858c-7b3d7ec054be'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}, 'endpoint_location': {}, 'endpoint_type': 'port', 'kpi_sample_types': [], 'name': '2'}, {'capabilities': {}, 'endpoint_id': {'device_id': {'device_uuid': {'uuid': 'a8d87244-5adb-5c45-8f9a-148c6008d4ba'}}, 'endpoint_uuid': {'uuid': 'a01396b9-ae0e-5f68-934a-4d5dacf11b38'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}, 'endpoint_location': {}, 'endpoint_type': 'port', 'kpi_sample_types': [], 'name': '1'}, {'capabilities': {}, 'endpoint_id': {'device_id': {'device_uuid': {'uuid': 'a8d87244-5adb-5c45-8f9a-148c6008d4ba'}}, 'endpoint_uuid': {'uuid': 'd478f12b-89f4-5e72-8896-0d3d51960a9b'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}, 'endpoint_location': {}, 'endpoint_type': 'port', 'kpi_sample_types': [], 'name': '3'}], 'device_id': {'device_uuid': {'uuid': 'a8d87244-5adb-5c45-8f9a-148c6008d4ba'}}, 'device_operational_status': 'DEVICEOPERATIONALSTATUS_ENABLED', 'device_type': 'p4-switch', 'name': 'sat-51726'}, {'components': [], 'controller_id': {}, 'device_config': {'config_rules': [{'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/endpoints/endpoint[67bbbfc5-6582-57cc-aafc-65f41ded6985]', 'resource_value': '{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"67bbbfc5-6582-57cc-aafc-65f41ded6985\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/address', 'resource_value': '172.25.0.3'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/port', 'resource_value': '52010'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/settings', 'resource_value': '{\"endpoints\": [{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"67bbbfc5-6582-57cc-aafc-65f41ded6985\"}], \"hw_ver\": \"BMv2\", \"id\": 10, \"name\": \"sat-53911\", \"p4bin\": \"/experiment/deploy/p4/bmv2.json\", \"p4info\": \"/experiment/deploy/p4/p4info.txt\", \"sw_ver\": \"simple_switch_grpc\", \"timeout\": 10, \"vendor\": \"P4.org\"}'}}]}, 'device_drivers': ['DEVICEDRIVER_P4'], 'device_endpoints': [{'capabilities': {}, 'endpoint_id': {'device_id': {'device_uuid': {'uuid': 'b05c48c7-fd4e-519e-8dfe-4c2f16052413'}}, 'endpoint_uuid': {'uuid': '67bbbfc5-6582-57cc-aafc-65f41ded6985'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}, 'endpoint_location': {}, 'endpoint_type': 'port', 'kpi_sample_types': [], 'name': '1'}], 'device_id': {'device_uuid': {'uuid': 'b05c48c7-fd4e-519e-8dfe-4c2f16052413'}}, 'device_operational_status': 'DEVICEOPERATIONALSTATUS_ENABLED', 'device_type': 'p4-switch', 'name': 'sat-53911'}, {'components': [], 'controller_id': {}, 'device_config': {'config_rules': [{'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/address', 'resource_value': '172.25.0.3'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/port', 'resource_value': '52016'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/settings', 'resource_value': '{\"endpoints\": [], \"hw_ver\": \"BMv2\", \"id\": 16, \"name\": \"sat-53925\", \"p4bin\": \"/experiment/deploy/p4/bmv2.json\", \"p4info\": \"/experiment/deploy/p4/p4info.txt\", \"sw_ver\": \"simple_switch_grpc\", \"timeout\": 10, \"vendor\": \"P4.org\"}'}}]}, 'device_drivers': ['DEVICEDRIVER_P4'], 'device_endpoints': [], 'device_id': {'device_uuid': {'uuid': 'b0ee1ac1-2567-5bb6-bd7c-9e54681df60c'}}, 'device_operational_status': 'DEVICEOPERATIONALSTATUS_ENABLED', 'device_type': 'p4-switch', 'name': 'sat-53925'}, {'components': [], 'controller_id': {}, 'device_config': {'config_rules': [{'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/endpoints/endpoint[fcfff2a6-fbfe-5304-99d3-4cab3fe6c426]', 'resource_value': '{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"fcfff2a6-fbfe-5304-99d3-4cab3fe6c426\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/address', 'resource_value': '172.25.0.3'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/port', 'resource_value': '52004'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/settings', 'resource_value': '{\"endpoints\": [{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"fcfff2a6-fbfe-5304-99d3-4cab3fe6c426\"}], \"hw_ver\": \"BMv2\", \"id\": 4, \"name\": \"sat-53843\", \"p4bin\": \"/experiment/deploy/p4/bmv2.json\", \"p4info\": \"/experiment/deploy/p4/p4info.txt\", \"sw_ver\": \"simple_switch_grpc\", \"timeout\": 10, \"vendor\": \"P4.org\"}'}}]}, 'device_drivers': ['DEVICEDRIVER_P4'], 'device_endpoints': [{'capabilities': {}, 'endpoint_id': {'device_id': {'device_uuid': {'uuid': 'e52f4461-50fa-5785-9352-898ef4ae9676'}}, 'endpoint_uuid': {'uuid': 'fcfff2a6-fbfe-5304-99d3-4cab3fe6c426'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}, 'endpoint_location': {}, 'endpoint_type': 'port', 'kpi_sample_types': [], 'name': '1'}], 'device_id': {'device_uuid': {'uuid': 'e52f4461-50fa-5785-9352-898ef4ae9676'}}, 'device_operational_status': 'DEVICEOPERATIONALSTATUS_ENABLED', 'device_type': 'p4-switch', 'name': 'sat-53843'}, {'components': [], 'controller_id': {}, 'device_config': {'config_rules': [{'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/action_profiles/action_profile/FabricIngress.next.hashed_profile[2424891933]', 'resource_value': '{\"action-name\": \"FabricIngress.next.output_hashed\", \"action-params\": [{\"action-param\": \"port_num\", \"action-value\": \"2\"}], \"action-profile-name\": \"FabricIngress.next.hashed_profile\", \"member-id\": 2}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/action_profiles/action_profile/FabricIngress.next.hashed_profile[535135288]', 'resource_value': '{\"action-name\": \"FabricIngress.next.output_hashed\", \"action-params\": [{\"action-param\": \"port_num\", \"action-value\": \"3\"}], \"action-profile-name\": \"FabricIngress.next.hashed_profile\", \"member-id\": 3}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/endpoints/endpoint[272140a8-e251-59d5-a5db-e70736f2465e]', 'resource_value': '{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"3\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"272140a8-e251-59d5-a5db-e70736f2465e\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/endpoints/endpoint[8c438986-e2f4-5e22-b764-40b32bed6ad9]', 'resource_value': '{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"2\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"8c438986-e2f4-5e22-b764-40b32bed6ad9\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/endpoints/endpoint[d6150c59-bd0c-5745-88b7-b3036a694457]', 'resource_value': '{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"d6150c59-bd0c-5745-88b7-b3036a694457\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/tables/table/FabricEgress.egress_next.egress_vlan[1096091533]', 'resource_value': '{\"action-name\": \"FabricEgress.egress_next.pop_vlan\", \"action-params\": [], \"match-fields\": [{\"match-field\": \"eg_port\", \"match-value\": \"2\"}, {\"match-field\": \"vlan_id\", \"match-value\": \"4094\"}], \"table-name\": \"FabricEgress.egress_next.egress_vlan\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/tables/table/FabricEgress.egress_next.egress_vlan[2052000486]', 'resource_value': '{\"action-name\": \"FabricEgress.egress_next.pop_vlan\", \"action-params\": [], \"match-fields\": [{\"match-field\": \"eg_port\", \"match-value\": \"3\"}, {\"match-field\": \"vlan_id\", \"match-value\": \"4094\"}], \"table-name\": \"FabricEgress.egress_next.egress_vlan\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/tables/table/FabricIngress.filtering.fwd_classifier[1403892410]', 'resource_value': '{\"action-name\": \"FabricIngress.filtering.set_forwarding_type\", \"action-params\": [{\"action-param\": \"fwd_type\", \"action-value\": \"0\"}], \"match-fields\": [{\"match-field\": \"ig_port\", \"match-value\": \"2\"}, {\"match-field\": \"ip_eth_type\", \"match-value\": \"0x0800\"}], \"priority\": 1, \"table-name\": \"FabricIngress.filtering.fwd_classifier\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/tables/table/FabricIngress.filtering.fwd_classifier[2365748572]', 'resource_value': '{\"action-name\": \"FabricIngress.filtering.set_forwarding_type\", \"action-params\": [{\"action-param\": \"fwd_type\", \"action-value\": \"0\"}], \"match-fields\": [{\"match-field\": \"ig_port\", \"match-value\": \"3\"}, {\"match-field\": \"ip_eth_type\", \"match-value\": \"0x0800\"}], \"priority\": 1, \"table-name\": \"FabricIngress.filtering.fwd_classifier\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/tables/table/FabricIngress.filtering.ingress_port_vlan[4264497440]', 'resource_value': '{\"action-name\": \"FabricIngress.filtering.permit_with_internal_vlan\", \"action-params\": [{\"action-param\": \"port_type\", \"action-value\": \"1\"}, {\"action-param\": \"vlan_id\", \"action-value\": \"4094\"}], \"match-fields\": [{\"match-field\": \"ig_port\", \"match-value\": \"3\"}, {\"match-field\": \"vlan_is_valid\", \"match-value\": \"0\"}], \"priority\": 10, \"table-name\": \"FabricIngress.filtering.ingress_port_vlan\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/tables/table/FabricIngress.filtering.ingress_port_vlan[84188955]', 'resource_value': '{\"action-name\": \"FabricIngress.filtering.permit_with_internal_vlan\", \"action-params\": [{\"action-param\": \"port_type\", \"action-value\": \"2\"}, {\"action-param\": \"vlan_id\", \"action-value\": \"4094\"}], \"match-fields\": [{\"match-field\": \"ig_port\", \"match-value\": \"2\"}, {\"match-field\": \"vlan_is_valid\", \"match-value\": \"0\"}], \"priority\": 10, \"table-name\": \"FabricIngress.filtering.ingress_port_vlan\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/tables/table/FabricIngress.forwarding.bridging[3234750734]', 'resource_value': '{\"action-name\": \"FabricIngress.forwarding.set_next_id_bridging\", \"action-params\": [{\"action-param\": \"next_id\", \"action-value\": \"3\"}], \"match-fields\": [{\"match-field\": \"vlan_id\", \"match-value\": \"4094\"}, {\"match-field\": \"eth_dst\", \"match-value\": \"00:00:00:00:00:02\"}], \"priority\": 1, \"table-name\": \"FabricIngress.forwarding.bridging\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/tables/table/FabricIngress.forwarding.bridging[4161414]', 'resource_value': '{\"action-name\": \"FabricIngress.forwarding.set_next_id_bridging\", \"action-params\": [{\"action-param\": \"next_id\", \"action-value\": \"2\"}], \"match-fields\": [{\"match-field\": \"vlan_id\", \"match-value\": \"4094\"}, {\"match-field\": \"eth_dst\", \"match-value\": \"00:00:00:00:00:01\"}], \"priority\": 1, \"table-name\": \"FabricIngress.forwarding.bridging\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/tables/table/FabricIngress.next.hashed[2199619772]', 'resource_value': '{\"match-fields\": [{\"match-field\": \"next_id\", \"match-value\": \"3\"}], \"member-id\": 3, \"table-name\": \"FabricIngress.next.hashed\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/tables/table/FabricIngress.next.hashed[4030187307]', 'resource_value': '{\"match-fields\": [{\"match-field\": \"next_id\", \"match-value\": \"2\"}], \"member-id\": 2, \"table-name\": \"FabricIngress.next.hashed\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/address', 'resource_value': '172.25.0.3'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/port', 'resource_value': '52012'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/settings', 'resource_value': '{\"endpoints\": [{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"d6150c59-bd0c-5745-88b7-b3036a694457\"}, {\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"2\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"8c438986-e2f4-5e22-b764-40b32bed6ad9\"}, {\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"3\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"272140a8-e251-59d5-a5db-e70736f2465e\"}], \"hw_ver\": \"BMv2\", \"id\": 12, \"name\": \"sat-53913\", \"p4bin\": \"/experiment/deploy/p4/bmv2.json\", \"p4info\": \"/experiment/deploy/p4/p4info.txt\", \"sw_ver\": \"simple_switch_grpc\", \"timeout\": 10, \"vendor\": \"P4.org\"}'}}]}, 'device_drivers': ['DEVICEDRIVER_P4'], 'device_endpoints': [{'capabilities': {}, 'endpoint_id': {'device_id': {'device_uuid': {'uuid': 'e65cd631-994c-5849-ab56-5904c0f55c3d'}}, 'endpoint_uuid': {'uuid': '272140a8-e251-59d5-a5db-e70736f2465e'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}, 'endpoint_location': {}, 'endpoint_type': 'port', 'kpi_sample_types': [], 'name': '3'}, {'capabilities': {}, 'endpoint_id': {'device_id': {'device_uuid': {'uuid': 'e65cd631-994c-5849-ab56-5904c0f55c3d'}}, 'endpoint_uuid': {'uuid': '8c438986-e2f4-5e22-b764-40b32bed6ad9'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}, 'endpoint_location': {}, 'endpoint_type': 'port', 'kpi_sample_types': [], 'name': '2'}, {'capabilities': {}, 'endpoint_id': {'device_id': {'device_uuid': {'uuid': 'e65cd631-994c-5849-ab56-5904c0f55c3d'}}, 'endpoint_uuid': {'uuid': 'd6150c59-bd0c-5745-88b7-b3036a694457'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}, 'endpoint_location': {}, 'endpoint_type': 'port', 'kpi_sample_types': [], 'name': '1'}], 'device_id': {'device_uuid': {'uuid': 'e65cd631-994c-5849-ab56-5904c0f55c3d'}}, 'device_operational_status': 'DEVICEOPERATIONALSTATUS_ENABLED', 'device_type': 'p4-switch', 'name': 'sat-53913'}, {'components': [], 'controller_id': {}, 'device_config': {'config_rules': [{'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/action_profiles/action_profile/FabricIngress.next.hashed_profile[2424891933]', 'resource_value': '{\"action-name\": \"FabricIngress.next.output_hashed\", \"action-params\": [{\"action-param\": \"port_num\", \"action-value\": \"2\"}], \"action-profile-name\": \"FabricIngress.next.hashed_profile\", \"member-id\": 2}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/action_profiles/action_profile/FabricIngress.next.hashed_profile[535135288]', 'resource_value': '{\"action-name\": \"FabricIngress.next.output_hashed\", \"action-params\": [{\"action-param\": \"port_num\", \"action-value\": \"3\"}], \"action-profile-name\": \"FabricIngress.next.hashed_profile\", \"member-id\": 3}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/endpoints/endpoint[0e335612-6de7-5dbb-9cb3-c62b0e7d237f]', 'resource_value': '{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"0e335612-6de7-5dbb-9cb3-c62b0e7d237f\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/endpoints/endpoint[20c235d3-36c3-5495-80c9-569eda225167]', 'resource_value': '{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"2\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"20c235d3-36c3-5495-80c9-569eda225167\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/endpoints/endpoint[c335c8d5-aaf1-5b81-b54b-7a0a0ea6daa8]', 'resource_value': '{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"3\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"c335c8d5-aaf1-5b81-b54b-7a0a0ea6daa8\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/tables/table/FabricEgress.egress_next.egress_vlan[1096091533]', 'resource_value': '{\"action-name\": \"FabricEgress.egress_next.pop_vlan\", \"action-params\": [], \"match-fields\": [{\"match-field\": \"eg_port\", \"match-value\": \"2\"}, {\"match-field\": \"vlan_id\", \"match-value\": \"4094\"}], \"table-name\": \"FabricEgress.egress_next.egress_vlan\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/tables/table/FabricEgress.egress_next.egress_vlan[2052000486]', 'resource_value': '{\"action-name\": \"FabricEgress.egress_next.pop_vlan\", \"action-params\": [], \"match-fields\": [{\"match-field\": \"eg_port\", \"match-value\": \"3\"}, {\"match-field\": \"vlan_id\", \"match-value\": \"4094\"}], \"table-name\": \"FabricEgress.egress_next.egress_vlan\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/tables/table/FabricIngress.filtering.fwd_classifier[1403892410]', 'resource_value': '{\"action-name\": \"FabricIngress.filtering.set_forwarding_type\", \"action-params\": [{\"action-param\": \"fwd_type\", \"action-value\": \"0\"}], \"match-fields\": [{\"match-field\": \"ig_port\", \"match-value\": \"2\"}, {\"match-field\": \"ip_eth_type\", \"match-value\": \"0x0800\"}], \"priority\": 1, \"table-name\": \"FabricIngress.filtering.fwd_classifier\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/tables/table/FabricIngress.filtering.fwd_classifier[2365748572]', 'resource_value': '{\"action-name\": \"FabricIngress.filtering.set_forwarding_type\", \"action-params\": [{\"action-param\": \"fwd_type\", \"action-value\": \"0\"}], \"match-fields\": [{\"match-field\": \"ig_port\", \"match-value\": \"3\"}, {\"match-field\": \"ip_eth_type\", \"match-value\": \"0x0800\"}], \"priority\": 1, \"table-name\": \"FabricIngress.filtering.fwd_classifier\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/tables/table/FabricIngress.filtering.ingress_port_vlan[4264497440]', 'resource_value': '{\"action-name\": \"FabricIngress.filtering.permit_with_internal_vlan\", \"action-params\": [{\"action-param\": \"port_type\", \"action-value\": \"1\"}, {\"action-param\": \"vlan_id\", \"action-value\": \"4094\"}], \"match-fields\": [{\"match-field\": \"ig_port\", \"match-value\": \"3\"}, {\"match-field\": \"vlan_is_valid\", \"match-value\": \"0\"}], \"priority\": 10, \"table-name\": \"FabricIngress.filtering.ingress_port_vlan\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/tables/table/FabricIngress.filtering.ingress_port_vlan[84188955]', 'resource_value': '{\"action-name\": \"FabricIngress.filtering.permit_with_internal_vlan\", \"action-params\": [{\"action-param\": \"port_type\", \"action-value\": \"2\"}, {\"action-param\": \"vlan_id\", \"action-value\": \"4094\"}], \"match-fields\": [{\"match-field\": \"ig_port\", \"match-value\": \"2\"}, {\"match-field\": \"vlan_is_valid\", \"match-value\": \"0\"}], \"priority\": 10, \"table-name\": \"FabricIngress.filtering.ingress_port_vlan\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/tables/table/FabricIngress.forwarding.bridging[4030056975]', 'resource_value': '{\"action-name\": \"FabricIngress.forwarding.set_next_id_bridging\", \"action-params\": [{\"action-param\": \"next_id\", \"action-value\": \"3\"}], \"match-fields\": [{\"match-field\": \"vlan_id\", \"match-value\": \"4094\"}, {\"match-field\": \"eth_dst\", \"match-value\": \"00:00:00:00:00:01\"}], \"priority\": 1, \"table-name\": \"FabricIngress.forwarding.bridging\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/tables/table/FabricIngress.forwarding.bridging[4052770857]', 'resource_value': '{\"action-name\": \"FabricIngress.forwarding.set_next_id_bridging\", \"action-params\": [{\"action-param\": \"next_id\", \"action-value\": \"2\"}], \"match-fields\": [{\"match-field\": \"vlan_id\", \"match-value\": \"4094\"}, {\"match-field\": \"eth_dst\", \"match-value\": \"00:00:00:00:00:02\"}], \"priority\": 1, \"table-name\": \"FabricIngress.forwarding.bridging\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/tables/table/FabricIngress.next.hashed[2199619772]', 'resource_value': '{\"match-fields\": [{\"match-field\": \"next_id\", \"match-value\": \"3\"}], \"member-id\": 3, \"table-name\": \"FabricIngress.next.hashed\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/tables/table/FabricIngress.next.hashed[4030187307]', 'resource_value': '{\"match-fields\": [{\"match-field\": \"next_id\", \"match-value\": \"2\"}], \"member-id\": 2, \"table-name\": \"FabricIngress.next.hashed\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/address', 'resource_value': '172.25.0.3'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/port', 'resource_value': '52006'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/settings', 'resource_value': '{\"endpoints\": [{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"0e335612-6de7-5dbb-9cb3-c62b0e7d237f\"}, {\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"2\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"20c235d3-36c3-5495-80c9-569eda225167\"}, {\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"3\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"c335c8d5-aaf1-5b81-b54b-7a0a0ea6daa8\"}], \"hw_ver\": \"BMv2\", \"id\": 6, \"name\": \"sat-53848\", \"p4bin\": \"/experiment/deploy/p4/bmv2.json\", \"p4info\": \"/experiment/deploy/p4/p4info.txt\", \"sw_ver\": \"simple_switch_grpc\", \"timeout\": 10, \"vendor\": \"P4.org\"}'}}]}, 'device_drivers': ['DEVICEDRIVER_P4'], 'device_endpoints': [{'capabilities': {}, 'endpoint_id': {'device_id': {'device_uuid': {'uuid': 'f7f1379d-0550-5a69-b6b5-9a7801028621'}}, 'endpoint_uuid': {'uuid': '0e335612-6de7-5dbb-9cb3-c62b0e7d237f'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}, 'endpoint_location': {}, 'endpoint_type': 'port', 'kpi_sample_types': [], 'name': '1'}, {'capabilities': {}, 'endpoint_id': {'device_id': {'device_uuid': {'uuid': 'f7f1379d-0550-5a69-b6b5-9a7801028621'}}, 'endpoint_uuid': {'uuid': '20c235d3-36c3-5495-80c9-569eda225167'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}, 'endpoint_location': {}, 'endpoint_type': 'port', 'kpi_sample_types': [], 'name': '2'}, {'capabilities': {}, 'endpoint_id': {'device_id': {'device_uuid': {'uuid': 'f7f1379d-0550-5a69-b6b5-9a7801028621'}}, 'endpoint_uuid': {'uuid': 'c335c8d5-aaf1-5b81-b54b-7a0a0ea6daa8'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}, 'endpoint_location': {}, 'endpoint_type': 'port', 'kpi_sample_types': [], 'name': '3'}], 'device_id': {'device_uuid': {'uuid': 'f7f1379d-0550-5a69-b6b5-9a7801028621'}}, 'device_operational_status': 'DEVICEOPERATIONALSTATUS_ENABLED', 'device_type': 'p4-switch', 'name': 'sat-53848'}, {'components': [], 'controller_id': {}, 'device_config': {'config_rules': [{'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/endpoints/endpoint[8c3b4cdf-f629-54af-999f-c320570ade8c]', 'resource_value': '{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"8c3b4cdf-f629-54af-999f-c320570ade8c\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/address', 'resource_value': '172.25.0.3'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/port', 'resource_value': '52009'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '_connect/settings', 'resource_value': '{\"endpoints\": [{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"8c3b4cdf-f629-54af-999f-c320570ade8c\"}], \"hw_ver\": \"BMv2\", \"id\": 9, \"name\": \"sat-53906\", \"p4bin\": \"/experiment/deploy/p4/bmv2.json\", \"p4info\": \"/experiment/deploy/p4/p4info.txt\", \"sw_ver\": \"simple_switch_grpc\", \"timeout\": 10, \"vendor\": \"P4.org\"}'}}]}, 'device_drivers': ['DEVICEDRIVER_P4'], 'device_endpoints': [{'capabilities': {}, 'endpoint_id': {'device_id': {'device_uuid': {'uuid': 'ffca8322-e8a3-5833-8f17-300982a6a638'}}, 'endpoint_uuid': {'uuid': '8c3b4cdf-f629-54af-999f-c320570ade8c'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}, 'endpoint_location': {}, 'endpoint_type': 'port', 'kpi_sample_types': [], 'name': '1'}], 'device_id': {'device_uuid': {'uuid': 'ffca8322-e8a3-5833-8f17-300982a6a638'}}, 'device_operational_status': 'DEVICEOPERATIONALSTATUS_ENABLED', 'device_type': 'p4-switch', 'name': 'sat-53906'}], 'links': [{'attributes': {'is_bidirectional': False, 'total_capacity_gbps': 0.0, 'used_capacity_gbps': 0.0}, 'link_endpoint_ids': [{'device_id': {'device_uuid': {'uuid': 'f7f1379d-0550-5a69-b6b5-9a7801028621'}}, 'endpoint_uuid': {'uuid': '20c235d3-36c3-5495-80c9-569eda225167'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}, {'device_id': {'device_uuid': {'uuid': 'e65cd631-994c-5849-ab56-5904c0f55c3d'}}, 'endpoint_uuid': {'uuid': '8c438986-e2f4-5e22-b764-40b32bed6ad9'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}], 'link_id': {'link_uuid': {'uuid': '08ff9af0-7016-5986-abc2-27b8f419c63a'}}, 'link_type': 'LINKTYPE_RADIO', 'name': 'isl-53848-53913'}, {'attributes': {'is_bidirectional': False, 'total_capacity_gbps': 0.0, 'used_capacity_gbps': 0.0}, 'link_endpoint_ids': [{'device_id': {'device_uuid': {'uuid': '066a8a8f-5054-5d27-93cb-027d33168ff4'}}, 'endpoint_uuid': {'uuid': '234a27b2-ca75-525e-89c6-ea70155b7454'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}, {'device_id': {'device_uuid': {'uuid': 'e52f4461-50fa-5785-9352-898ef4ae9676'}}, 'endpoint_uuid': {'uuid': 'fcfff2a6-fbfe-5304-99d3-4cab3fe6c426'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}], 'link_id': {'link_uuid': {'uuid': '2984ccfc-0b9b-5716-a6bf-e390d041c51d'}}, 'link_type': 'LINKTYPE_RADIO', 'name': 'isl-53912-53843'}, {'attributes': {'is_bidirectional': False, 'total_capacity_gbps': 0.0, 'used_capacity_gbps': 0.0}, 'link_endpoint_ids': [{'device_id': {'device_uuid': {'uuid': 'f7f1379d-0550-5a69-b6b5-9a7801028621'}}, 'endpoint_uuid': {'uuid': '0e335612-6de7-5dbb-9cb3-c62b0e7d237f'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}, {'device_id': {'device_uuid': {'uuid': 'a8d87244-5adb-5c45-8f9a-148c6008d4ba'}}, 'endpoint_uuid': {'uuid': 'a01396b9-ae0e-5f68-934a-4d5dacf11b38'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}], 'link_id': {'link_uuid': {'uuid': '2c4e2839-4591-530c-b6a6-6b394052ee3a'}}, 'link_type': 'LINKTYPE_RADIO', 'name': 'isl-53848-51726'}, {'attributes': {'is_bidirectional': False, 'total_capacity_gbps': 0.0, 'used_capacity_gbps': 0.0}, 'link_endpoint_ids': [{'device_id': {'device_uuid': {'uuid': 'e52f4461-50fa-5785-9352-898ef4ae9676'}}, 'endpoint_uuid': {'uuid': 'fcfff2a6-fbfe-5304-99d3-4cab3fe6c426'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}, {'device_id': {'device_uuid': {'uuid': '066a8a8f-5054-5d27-93cb-027d33168ff4'}}, 'endpoint_uuid': {'uuid': '234a27b2-ca75-525e-89c6-ea70155b7454'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}], 'link_id': {'link_uuid': {'uuid': '73ac1027-291b-522a-af8c-276b79cf997c'}}, 'link_type': 'LINKTYPE_RADIO', 'name': 'isl-53843-53912'}, {'attributes': {'is_bidirectional': False, 'total_capacity_gbps': 0.0, 'used_capacity_gbps': 0.0}, 'link_endpoint_ids': [{'device_id': {'device_uuid': {'uuid': 'e65cd631-994c-5849-ab56-5904c0f55c3d'}}, 'endpoint_uuid': {'uuid': 'd6150c59-bd0c-5745-88b7-b3036a694457'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}, {'device_id': {'device_uuid': {'uuid': 'a8d87244-5adb-5c45-8f9a-148c6008d4ba'}}, 'endpoint_uuid': {'uuid': 'd478f12b-89f4-5e72-8896-0d3d51960a9b'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}], 'link_id': {'link_uuid': {'uuid': '7d961ee0-353a-59b6-8776-6d2adf194b4f'}}, 'link_type': 'LINKTYPE_RADIO', 'name': 'isl-53913-51726'}, {'attributes': {'is_bidirectional': False, 'total_capacity_gbps': 0.0, 'used_capacity_gbps': 0.0}, 'link_endpoint_ids': [{'device_id': {'device_uuid': {'uuid': '74dd61b5-22ec-5fc1-b3e9-7ed38c946398'}}, 'endpoint_uuid': {'uuid': 'd1c5912b-d268-58a1-883d-d915199d5bd4'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}, {'device_id': {'device_uuid': {'uuid': 'b05c48c7-fd4e-519e-8dfe-4c2f16052413'}}, 'endpoint_uuid': {'uuid': '67bbbfc5-6582-57cc-aafc-65f41ded6985'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}], 'link_id': {'link_uuid': {'uuid': 'a796cdbb-3780-5466-83f0-8ef6b261f091'}}, 'link_type': 'LINKTYPE_RADIO', 'name': 'isl-53847-53911'}, {'attributes': {'is_bidirectional': False, 'total_capacity_gbps': 0.0, 'used_capacity_gbps': 0.0}, 'link_endpoint_ids': [{'device_id': {'device_uuid': {'uuid': 'a8d87244-5adb-5c45-8f9a-148c6008d4ba'}}, 'endpoint_uuid': {'uuid': 'a01396b9-ae0e-5f68-934a-4d5dacf11b38'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}, {'device_id': {'device_uuid': {'uuid': 'f7f1379d-0550-5a69-b6b5-9a7801028621'}}, 'endpoint_uuid': {'uuid': '0e335612-6de7-5dbb-9cb3-c62b0e7d237f'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}], 'link_id': {'link_uuid': {'uuid': 'a96869a0-9290-5d82-8192-6cbe97f8ab1b'}}, 'link_type': 'LINKTYPE_RADIO', 'name': 'isl-51726-53848'}, {'attributes': {'is_bidirectional': False, 'total_capacity_gbps': 0.0, 'used_capacity_gbps': 0.0}, 'link_endpoint_ids': [{'device_id': {'device_uuid': {'uuid': 'b05c48c7-fd4e-519e-8dfe-4c2f16052413'}}, 'endpoint_uuid': {'uuid': '67bbbfc5-6582-57cc-aafc-65f41ded6985'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}, {'device_id': {'device_uuid': {'uuid': '74dd61b5-22ec-5fc1-b3e9-7ed38c946398'}}, 'endpoint_uuid': {'uuid': 'd1c5912b-d268-58a1-883d-d915199d5bd4'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}], 'link_id': {'link_uuid': {'uuid': 'ca310af4-2e70-5328-9426-14cfe3058743'}}, 'link_type': 'LINKTYPE_RADIO', 'name': 'isl-53911-53847'}, {'attributes': {'is_bidirectional': False, 'total_capacity_gbps': 0.0, 'used_capacity_gbps': 0.0}, 'link_endpoint_ids': [{'device_id': {'device_uuid': {'uuid': 'a8d87244-5adb-5c45-8f9a-148c6008d4ba'}}, 'endpoint_uuid': {'uuid': 'd478f12b-89f4-5e72-8896-0d3d51960a9b'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}, {'device_id': {'device_uuid': {'uuid': 'e65cd631-994c-5849-ab56-5904c0f55c3d'}}, 'endpoint_uuid': {'uuid': 'd6150c59-bd0c-5745-88b7-b3036a694457'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}], 'link_id': {'link_uuid': {'uuid': 'd0d8a2b7-df19-5708-871d-d13201cbb534'}}, 'link_type': 'LINKTYPE_RADIO', 'name': 'isl-51726-53913'}, {'attributes': {'is_bidirectional': False, 'total_capacity_gbps': 0.0, 'used_capacity_gbps': 0.0}, 'link_endpoint_ids': [{'device_id': {'device_uuid': {'uuid': 'e65cd631-994c-5849-ab56-5904c0f55c3d'}}, 'endpoint_uuid': {'uuid': '8c438986-e2f4-5e22-b764-40b32bed6ad9'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}, {'device_id': {'device_uuid': {'uuid': 'f7f1379d-0550-5a69-b6b5-9a7801028621'}}, 'endpoint_uuid': {'uuid': '20c235d3-36c3-5495-80c9-569eda225167'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}], 'link_id': {'link_uuid': {'uuid': 'f97b4817-a19e-53f5-98cb-81e6e6d0e2b9'}}, 'link_type': 'LINKTYPE_RADIO', 'name': 'isl-53913-53848'}], 'topologies': [{'device_ids': [{'device_uuid': {'uuid': '066a8a8f-5054-5d27-93cb-027d33168ff4'}}, {'device_uuid': {'uuid': '173da48c-bcb9-50d0-9cf5-1ba9762da1d2'}}, {'device_uuid': {'uuid': '37c8b228-467f-545a-becb-c90293434dcb'}}, {'device_uuid': {'uuid': '74dd61b5-22ec-5fc1-b3e9-7ed38c946398'}}, {'device_uuid': {'uuid': 'a8d87244-5adb-5c45-8f9a-148c6008d4ba'}}, {'device_uuid': {'uuid': 'b05c48c7-fd4e-519e-8dfe-4c2f16052413'}}, {'device_uuid': {'uuid': 'e52f4461-50fa-5785-9352-898ef4ae9676'}}, {'device_uuid': {'uuid': 'e65cd631-994c-5849-ab56-5904c0f55c3d'}}, {'device_uuid': {'uuid': 'f7f1379d-0550-5a69-b6b5-9a7801028621'}}, {'device_uuid': {'uuid': 'ffca8322-e8a3-5833-8f17-300982a6a638'}}], 'link_ids': [{'link_uuid': {'uuid': '08ff9af0-7016-5986-abc2-27b8f419c63a'}}, {'link_uuid': {'uuid': '2984ccfc-0b9b-5716-a6bf-e390d041c51d'}}, {'link_uuid': {'uuid': '2c4e2839-4591-530c-b6a6-6b394052ee3a'}}, {'link_uuid': {'uuid': '73ac1027-291b-522a-af8c-276b79cf997c'}}, {'link_uuid': {'uuid': '7d961ee0-353a-59b6-8776-6d2adf194b4f'}}, {'link_uuid': {'uuid': 'a796cdbb-3780-5466-83f0-8ef6b261f091'}}, {'link_uuid': {'uuid': 'a96869a0-9290-5d82-8192-6cbe97f8ab1b'}}, {'link_uuid': {'uuid': 'ca310af4-2e70-5328-9426-14cfe3058743'}}, {'link_uuid': {'uuid': 'd0d8a2b7-df19-5708-871d-d13201cbb534'}}, {'link_uuid': {'uuid': 'f97b4817-a19e-53f5-98cb-81e6e6d0e2b9'}}], 'name': 'starlink-17', 'optical_link_ids': [], 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}], 'services': [{'name': 'migration-l2', 'service_config': {'config_rules': [{'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/device[sat-53848]/endpoint[2]/settings', 'resource_value': '{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"2\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"20c235d3-36c3-5495-80c9-569eda225167\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/device[sat-53848]/endpoint[3]/settings', 'resource_value': '{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"3\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"c335c8d5-aaf1-5b81-b54b-7a0a0ea6daa8\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/device[sat-53913]/endpoint[2]/settings', 'resource_value': '{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"2\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"8c438986-e2f4-5e22-b764-40b32bed6ad9\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/device[sat-53913]/endpoint[3]/settings', 'resource_value': '{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"3\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"272140a8-e251-59d5-a5db-e70736f2465e\"}'}}, {'action': 'CONFIGACTION_SET', 'custom': {'resource_key': '/settings', 'resource_value': '{\"switch_info\": [{\"sat-51726\": {\"arch\": \"v1model\", \"dpid\": 1, \"fwd_list\": [{\"host_mac\": \"00:00:00:00:00:01\", \"port_id\": 1}, {\"host_mac\": \"00:00:00:00:00:02\", \"port_id\": 3}], \"port_list\": [{\"port_id\": 1, \"port_type\": \"switch\", \"vlan_id\": 4094}, {\"port_id\": 2, \"port_type\": \"switch\", \"vlan_id\": 4094}, {\"port_id\": 3, \"port_type\": \"switch\", \"vlan_id\": 4094}]}}, {\"sat-53848\": {\"arch\": \"v1model\", \"dpid\": 6, \"fwd_list\": [{\"host_mac\": \"00:00:00:00:00:01\", \"port_id\": 3}, {\"host_mac\": \"00:00:00:00:00:02\", \"port_id\": 2}], \"port_list\": [{\"port_id\": 1, \"port_type\": \"switch\", \"vlan_id\": 4094}, {\"port_id\": 2, \"port_type\": \"switch\", \"vlan_id\": 4094}, {\"port_id\": 3, \"port_type\": \"host\", \"vlan_id\": 4094}]}}, {\"sat-53913\": {\"arch\": \"v1model\", \"dpid\": 12, \"fwd_list\": [{\"host_mac\": \"00:00:00:00:00:01\", \"port_id\": 2}, {\"host_mac\": \"00:00:00:00:00:02\", \"port_id\": 3}], \"port_list\": [{\"port_id\": 1, \"port_type\": \"switch\", \"vlan_id\": 4094}, {\"port_id\": 2, \"port_type\": \"switch\", \"vlan_id\": 4094}, {\"port_id\": 3, \"port_type\": \"host\", \"vlan_id\": 4094}]}}]}'}}]}, 'service_constraints': [], 'service_endpoint_ids': [{'device_id': {'device_uuid': {'uuid': 'f7f1379d-0550-5a69-b6b5-9a7801028621'}}, 'endpoint_uuid': {'uuid': 'c335c8d5-aaf1-5b81-b54b-7a0a0ea6daa8'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}, {'device_id': {'device_uuid': {'uuid': 'e65cd631-994c-5849-ab56-5904c0f55c3d'}}, 'endpoint_uuid': {'uuid': '272140a8-e251-59d5-a5db-e70736f2465e'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}], 'service_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'service_uuid': {'uuid': 'c853520e-8776-5497-8d35-8a76147662e7'}}, 'service_status': {'service_status': 'SERVICESTATUS_ACTIVE'}, 'service_type': 'SERVICETYPE_L2NM'}], 'connections': [{'connection_id': {'connection_uuid': {'uuid': 'a20095c2-4aa0-4422-983f-067e7d634303'}}, 'path_hops_endpoint_ids': [{'device_id': {'device_uuid': {'uuid': 'f7f1379d-0550-5a69-b6b5-9a7801028621'}}, 'endpoint_uuid': {'uuid': 'c335c8d5-aaf1-5b81-b54b-7a0a0ea6daa8'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}, {'device_id': {'device_uuid': {'uuid': 'f7f1379d-0550-5a69-b6b5-9a7801028621'}}, 'endpoint_uuid': {'uuid': '20c235d3-36c3-5495-80c9-569eda225167'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}, {'device_id': {'device_uuid': {'uuid': 'e65cd631-994c-5849-ab56-5904c0f55c3d'}}, 'endpoint_uuid': {'uuid': '8c438986-e2f4-5e22-b764-40b32bed6ad9'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}, {'device_id': {'device_uuid': {'uuid': 'e65cd631-994c-5849-ab56-5904c0f55c3d'}}, 'endpoint_uuid': {'uuid': '272140a8-e251-59d5-a5db-e70736f2465e'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}], 'service_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'service_uuid': {'uuid': 'c853520e-8776-5497-8d35-8a76147662e7'}}, 'settings': {}, 'sub_service_ids': []}, {'connection_id': {'connection_uuid': {'uuid': 'e9c2231a-cd58-413e-9597-28b3364febca'}}, 'path_hops_endpoint_ids': [{'device_id': {'device_uuid': {'uuid': 'f7f1379d-0550-5a69-b6b5-9a7801028621'}}, 'endpoint_uuid': {'uuid': 'c335c8d5-aaf1-5b81-b54b-7a0a0ea6daa8'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}, {'device_id': {'device_uuid': {'uuid': 'f7f1379d-0550-5a69-b6b5-9a7801028621'}}, 'endpoint_uuid': {'uuid': '20c235d3-36c3-5495-80c9-569eda225167'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}, {'device_id': {'device_uuid': {'uuid': 'e65cd631-994c-5849-ab56-5904c0f55c3d'}}, 'endpoint_uuid': {'uuid': '8c438986-e2f4-5e22-b764-40b32bed6ad9'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}, {'device_id': {'device_uuid': {'uuid': 'e65cd631-994c-5849-ab56-5904c0f55c3d'}}, 'endpoint_uuid': {'uuid': '272140a8-e251-59d5-a5db-e70736f2465e'}, 'topology_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'topology_uuid': {'uuid': 'd70ad060-7109-5b8a-8eb2-d77bf74e2c3a'}}}], 'service_id': {'context_id': {'context_uuid': {'uuid': '4270b8eb-9108-543a-a503-93e662160a13'}}, 'service_uuid': {'uuid': 'c853520e-8776-5497-8d35-8a76147662e7'}}, 'settings': {}, 'sub_service_ids': []}]}}}",
+      "timestamp_utc": "2026-10-08T16:23:21.636850+00:00"
+    },
+    {
+      "elapsed_s": 362.9014113000594,
+      "id": 17,
+      "orbital_s": 4710.90141180018,
+      "phase": "rollback",
+      "timestamp_utc": "2026-10-08T16:23:51.901939+00:00"
+    },
+    {
+      "elapsed_s": 368.0776236001402,
+      "id": 18,
+      "orbital_s": 4716.077624500031,
+      "phase": "alignment",
+      "timestamp_utc": "2026-10-08T16:23:57.078156+00:00"
+    },
+    {
+      "attempt": 2,
+      "elapsed_s": 393.11438739998266,
+      "id": 19,
+      "orbital_s": 4741.114388500107,
+      "phase": "attempt_failed",
+      "reason": "Job interrupted by user",
+      "timestamp_utc": "2026-10-08T16:24:22.114897+00:00"
+    },
+    {
+      "elapsed_s": 393.1563308001496,
+      "id": 20,
+      "orbital_s": 4741.1563311000355,
+      "phase": "rollback",
+      "timestamp_utc": "2026-10-08T16:24:22.156863+00:00"
+    },
+    {
+      "elapsed_s": 397.37063110014424,
+      "id": 21,
+      "orbital_s": 4745.370632100152,
+      "phase": "failed",
+      "timestamp_utc": "2026-10-08T16:24:26.371164+00:00"
+    }
+  ],
+  "execution_kind": "live-hybrid",
+  "failure_phase": "alignment",
+  "failure_reason": "Job interrupted by user",
+  "fault": null,
+  "image_throughput_bps": 998536301.3756368,
+  "images_inventory": "per-host verified receipts; not Docker cache",
+  "interrupted": true,
+  "method": "hot",
+  "migration_start_unix_s": 1791476299.0006585,
+  "operations": [
+    {
+      "elapsed_s": 0.63724509999156,
+      "operation": "snapshot",
+      "timestamp_utc": "2026-10-08T16:19:20.132775+00:00"
+    },
+    {
+      "elapsed_s": 154.57152740005404,
+      "operation": "image_load_shared_daemon",
+      "timestamp_utc": "2026-10-08T16:22:16.835119+00:00"
+    },
+    {
+      "elapsed_s": 25.070321399951354,
+      "operation": "controller_startup",
+      "timestamp_utc": "2026-10-08T16:22:41.909219+00:00"
+    },
+    {
+      "elapsed_s": 30.211173499934375,
+      "operation": "api_restore",
+      "timestamp_utc": "2026-10-08T16:23:12.136256+00:00"
+    },
+    {
+      "elapsed_s": 0.06848770007491112,
+      "operation": "freeze",
+      "timestamp_utc": "2026-10-08T16:23:12.219618+00:00"
+    },
+    {
+      "elapsed_s": 0.8789876999799162,
+      "operation": "snapshot",
+      "timestamp_utc": "2026-10-08T16:23:13.113154+00:00"
+    },
+    {
+      "elapsed_s": 7.526356799993664,
+      "operation": "delta_apply",
+      "timestamp_utc": "2026-10-08T16:23:20.731963+00:00"
+    },
+    {
+      "elapsed_s": 0.8853394999168813,
+      "operation": "api_verification",
+      "timestamp_utc": "2026-10-08T16:23:21.632330+00:00"
+    }
+  ],
+  "outcome": "interrupted",
+  "probes": {
+    "ping": {
+      "baseline_path_available": false,
+      "continuous_during_observation": false,
+      "first_loss_unix_s": 1791476299.012619,
+      "longest_consecutive_successes": 2659,
+      "loss_fraction": 0.3096774193548387,
+      "lost_probes": 1200,
+      "observed_probes": 3875,
+      "recovery_observed": true,
+      "rtt_max_ms": 113097.0,
+      "rtt_mean_ms": 174.47143925233644,
+      "rtt_min_ms": 3.33,
+      "stable_recovery_unix_s": 1791476383.025305,
+      "successful_probes": 2675,
+      "time_to_stable_recovery_s": null
+    },
+    "schema_version": 1,
+    "udp": {
+      "duplicate_packets": 0,
+      "jitter_method": "RFC3550 transit-difference EWMA (1/16)",
+      "jitter_ms": 0.23517784959584723,
+      "loss_fraction": 0.318659547222692,
+      "lost_packets": 13189,
+      "observation_s": 397.297437567,
+      "received_packets": 28200,
+      "received_payload_bytes": 33840000,
+      "sent_packets": 41389,
+      "throughput_bps": 681403.841056352
+    }
+  },
+  "purpose": "diagnostic",
+  "raw_probes_directory": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\results\\lab\\run-bd559578930c4799b7c2e12afe326366",
+  "restarted_payload_bytes": 0,
+  "run_id": "run-bd559578930c4799b7c2e12afe326366",
+  "schema_version": 2,
+  "shared_docker_daemon": true,
+  "success": false,
+  "tcp_retransmissions": null,
+  "useful_payload_bytes": 1823565400
+}

@@ -1,0 +1,9 @@
+{
+  "created_utc": "2026-10-08T16:50:08.383649+00:00",
+  "job_id": "job-49e9cf75efe74ad5bdfe4a0df1142712",
+  "operation": "complete",
+  "parameters": {},
+  "started_utc": "2026-10-08T16:50:08.657518+00:00",
+  "status": "running",
+  "worker_pid": 10412
+}

@@ -1,0 +1,1 @@
+{"timestamp_utc": "2026-10-08T16:47:51.154363+00:00", "hosts": {"sat-a": {"running_containers": 9, "cpu_cores": 0.8511, "ram_gib": 1.7834248046874999}, "sat-b": {"running_containers": 3, "cpu_cores": 2.2599, "ram_gib": 0.8401591796875}}}

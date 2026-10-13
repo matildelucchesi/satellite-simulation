@@ -1,0 +1,470 @@
+{
+  "changes": {
+    "connections": {
+      "deletes": [
+        {
+          "connection_uuid": {
+            "uuid": "6e2dc85b-9d74-4d72-a418-e0af1ab1b862"
+          }
+        }
+      ],
+      "upserts": [
+        {
+          "connection_id": {
+            "connection_uuid": {
+              "uuid": "a8f778a1-ee3a-40ce-aa44-01a89ed54119"
+            }
+          },
+          "path_hops_endpoint_ids": [
+            {
+              "device_id": {
+                "device_uuid": {
+                  "uuid": "f7f1379d-0550-5a69-b6b5-9a7801028621"
+                }
+              },
+              "endpoint_uuid": {
+                "uuid": "c335c8d5-aaf1-5b81-b54b-7a0a0ea6daa8"
+              },
+              "topology_id": {
+                "context_id": {
+                  "context_uuid": {
+                    "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                  }
+                },
+                "topology_uuid": {
+                  "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+                }
+              }
+            },
+            {
+              "device_id": {
+                "device_uuid": {
+                  "uuid": "f7f1379d-0550-5a69-b6b5-9a7801028621"
+                }
+              },
+              "endpoint_uuid": {
+                "uuid": "20c235d3-36c3-5495-80c9-569eda225167"
+              },
+              "topology_id": {
+                "context_id": {
+                  "context_uuid": {
+                    "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                  }
+                },
+                "topology_uuid": {
+                  "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+                }
+              }
+            },
+            {
+              "device_id": {
+                "device_uuid": {
+                  "uuid": "e65cd631-994c-5849-ab56-5904c0f55c3d"
+                }
+              },
+              "endpoint_uuid": {
+                "uuid": "8c438986-e2f4-5e22-b764-40b32bed6ad9"
+              },
+              "topology_id": {
+                "context_id": {
+                  "context_uuid": {
+                    "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                  }
+                },
+                "topology_uuid": {
+                  "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+                }
+              }
+            },
+            {
+              "device_id": {
+                "device_uuid": {
+                  "uuid": "e65cd631-994c-5849-ab56-5904c0f55c3d"
+                }
+              },
+              "endpoint_uuid": {
+                "uuid": "272140a8-e251-59d5-a5db-e70736f2465e"
+              },
+              "topology_id": {
+                "context_id": {
+                  "context_uuid": {
+                    "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                  }
+                },
+                "topology_uuid": {
+                  "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+                }
+              }
+            }
+          ],
+          "service_id": {
+            "context_id": {
+              "context_uuid": {
+                "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+              }
+            },
+            "service_uuid": {
+              "uuid": "c853520e-8776-5497-8d35-8a76147662e7"
+            }
+          },
+          "settings": {},
+          "sub_service_ids": []
+        }
+      ]
+    },
+    "contexts": {
+      "deletes": [],
+      "upserts": []
+    },
+    "devices": {
+      "deletes": [],
+      "upserts": []
+    },
+    "links": {
+      "deletes": [],
+      "upserts": [
+        {
+          "attributes": {
+            "is_bidirectional": false,
+            "total_capacity_gbps": 0.0,
+            "used_capacity_gbps": 0.0
+          },
+          "link_endpoint_ids": [
+            {
+              "device_id": {
+                "device_uuid": {
+                  "uuid": "f7f1379d-0550-5a69-b6b5-9a7801028621"
+                }
+              },
+              "endpoint_uuid": {
+                "uuid": "0e335612-6de7-5dbb-9cb3-c62b0e7d237f"
+              },
+              "topology_id": {
+                "context_id": {
+                  "context_uuid": {
+                    "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                  }
+                },
+                "topology_uuid": {
+                  "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+                }
+              }
+            },
+            {
+              "device_id": {
+                "device_uuid": {
+                  "uuid": "a8d87244-5adb-5c45-8f9a-148c6008d4ba"
+                }
+              },
+              "endpoint_uuid": {
+                "uuid": "a01396b9-ae0e-5f68-934a-4d5dacf11b38"
+              },
+              "topology_id": {
+                "context_id": {
+                  "context_uuid": {
+                    "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                  }
+                },
+                "topology_uuid": {
+                  "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+                }
+              }
+            }
+          ],
+          "link_id": {
+            "link_uuid": {
+              "uuid": "2c4e2839-4591-530c-b6a6-6b394052ee3a"
+            }
+          },
+          "link_type": "LINKTYPE_RADIO",
+          "name": "isl-53848-51726"
+        },
+        {
+          "attributes": {
+            "is_bidirectional": false,
+            "total_capacity_gbps": 0.0,
+            "used_capacity_gbps": 0.0
+          },
+          "link_endpoint_ids": [
+            {
+              "device_id": {
+                "device_uuid": {
+                  "uuid": "a8d87244-5adb-5c45-8f9a-148c6008d4ba"
+                }
+              },
+              "endpoint_uuid": {
+                "uuid": "a01396b9-ae0e-5f68-934a-4d5dacf11b38"
+              },
+              "topology_id": {
+                "context_id": {
+                  "context_uuid": {
+                    "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                  }
+                },
+                "topology_uuid": {
+                  "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+                }
+              }
+            },
+            {
+              "device_id": {
+                "device_uuid": {
+                  "uuid": "f7f1379d-0550-5a69-b6b5-9a7801028621"
+                }
+              },
+              "endpoint_uuid": {
+                "uuid": "0e335612-6de7-5dbb-9cb3-c62b0e7d237f"
+              },
+              "topology_id": {
+                "context_id": {
+                  "context_uuid": {
+                    "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                  }
+                },
+                "topology_uuid": {
+                  "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+                }
+              }
+            }
+          ],
+          "link_id": {
+            "link_uuid": {
+              "uuid": "a96869a0-9290-5d82-8192-6cbe97f8ab1b"
+            }
+          },
+          "link_type": "LINKTYPE_RADIO",
+          "name": "isl-51726-53848"
+        }
+      ]
+    },
+    "services": {
+      "deletes": [],
+      "upserts": [
+        {
+          "name": "migration-l2",
+          "service_config": {
+            "config_rules": [
+              {
+                "action": "CONFIGACTION_SET",
+                "custom": {
+                  "resource_key": "/device[sat-53848]/endpoint[2]/settings",
+                  "resource_value": "{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"2\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"20c235d3-36c3-5495-80c9-569eda225167\"}"
+                }
+              },
+              {
+                "action": "CONFIGACTION_SET",
+                "custom": {
+                  "resource_key": "/device[sat-53848]/endpoint[3]/settings",
+                  "resource_value": "{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"3\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"c335c8d5-aaf1-5b81-b54b-7a0a0ea6daa8\"}"
+                }
+              },
+              {
+                "action": "CONFIGACTION_SET",
+                "custom": {
+                  "resource_key": "/device[sat-53913]/endpoint[2]/settings",
+                  "resource_value": "{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"2\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"8c438986-e2f4-5e22-b764-40b32bed6ad9\"}"
+                }
+              },
+              {
+                "action": "CONFIGACTION_SET",
+                "custom": {
+                  "resource_key": "/device[sat-53913]/endpoint[3]/settings",
+                  "resource_value": "{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"3\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"272140a8-e251-59d5-a5db-e70736f2465e\"}"
+                }
+              },
+              {
+                "action": "CONFIGACTION_SET",
+                "custom": {
+                  "resource_key": "/settings",
+                  "resource_value": "{\"switch_info\": [{\"sat-51726\": {\"arch\": \"v1model\", \"dpid\": 1, \"fwd_list\": [{\"host_mac\": \"00:00:00:00:00:01\", \"port_id\": 1}, {\"host_mac\": \"00:00:00:00:00:02\", \"port_id\": 3}], \"port_list\": [{\"port_id\": 1, \"port_type\": \"switch\", \"vlan_id\": 4094}, {\"port_id\": 2, \"port_type\": \"switch\", \"vlan_id\": 4094}, {\"port_id\": 3, \"port_type\": \"switch\", \"vlan_id\": 4094}]}}, {\"sat-53848\": {\"arch\": \"v1model\", \"dpid\": 6, \"fwd_list\": [{\"host_mac\": \"00:00:00:00:00:01\", \"port_id\": 3}, {\"host_mac\": \"00:00:00:00:00:02\", \"port_id\": 2}], \"port_list\": [{\"port_id\": 1, \"port_type\": \"switch\", \"vlan_id\": 4094}, {\"port_id\": 2, \"port_type\": \"switch\", \"vlan_id\": 4094}, {\"port_id\": 3, \"port_type\": \"host\", \"vlan_id\": 4094}]}}, {\"sat-53913\": {\"arch\": \"v1model\", \"dpid\": 12, \"fwd_list\": [{\"host_mac\": \"00:00:00:00:00:01\", \"port_id\": 2}, {\"host_mac\": \"00:00:00:00:00:02\", \"port_id\": 3}], \"port_list\": [{\"port_id\": 1, \"port_type\": \"switch\", \"vlan_id\": 4094}, {\"port_id\": 2, \"port_type\": \"switch\", \"vlan_id\": 4094}, {\"port_id\": 3, \"port_type\": \"host\", \"vlan_id\": 4094}]}}]}"
+                }
+              }
+            ]
+          },
+          "service_constraints": [],
+          "service_endpoint_ids": [
+            {
+              "device_id": {
+                "device_uuid": {
+                  "uuid": "f7f1379d-0550-5a69-b6b5-9a7801028621"
+                }
+              },
+              "endpoint_uuid": {
+                "uuid": "c335c8d5-aaf1-5b81-b54b-7a0a0ea6daa8"
+              },
+              "topology_id": {
+                "context_id": {
+                  "context_uuid": {
+                    "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                  }
+                },
+                "topology_uuid": {
+                  "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+                }
+              }
+            },
+            {
+              "device_id": {
+                "device_uuid": {
+                  "uuid": "e65cd631-994c-5849-ab56-5904c0f55c3d"
+                }
+              },
+              "endpoint_uuid": {
+                "uuid": "272140a8-e251-59d5-a5db-e70736f2465e"
+              },
+              "topology_id": {
+                "context_id": {
+                  "context_uuid": {
+                    "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                  }
+                },
+                "topology_uuid": {
+                  "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+                }
+              }
+            }
+          ],
+          "service_id": {
+            "context_id": {
+              "context_uuid": {
+                "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+              }
+            },
+            "service_uuid": {
+              "uuid": "c853520e-8776-5497-8d35-8a76147662e7"
+            }
+          },
+          "service_status": {
+            "service_status": "SERVICESTATUS_ACTIVE"
+          },
+          "service_type": "SERVICETYPE_L2NM"
+        }
+      ]
+    },
+    "topologies": {
+      "deletes": [],
+      "upserts": [
+        {
+          "device_ids": [
+            {
+              "device_uuid": {
+                "uuid": "066a8a8f-5054-5d27-93cb-027d33168ff4"
+              }
+            },
+            {
+              "device_uuid": {
+                "uuid": "173da48c-bcb9-50d0-9cf5-1ba9762da1d2"
+              }
+            },
+            {
+              "device_uuid": {
+                "uuid": "37c8b228-467f-545a-becb-c90293434dcb"
+              }
+            },
+            {
+              "device_uuid": {
+                "uuid": "74dd61b5-22ec-5fc1-b3e9-7ed38c946398"
+              }
+            },
+            {
+              "device_uuid": {
+                "uuid": "a8d87244-5adb-5c45-8f9a-148c6008d4ba"
+              }
+            },
+            {
+              "device_uuid": {
+                "uuid": "b05c48c7-fd4e-519e-8dfe-4c2f16052413"
+              }
+            },
+            {
+              "device_uuid": {
+                "uuid": "e52f4461-50fa-5785-9352-898ef4ae9676"
+              }
+            },
+            {
+              "device_uuid": {
+                "uuid": "e65cd631-994c-5849-ab56-5904c0f55c3d"
+              }
+            },
+            {
+              "device_uuid": {
+                "uuid": "f7f1379d-0550-5a69-b6b5-9a7801028621"
+              }
+            },
+            {
+              "device_uuid": {
+                "uuid": "ffca8322-e8a3-5833-8f17-300982a6a638"
+              }
+            }
+          ],
+          "link_ids": [
+            {
+              "link_uuid": {
+                "uuid": "08ff9af0-7016-5986-abc2-27b8f419c63a"
+              }
+            },
+            {
+              "link_uuid": {
+                "uuid": "2984ccfc-0b9b-5716-a6bf-e390d041c51d"
+              }
+            },
+            {
+              "link_uuid": {
+                "uuid": "2c4e2839-4591-530c-b6a6-6b394052ee3a"
+              }
+            },
+            {
+              "link_uuid": {
+                "uuid": "73ac1027-291b-522a-af8c-276b79cf997c"
+              }
+            },
+            {
+              "link_uuid": {
+                "uuid": "7d961ee0-353a-59b6-8776-6d2adf194b4f"
+              }
+            },
+            {
+              "link_uuid": {
+                "uuid": "a796cdbb-3780-5466-83f0-8ef6b261f091"
+              }
+            },
+            {
+              "link_uuid": {
+                "uuid": "a96869a0-9290-5d82-8192-6cbe97f8ab1b"
+              }
+            },
+            {
+              "link_uuid": {
+                "uuid": "ca310af4-2e70-5328-9426-14cfe3058743"
+              }
+            },
+            {
+              "link_uuid": {
+                "uuid": "d0d8a2b7-df19-5708-871d-d13201cbb534"
+              }
+            },
+            {
+              "link_uuid": {
+                "uuid": "f97b4817-a19e-53f5-98cb-81e6e6d0e2b9"
+              }
+            }
+          ],
+          "name": "starlink-17",
+          "optical_link_ids": [],
+          "topology_id": {
+            "context_id": {
+              "context_uuid": {
+                "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+              }
+            },
+            "topology_uuid": {
+              "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "schema_version": 1,
+  "source_commit": "fb8707871eba26806cac7ac373c70b2bb5bd26fc"
+}

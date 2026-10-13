@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
+import math
 
 
 @dataclass(frozen=True)
@@ -39,8 +40,10 @@ class MigrationCase:
 
 def validate_workload(workload: Workload) -> None:
     for name, value in asdict(workload).items():
-        if value < 0:
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value < 0:
             raise ValueError(f"{name} must be non-negative")
+        if name.endswith("_bytes") and not isinstance(value, int):
+            raise ValueError(f"{name} must be an integer byte count")
     if workload.image_bytes == 0:
         raise ValueError("image_bytes must be measured and greater than zero")
     if workload.cold_state_bytes == 0 or workload.hot_initial_state_bytes == 0:
@@ -64,6 +67,9 @@ def evaluate(
     validate_workload(workload)
     if method not in {"cold", "hot"}:
         raise ValueError("method must be 'cold' or 'hot'")
+    values = (useful_rate_bps, alignment_s, contact_window_s, deadline_window_s)
+    if any(isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) for value in values):
+        raise ValueError("rates and durations must be finite numeric values")
     if useful_rate_bps <= 0 or alignment_s < 0 or contact_window_s < 0 or deadline_window_s < 0:
         raise ValueError("rates must be positive and durations non-negative")
 

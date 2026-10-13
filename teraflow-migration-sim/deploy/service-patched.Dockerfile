@@ -1,0 +1,2 @@
+FROM tfs-migration/service:7.0.0-fb870787
+COPY deploy/patches/p4_fabric_tna_l2_simple_service_handler.py /var/teraflow/service/service/service_handlers/p4_fabric_tna_l2_simple/p4_fabric_tna_l2_simple_service_handler.py

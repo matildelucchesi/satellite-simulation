@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "bmv2_image": "p4lang/behavioral-model@sha256:53eb8d8514619a1d0033fab462dd9f002a6055c82a4676ac180322e0d589f99f",
+  "fixture": {
+    "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\config\\fixture.json",
+    "bytes": 4292,
+    "sha256": "77dc9fbef9d9018dd5b41a9e893aed433daccd23b048ed68e4705c259be3b9b2"
+  },
+  "p4_artifacts": [
+    {
+      "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\deploy\\p4\\bmv2.json",
+      "bytes": 853383,
+      "sha256": "a06ff18fede7cc91471056fd4a6893dc4901a1d0a8b34f0c692f780a4a5239bd"
+    },
+    {
+      "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\deploy\\p4\\p4info.txt",
+      "bytes": 40052,
+      "sha256": "76fcf2127025841e7a1cda5dc9a7a26147c72191a0410ff2991298658603bb84"
+    },
+    {
+      "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\deploy\\p4\\_pp.p4",
+      "bytes": 91855,
+      "sha256": "7192b3adf76a4ff5c1de36eddf448bdff9d61359b30836e307180dd7709d8d60"
+    }
+  ]
+}

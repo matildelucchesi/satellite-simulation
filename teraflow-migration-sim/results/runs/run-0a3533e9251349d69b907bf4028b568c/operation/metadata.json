@@ -1,0 +1,215 @@
+{
+  "ack": true,
+  "attempt": 1,
+  "bytes_received": 1823565400,
+  "bytes_sent": 1823565400,
+  "controller_downtime_s": 19.526700699934736,
+  "event": {
+    "contact_end_s": 6248,
+    "contact_window_s": 1870,
+    "deadline_s": 7571,
+    "deadline_window_s": 3193,
+    "event_id": "functional-53848-53913-4378",
+    "execution_purpose": "functional-calibration",
+    "sat_a": 53848,
+    "sat_b": 53913,
+    "trigger_causes": [
+      "functional_diagnostic"
+    ],
+    "trigger_s": 4378
+  },
+  "events": [
+    {
+      "causes": [
+        "functional_diagnostic"
+      ],
+      "elapsed_s": 30.000836900202557,
+      "id": 1,
+      "orbital_s": 4378.000838200096,
+      "phase": "trigger",
+      "timestamp_utc": "2026-10-08T16:26:46.281712+00:00"
+    },
+    {
+      "elapsed_s": 30.351025900105014,
+      "id": 2,
+      "orbital_s": 4378.351026799995,
+      "phase": "alignment",
+      "timestamp_utc": "2026-10-08T16:26:46.631905+00:00"
+    },
+    {
+      "elapsed_s": 90.38750320021063,
+      "id": 3,
+      "orbital_s": 4438.387503999984,
+      "phase": "snapshot_initial",
+      "timestamp_utc": "2026-10-08T16:27:46.668371+00:00"
+    },
+    {
+      "artifact": {
+        "bytes": 1823463936,
+        "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\artifacts\\images-l2-patched-v2\\teraflow-v7-images.tar",
+        "sha256": "9fc2920c12e4cc8867cd34ad294f1c240acc34b181dd462ce69e5abd51531c00"
+      },
+      "elapsed_s": 93.4416208001785,
+      "id": 4,
+      "orbital_s": 4441.441621800186,
+      "payload": "teraflow-v7-images.tar",
+      "phase": "transfer",
+      "timestamp_utc": "2026-10-08T16:27:49.722494+00:00"
+    },
+    {
+      "elapsed_s": 110.35258180019446,
+      "id": 5,
+      "orbital_s": 4458.352582800202,
+      "payload": "teraflow-v7-images.tar",
+      "phase": "transfer_verified",
+      "receipt": {
+        "configured_rate_bps": 1000000000,
+        "elapsed_s": 14.59817330003716,
+        "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\results\\runs\\run-0a3533e9251349d69b907bf4028b568c\\received\\teraflow-v7-images.tar",
+        "received_bytes": 1823463936,
+        "receiver_elapsed_s": 14.588630300015211,
+        "sent_bytes": 1823463936,
+        "sha256": "9fc2920c12e4cc8867cd34ad294f1c240acc34b181dd462ce69e5abd51531c00",
+        "tcp_retransmission_measurement": "unavailable on host transport",
+        "tcp_retransmissions": null,
+        "useful_throughput_bps": 999283347.8667407
+      },
+      "timestamp_utc": "2026-10-08T16:28:06.633456+00:00"
+    },
+    {
+      "artifact": {
+        "bytes": 85838,
+        "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\results\\runs\\run-0a3533e9251349d69b907bf4028b568c\\operation\\snapshot-1.json",
+        "sha256": "ddbc42065348a50b1082ca2d46a805e35588e48302c84321de267d4b877be55d"
+      },
+      "elapsed_s": 112.77764260000549,
+      "id": 6,
+      "orbital_s": 4460.777643600013,
+      "payload": "snapshot-1.json",
+      "phase": "transfer",
+      "timestamp_utc": "2026-10-08T16:28:09.058515+00:00"
+    },
+    {
+      "elapsed_s": 112.80204420001246,
+      "id": 7,
+      "orbital_s": 4460.802045100136,
+      "payload": "snapshot-1.json",
+      "phase": "transfer_verified",
+      "receipt": {
+        "configured_rate_bps": 1000000000,
+        "elapsed_s": 0.012284999946132302,
+        "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\results\\runs\\run-0a3533e9251349d69b907bf4028b568c\\received\\snapshot-1.json",
+        "received_bytes": 85838,
+        "receiver_elapsed_s": 0.002174199791625142,
+        "sent_bytes": 85838,
+        "sha256": "ddbc42065348a50b1082ca2d46a805e35588e48302c84321de267d4b877be55d",
+        "tcp_retransmission_measurement": "unavailable on host transport",
+        "tcp_retransmissions": null,
+        "useful_throughput_bps": 55897761.74286396
+      },
+      "timestamp_utc": "2026-10-08T16:28:09.082918+00:00"
+    },
+    {
+      "elapsed_s": 112.81142690009438,
+      "id": 8,
+      "orbital_s": 4460.811427799985,
+      "phase": "target_start",
+      "timestamp_utc": "2026-10-08T16:28:09.092285+00:00"
+    },
+    {
+      "elapsed_s": 260.3596840000246,
+      "id": 9,
+      "orbital_s": 4608.359684300143,
+      "phase": "restore_initial",
+      "timestamp_utc": "2026-10-08T16:30:36.640564+00:00"
+    },
+    {
+      "elapsed_s": 290.87903960002586,
+      "id": 10,
+      "orbital_s": 4638.879040000029,
+      "phase": "freeze",
+      "timestamp_utc": "2026-10-08T16:31:07.159915+00:00"
+    },
+    {
+      "elapsed_s": 290.9135164001491,
+      "id": 11,
+      "orbital_s": 4638.9135173000395,
+      "phase": "source_frozen",
+      "timestamp_utc": "2026-10-08T16:31:07.194393+00:00"
+    },
+    {
+      "artifact": {
+        "bytes": 15626,
+        "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\results\\runs\\run-0a3533e9251349d69b907bf4028b568c\\operation\\delta-1.json",
+        "sha256": "fd2e4988d65a817b3f5560dea9262905d607806c5ce51b30bec996c6f105f000"
+      },
+      "elapsed_s": 291.6127882001456,
+      "id": 12,
+      "orbital_s": 4639.612789500039,
+      "payload": "delta-1.json",
+      "phase": "transfer",
+      "timestamp_utc": "2026-10-08T16:31:07.893661+00:00"
+    },
+    {
+      "elapsed_s": 291.65360910003074,
+      "id": 13,
+      "orbital_s": 4639.6536098001525,
+      "payload": "delta-1.json",
+      "phase": "transfer_verified",
+      "receipt": {
+        "configured_rate_bps": 1000000000,
+        "elapsed_s": 0.029495500028133392,
+        "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\results\\runs\\run-0a3533e9251349d69b907bf4028b568c\\received\\delta-1.json",
+        "received_bytes": 15626,
+        "receiver_elapsed_s": 0.002157599898055196,
+        "sent_bytes": 15626,
+        "sha256": "fd2e4988d65a817b3f5560dea9262905d607806c5ce51b30bec996c6f105f000",
+        "tcp_retransmission_measurement": "unavailable on host transport",
+        "tcp_retransmissions": null,
+        "useful_throughput_bps": 4238205.823965178
+      },
+      "timestamp_utc": "2026-10-08T16:31:07.934487+00:00"
+    },
+    {
+      "elapsed_s": 291.66481630015187,
+      "id": 14,
+      "orbital_s": 4639.664817200042,
+      "phase": "restore_delta",
+      "timestamp_utc": "2026-10-08T16:31:07.945684+00:00"
+    },
+    {
+      "elapsed_s": 309.0182080999948,
+      "id": 15,
+      "orbital_s": 4657.018209000118,
+      "phase": "verify",
+      "timestamp_utc": "2026-10-08T16:31:25.299083+00:00"
+    },
+    {
+      "elapsed_s": 309.98834919999354,
+      "id": 16,
+      "orbital_s": 4657.98835,
+      "phase": "ack",
+      "timestamp_utc": "2026-10-08T16:31:26.269229+00:00"
+    },
+    {
+      "elapsed_s": 309.9998947000131,
+      "id": 17,
+      "orbital_s": 4657.999895100016,
+      "phase": "cutover",
+      "timestamp_utc": "2026-10-08T16:31:26.280768+00:00"
+    },
+    {
+      "attempt": 1,
+      "elapsed_s": 310.40282560000196,
+      "id": 18,
+      "orbital_s": 4658.402825900121,
+      "phase": "completed",
+      "timestamp_utc": "2026-10-08T16:31:26.683700+00:00"
+    }
+  ],
+  "execution_kind": "live-hybrid",
+  "method": "hot",
+  "schema_version": 2,
+  "success": true,
+  "total_operation_s": 280.40236299997196
+}

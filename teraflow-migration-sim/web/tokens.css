@@ -1,0 +1,14 @@
+@font-face{font-family:Space Grotesk;src:url('/fonts/SpaceGrotesk.ttf') format('truetype');font-weight:300 700;font-display:swap}
+@font-face{font-family:Inter;src:url('/fonts/Inter.ttf') format('truetype');font-weight:100 900;font-display:swap}
+:root{
+ --color-paper:oklch(98.5% .004 250);--color-panel:oklch(96% .006 250);--color-ink:oklch(24% .02 258);
+ --color-muted:oklch(44% .018 257);--color-rule:oklch(80% .012 250);--color-control:oklch(60% .014 250);
+ --color-accent:oklch(49% .20 256);--color-focus:var(--color-accent);--color-accent-ink:oklch(98% .004 250);
+ --color-error:oklch(43% .13 25);--color-success:oklch(39% .07 180);--color-graphite:oklch(24% .02 258);
+ --color-dark-ink:oklch(95% .004 250);--color-shadow:oklch(88% .008 250);--color-path:var(--color-accent);
+ --font-display:'Space Grotesk',sans-serif;--font-body:'Inter',sans-serif;
+ --space-xs:.25rem;--space-sm:.5rem;--space-md:1rem;--space-lg:1.5rem;--space-xl:2.5rem;--space-2xl:4rem;
+ --text-sm:.875rem;--text-base:1rem;--text-md:1.25rem;--text-lg:1.5625rem;--text-xl:2rem;
+ --radius-sm:6px;--rule-width:1px;--dur-micro:120ms;--dur-short:220ms;
+ --ease-out:cubic-bezier(.16,1,.3,1);--ease-in:cubic-bezier(.7,0,.84,0);--ease-in-out:cubic-bezier(.65,0,.35,1);
+}

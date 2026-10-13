@@ -1,0 +1,219 @@
+{
+  "schema_version": 1,
+  "context": "migration-lab",
+  "topology": "starlink-17",
+  "service": "migration-l2",
+  "emulator": {
+    "devices": [
+      {
+        "norad": 51726,
+        "dpid": 1,
+        "name": "s1",
+        "grpc_port": 50001,
+        "proxy_port": 51001,
+        "ports": {
+          "53848": 1,
+          "53853": 2,
+          "53913": 3
+        }
+      },
+      {
+        "norad": 53838,
+        "dpid": 2,
+        "name": "s2",
+        "grpc_port": 50002,
+        "proxy_port": 51002,
+        "ports": {
+          "53906": 1
+        }
+      },
+      {
+        "norad": 53839,
+        "dpid": 3,
+        "name": "s3",
+        "grpc_port": 50003,
+        "proxy_port": 51003,
+        "ports": {}
+      },
+      {
+        "norad": 53843,
+        "dpid": 4,
+        "name": "s4",
+        "grpc_port": 50004,
+        "proxy_port": 51004,
+        "ports": {
+          "53912": 1
+        }
+      },
+      {
+        "norad": 53847,
+        "dpid": 5,
+        "name": "s5",
+        "grpc_port": 50005,
+        "proxy_port": 51005,
+        "ports": {
+          "53911": 1
+        }
+      },
+      {
+        "norad": 53848,
+        "dpid": 6,
+        "name": "s6",
+        "grpc_port": 50006,
+        "proxy_port": 51006,
+        "ports": {
+          "51726": 1,
+          "53913": 2,
+          "h1": 3
+        }
+      },
+      {
+        "norad": 53853,
+        "dpid": 7,
+        "name": "s7",
+        "grpc_port": 50007,
+        "proxy_port": 51007,
+        "ports": {
+          "51726": 1
+        }
+      },
+      {
+        "norad": 53905,
+        "dpid": 8,
+        "name": "s8",
+        "grpc_port": 50008,
+        "proxy_port": 51008,
+        "ports": {}
+      },
+      {
+        "norad": 53906,
+        "dpid": 9,
+        "name": "s9",
+        "grpc_port": 50009,
+        "proxy_port": 51009,
+        "ports": {
+          "53838": 1
+        }
+      },
+      {
+        "norad": 53911,
+        "dpid": 10,
+        "name": "s10",
+        "grpc_port": 50010,
+        "proxy_port": 51010,
+        "ports": {
+          "53847": 1
+        }
+      },
+      {
+        "norad": 53912,
+        "dpid": 11,
+        "name": "s11",
+        "grpc_port": 50011,
+        "proxy_port": 51011,
+        "ports": {
+          "53843": 1
+        }
+      },
+      {
+        "norad": 53913,
+        "dpid": 12,
+        "name": "s12",
+        "grpc_port": 50012,
+        "proxy_port": 51012,
+        "ports": {
+          "51726": 1,
+          "53848": 2,
+          "h2": 3
+        }
+      },
+      {
+        "norad": 53918,
+        "dpid": 13,
+        "name": "s13",
+        "grpc_port": 50013,
+        "proxy_port": 51013,
+        "ports": {}
+      },
+      {
+        "norad": 53922,
+        "dpid": 14,
+        "name": "s14",
+        "grpc_port": 50014,
+        "proxy_port": 51014,
+        "ports": {}
+      },
+      {
+        "norad": 53923,
+        "dpid": 15,
+        "name": "s15",
+        "grpc_port": 50015,
+        "proxy_port": 51015,
+        "ports": {}
+      },
+      {
+        "norad": 53925,
+        "dpid": 16,
+        "name": "s16",
+        "grpc_port": 50016,
+        "proxy_port": 51016,
+        "ports": {}
+      },
+      {
+        "norad": 54060,
+        "dpid": 17,
+        "name": "s17",
+        "grpc_port": 50017,
+        "proxy_port": 51017,
+        "ports": {}
+      }
+    ],
+    "pairs": [
+      [
+        51726,
+        53848
+      ],
+      [
+        51726,
+        53853
+      ],
+      [
+        51726,
+        53913
+      ],
+      [
+        53838,
+        53906
+      ],
+      [
+        53843,
+        53912
+      ],
+      [
+        53847,
+        53911
+      ],
+      [
+        53848,
+        53913
+      ]
+    ],
+    "hosts": [
+      {
+        "name": "h1",
+        "satellite": 53848,
+        "ip": "10.0.0.1/24",
+        "mac": "00:00:00:00:00:01"
+      },
+      {
+        "name": "h2",
+        "satellite": 53913,
+        "ip": "10.0.0.2/24",
+        "mac": "00:00:00:00:00:02"
+      }
+    ]
+  },
+  "controller_proxy": "p4-proxy",
+  "pipeline_binary": "/experiment/deploy/p4/bmv2.json",
+  "pipeline_info": "/experiment/deploy/p4/p4info.txt"
+}

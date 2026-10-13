@@ -1,6 +1,7 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "incomplete",
+  "image_bundle": {"path": null, "bytes": null, "sha256": null, "format": "docker-save-tar-uncompressed"},
   "controller": {
     "release": "7.0.0",
     "source_tag": "v7.0.0",

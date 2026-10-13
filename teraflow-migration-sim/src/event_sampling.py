@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 PERCENTILES = (10, 50, 90)
+import math
 
 
 def linear_quantile(values: list[float], percentile: int) -> float:
@@ -29,7 +30,7 @@ def select_percentile_events(events: list[dict]) -> list[dict]:
     if any(value in (None, "") for value in ids) or len(set(ids)) != len(ids):
         raise ValueError("event_id values must be present and unique")
     margins = [event.get("orbital_margin_s") for event in events]
-    if any(not isinstance(value, (int, float)) for value in margins):
+    if any(isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) for value in margins):
         raise ValueError("each event needs a numeric orbital_margin_s")
     targets = [linear_quantile(margins, p) for p in PERCENTILES]
     ordered = sorted(events, key=lambda event: (event["orbital_margin_s"], str(event["event_id"])))

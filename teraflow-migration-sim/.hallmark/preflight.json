@@ -1,0 +1,12 @@
+{
+  "date": "2026-10-08",
+  "scope": "Independent simulator console; existing other-project dashboard preserved",
+  "existing_design_system": null,
+  "framework": "vanilla HTML/CSS/JavaScript with Python standard HTTP server",
+  "font_stack": "Space Grotesk and Inter, vendored locally with OFL licenses",
+  "palette": "Cobalt OKLCH tokens in web/tokens.css",
+  "spacing": "4pt scale",
+  "motion": "cut; focus and hover feedback, no decorative animation",
+  "responsive_verified_px": [320, 375, 414, 768, 1280],
+  "horizontal_overflow": false
+}

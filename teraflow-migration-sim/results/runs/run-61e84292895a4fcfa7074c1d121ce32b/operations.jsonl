@@ -1,0 +1,9 @@
+{"operation": "snapshot", "elapsed_s": 0.6319921999238431, "timestamp_utc": "2026-10-08T16:56:02.907699+00:00"}
+{"operation": "source_stop", "elapsed_s": 12.86250780010596, "timestamp_utc": "2026-10-08T16:56:15.814767+00:00"}
+{"operation": "image_load_shared_daemon", "elapsed_s": 98.37031390005723, "timestamp_utc": "2026-10-08T16:58:19.187431+00:00"}
+{"operation": "controller_startup", "elapsed_s": 24.486621499992907, "timestamp_utc": "2026-10-08T16:58:43.678140+00:00"}
+{"operation": "api_restore", "elapsed_s": 26.808224099921063, "timestamp_utc": "2026-10-08T16:59:10.505305+00:00"}
+{"operation": "api_verification", "elapsed_s": 0.8594825000036508, "timestamp_utc": "2026-10-08T16:59:11.380808+00:00"}
+{"operation": "queued_topology_apply", "elapsed_s": 15.414029799867421, "timestamp_utc": "2026-10-08T16:59:26.798181+00:00"}
+{"operation": "queued_topology_apply", "elapsed_s": 1.3962805999908596, "timestamp_utc": "2026-10-08T16:59:28.261997+00:00"}
+{"operation": "cutover", "elapsed_s": 0.2655982000287622, "timestamp_utc": "2026-10-08T16:59:28.568315+00:00"}

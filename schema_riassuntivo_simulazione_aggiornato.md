@@ -341,3 +341,10 @@ I test automatizzati devono coprire formule e casi limite del selettore/score, t
 8. ETSI TeraFlowSDN, [TFS#3 Hackfest report](https://tfs.etsi.org/news/hackfest-3/), esperienza con Mininet, switch P4, servizio tra endpoint e ping.
 9. Mininet Project, [Overview](https://mininet.org/overview/), emulazione di host, switch, controller e link virtuali.
 10. P4 Language Consortium, [Behavioral Model (BMv2)](https://github.com/p4lang/behavioral-model), switch software di riferimento per testare data plane P4.
+# Stato operativo dell'implementazione — aggiornamento 8 ottobre 2026
+
+Il progetto indipendente `teraflow-migration-sim` dispone del backend live e del servizio applicativo condiviso tra CLI e GUI. La console locale si avvia con `python tools/serve_gui.py` dalla directory del progetto ed è accessibile su **http://127.0.0.1:18092/**. Mostra topologia SVG dei 17 satelliti, timeline persistente, matrice principale, sonde e artefatti. Guida: `teraflow-migration-sim/docs/operating-guide.md`.
+
+Sono state osservate migrazioni funzionali cold e hot riuscite con equivalenza API, ACK e cutover hardware, usando le patch Service/Device autorizzate e il bundle unico delle sei immagini effettive. Queste verifiche non sostituiscono le 18 prove principali. Il downtime di servizio non è attribuito alla migrazione quando il servizio era già indisponibile nella baseline.
+
+La calibrazione, il congelamento e la campagna restano subordinati ai gate live e ai risultati salvati. Il worker `complete` procede in sequenza e si arresta al primo gate fallito; il report rimane preliminare finché tutti i casi richiesti non hanno esito tracciabile. Le misure di disco comprendono layer unici di workload e dipendenze; l'importazione immagini sul daemon condiviso dichiara il possibile riuso dei layer. Orbite, FSO e carico sono modellati; TCP, API, P4 e sonde sono live.

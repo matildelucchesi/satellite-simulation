@@ -1,0 +1,479 @@
+{
+  "complete": false,
+  "stages": {
+    "environment": {
+      "bundle": {
+        "bytes": 1823463936,
+        "format": "docker-save-tar-uncompressed",
+        "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\artifacts\\images-l2-patched-v2\\teraflow-v7-images.tar",
+        "sha256": "9fc2920c12e4cc8867cd34ad294f1c240acc34b181dd462ce69e5abd51531c00"
+      },
+      "capacity_checked": true,
+      "controllers": {
+        "sat-a": true,
+        "sat-b": true
+      },
+      "docker_info": {
+        "Architecture": "x86_64",
+        "CDISpecDirs": [
+          "/etc/cdi",
+          "/var/run/cdi"
+        ],
+        "CPUSet": true,
+        "CPUShares": true,
+        "CgroupDriver": "cgroupfs",
+        "CgroupVersion": "2",
+        "ClientInfo": {
+          "Arch": "amd64",
+          "BuildTime": "Fri Jun 26 11:43:32 2026",
+          "Context": "desktop-linux",
+          "Debug": false,
+          "DefaultAPIVersion": "1.55",
+          "GitCommit": "8900f1d",
+          "GoVersion": "go1.26.4",
+          "Os": "windows",
+          "Plugins": [
+            {
+              "Name": "agent",
+              "Path": "C:\\Program Files\\Docker\\cli-plugins\\docker-agent.exe",
+              "SchemaVersion": "0.1.0",
+              "ShortDescription": "Docker AI Agent Runner",
+              "Vendor": "Docker Inc.",
+              "Version": "v1.98.0"
+            },
+            {
+              "Name": "ai",
+              "Path": "C:\\Program Files\\Docker\\cli-plugins\\docker-ai.exe",
+              "SchemaVersion": "0.1.0",
+              "ShortDescription": "Docker AI Agent - Ask Gordon",
+              "Vendor": "Docker Inc.",
+              "Version": "v1.27.0"
+            },
+            {
+              "Name": "buildx",
+              "Path": "C:\\Program Files\\Docker\\cli-plugins\\docker-buildx.exe",
+              "SchemaVersion": "0.1.0",
+              "ShortDescription": "Docker Buildx",
+              "Vendor": "Docker Inc.",
+              "Version": "v0.35.0-desktop.2"
+            },
+            {
+              "Name": "compose",
+              "Path": "C:\\Program Files\\Docker\\cli-plugins\\docker-compose.exe",
+              "SchemaVersion": "0.1.0",
+              "ShortDescription": "Docker Compose",
+              "Vendor": "Docker Inc.",
+              "Version": "v5.3.0"
+            },
+            {
+              "Name": "debug",
+              "Path": "C:\\Program Files\\Docker\\cli-plugins\\docker-debug.exe",
+              "SchemaVersion": "0.1.0",
+              "ShortDescription": "Get a shell into any image or container",
+              "Vendor": "Docker Inc.",
+              "Version": "0.0.47"
+            },
+            {
+              "Name": "desktop",
+              "Path": "C:\\Program Files\\Docker\\cli-plugins\\docker-desktop.exe",
+              "SchemaVersion": "0.1.0",
+              "ShortDescription": "Docker Desktop commands",
+              "Vendor": "Docker Inc.",
+              "Version": "v0.4.1"
+            },
+            {
+              "Name": "dhi",
+              "Path": "C:\\Users\\matil\\.docker\\cli-plugins\\docker-dhi.exe",
+              "SchemaVersion": "0.1.0",
+              "ShadowedPaths": [
+                "C:\\Program Files\\Docker\\cli-plugins\\docker-dhi.exe"
+              ],
+              "ShortDescription": "CLI for managing Docker Hardened Images",
+              "Vendor": "Docker Inc.",
+              "Version": "v0.0.6"
+            },
+            {
+              "Name": "extension",
+              "Path": "C:\\Program Files\\Docker\\cli-plugins\\docker-extension.exe",
+              "SchemaVersion": "0.1.0",
+              "ShortDescription": "Manages Docker extensions",
+              "Vendor": "Docker Inc.",
+              "Version": "v0.2.31"
+            },
+            {
+              "Name": "init",
+              "Path": "C:\\Program Files\\Docker\\cli-plugins\\docker-init.exe",
+              "SchemaVersion": "0.1.0",
+              "ShortDescription": "Creates Docker-related starter files for your project",
+              "Vendor": "Docker Inc.",
+              "Version": "v1.4.0"
+            },
+            {
+              "Name": "mcp",
+              "Path": "C:\\Program Files\\Docker\\cli-plugins\\docker-mcp.exe",
+              "SchemaVersion": "0.1.0",
+              "ShortDescription": "Docker MCP Plugin",
+              "Vendor": "Docker Inc.",
+              "Version": "v0.43.1"
+            },
+            {
+              "Name": "model",
+              "Path": "C:\\Program Files\\Docker\\cli-plugins\\docker-model.exe",
+              "SchemaVersion": "0.1.0",
+              "ShortDescription": "Docker Model Runner",
+              "Vendor": "Docker Inc.",
+              "Version": "v1.2.5"
+            },
+            {
+              "Name": "offload",
+              "Path": "C:\\Program Files\\Docker\\cli-plugins\\docker-offload.exe",
+              "SchemaVersion": "0.1.0",
+              "ShortDescription": "Docker Offload",
+              "Vendor": "Docker Inc.",
+              "Version": "v0.6.7"
+            },
+            {
+              "Name": "pass",
+              "Path": "C:\\Program Files\\Docker\\cli-plugins\\docker-pass.exe",
+              "SchemaVersion": "0.1.0",
+              "ShortDescription": "Docker Pass Secrets Manager Plugin (beta)",
+              "Vendor": "Docker Inc.",
+              "Version": "v0.2.0"
+            },
+            {
+              "Hidden": true,
+              "Name": "sandbox",
+              "Path": "C:\\Program Files\\Docker\\cli-plugins\\docker-sandbox.exe",
+              "SchemaVersion": "0.1.0",
+              "ShortDescription": "\"docker sandbox\" is deprecated, use Docker Sandboxes instead",
+              "URL": "https://www.docker.com/products/docker-sandboxes",
+              "Vendor": "Docker Inc.",
+              "Version": "v0.13.0"
+            },
+            {
+              "Name": "scout",
+              "Path": "C:\\Program Files\\Docker\\cli-plugins\\docker-scout.exe",
+              "SchemaVersion": "0.1.0",
+              "ShortDescription": "Docker Scout",
+              "Vendor": "Docker Inc.",
+              "Version": "v1.23.1"
+            }
+          ],
+          "Version": "29.6.1",
+          "Warnings": null
+        },
+        "Containerd": {
+          "Address": "/run/containerd/containerd.sock",
+          "Namespaces": {
+            "Containers": "moby",
+            "Plugins": "plugins.moby"
+          }
+        },
+        "ContainerdCommit": {
+          "ID": "e53c7c1516c3b2bff98eb76f1f4117477e6f4e66"
+        },
+        "Containers": 61,
+        "ContainersPaused": 0,
+        "ContainersRunning": 20,
+        "ContainersStopped": 41,
+        "CpuCfsPeriod": true,
+        "CpuCfsQuota": true,
+        "Debug": false,
+        "DefaultRuntime": "runc",
+        "DiscoveredDevices": [
+          {
+            "ID": "docker.com/gpu=webgpu",
+            "Source": "cdi"
+          }
+        ],
+        "DockerRootDir": "/var/lib/docker",
+        "Driver": "overlayfs",
+        "DriverStatus": [
+          [
+            "driver-type",
+            "io.containerd.snapshotter.v1"
+          ]
+        ],
+        "ExperimentalBuild": false,
+        "FirewallBackend": {
+          "Driver": "iptables"
+        },
+        "GenericResources": null,
+        "HttpProxy": "http.docker.internal:3128",
+        "HttpsProxy": "http.docker.internal:3128",
+        "ID": "71fb6272-c4dd-4682-9256-b6d2d53925bf",
+        "IPv4Forwarding": true,
+        "Images": 35,
+        "IndexServerAddress": "https://index.docker.io/v1/",
+        "InitBinary": "docker-init",
+        "InitCommit": {
+          "ID": "de40ad0"
+        },
+        "Isolation": "",
+        "KernelVersion": "6.18.33.2-microsoft-standard-WSL2",
+        "Labels": [
+          "com.docker.desktop.address=npipe://\\\\.\\pipe\\docker_cli"
+        ],
+        "LiveRestoreEnabled": false,
+        "LoggingDriver": "json-file",
+        "MemTotal": 16613269504,
+        "MemoryLimit": true,
+        "NCPU": 16,
+        "NEventsListener": 12,
+        "NFd": 223,
+        "NGoroutines": 250,
+        "Name": "docker-desktop",
+        "NoProxy": "hubproxy.docker.internal",
+        "OSType": "linux",
+        "OSVersion": "",
+        "OomKillDisable": false,
+        "OperatingSystem": "Docker Desktop",
+        "PidsLimit": true,
+        "Plugins": {
+          "Authorization": null,
+          "Log": [
+            "awslogs",
+            "fluentd",
+            "gcplogs",
+            "gelf",
+            "journald",
+            "json-file",
+            "local",
+            "splunk",
+            "syslog"
+          ],
+          "Network": [
+            "bridge",
+            "host",
+            "ipvlan",
+            "macvlan",
+            "null",
+            "overlay"
+          ],
+          "Volume": [
+            "local"
+          ]
+        },
+        "RegistryConfig": {
+          "IndexConfigs": {
+            "docker.io": {
+              "Mirrors": [],
+              "Name": "docker.io",
+              "Official": true,
+              "Secure": true
+            },
+            "hubproxy.docker.internal:5555": {
+              "Mirrors": [],
+              "Name": "hubproxy.docker.internal:5555",
+              "Official": false,
+              "Secure": false
+            }
+          },
+          "InsecureRegistryCIDRs": [
+            "::1/128",
+            "127.0.0.0/8"
+          ],
+          "Mirrors": []
+        },
+        "RuncCommit": {
+          "ID": "v1.3.6-0-g491b69ba"
+        },
+        "Runtimes": {
+          "io.containerd.runc.v2": {
+            "path": "runc",
+            "status": {
+              "org.opencontainers.runtime-spec.features": "{\"ociVersionMin\":\"1.0.0\",\"ociVersionMax\":\"1.2.1\",\"hooks\":[\"prestart\",\"createRuntime\",\"createContainer\",\"startContainer\",\"poststart\",\"poststop\"],\"mountOptions\":[\"async\",\"atime\",\"bind\",\"defaults\",\"dev\",\"diratime\",\"dirsync\",\"exec\",\"iversion\",\"lazytime\",\"loud\",\"mand\",\"noatime\",\"nodev\",\"nodiratime\",\"noexec\",\"noiversion\",\"nolazytime\",\"nomand\",\"norelatime\",\"nostrictatime\",\"nosuid\",\"nosymfollow\",\"private\",\"ratime\",\"rbind\",\"rdev\",\"rdiratime\",\"relatime\",\"remount\",\"rexec\",\"rnoatime\",\"rnodev\",\"rnodiratime\",\"rnoexec\",\"rnorelatime\",\"rnostrictatime\",\"rnosuid\",\"rnosymfollow\",\"ro\",\"rprivate\",\"rrelatime\",\"rro\",\"rrw\",\"rshared\",\"rslave\",\"rstrictatime\",\"rsuid\",\"rsymfollow\",\"runbindable\",\"rw\",\"shared\",\"silent\",\"slave\",\"strictatime\",\"suid\",\"symfollow\",\"sync\",\"tmpcopyup\",\"unbindable\"],\"linux\":{\"namespaces\":[\"cgroup\",\"ipc\",\"mount\",\"network\",\"pid\",\"time\",\"user\",\"uts\"],\"capabilities\":[\"CAP_CHOWN\",\"CAP_DAC_OVERRIDE\",\"CAP_DAC_READ_SEARCH\",\"CAP_FOWNER\",\"CAP_FSETID\",\"CAP_KILL\",\"CAP_SETGID\",\"CAP_SETUID\",\"CAP_SETPCAP\",\"CAP_LINUX_IMMUTABLE\",\"CAP_NET_BIND_SERVICE\",\"CAP_NET_BROADCAST\",\"CAP_NET_ADMIN\",\"CAP_NET_RAW\",\"CAP_IPC_LOCK\",\"CAP_IPC_OWNER\",\"CAP_SYS_MODULE\",\"CAP_SYS_RAWIO\",\"CAP_SYS_CHROOT\",\"CAP_SYS_PTRACE\",\"CAP_SYS_PACCT\",\"CAP_SYS_ADMIN\",\"CAP_SYS_BOOT\",\"CAP_SYS_NICE\",\"CAP_SYS_RESOURCE\",\"CAP_SYS_TIME\",\"CAP_SYS_TTY_CONFIG\",\"CAP_MKNOD\",\"CAP_LEASE\",\"CAP_AUDIT_WRITE\",\"CAP_AUDIT_CONTROL\",\"CAP_SETFCAP\",\"CAP_MAC_OVERRIDE\",\"CAP_MAC_ADMIN\",\"CAP_SYSLOG\",\"CAP_WAKE_ALARM\",\"CAP_BLOCK_SUSPEND\",\"CAP_AUDIT_READ\",\"CAP_PERFMON\",\"CAP_BPF\",\"CAP_CHECKPOINT_RESTORE\"],\"cgroup\":{\"v1\":true,\"v2\":true,\"systemd\":true,\"systemdUser\":true,\"rdma\":true},\"seccomp\":{\"enabled\":true,\"actions\":[\"SCMP_ACT_ALLOW\",\"SCMP_ACT_ERRNO\",\"SCMP_ACT_KILL\",\"SCMP_ACT_KILL_PROCESS\",\"SCMP_ACT_KILL_THREAD\",\"SCMP_ACT_LOG\",\"SCMP_ACT_NOTIFY\",\"SCMP_ACT_TRACE\",\"SCMP_ACT_TRAP\"],\"operators\":[\"SCMP_CMP_EQ\",\"SCMP_CMP_GE\",\"SCMP_CMP_GT\",\"SCMP_CMP_LE\",\"SCMP_CMP_LT\",\"SCMP_CMP_MASKED_EQ\",\"SCMP_CMP_NE\"],\"archs\":[\"SCMP_ARCH_AARCH64\",\"SCMP_ARCH_ARM\",\"SCMP_ARCH_MIPS\",\"SCMP_ARCH_MIPS64\",\"SCMP_ARCH_MIPS64N32\",\"SCMP_ARCH_MIPSEL\",\"SCMP_ARCH_MIPSEL64\",\"SCMP_ARCH_MIPSEL64N32\",\"SCMP_ARCH_PPC\",\"SCMP_ARCH_PPC64\",\"SCMP_ARCH_PPC64LE\",\"SCMP_ARCH_RISCV64\",\"SCMP_ARCH_S390\",\"SCMP_ARCH_S390X\",\"SCMP_ARCH_X32\",\"SCMP_ARCH_X86\",\"SCMP_ARCH_X86_64\"],\"knownFlags\":[\"SECCOMP_FILTER_FLAG_TSYNC\",\"SECCOMP_FILTER_FLAG_SPEC_ALLOW\",\"SECCOMP_FILTER_FLAG_LOG\"],\"supportedFlags\":[\"SECCOMP_FILTER_FLAG_TSYNC\",\"SECCOMP_FILTER_FLAG_SPEC_ALLOW\",\"SECCOMP_FILTER_FLAG_LOG\"]},\"apparmor\":{\"enabled\":true},\"selinux\":{\"enabled\":true},\"intelRdt\":{\"enabled\":true},\"mountExtensions\":{\"idmap\":{\"enabled\":true}}},\"annotations\":{\"io.github.seccomp.libseccomp.version\":\"2.5.4\",\"org.opencontainers.runc.checkpoint.enabled\":\"true\",\"org.opencontainers.runc.commit\":\"v1.3.6-0-g491b69ba\",\"org.opencontainers.runc.version\":\"1.3.6\\n\"},\"potentiallyUnsafeConfigAnnotations\":[\"bundle\",\"org.systemd.property.\",\"org.criu.config\"]}"
+            }
+          },
+          "nvidia": {
+            "path": "nvidia-container-runtime",
+            "status": {
+              "org.opencontainers.runtime-spec.features": "{\"ociVersionMin\":\"1.0.0\",\"ociVersionMax\":\"1.2.1\",\"hooks\":[\"prestart\",\"createRuntime\",\"createContainer\",\"startContainer\",\"poststart\",\"poststop\"],\"mountOptions\":[\"async\",\"atime\",\"bind\",\"defaults\",\"dev\",\"diratime\",\"dirsync\",\"exec\",\"iversion\",\"lazytime\",\"loud\",\"mand\",\"noatime\",\"nodev\",\"nodiratime\",\"noexec\",\"noiversion\",\"nolazytime\",\"nomand\",\"norelatime\",\"nostrictatime\",\"nosuid\",\"nosymfollow\",\"private\",\"ratime\",\"rbind\",\"rdev\",\"rdiratime\",\"relatime\",\"remount\",\"rexec\",\"rnoatime\",\"rnodev\",\"rnodiratime\",\"rnoexec\",\"rnorelatime\",\"rnostrictatime\",\"rnosuid\",\"rnosymfollow\",\"ro\",\"rprivate\",\"rrelatime\",\"rro\",\"rrw\",\"rshared\",\"rslave\",\"rstrictatime\",\"rsuid\",\"rsymfollow\",\"runbindable\",\"rw\",\"shared\",\"silent\",\"slave\",\"strictatime\",\"suid\",\"symfollow\",\"sync\",\"tmpcopyup\",\"unbindable\"],\"linux\":{\"namespaces\":[\"cgroup\",\"ipc\",\"mount\",\"network\",\"pid\",\"time\",\"user\",\"uts\"],\"capabilities\":[\"CAP_CHOWN\",\"CAP_DAC_OVERRIDE\",\"CAP_DAC_READ_SEARCH\",\"CAP_FOWNER\",\"CAP_FSETID\",\"CAP_KILL\",\"CAP_SETGID\",\"CAP_SETUID\",\"CAP_SETPCAP\",\"CAP_LINUX_IMMUTABLE\",\"CAP_NET_BIND_SERVICE\",\"CAP_NET_BROADCAST\",\"CAP_NET_ADMIN\",\"CAP_NET_RAW\",\"CAP_IPC_LOCK\",\"CAP_IPC_OWNER\",\"CAP_SYS_MODULE\",\"CAP_SYS_RAWIO\",\"CAP_SYS_CHROOT\",\"CAP_SYS_PTRACE\",\"CAP_SYS_PACCT\",\"CAP_SYS_ADMIN\",\"CAP_SYS_BOOT\",\"CAP_SYS_NICE\",\"CAP_SYS_RESOURCE\",\"CAP_SYS_TIME\",\"CAP_SYS_TTY_CONFIG\",\"CAP_MKNOD\",\"CAP_LEASE\",\"CAP_AUDIT_WRITE\",\"CAP_AUDIT_CONTROL\",\"CAP_SETFCAP\",\"CAP_MAC_OVERRIDE\",\"CAP_MAC_ADMIN\",\"CAP_SYSLOG\",\"CAP_WAKE_ALARM\",\"CAP_BLOCK_SUSPEND\",\"CAP_AUDIT_READ\",\"CAP_PERFMON\",\"CAP_BPF\",\"CAP_CHECKPOINT_RESTORE\"],\"cgroup\":{\"v1\":true,\"v2\":true,\"systemd\":true,\"systemdUser\":true,\"rdma\":true},\"seccomp\":{\"enabled\":true,\"actions\":[\"SCMP_ACT_ALLOW\",\"SCMP_ACT_ERRNO\",\"SCMP_ACT_KILL\",\"SCMP_ACT_KILL_PROCESS\",\"SCMP_ACT_KILL_THREAD\",\"SCMP_ACT_LOG\",\"SCMP_ACT_NOTIFY\",\"SCMP_ACT_TRACE\",\"SCMP_ACT_TRAP\"],\"operators\":[\"SCMP_CMP_EQ\",\"SCMP_CMP_GE\",\"SCMP_CMP_GT\",\"SCMP_CMP_LE\",\"SCMP_CMP_LT\",\"SCMP_CMP_MASKED_EQ\",\"SCMP_CMP_NE\"],\"archs\":[\"SCMP_ARCH_AARCH64\",\"SCMP_ARCH_ARM\",\"SCMP_ARCH_MIPS\",\"SCMP_ARCH_MIPS64\",\"SCMP_ARCH_MIPS64N32\",\"SCMP_ARCH_MIPSEL\",\"SCMP_ARCH_MIPSEL64\",\"SCMP_ARCH_MIPSEL64N32\",\"SCMP_ARCH_PPC\",\"SCMP_ARCH_PPC64\",\"SCMP_ARCH_PPC64LE\",\"SCMP_ARCH_RISCV64\",\"SCMP_ARCH_S390\",\"SCMP_ARCH_S390X\",\"SCMP_ARCH_X32\",\"SCMP_ARCH_X86\",\"SCMP_ARCH_X86_64\"],\"knownFlags\":[\"SECCOMP_FILTER_FLAG_TSYNC\",\"SECCOMP_FILTER_FLAG_SPEC_ALLOW\",\"SECCOMP_FILTER_FLAG_LOG\"],\"supportedFlags\":[\"SECCOMP_FILTER_FLAG_TSYNC\",\"SECCOMP_FILTER_FLAG_SPEC_ALLOW\",\"SECCOMP_FILTER_FLAG_LOG\"]},\"apparmor\":{\"enabled\":true},\"selinux\":{\"enabled\":true},\"intelRdt\":{\"enabled\":true},\"mountExtensions\":{\"idmap\":{\"enabled\":true}}},\"annotations\":{\"io.github.seccomp.libseccomp.version\":\"2.5.4\",\"org.opencontainers.runc.checkpoint.enabled\":\"true\",\"org.opencontainers.runc.commit\":\"v1.3.6-0-g491b69ba\",\"org.opencontainers.runc.version\":\"1.3.6\\n\"},\"potentiallyUnsafeConfigAnnotations\":[\"bundle\",\"org.systemd.property.\",\"org.criu.config\"]}"
+            }
+          },
+          "runc": {
+            "path": "runc",
+            "status": {
+              "org.opencontainers.runtime-spec.features": "{\"ociVersionMin\":\"1.0.0\",\"ociVersionMax\":\"1.2.1\",\"hooks\":[\"prestart\",\"createRuntime\",\"createContainer\",\"startContainer\",\"poststart\",\"poststop\"],\"mountOptions\":[\"async\",\"atime\",\"bind\",\"defaults\",\"dev\",\"diratime\",\"dirsync\",\"exec\",\"iversion\",\"lazytime\",\"loud\",\"mand\",\"noatime\",\"nodev\",\"nodiratime\",\"noexec\",\"noiversion\",\"nolazytime\",\"nomand\",\"norelatime\",\"nostrictatime\",\"nosuid\",\"nosymfollow\",\"private\",\"ratime\",\"rbind\",\"rdev\",\"rdiratime\",\"relatime\",\"remount\",\"rexec\",\"rnoatime\",\"rnodev\",\"rnodiratime\",\"rnoexec\",\"rnorelatime\",\"rnostrictatime\",\"rnosuid\",\"rnosymfollow\",\"ro\",\"rprivate\",\"rrelatime\",\"rro\",\"rrw\",\"rshared\",\"rslave\",\"rstrictatime\",\"rsuid\",\"rsymfollow\",\"runbindable\",\"rw\",\"shared\",\"silent\",\"slave\",\"strictatime\",\"suid\",\"symfollow\",\"sync\",\"tmpcopyup\",\"unbindable\"],\"linux\":{\"namespaces\":[\"cgroup\",\"ipc\",\"mount\",\"network\",\"pid\",\"time\",\"user\",\"uts\"],\"capabilities\":[\"CAP_CHOWN\",\"CAP_DAC_OVERRIDE\",\"CAP_DAC_READ_SEARCH\",\"CAP_FOWNER\",\"CAP_FSETID\",\"CAP_KILL\",\"CAP_SETGID\",\"CAP_SETUID\",\"CAP_SETPCAP\",\"CAP_LINUX_IMMUTABLE\",\"CAP_NET_BIND_SERVICE\",\"CAP_NET_BROADCAST\",\"CAP_NET_ADMIN\",\"CAP_NET_RAW\",\"CAP_IPC_LOCK\",\"CAP_IPC_OWNER\",\"CAP_SYS_MODULE\",\"CAP_SYS_RAWIO\",\"CAP_SYS_CHROOT\",\"CAP_SYS_PTRACE\",\"CAP_SYS_PACCT\",\"CAP_SYS_ADMIN\",\"CAP_SYS_BOOT\",\"CAP_SYS_NICE\",\"CAP_SYS_RESOURCE\",\"CAP_SYS_TIME\",\"CAP_SYS_TTY_CONFIG\",\"CAP_MKNOD\",\"CAP_LEASE\",\"CAP_AUDIT_WRITE\",\"CAP_AUDIT_CONTROL\",\"CAP_SETFCAP\",\"CAP_MAC_OVERRIDE\",\"CAP_MAC_ADMIN\",\"CAP_SYSLOG\",\"CAP_WAKE_ALARM\",\"CAP_BLOCK_SUSPEND\",\"CAP_AUDIT_READ\",\"CAP_PERFMON\",\"CAP_BPF\",\"CAP_CHECKPOINT_RESTORE\"],\"cgroup\":{\"v1\":true,\"v2\":true,\"systemd\":true,\"systemdUser\":true,\"rdma\":true},\"seccomp\":{\"enabled\":true,\"actions\":[\"SCMP_ACT_ALLOW\",\"SCMP_ACT_ERRNO\",\"SCMP_ACT_KILL\",\"SCMP_ACT_KILL_PROCESS\",\"SCMP_ACT_KILL_THREAD\",\"SCMP_ACT_LOG\",\"SCMP_ACT_NOTIFY\",\"SCMP_ACT_TRACE\",\"SCMP_ACT_TRAP\"],\"operators\":[\"SCMP_CMP_EQ\",\"SCMP_CMP_GE\",\"SCMP_CMP_GT\",\"SCMP_CMP_LE\",\"SCMP_CMP_LT\",\"SCMP_CMP_MASKED_EQ\",\"SCMP_CMP_NE\"],\"archs\":[\"SCMP_ARCH_AARCH64\",\"SCMP_ARCH_ARM\",\"SCMP_ARCH_MIPS\",\"SCMP_ARCH_MIPS64\",\"SCMP_ARCH_MIPS64N32\",\"SCMP_ARCH_MIPSEL\",\"SCMP_ARCH_MIPSEL64\",\"SCMP_ARCH_MIPSEL64N32\",\"SCMP_ARCH_PPC\",\"SCMP_ARCH_PPC64\",\"SCMP_ARCH_PPC64LE\",\"SCMP_ARCH_RISCV64\",\"SCMP_ARCH_S390\",\"SCMP_ARCH_S390X\",\"SCMP_ARCH_X32\",\"SCMP_ARCH_X86\",\"SCMP_ARCH_X86_64\"],\"knownFlags\":[\"SECCOMP_FILTER_FLAG_TSYNC\",\"SECCOMP_FILTER_FLAG_SPEC_ALLOW\",\"SECCOMP_FILTER_FLAG_LOG\"],\"supportedFlags\":[\"SECCOMP_FILTER_FLAG_TSYNC\",\"SECCOMP_FILTER_FLAG_SPEC_ALLOW\",\"SECCOMP_FILTER_FLAG_LOG\"]},\"apparmor\":{\"enabled\":true},\"selinux\":{\"enabled\":true},\"intelRdt\":{\"enabled\":true},\"mountExtensions\":{\"idmap\":{\"enabled\":true}}},\"annotations\":{\"io.github.seccomp.libseccomp.version\":\"2.5.4\",\"org.opencontainers.runc.checkpoint.enabled\":\"true\",\"org.opencontainers.runc.commit\":\"v1.3.6-0-g491b69ba\",\"org.opencontainers.runc.version\":\"1.3.6\\n\"},\"potentiallyUnsafeConfigAnnotations\":[\"bundle\",\"org.systemd.property.\",\"org.criu.config\"]}"
+            }
+          }
+        },
+        "SecurityOptions": [
+          "name=seccomp,profile=builtin",
+          "name=cgroupns"
+        ],
+        "ServerVersion": "29.6.1",
+        "SwapLimit": true,
+        "Swarm": {
+          "ControlAvailable": false,
+          "Error": "",
+          "LocalNodeState": "inactive",
+          "NodeAddr": "",
+          "NodeID": "",
+          "RemoteManagers": null
+        },
+        "SystemTime": "2026-10-08T16:50:40.261925365Z",
+        "Warnings": null
+      },
+      "execution_kind": "live",
+      "host": {
+        "disk_free_bytes": 99390586880,
+        "platform": "Windows-11-10.0.26200-SP0",
+        "python": "3.13.9"
+      },
+      "mininet": {
+        "probes": [],
+        "switch_count": 17,
+        "switches_alive": true
+      },
+      "proxy": {
+        "ack": false,
+        "active": "sat-a",
+        "frozen": false,
+        "generation": 4,
+        "ipv4": "172.25.0.3",
+        "states": [
+          {
+            "device_id": 1,
+            "staged_entries": 0,
+            "standby_ready": false,
+            "upstream_master": true
+          },
+          {
+            "device_id": 2,
+            "staged_entries": 0,
+            "standby_ready": false,
+            "upstream_master": true
+          },
+          {
+            "device_id": 3,
+            "staged_entries": 0,
+            "standby_ready": false,
+            "upstream_master": true
+          },
+          {
+            "device_id": 4,
+            "staged_entries": 0,
+            "standby_ready": false,
+            "upstream_master": true
+          },
+          {
+            "device_id": 5,
+            "staged_entries": 0,
+            "standby_ready": false,
+            "upstream_master": true
+          },
+          {
+            "device_id": 6,
+            "staged_entries": 0,
+            "standby_ready": false,
+            "upstream_master": true
+          },
+          {
+            "device_id": 7,
+            "staged_entries": 0,
+            "standby_ready": false,
+            "upstream_master": true
+          },
+          {
+            "device_id": 8,
+            "staged_entries": 0,
+            "standby_ready": false,
+            "upstream_master": true
+          },
+          {
+            "device_id": 9,
+            "staged_entries": 0,
+            "standby_ready": false,
+            "upstream_master": true
+          },
+          {
+            "device_id": 10,
+            "staged_entries": 0,
+            "standby_ready": false,
+            "upstream_master": true
+          },
+          {
+            "device_id": 11,
+            "staged_entries": 0,
+            "standby_ready": false,
+            "upstream_master": true
+          },
+          {
+            "device_id": 12,
+            "staged_entries": 0,
+            "standby_ready": false,
+            "upstream_master": true
+          },
+          {
+            "device_id": 13,
+            "staged_entries": 0,
+            "standby_ready": false,
+            "upstream_master": true
+          },
+          {
+            "device_id": 14,
+            "staged_entries": 0,
+            "standby_ready": false,
+            "upstream_master": true
+          },
+          {
+            "device_id": 15,
+            "staged_entries": 0,
+            "standby_ready": false,
+            "upstream_master": true
+          },
+          {
+            "device_id": 16,
+            "staged_entries": 0,
+            "standby_ready": false,
+            "upstream_master": true
+          },
+          {
+            "device_id": 17,
+            "staged_entries": 0,
+            "standby_ready": false,
+            "upstream_master": true
+          }
+        ]
+      },
+      "success": true,
+      "timestamp_utc": "2026-10-08T16:50:08.672866+00:00",
+      "transport_capacity": [
+        {
+          "configured_rate_bps": 100000000,
+          "elapsed_s": 145.8879969001282,
+          "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\results\\capacity\\teraflow-v7-images.tar",
+          "received_bytes": 1823463936,
+          "receiver_elapsed_s": 145.86708230013028,
+          "sent_bytes": 1823463936,
+          "sha256": "9fc2920c12e4cc8867cd34ad294f1c240acc34b181dd462ce69e5abd51531c00",
+          "supported": true,
+          "useful_throughput_bps": 99992540.83930178
+        },
+        {
+          "configured_rate_bps": 1000000000,
+          "elapsed_s": 14.609369999961928,
+          "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\results\\capacity\\teraflow-v7-images.tar",
+          "received_bytes": 1823463936,
+          "receiver_elapsed_s": 14.607695699902251,
+          "sent_bytes": 1823463936,
+          "sha256": "9fc2920c12e4cc8867cd34ad294f1c240acc34b181dd462ce69e5abd51531c00",
+          "supported": true,
+          "useful_throughput_bps": 998517491.7219576
+        },
+        {
+          "configured_rate_bps": 10000000000,
+          "elapsed_s": 4.811253899941221,
+          "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\results\\capacity\\teraflow-v7-images.tar",
+          "received_bytes": 1823463936,
+          "receiver_elapsed_s": 4.8029466001316905,
+          "sent_bytes": 1823463936,
+          "sha256": "9fc2920c12e4cc8867cd34ad294f1c240acc34b181dd462ce69e5abd51531c00",
+          "supported": false,
+          "useful_throughput_bps": 3031997851.5742474
+        }
+      ]
+    }
+  }
+}

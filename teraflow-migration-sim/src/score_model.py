@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
+import math
 
 
 @dataclass(frozen=True)
@@ -29,6 +30,7 @@ def _clamp01(value: float) -> float:
 def score_candidates(
     candidates: list[CandidateMetrics],
     reserve_fraction: float = 0.20,
+    weights: dict[str, float] | None = None,
 ) -> list[dict]:
     """Score eligible candidates, returning descending score with deterministic tie-breaks.
 
@@ -38,10 +40,16 @@ def score_candidates(
     Resource utility is the weakest CPU/RAM/disk headroom above the reserve,
     normalized to [0, 1].
     """
-    if not 0 <= reserve_fraction < 1:
+    weights = WEIGHTS if weights is None else weights
+    if (set(weights) != set(WEIGHTS) or any(not math.isfinite(w) or w < 0 for w in weights.values())
+            or not math.isclose(sum(weights.values()), 1.0)):
+        raise ValueError("Score weights must be finite, nonnegative, and sum to one")
+    if not math.isfinite(reserve_fraction) or not 0 <= reserve_fraction < 1:
         raise ValueError("reserve_fraction must be in [0, 1)")
     eligible = []
     for candidate in candidates:
+        if any(not math.isfinite(value) for value in asdict(candidate).values()):
+            raise ValueError("All candidate metrics must be finite")
         if candidate.control_latency_ms < 0 or candidate.fso_distance_km < 0:
             raise ValueError("latency and distance must be non-negative")
         if candidate.total_nodes <= 0 or not 0 <= candidate.reachable_nodes <= candidate.total_nodes:
@@ -74,10 +82,10 @@ def score_candidates(
             (candidate.disk_free_after_placement - reserve_fraction) / (1 - reserve_fraction),
         ))
         score = 100.0 * (
-            WEIGHTS["latency"] * u_latency
-            + WEIGHTS["connectivity"] * u_connectivity
-            + WEIGHTS["continuity"] * u_continuity
-            + WEIGHTS["resources"] * u_resources
+            weights["latency"] * u_latency
+            + weights["connectivity"] * u_connectivity
+            + weights["continuity"] * u_continuity
+            + weights["resources"] * u_resources
         )
         scored.append({
             "satellite_id": candidate.satellite_id,

@@ -1,0 +1,56 @@
+{
+  "schema_version": 2,
+  "source_commit": "fb8707871eba26806cac7ac373c70b2bb5bd26fc",
+  "format": "docker-save-tar-uncompressed",
+  "created_utc": "2026-10-02T14:55:39.322421+00:00",
+  "docker_version": "29.6.1",
+  "image_bundle": {
+    "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\artifacts\\images\\teraflow-v7-images.tar",
+    "bytes": 1823417856,
+    "sha256": "34af14bce5a6c8129e2f8dbda5e169086b4e63eb4ba5e677ee9d7db40770a883"
+  },
+  "images": {
+    "context": {
+      "reference": "tfs-migration/context:7.0.0-fb870787",
+      "image_id": "sha256:1e5f589a1b198305ac41555ce6b39548940f34c0b69fca73e0b57d556151ded4",
+      "repo_digests": [
+        "tfs-migration/context@sha256:1e5f589a1b198305ac41555ce6b39548940f34c0b69fca73e0b57d556151ded4"
+      ]
+    },
+    "device": {
+      "reference": "tfs-migration/device:7.0.0-fb870787",
+      "image_id": "sha256:e23e7b2f74fb765fe7f2fbb71ade48a6dc0964355c7e944c253b7c1c3f190744",
+      "repo_digests": [
+        "tfs-migration/device@sha256:e23e7b2f74fb765fe7f2fbb71ade48a6dc0964355c7e944c253b7c1c3f190744"
+      ]
+    },
+    "pathcomp-frontend": {
+      "reference": "tfs-migration/pathcomp-frontend:7.0.0-fb870787",
+      "image_id": "sha256:320992810dd5dd02100b72c88cef3cbf41ecea5e8370f2f711df1678894954ac",
+      "repo_digests": [
+        "tfs-migration/pathcomp-frontend@sha256:320992810dd5dd02100b72c88cef3cbf41ecea5e8370f2f711df1678894954ac"
+      ]
+    },
+    "pathcomp-backend": {
+      "reference": "tfs-migration/pathcomp-backend:7.0.0-fb870787",
+      "image_id": "sha256:e17f6f08cdeae820d26616ad2ff2a5b1fc39e1c83b565e0885597f9698c08654",
+      "repo_digests": [
+        "tfs-migration/pathcomp-backend@sha256:e17f6f08cdeae820d26616ad2ff2a5b1fc39e1c83b565e0885597f9698c08654"
+      ]
+    },
+    "service": {
+      "reference": "tfs-migration/service:7.0.0-fb870787",
+      "image_id": "sha256:0925aa4fd7fe013f9b271481853608b86f5a4843aa4368f9a0de1469992dcfc0",
+      "repo_digests": [
+        "tfs-migration/service@sha256:0925aa4fd7fe013f9b271481853608b86f5a4843aa4368f9a0de1469992dcfc0"
+      ]
+    },
+    "nbi": {
+      "reference": "tfs-migration/nbi:7.0.0-fb870787",
+      "image_id": "sha256:4e787127caf54a5fde86b0dbe58d60cd128d656418f5ecbc7f142423c55dd7c9",
+      "repo_digests": [
+        "tfs-migration/nbi@sha256:4e787127caf54a5fde86b0dbe58d60cd128d656418f5ecbc7f142423c55dd7c9"
+      ]
+    }
+  }
+}

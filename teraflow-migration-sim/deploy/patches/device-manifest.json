@@ -1,0 +1,16 @@
+{
+  "upstream_commit": "fb8707871eba26806cac7ac373c70b2bb5bd26fc",
+  "upstream_file": "src/device/service/drivers/p4/p4_driver.py",
+  "upstream_sha256": "ac410160bebfd2c4b40f0be32abdeb71ca023f2a0cfcca7fb6b52d21aee47d5c",
+  "patched_sha256": "a351be12f029d44bdfac742a802d37a9da4f7c379c9bcac513059cb794b56845",
+  "patch_sha256": "ba349ff0cdcb82089e82db6a433e66c6df89cb3c2aa6839ea7e576b4d06bbade",
+  "authorization": "User requested correction of the Device error on 2026-10-02",
+  "related_files": [
+    {
+      "upstream_file": "src/device/service/drivers/p4/p4_manager.py",
+      "upstream_sha256": "f83e139149198998b179475bcf381cf3bdb7ff62aaec1f94b5947ad2ae48453b",
+      "patched_sha256": "032dc356986bfd885ccae6f5b7c5bffe1969abca9ca402234a728f48e0020567",
+      "patch_sha256": "f2531578467c0e7cf9a3d65339523fd8b9d5371cdeb0667d339a408cc0738601"
+    }
+  ]
+}

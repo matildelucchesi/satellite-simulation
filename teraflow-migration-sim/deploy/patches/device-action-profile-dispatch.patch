@@ -1,0 +1,25 @@
+--- a/src/device/service/drivers/p4/p4_driver.py
++++ b/src/device/service/drivers/p4/p4_driver.py
+@@ -669,10 +669,18 @@
+             self.__manager.direct_meter_entry_operation_from_json(
+                 resource_value, operation)
+         elif KEY_ACTION_PROFILE in resource_key:
+-            self.__manager.action_prof_member_entry_operation_from_json(
+-                resource_value, operation)
+-            self.__manager.action_prof_group_entry_operation_from_json(
+-                resource_value, operation)
++            # A resource represents either a member or a selector group.
++            # Parsing both creates an invalid -1 ID for the absent entity.
++            member = "member-id" in resource_value
++            group = "group-id" in resource_value
++            if member == group:
++                raise ValueError("Action profile requires exactly one member-id or group-id")
++            if member:
++                self.__manager.action_prof_member_entry_operation_from_json(
++                    resource_value, operation)
++            else:
++                self.__manager.action_prof_group_entry_operation_from_json(
++                    resource_value, operation)
+         elif KEY_CLONE_SESSION in resource_key:
+             self.__manager.clone_session_entry_operation_from_json(
+                 resource_value, operation)

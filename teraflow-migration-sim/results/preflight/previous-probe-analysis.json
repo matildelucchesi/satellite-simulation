@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "ping": {
+    "observed_probes": 18,
+    "successful_probes": 0,
+    "lost_probes": 18,
+    "loss_fraction": 1.0,
+    "rtt_mean_ms": null,
+    "rtt_min_ms": null,
+    "rtt_max_ms": null,
+    "first_loss_unix_s": 1790954966.224994,
+    "stable_recovery_unix_s": null,
+    "time_to_stable_recovery_s": null,
+    "continuous_during_observation": false,
+    "recovery_observed": false,
+    "baseline_path_available": true
+  },
+  "udp": {
+    "sent_packets": 0,
+    "received_packets": 0,
+    "duplicate_packets": 0,
+    "lost_packets": 0,
+    "loss_fraction": null,
+    "received_payload_bytes": 0,
+    "observation_s": null,
+    "throughput_bps": null,
+    "jitter_ms": null,
+    "jitter_method": "RFC3550 transit-difference EWMA (1/16)"
+  }
+}

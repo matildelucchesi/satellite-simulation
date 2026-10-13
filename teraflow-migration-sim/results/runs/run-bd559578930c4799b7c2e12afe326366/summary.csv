@@ -1,0 +1,2 @@
+run_id,purpose,execution_kind,method,configured_rate_bps,outcome,success,ack,controller_downtime_s,total_operation_s,bytes_sent,bytes_received,failure_reason
+run-bd559578930c4799b7c2e12afe326366,diagnostic,live-hybrid,hot,1000000000,interrupted,False,False,,,1823565400,1823565400,Job interrupted by user

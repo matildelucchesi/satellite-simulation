@@ -43,12 +43,20 @@ The two independent SAT-A/SAT-B stacks are defined in [deploy/compose.yaml](depl
 
 ## Remaining work before final results
 
-1. Pin and build the exact TeraFlowSDN `v7.0.0` source; measure the five component artifacts and decide which supporting services are transferred or preinstalled.
-2. Implement and exercise the Release 7 API adapter against the exact build: export contexts/topologies, devices/links, services/connections/policies; recreate them on SAT-B; check operational state; only then ACK.
-3. Measure cold snapshot, hot initial restore/freeze/delta, controller startup, API restore/verification, and ACK times. Populate the artifact manifest from those runs.
-4. Fix the score utility normalization and the starting SAT-A. The score implementation uses within-event latency normalization, connected-network reachability, predicted control-continuity over the common horizon, and the weakest CPU/RAM/disk headroom above reserve. Confirm the chosen initial host and that each selected event has multiple eligible SAT-B candidates before treating the score comparison as meaningful.
-5. Generate eclipse/resource triggers and choose distinct P10/P50/P90 migration events from eligible triggers, then run the paired hot/cold × three-rate matrix. Add separately labelled controlled FSO-loss and destination-start failure trials.
-6. Integrate the actual Mininet/BMv2 service probe and TeraFlow service restore, then confirm controller recovery and data-plane recovery separately.
+### Live engine and local console (2026-10-08)
+
+The shared application service now connects Compose, TeraFlow restore, TCP transfer, orbital replay, probes and staged P4 cutover. Cold and hot functional migrations have completed with verified API equivalence, ACK and hardware cutover; these are diagnostics, not the 18 principal cases. Calibration and the experimental gates must finish before claiming final results.
+
+Start the independent local GUI with `python tools/serve_gui.py`, then open **http://127.0.0.1:18092/**. The SVG topology, persistent job timeline, experiment matrix, run details and registered downloads read the same results as the CLI. See [the operating guide](docs/operating-guide.md) for commands, interruption/recovery and measurement limits. `python tools/experiment.py complete` runs the gated workflow in a separate worker; the browser may be closed without stopping it.
+
+The historical checklist below describes the earlier preflight stage. Consult [implementation status](docs/implementation-status.md) and the saved job results for current acceptance status.
+
+The source and six original workload images are pinned. The lab, deterministic fixture, API adapter, snapshot/delta handling, TCP transport, migration state machine, orbital replay and standby P4 proxy have implementations. Their existence does not establish successful live migration. Current verification and the upstream compatibility failure are recorded in [docs/implementation-status.md](docs/implementation-status.md).
+
+1. Extend the successful L2NM restore/forwarding preflight to confirmed hardware cutover and live standby isolation checks. The authorized Service/Device compatibility patches and the separate six-image bundle are tracked; the original upstream bundle is preserved.
+2. Connect the live backend to the migration state machine; verify cold/hot cutover, crash recovery and every required injected failure. Confirm controller recovery and data-plane recovery independently.
+3. Complete the three functional calibration measurements per mode and transport capacity checks. Freeze the measured manifest, workload, horizon and selected events.
+4. Run the 18 paired cases and the separate ranking diagnostic, then publish raw evidence, aggregate results and modeled sensitivity separately.
 
 Until these measurements and integration checks are complete, the output is an orbital preflight and a parametric model, not final performance evidence for a running TeraFlowSDN deployment.
 

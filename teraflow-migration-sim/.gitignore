@@ -3,3 +3,7 @@ __pycache__/
 .venv/
 .reference/
 results/tmp/
+artifacts/**/*.tar
+artifacts/**/*.partial
+artifacts/**/*.npz
+results/lab/

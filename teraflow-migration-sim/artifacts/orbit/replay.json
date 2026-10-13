@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "artifact": {
+    "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\artifacts\\orbit\\replay.npz",
+    "bytes": 33490373,
+    "sha256": "5514d51384718a0a48ffee01c5c88dacb1ced9abd499b8f3986aa845146a5727"
+  },
+  "astropy": "7.1.0",
+  "numpy": "2.2.6",
+  "solar_ephemeris": "astropy-get_sun-built-in-ERFA",
+  "frame": "TEME",
+  "eclipse_model": "cylindrical-spherical-earth",
+  "epoch_utc": "2026-10-01T09:01:39.677069+00:00",
+  "scenario_sha256": "da0c317c1c52a70589f553d9c30f616ee4323a2af714b60ffcb882d3bd47062b",
+  "tle_sha256": "2beb3d7a65aded2e55122f2405e53d4d3c50fdce11623bda0beb3c4676d84187"
+}

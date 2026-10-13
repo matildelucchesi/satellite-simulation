@@ -1,0 +1,37 @@
+--- a/src/device/service/drivers/p4/p4_manager.py
++++ b/src/device/service/drivers/p4/p4_manager.py
+@@ -697,6 +697,34 @@
+         table_name = parse_resource_string_from_json(
+             json_resource, "table-name")
+         match_map = parse_match_operations_from_json(json_resource)
++        # Indirect table actions reference a profile member or selector group.
++        references = [key for key in ("member-id", "group-id") if key in json_resource]
++        if references:
++            if len(references) != 1 or "action-name" in json_resource:
++                raise ValueError("Indirect table requires exactly one action reference")
++            identifier = json_resource[references[0]]
++            if isinstance(identifier, bool) or not isinstance(identifier, int) or identifier <= 0:
++                raise ValueError("Indirect action identifier must be a positive integer")
++            entry = TableEntry(self.local_client, table_name)
++            for field, value in match_map.items():
++                entry.match[field] = value
++            setattr(entry, references[0].replace("-", "_"), identifier)
++            if "priority" in json_resource:
++                entry.priority = parse_resource_integer_from_json(json_resource, "priority")
++            if operation == WriteOperation.delete:
++                entry.delete()
++            elif operation == WriteOperation.update:
++                entry.modify()
++            elif operation == WriteOperation.insert:
++                try:
++                    entry.insert()
++                except (P4RuntimeException, P4RuntimeWriteException) as exc:
++                    if "ALREADY_EXISTS" not in str(exc):
++                        raise
++                    entry.modify()
++            else:
++                raise ValueError("Unsupported indirect table operation")
++            return entry
+         action_name = parse_resource_string_from_json(
+             json_resource, "action-name")
+         action_params = parse_action_parameters_from_json(json_resource)

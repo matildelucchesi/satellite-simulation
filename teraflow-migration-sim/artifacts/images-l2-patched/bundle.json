@@ -1,0 +1,95 @@
+{
+  "schema_version": 2,
+  "source_commit": "fb8707871eba26806cac7ac373c70b2bb5bd26fc",
+  "format": "docker-save-tar-uncompressed",
+  "created_utc": "2026-10-02T20:36:13.439394+00:00",
+  "docker_version": "29.6.1",
+  "image_bundle": {
+    "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\artifacts\\images-l2-patched\\teraflow-v7-images.tar",
+    "bytes": 1823463936,
+    "sha256": "28cedd8d75c0666a9ede29308c59a7fa1a7ce6c3ac50fdfc0a0997fe7a32cdc7",
+    "format": "docker-save-tar-uncompressed"
+  },
+  "local_patch": {
+    "manifest": {
+      "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\deploy\\patches\\manifest.json",
+      "bytes": 554,
+      "sha256": "cbd214db3fe1070e1f0757f2f6b53ca08ad48701df0255346a8d1fa58fd438c4"
+    },
+    "metadata": {
+      "upstream_commit": "fb8707871eba26806cac7ac373c70b2bb5bd26fc",
+      "upstream_file": "src/service/service/service_handlers/p4_fabric_tna_l2_simple/p4_fabric_tna_l2_simple_service_handler.py",
+      "upstream_sha256": "ee4928041c0789797e4898945f411523452e5b2b5302a3adac9383ae60e60629",
+      "patched_sha256": "1d6d1bee4dab643a3e5b834a1fa54fdbeb17e2439dc8f3e4b418c5c20bb0dd9c",
+      "patch_sha256": "852070608f952b7e83a3c0bd4ee4ba604863fca85e531c894b3aa3db34aeee90",
+      "authorization": "User approved tracked local L2NM compatibility patch on 2026-10-02"
+    }
+  },
+  "device_patch": {
+    "manifest": {
+      "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\deploy\\patches\\device-manifest.json",
+      "bytes": 876,
+      "sha256": "095c255d739215b4c0721c7ffec2b1b0a3d771884925d202523991a1993250f0"
+    },
+    "metadata": {
+      "upstream_commit": "fb8707871eba26806cac7ac373c70b2bb5bd26fc",
+      "upstream_file": "src/device/service/drivers/p4/p4_driver.py",
+      "upstream_sha256": "ac410160bebfd2c4b40f0be32abdeb71ca023f2a0cfcca7fb6b52d21aee47d5c",
+      "patched_sha256": "a351be12f029d44bdfac742a802d37a9da4f7c379c9bcac513059cb794b56845",
+      "patch_sha256": "ba349ff0cdcb82089e82db6a433e66c6df89cb3c2aa6839ea7e576b4d06bbade",
+      "authorization": "User requested correction of the Device error on 2026-10-02",
+      "related_files": [
+        {
+          "upstream_file": "src/device/service/drivers/p4/p4_manager.py",
+          "upstream_sha256": "f83e139149198998b179475bcf381cf3bdb7ff62aaec1f94b5947ad2ae48453b",
+          "patched_sha256": "032dc356986bfd885ccae6f5b7c5bffe1969abca9ca402234a728f48e0020567",
+          "patch_sha256": "f2531578467c0e7cf9a3d65339523fd8b9d5371cdeb0667d339a408cc0738601"
+        }
+      ]
+    }
+  },
+  "images": {
+    "context": {
+      "reference": "tfs-migration/context:7.0.0-fb870787",
+      "image_id": "sha256:1e5f589a1b198305ac41555ce6b39548940f34c0b69fca73e0b57d556151ded4",
+      "repo_digests": [
+        "tfs-migration/context@sha256:1e5f589a1b198305ac41555ce6b39548940f34c0b69fca73e0b57d556151ded4"
+      ]
+    },
+    "device": {
+      "reference": "tfs-migration/device:7.0.0-fb870787-lab2",
+      "image_id": "sha256:c39891f351ac0df0ca116966f1f4bb7580b369b25d60c136fa8dc3578078629e",
+      "repo_digests": [
+        "tfs-migration/device@sha256:c39891f351ac0df0ca116966f1f4bb7580b369b25d60c136fa8dc3578078629e"
+      ]
+    },
+    "pathcomp-frontend": {
+      "reference": "tfs-migration/pathcomp-frontend:7.0.0-fb870787",
+      "image_id": "sha256:320992810dd5dd02100b72c88cef3cbf41ecea5e8370f2f711df1678894954ac",
+      "repo_digests": [
+        "tfs-migration/pathcomp-frontend@sha256:320992810dd5dd02100b72c88cef3cbf41ecea5e8370f2f711df1678894954ac"
+      ]
+    },
+    "pathcomp-backend": {
+      "reference": "tfs-migration/pathcomp-backend:7.0.0-fb870787",
+      "image_id": "sha256:e17f6f08cdeae820d26616ad2ff2a5b1fc39e1c83b565e0885597f9698c08654",
+      "repo_digests": [
+        "tfs-migration/pathcomp-backend@sha256:e17f6f08cdeae820d26616ad2ff2a5b1fc39e1c83b565e0885597f9698c08654"
+      ]
+    },
+    "service": {
+      "reference": "tfs-migration/service:7.0.0-fb870787-lab1",
+      "image_id": "sha256:a5cfe3a49631320757c076065e2da3cc9179ebf0c59eb43db3126624b4fb9ca7",
+      "repo_digests": [
+        "tfs-migration/service@sha256:a5cfe3a49631320757c076065e2da3cc9179ebf0c59eb43db3126624b4fb9ca7"
+      ]
+    },
+    "nbi": {
+      "reference": "tfs-migration/nbi:7.0.0-fb870787",
+      "image_id": "sha256:4e787127caf54a5fde86b0dbe58d60cd128d656418f5ecbc7f142423c55dd7c9",
+      "repo_digests": [
+        "tfs-migration/nbi@sha256:4e787127caf54a5fde86b0dbe58d60cd128d656418f5ecbc7f142423c55dd7c9"
+      ]
+    }
+  }
+}

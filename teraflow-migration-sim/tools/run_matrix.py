@@ -26,7 +26,7 @@ def load_workload(path: Path) -> Workload:
     state = document["operational_state"]
     times = document["timing_measurements_s"]
     return Workload(
-        image_bytes=sum(images[name]["transferred_bytes"] for name in ("context", "device", "pathcomp-frontend", "pathcomp-backend", "service", "nbi")),
+        image_bytes=document["image_bundle"]["bytes"],
         cold_state_bytes=state["cold_snapshot_bytes"],
         hot_initial_state_bytes=state["hot_initial_state_bytes"],
         hot_final_delta_bytes=state["hot_final_delta_bytes"],
@@ -60,6 +60,10 @@ def main() -> int:
     rates = scenario["fso"]["useful_throughput_bps"]
     alignment = scenario["fso"]["alignment_s"]
     rows = []
+    horizon = reference_horizon_s(max(
+        evaluate(workload, method, rate, alignment, 1e12, 1e12).total_operation_s
+        for method in ("cold", "hot") for rate in rates),
+        scenario["controller"]["resource_forecast_horizon_factor"])
     for event in events:
         for method in ("cold", "hot"):
             for rate in rates:
@@ -67,10 +71,8 @@ def main() -> int:
                                 event["contact_window_s"], event["deadline_window_s"])
                 row = {"event_id": event["event_id"], "percentile_case": event["percentile_case"],
                        "sat_a": event["sat_a"], "sat_b": event["sat_b"], **asdict(case)}
-                row["reference_horizon_s"] = reference_horizon_s(
-                    evaluate(workload, "cold", rates[0], alignment, 1e12, 1e12).total_operation_s,
-                    scenario["controller"]["resource_forecast_horizon_factor"],
-                )
+                row["reference_horizon_s"] = horizon
+                row["execution_kind"] = "calibrated-model"
                 rows.append(row)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     json_path = out_path.with_suffix(".json")

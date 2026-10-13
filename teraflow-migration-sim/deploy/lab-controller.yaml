@@ -1,0 +1,8 @@
+services:
+  deviceservice:
+    volumes: ["..:/experiment:ro"]
+    networks: [default, lab]
+networks:
+  lab:
+    external: true
+    name: tfs-migration-lab

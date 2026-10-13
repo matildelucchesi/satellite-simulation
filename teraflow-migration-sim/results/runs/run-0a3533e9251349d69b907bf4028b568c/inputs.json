@@ -1,0 +1,248 @@
+{
+  "bundle": {
+    "created_utc": "2026-10-02T21:11:33.278421+00:00",
+    "device_patch": {
+      "manifest": {
+        "bytes": 876,
+        "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\deploy\\patches\\device-manifest.json",
+        "sha256": "095c255d739215b4c0721c7ffec2b1b0a3d771884925d202523991a1993250f0"
+      },
+      "metadata": {
+        "authorization": "User requested correction of the Device error on 2026-10-02",
+        "patch_sha256": "ba349ff0cdcb82089e82db6a433e66c6df89cb3c2aa6839ea7e576b4d06bbade",
+        "patched_sha256": "a351be12f029d44bdfac742a802d37a9da4f7c379c9bcac513059cb794b56845",
+        "related_files": [
+          {
+            "patch_sha256": "f2531578467c0e7cf9a3d65339523fd8b9d5371cdeb0667d339a408cc0738601",
+            "patched_sha256": "032dc356986bfd885ccae6f5b7c5bffe1969abca9ca402234a728f48e0020567",
+            "upstream_file": "src/device/service/drivers/p4/p4_manager.py",
+            "upstream_sha256": "f83e139149198998b179475bcf381cf3bdb7ff62aaec1f94b5947ad2ae48453b"
+          }
+        ],
+        "upstream_commit": "fb8707871eba26806cac7ac373c70b2bb5bd26fc",
+        "upstream_file": "src/device/service/drivers/p4/p4_driver.py",
+        "upstream_sha256": "ac410160bebfd2c4b40f0be32abdeb71ca023f2a0cfcca7fb6b52d21aee47d5c"
+      }
+    },
+    "docker_version": "29.6.1",
+    "format": "docker-save-tar-uncompressed",
+    "image_bundle": {
+      "bytes": 1823463936,
+      "format": "docker-save-tar-uncompressed",
+      "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\artifacts\\images-l2-patched-v2\\teraflow-v7-images.tar",
+      "sha256": "9fc2920c12e4cc8867cd34ad294f1c240acc34b181dd462ce69e5abd51531c00"
+    },
+    "images": {
+      "context": {
+        "image_id": "sha256:1e5f589a1b198305ac41555ce6b39548940f34c0b69fca73e0b57d556151ded4",
+        "reference": "tfs-migration/context:7.0.0-fb870787",
+        "repo_digests": [
+          "tfs-migration/context@sha256:1e5f589a1b198305ac41555ce6b39548940f34c0b69fca73e0b57d556151ded4"
+        ]
+      },
+      "device": {
+        "image_id": "sha256:c39891f351ac0df0ca116966f1f4bb7580b369b25d60c136fa8dc3578078629e",
+        "reference": "tfs-migration/device:7.0.0-fb870787-lab2",
+        "repo_digests": [
+          "tfs-migration/device@sha256:c39891f351ac0df0ca116966f1f4bb7580b369b25d60c136fa8dc3578078629e"
+        ]
+      },
+      "nbi": {
+        "image_id": "sha256:4e787127caf54a5fde86b0dbe58d60cd128d656418f5ecbc7f142423c55dd7c9",
+        "reference": "tfs-migration/nbi:7.0.0-fb870787",
+        "repo_digests": [
+          "tfs-migration/nbi@sha256:4e787127caf54a5fde86b0dbe58d60cd128d656418f5ecbc7f142423c55dd7c9"
+        ]
+      },
+      "pathcomp-backend": {
+        "image_id": "sha256:e17f6f08cdeae820d26616ad2ff2a5b1fc39e1c83b565e0885597f9698c08654",
+        "reference": "tfs-migration/pathcomp-backend:7.0.0-fb870787",
+        "repo_digests": [
+          "tfs-migration/pathcomp-backend@sha256:e17f6f08cdeae820d26616ad2ff2a5b1fc39e1c83b565e0885597f9698c08654"
+        ]
+      },
+      "pathcomp-frontend": {
+        "image_id": "sha256:320992810dd5dd02100b72c88cef3cbf41ecea5e8370f2f711df1678894954ac",
+        "reference": "tfs-migration/pathcomp-frontend:7.0.0-fb870787",
+        "repo_digests": [
+          "tfs-migration/pathcomp-frontend@sha256:320992810dd5dd02100b72c88cef3cbf41ecea5e8370f2f711df1678894954ac"
+        ]
+      },
+      "service": {
+        "image_id": "sha256:5dea4352243855da7e1e2aa4a454f07c68864c1afe969471714ad395262b47fe",
+        "reference": "tfs-migration/service:7.0.0-fb870787-lab2",
+        "repo_digests": [
+          "tfs-migration/service@sha256:5dea4352243855da7e1e2aa4a454f07c68864c1afe969471714ad395262b47fe"
+        ]
+      }
+    },
+    "local_patch": {
+      "manifest": {
+        "bytes": 554,
+        "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\deploy\\patches\\manifest.json",
+        "sha256": "eed5001296463839dd1cc84dd0f8aa90a32c428544a3e10bd18e049dab1243c6"
+      },
+      "metadata": {
+        "authorization": "User approved tracked local L2NM compatibility patch on 2026-10-02",
+        "patch_sha256": "b5bdc303b10292d43e33ffae86bd7f9cbd1e0bde4e9574a96b01c051deb4de3c",
+        "patched_sha256": "09fb85a9ac02ade7d03cfa626ae3298ab6a59451d708b08ec3e604e6afca9c11",
+        "upstream_commit": "fb8707871eba26806cac7ac373c70b2bb5bd26fc",
+        "upstream_file": "src/service/service/service_handlers/p4_fabric_tna_l2_simple/p4_fabric_tna_l2_simple_service_handler.py",
+        "upstream_sha256": "ee4928041c0789797e4898945f411523452e5b2b5302a3adac9383ae60e60629"
+      }
+    },
+    "schema_version": 2,
+    "source_commit": "fb8707871eba26806cac7ac373c70b2bb5bd26fc"
+  },
+  "event": {
+    "contact_end_s": 6248,
+    "contact_window_s": 1870,
+    "deadline_s": 7571,
+    "deadline_window_s": 3193,
+    "event_id": "functional-53848-53913-4378",
+    "execution_purpose": "functional-calibration",
+    "sat_a": 53848,
+    "sat_b": 53913,
+    "trigger_causes": [
+      "functional_diagnostic"
+    ],
+    "trigger_s": 4378
+  },
+  "fault": null,
+  "method": "hot",
+  "purpose": "diagnostic",
+  "rate_bps": 1000000000,
+  "scenario": {
+    "controller": {
+      "background_load_model": {
+        "candidate_cpu_start_percent": 40,
+        "candidate_ram_start_percent": 45,
+        "ramp_duration_horizons": 2,
+        "sample_step_s": 1,
+        "sat_a_cpu_ram_end_percent": 85,
+        "sat_a_cpu_ram_start_percent": 55,
+        "type": "deterministic-linear-ramp"
+      },
+      "components": [
+        "context",
+        "device",
+        "pathcomp",
+        "service",
+        "nbi"
+      ],
+      "dependency_policy": "preinstalled-independent-cockroachdb-nats-kafka-per-host",
+      "eclipse_trigger": "start when predicted time to SAT-A eclipse is within H; eclipse is a modeled operational deadline, not an automatic radio outage",
+      "resource_clear_fraction": 0.7,
+      "resource_clear_persistence_s": 60,
+      "resource_forecast_horizon_factor": 1.2,
+      "resource_persistence_s": 30,
+      "resource_profile": {
+        "cpu_cores": 6,
+        "disk_gib": 80,
+        "ram_gib": 12
+      },
+      "resource_reserve_fraction": 0.2,
+      "resource_reserve_sensitivity": [
+        0.1,
+        0.3
+      ],
+      "resource_trigger_fraction": 0.8,
+      "teraflow_release": "7.0.0",
+      "workload_images": [
+        "context",
+        "device",
+        "pathcomp-frontend",
+        "pathcomp-backend",
+        "service",
+        "nbi"
+      ]
+    },
+    "fso": {
+      "alignment_s": 60,
+      "max_attempts": 3,
+      "max_range_km": 1700.0,
+      "progress_timeout_s": 120,
+      "protocol": "TCP",
+      "restart_copy_from_zero_after_link_loss": true,
+      "useful_throughput_bps": [
+        100000000,
+        1000000000,
+        10000000000
+      ]
+    },
+    "orbital": {
+      "earth_occultation_model": "spherical",
+      "earth_radius_km": 6378.137,
+      "inclination_screen_deg": [
+        52.5,
+        53.5
+      ],
+      "nominal_shell_altitude_km": 550.0,
+      "nominal_shell_inclination_deg": 53.0,
+      "plane_separation_deg": [
+        10.0,
+        30.0
+      ],
+      "planes": 2,
+      "propagation_duration_s": 86400,
+      "propagation_step_s": 1,
+      "raan_cluster_gap_deg": 1.5,
+      "reference_epoch_utc": "2026-10-01T09:01:39.677069+00:00",
+      "satellites_per_plane": [
+        6,
+        11
+      ],
+      "satellites_total": 17,
+      "selected_altitude_range_km": [
+        521.9046,
+        540.0584
+      ],
+      "selected_constellation_file": "config/selected_constellation.json",
+      "selected_raan_centers_deg": [
+        90.00469401379361,
+        110.02730776511369
+      ],
+      "sgp4_mean_semi_major_axis_altitude_screening_km": [
+        520.0,
+        580.0
+      ],
+      "tle_file": "data/starlink_2026-10-01.tle"
+    },
+    "project": "teraflow-sdn-controller-migration",
+    "sampling": {
+      "event_percentiles": [
+        10,
+        50,
+        90
+      ],
+      "fault_trials_separate": true,
+      "paired_by_event_destination_and_trigger": true,
+      "primary_matrix": [
+        "cold",
+        "hot"
+      ],
+      "replicas_per_event_per_case": 1
+    },
+    "schema_version": 1,
+    "score": {
+      "normalization": "latency=minmax-inverse-among-eligible-candidates-per-event; connectivity=reachable_nodes/total_nodes; continuity=min(time_to_outage/H,1); resources=weakest_post-placement_headroom_above_reserve_normalized_to_1",
+      "tie_break": [
+        "shortest_fso_distance_km",
+        "lowest_norad_id"
+      ],
+      "weights": {
+        "connectivity": 0.3,
+        "continuity": 0.2,
+        "latency": 0.35,
+        "resources": 0.15
+      }
+    },
+    "service_probe": {
+      "control_heartbeat_s": 5,
+      "link_policy": "data-plane-links-follow-orbital-geometry; controller-binding-moves-after-ack",
+      "ping_interval_s": 0.1,
+      "stable_recovery_successes": 10,
+      "udp_rate_bps": 1000000
+    }
+  }
+}

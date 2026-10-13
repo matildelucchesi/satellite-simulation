@@ -1,0 +1,27 @@
+services:
+  mininet:
+    build:
+      context: ..
+      dockerfile: deploy/emulator.Dockerfile
+      args:
+        BMV2_IMAGE: ${BMV2_IMAGE:?Run prepare_lab.py first}
+    image: tfs-migration/mininet:local
+    privileged: true
+    volumes: ["..:/experiment:ro", "../results/lab:/results"]
+    command: ["config/fixture.json"]
+    ports: ["127.0.0.1:18090:8089"]
+    networks: [lab]
+  p4-proxy:
+    image: tfs-migration/device:7.0.0-fb870787
+    entrypoint: [python, -m, src.p4_proxy, config/fixture.json]
+    working_dir: /experiment
+    environment: {PYTHONPATH: /experiment:/opt/tfs, P4_STATE_DIRECTORY: /state}
+    volumes: ["..:/experiment:ro", "proxy-state:/state"]
+    ports: ["127.0.0.1:18091:8090"]
+    depends_on: [mininet]
+    networks: [lab]
+networks:
+  lab:
+    name: tfs-migration-lab
+volumes:
+  proxy-state:

@@ -40,6 +40,10 @@ def resource_trigger(
     """Whether the predicted crossing has persisted for the configured samples."""
     if persistence_s <= 0 or sample_step_s <= 0:
         raise ValueError("persistence and sample step must be positive")
+    if horizon_s <= 0 or elapsed_s < 0:
+        raise ValueError("horizon must be positive and elapsed time nonnegative")
+    if int(elapsed_s / sample_step_s) + 1 < math.ceil(persistence_s / sample_step_s):
+        return False
     slope = (end_percent - start_percent) / (2.0 * horizon_s)
     first_sample = max(0, int(elapsed_s / sample_step_s) - math.ceil(persistence_s / sample_step_s) + 1)
     required_samples = math.ceil(persistence_s / sample_step_s)

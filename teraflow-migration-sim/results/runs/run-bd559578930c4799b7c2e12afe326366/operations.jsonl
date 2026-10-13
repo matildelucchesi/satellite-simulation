@@ -1,0 +1,8 @@
+{"operation": "snapshot", "elapsed_s": 0.63724509999156, "timestamp_utc": "2026-10-08T16:19:20.132775+00:00"}
+{"operation": "image_load_shared_daemon", "elapsed_s": 154.57152740005404, "timestamp_utc": "2026-10-08T16:22:16.835119+00:00"}
+{"operation": "controller_startup", "elapsed_s": 25.070321399951354, "timestamp_utc": "2026-10-08T16:22:41.909219+00:00"}
+{"operation": "api_restore", "elapsed_s": 30.211173499934375, "timestamp_utc": "2026-10-08T16:23:12.136256+00:00"}
+{"operation": "freeze", "elapsed_s": 0.06848770007491112, "timestamp_utc": "2026-10-08T16:23:12.219618+00:00"}
+{"operation": "snapshot", "elapsed_s": 0.8789876999799162, "timestamp_utc": "2026-10-08T16:23:13.113154+00:00"}
+{"operation": "delta_apply", "elapsed_s": 7.526356799993664, "timestamp_utc": "2026-10-08T16:23:20.731963+00:00"}
+{"operation": "api_verification", "elapsed_s": 0.8853394999168813, "timestamp_utc": "2026-10-08T16:23:21.632330+00:00"}
