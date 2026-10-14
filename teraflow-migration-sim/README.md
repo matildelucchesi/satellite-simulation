@@ -1,6 +1,6 @@
 # TeraFlowSDN controller migration simulation
 
-This is a greenfield experiment workspace. It does not use the existing simulator implementation.
+This is the sole application in the repository. The previous seven-satellite simulator and its port-8081 dashboard have been removed. The local console is served directly on port 18092.
 
 The experiment compares hot and cold migration of a TeraFlowSDN Release 7 controller workload over a direct FSO/TCP link. The orbital inputs are frozen Starlink TLEs, propagated with SGP4. Mininet/BMv2/P4 is planned as the functional service data plane; its links follow orbital visibility, while the controller binding moves only after SAT-B passes restoration checks and ACKs.
 

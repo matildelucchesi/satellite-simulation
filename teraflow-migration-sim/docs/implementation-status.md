@@ -1,5 +1,15 @@
 # Implementation status — 2026-10-02
 
+## Live verification — 2026-10-14
+
+After removal of the previous simulator, the TeraFlow/P4 laboratory and local console were restarted. The stale workflow job was recovered through the normal job service; its source orbital window had expired, so the controllers were fenced before a new trial.
+
+The restart exposed a missing-pipeline recovery defect: BMv2 starts without its P4 pipeline, while the proxy retains desired state. Recovery now installs the checkpointed pipeline before reading/reconciling rules; an existing conflicting pipeline is rejected. Eight P4 tests pass in the pinned proxy container. The host suite passes 56 tests with those eight container-only tests skipped.
+
+The first diagnostic hot trial was interrupted after a 180-second Docker image-load timeout and rollback. A direct load of the unchanged authorized bundle succeeded. Image import now has a 600-second ceiling bounded by the remaining source operational deadline. The subsequent hot trial `run-c680093ed93447bcb7a5b6323c6dd7c8` succeeded on its first attempt: verified transfers, API equivalence, ACK and P4 cutover. Measured useful image throughput was 999.265 Mbit/s, image load 460.271 s, total operation 627.651 s and controller downtime 20.936 s. The final authority is SAT-B; 320/320 ping replies were observed after cutover.
+
+The independent preflight verified 50/50 pings and 498/506 UDP packets. The migration trial's initial service baseline was unavailable, so its service recovery duration remains non-attributable; the trial is a functional diagnostic, not a primary campaign result. Cold mode was not rerun in this verification. Calibration and the 18-case primary campaign remain incomplete. Raw evidence is in the run/job directories, the regenerated summary in `results/report/`, and final checks in `results/runtime-verification-2026-10-14.json`.
+
 The experiment is incomplete. No 18-case live campaign or completed calibration is claimed.
 
 ## Verified implementation

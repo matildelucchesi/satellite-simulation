@@ -1,0 +1,9 @@
+{"operation": "snapshot", "elapsed_s": 1.291495299898088, "timestamp_utc": "2026-10-14T14:24:38.850502+00:00"}
+{"operation": "image_load_shared_daemon", "elapsed_s": 460.2712565998081, "timestamp_utc": "2026-10-14T14:32:42.354742+00:00"}
+{"operation": "controller_startup", "elapsed_s": 26.86773919989355, "timestamp_utc": "2026-10-14T14:33:09.226903+00:00"}
+{"operation": "api_restore", "elapsed_s": 34.42903230013326, "timestamp_utc": "2026-10-14T14:33:43.691947+00:00"}
+{"operation": "freeze", "elapsed_s": 0.057867900002747774, "timestamp_utc": "2026-10-14T14:33:43.781640+00:00"}
+{"operation": "snapshot", "elapsed_s": 0.9369657000061125, "timestamp_utc": "2026-10-14T14:33:44.746301+00:00"}
+{"operation": "delta_apply", "elapsed_s": 17.975143800023943, "timestamp_utc": "2026-10-14T14:34:02.913259+00:00"}
+{"operation": "api_verification", "elapsed_s": 1.0228383999783546, "timestamp_utc": "2026-10-14T14:34:03.970064+00:00"}
+{"operation": "cutover", "elapsed_s": 0.4216102999635041, "timestamp_utc": "2026-10-14T14:34:04.639885+00:00"}

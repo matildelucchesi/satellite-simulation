@@ -248,6 +248,24 @@ class SwitchState:
         backend = self.backend
         backend.require_master()
         if destination not in self.pipeline: raise RuntimeError("Destination pipeline missing")
+        request = pb.GetForwardingPipelineConfigRequest(device_id=backend.device_id,
+                    response_type=pb.GetForwardingPipelineConfigRequest.ALL)
+        try:
+            hardware_pipeline = backend.stub.GetForwardingPipelineConfig(request, timeout=10).config
+        except grpc.RpcError as exc:
+            if exc.code() not in (grpc.StatusCode.NOT_FOUND, grpc.StatusCode.FAILED_PRECONDITION):
+                raise
+            hardware_pipeline = pb.ForwardingPipelineConfig()
+        if not hardware_pipeline.p4info.tables:
+            # A restarted BMv2 has no pipeline, even when the proxy has a
+            # durable desired-state checkpoint. Install it before reading rules.
+            install = pb.SetForwardingPipelineConfigRequest(device_id=backend.device_id,
+                        action=pb.SetForwardingPipelineConfigRequest.VERIFY_AND_COMMIT)
+            install.election_id.CopyFrom(backend.election)
+            install.config.CopyFrom(self.pipeline[destination])
+            backend.stub.SetForwardingPipelineConfig(install, timeout=10)
+        elif hardware_pipeline != self.pipeline[destination]:
+            raise RuntimeError("Hardware pipeline differs from recovery checkpoint")
         current = {entry_key(entity): entity for entity in backend.read_all()}
         desired = self.entries[destination]
         updates = []
@@ -454,7 +472,8 @@ def serve(fixture):
                 else: raise ValueError("Unknown operation")
                 self.send_response(200); self.end_headers(); self.wfile.write(b'{}')
             except Exception as exc:
-                self.send_response(409); self.end_headers(); self.wfile.write(json.dumps({"error": str(exc)}).encode())
+                logging.exception('P4 administration failed: %s', self.path)
+                self.send_response(409); self.end_headers(); self.wfile.write(json.dumps({"error": str(exc) or repr(exc)}).encode())
     ThreadingHTTPServer(("0.0.0.0", 8090), Handler).serve_forever()
 
 

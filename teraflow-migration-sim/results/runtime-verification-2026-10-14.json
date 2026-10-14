@@ -1,0 +1,18 @@
+{
+  "verified_utc": "2026-10-14T16:52:22.6957112+02:00",
+  "run_id": "run-c680093ed93447bcb7a5b6323c6dd7c8",
+  "outcome": "success",
+  "ack": true,
+  "active_controller": "sat-b",
+  "current_ack": true,
+  "console_available": true,
+  "mininet_available": true,
+  "switches_alive": true,
+  "destination_api_available": true,
+  "lab_lock": null,
+  "post_cutover_ping_lines": 320,
+  "post_cutover_ping_replies": 320,
+  "controller_downtime_s": 20.93632660014555,
+  "baseline_service_available": false,
+  "primary_campaign_validated": false
+}

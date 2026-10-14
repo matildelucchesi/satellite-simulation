@@ -9,7 +9,3 @@ __pycache__/
 .ruff_cache/
 .coverage
 htmlcov/
-logs/*
-!logs/.gitkeep
-state/*
-!state/.gitkeep

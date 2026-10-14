@@ -1,0 +1,11 @@
+{
+  "created_utc": "2026-10-14T14:51:36.674760+00:00",
+  "finished_utc": "2026-10-14T14:51:39.604009+00:00",
+  "job_id": "job-9c2f058a8dc24a069c09794fa040bc74",
+  "operation": "report",
+  "parameters": {},
+  "result_path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\results\\jobs\\job-9c2f058a8dc24a069c09794fa040bc74\\result.json",
+  "started_utc": "2026-10-14T14:51:37.026019+00:00",
+  "status": "completed",
+  "worker_pid": 40556
+}

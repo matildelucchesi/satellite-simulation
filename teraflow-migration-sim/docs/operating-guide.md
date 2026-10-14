@@ -2,9 +2,23 @@
 
 La console indipendente è disponibile su **http://127.0.0.1:18092/**. Da questa directory:
 
+La console sulla porta 18092 è l'unico frontend del progetto. La precedente dashboard Docker sulla porta 8081, la route `/legacy` e il relativo proxy sono stati rimossi. Avviare la GUI dalla directory `teraflow-migration-sim`; il worker è gestito dal motore sul computer.
+
 ```powershell
 python tools/serve_gui.py
 ```
+
+Se si usa l'ambiente locale del progetto, installare prima le dipendenze e avviare il laboratorio da questa directory:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt matplotlib
+docker compose --env-file deploy/lab.env -p migration-lab -f deploy/lab.yaml up -d --no-build
+docker compose --env-file deploy/sat-a.env -p sat-a -f deploy/compose.yaml -f deploy/lab-controller.yaml -f deploy/l2-patched.yaml up -d --wait
+docker compose --env-file deploy/sat-b.env -p sat-b -f deploy/compose.yaml -f deploy/lab-controller.yaml -f deploy/l2-patched.yaml up -d --wait
+.\.venv\Scripts\python.exe tools/serve_gui.py
+```
+
+Questi comandi presuppongono le immagini già costruite e gli artefatti del laboratorio presenti. `matplotlib` abilita le figure del report; NumPy e Astropy appartengono alle dipendenze dichiarate del progetto. Se è rimasto un lock di un worker morto, eseguire `tools/experiment.py recover --wait` con lo stesso interprete prima di nuove prove. Il recupero di un job ormai oltre la scadenza orbitale termina con i controller fenced: la nuova prova ricostruisce il proprio scenario.
 
 Usa Python con le dipendenze di `requirements.txt` installate e Docker Desktop con engine Linux avviato. Il server ascolta soltanto il loopback. Le API `/api/v1` applicano same-origin, verifica Host e token di sessione per i comandi. Non pubblicare la porta sulla rete.
 

@@ -1,0 +1,3 @@
+{"operation": "snapshot", "elapsed_s": 0.8117223000153899, "timestamp_utc": "2026-10-14T14:11:52.440403+00:00"}
+{"operation": "image_load_shared_daemon", "elapsed_s": 180.037799899932, "timestamp_utc": "2026-10-14T14:15:17.671602+00:00"}
+{"operation": "snapshot", "elapsed_s": 1.4184312999714166, "timestamp_utc": "2026-10-14T14:16:32.154636+00:00"}

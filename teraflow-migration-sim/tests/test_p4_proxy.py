@@ -52,6 +52,45 @@ class ProxyTests(unittest.TestCase):
         roundtrip = pb.Entity.FromString(content(member))
         self.assertEqual(roundtrip.WhichOneof('entity'), 'action_profile_member')
 
+    def test_recovery_installs_pipeline_before_reading_restarted_switch(self):
+        state, _, _ = self.setup_state()
+        backend = state.backend
+        backend.election = pb.Uint128(low=1)
+        installed = []
+        backend.SetForwardingPipelineConfig = lambda request, **kwargs: installed.append(request)
+        def read_all():
+            self.assertEqual(len(installed), 1)
+            return list(state.entries['sat-b'].values())
+        backend.read_all = read_all
+        backend.write = lambda updates: self.assertEqual(updates, [])
+        state.reconcile('sat-b')
+        self.assertEqual(installed[0].action, pb.SetForwardingPipelineConfigRequest.VERIFY_AND_COMMIT)
+        self.assertEqual(installed[0].config, state.pipeline['sat-b'])
+
+    def test_recovery_rejects_conflicting_hardware_pipeline(self):
+        state, _, _ = self.setup_state()
+        changed = pb.ForwardingPipelineConfig()
+        changed.CopyFrom(state.pipeline['sat-b'])
+        changed.p4_device_config = b'different'
+        state.backend.GetForwardingPipelineConfig = lambda *args, **kwargs: pb.GetForwardingPipelineConfigResponse(config=changed)
+        with self.assertRaisesRegex(RuntimeError, 'Hardware pipeline differs'):
+            state.reconcile('sat-b')
+
+    def test_recovery_handles_bmv2_missing_pipeline_rpc_status(self):
+        import grpc
+        state, _, _ = self.setup_state()
+        class MissingPipeline(grpc.RpcError):
+            def code(self): return grpc.StatusCode.FAILED_PRECONDITION
+        def missing(*args, **kwargs): raise MissingPipeline()
+        state.backend.GetForwardingPipelineConfig = missing
+        state.backend.election = pb.Uint128(low=1)
+        installed = []
+        state.backend.SetForwardingPipelineConfig = lambda request, **kwargs: installed.append(request)
+        state.backend.read_all = lambda: list(state.entries['sat-b'].values())
+        state.backend.write = lambda updates: None
+        state.reconcile('sat-b')
+        self.assertEqual(len(installed), 1)
+
     def test_delete_member_requires_identity_without_action_parameters(self):
         state, member, _ = self.setup_state()
         member.action_profile_member.ClearField('action')

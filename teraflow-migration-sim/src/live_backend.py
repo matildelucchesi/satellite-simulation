@@ -275,7 +275,11 @@ class LiveBackend:
         if self.fault == 'target_start': raise RuntimeError('Injected SAT-B startup failure')
         path = Path(receipt['path'])
         def load():
-            result = subprocess.run(['docker','load','-i',str(path)], cwd=self.root, capture_output=True, text=True, timeout=180)
+            # Docker Desktop may spend several minutes importing a verified
+            # bundle even when its layers are already present locally.
+            remaining = max(0, self.event['deadline_s'] - self.clock.orbital()) if self.clock else 600
+            result = subprocess.run(['docker','load','-i',str(path)], cwd=self.root,
+                                    capture_output=True, text=True, timeout=min(600, remaining))
             if result.returncode: raise RuntimeError(result.stderr)
         self.measure('image_load_shared_daemon', load)
         self.target_started = True

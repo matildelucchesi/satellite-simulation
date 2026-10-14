@@ -1,0 +1,2449 @@
+{
+  "entities": {
+    "connections": [
+      {
+        "connection_id": {
+          "connection_uuid": {
+            "uuid": "900e1042-c355-4691-a5b9-7de3394c4fad"
+          }
+        },
+        "path_hops_endpoint_ids": [
+          {
+            "device_id": {
+              "device_uuid": {
+                "uuid": "f7f1379d-0550-5a69-b6b5-9a7801028621"
+              }
+            },
+            "endpoint_uuid": {
+              "uuid": "c335c8d5-aaf1-5b81-b54b-7a0a0ea6daa8"
+            },
+            "topology_id": {
+              "context_id": {
+                "context_uuid": {
+                  "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                }
+              },
+              "topology_uuid": {
+                "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+              }
+            }
+          },
+          {
+            "device_id": {
+              "device_uuid": {
+                "uuid": "f7f1379d-0550-5a69-b6b5-9a7801028621"
+              }
+            },
+            "endpoint_uuid": {
+              "uuid": "20c235d3-36c3-5495-80c9-569eda225167"
+            },
+            "topology_id": {
+              "context_id": {
+                "context_uuid": {
+                  "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                }
+              },
+              "topology_uuid": {
+                "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+              }
+            }
+          },
+          {
+            "device_id": {
+              "device_uuid": {
+                "uuid": "e65cd631-994c-5849-ab56-5904c0f55c3d"
+              }
+            },
+            "endpoint_uuid": {
+              "uuid": "8c438986-e2f4-5e22-b764-40b32bed6ad9"
+            },
+            "topology_id": {
+              "context_id": {
+                "context_uuid": {
+                  "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                }
+              },
+              "topology_uuid": {
+                "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+              }
+            }
+          },
+          {
+            "device_id": {
+              "device_uuid": {
+                "uuid": "e65cd631-994c-5849-ab56-5904c0f55c3d"
+              }
+            },
+            "endpoint_uuid": {
+              "uuid": "272140a8-e251-59d5-a5db-e70736f2465e"
+            },
+            "topology_id": {
+              "context_id": {
+                "context_uuid": {
+                  "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                }
+              },
+              "topology_uuid": {
+                "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+              }
+            }
+          }
+        ],
+        "service_id": {
+          "context_id": {
+            "context_uuid": {
+              "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+            }
+          },
+          "service_uuid": {
+            "uuid": "c853520e-8776-5497-8d35-8a76147662e7"
+          }
+        },
+        "settings": {},
+        "sub_service_ids": []
+      },
+      {
+        "connection_id": {
+          "connection_uuid": {
+            "uuid": "d0b3bdb0-6549-401e-96fb-ba8858db9faa"
+          }
+        },
+        "path_hops_endpoint_ids": [
+          {
+            "device_id": {
+              "device_uuid": {
+                "uuid": "f7f1379d-0550-5a69-b6b5-9a7801028621"
+              }
+            },
+            "endpoint_uuid": {
+              "uuid": "c335c8d5-aaf1-5b81-b54b-7a0a0ea6daa8"
+            },
+            "topology_id": {
+              "context_id": {
+                "context_uuid": {
+                  "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                }
+              },
+              "topology_uuid": {
+                "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+              }
+            }
+          },
+          {
+            "device_id": {
+              "device_uuid": {
+                "uuid": "f7f1379d-0550-5a69-b6b5-9a7801028621"
+              }
+            },
+            "endpoint_uuid": {
+              "uuid": "20c235d3-36c3-5495-80c9-569eda225167"
+            },
+            "topology_id": {
+              "context_id": {
+                "context_uuid": {
+                  "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                }
+              },
+              "topology_uuid": {
+                "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+              }
+            }
+          },
+          {
+            "device_id": {
+              "device_uuid": {
+                "uuid": "e65cd631-994c-5849-ab56-5904c0f55c3d"
+              }
+            },
+            "endpoint_uuid": {
+              "uuid": "8c438986-e2f4-5e22-b764-40b32bed6ad9"
+            },
+            "topology_id": {
+              "context_id": {
+                "context_uuid": {
+                  "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                }
+              },
+              "topology_uuid": {
+                "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+              }
+            }
+          },
+          {
+            "device_id": {
+              "device_uuid": {
+                "uuid": "e65cd631-994c-5849-ab56-5904c0f55c3d"
+              }
+            },
+            "endpoint_uuid": {
+              "uuid": "272140a8-e251-59d5-a5db-e70736f2465e"
+            },
+            "topology_id": {
+              "context_id": {
+                "context_uuid": {
+                  "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                }
+              },
+              "topology_uuid": {
+                "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+              }
+            }
+          }
+        ],
+        "service_id": {
+          "context_id": {
+            "context_uuid": {
+              "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+            }
+          },
+          "service_uuid": {
+            "uuid": "c853520e-8776-5497-8d35-8a76147662e7"
+          }
+        },
+        "settings": {},
+        "sub_service_ids": []
+      }
+    ],
+    "contexts": [
+      {
+        "context_id": {
+          "context_uuid": {
+            "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+          }
+        },
+        "name": "migration-lab",
+        "service_ids": [
+          {
+            "context_id": {
+              "context_uuid": {
+                "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+              }
+            },
+            "service_uuid": {
+              "uuid": "c853520e-8776-5497-8d35-8a76147662e7"
+            }
+          }
+        ],
+        "slice_ids": [],
+        "topology_ids": [
+          {
+            "context_id": {
+              "context_uuid": {
+                "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+              }
+            },
+            "topology_uuid": {
+              "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+            }
+          }
+        ]
+      }
+    ],
+    "devices": [
+      {
+        "components": [],
+        "controller_id": {},
+        "device_config": {
+          "config_rules": [
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/address",
+                "resource_value": "172.25.0.3"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/port",
+                "resource_value": "51008"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/settings",
+                "resource_value": "{\"endpoints\": [], \"hw_ver\": \"BMv2\", \"id\": 8, \"name\": \"sat-53905\", \"p4bin\": \"/experiment/deploy/p4/bmv2.json\", \"p4info\": \"/experiment/deploy/p4/p4info.txt\", \"sw_ver\": \"simple_switch_grpc\", \"timeout\": 10, \"vendor\": \"P4.org\"}"
+              }
+            }
+          ]
+        },
+        "device_drivers": [
+          "DEVICEDRIVER_P4"
+        ],
+        "device_endpoints": [],
+        "device_id": {
+          "device_uuid": {
+            "uuid": "0349d74d-abd3-5fd5-a744-b7fe6ad4f456"
+          }
+        },
+        "device_operational_status": "DEVICEOPERATIONALSTATUS_ENABLED",
+        "device_type": "p4-switch",
+        "name": "sat-53905"
+      },
+      {
+        "components": [],
+        "controller_id": {},
+        "device_config": {
+          "config_rules": [
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/endpoints/endpoint[234a27b2-ca75-525e-89c6-ea70155b7454]",
+                "resource_value": "{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"234a27b2-ca75-525e-89c6-ea70155b7454\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/address",
+                "resource_value": "172.25.0.3"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/port",
+                "resource_value": "51011"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/settings",
+                "resource_value": "{\"endpoints\": [{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"234a27b2-ca75-525e-89c6-ea70155b7454\"}], \"hw_ver\": \"BMv2\", \"id\": 11, \"name\": \"sat-53912\", \"p4bin\": \"/experiment/deploy/p4/bmv2.json\", \"p4info\": \"/experiment/deploy/p4/p4info.txt\", \"sw_ver\": \"simple_switch_grpc\", \"timeout\": 10, \"vendor\": \"P4.org\"}"
+              }
+            }
+          ]
+        },
+        "device_drivers": [
+          "DEVICEDRIVER_P4"
+        ],
+        "device_endpoints": [
+          {
+            "capabilities": {},
+            "endpoint_id": {
+              "device_id": {
+                "device_uuid": {
+                  "uuid": "066a8a8f-5054-5d27-93cb-027d33168ff4"
+                }
+              },
+              "endpoint_uuid": {
+                "uuid": "234a27b2-ca75-525e-89c6-ea70155b7454"
+              },
+              "topology_id": {
+                "context_id": {
+                  "context_uuid": {
+                    "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                  }
+                },
+                "topology_uuid": {
+                  "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+                }
+              }
+            },
+            "endpoint_location": {},
+            "endpoint_type": "port",
+            "kpi_sample_types": [],
+            "name": "1"
+          }
+        ],
+        "device_id": {
+          "device_uuid": {
+            "uuid": "066a8a8f-5054-5d27-93cb-027d33168ff4"
+          }
+        },
+        "device_operational_status": "DEVICEOPERATIONALSTATUS_ENABLED",
+        "device_type": "p4-switch",
+        "name": "sat-53912"
+      },
+      {
+        "components": [],
+        "controller_id": {},
+        "device_config": {
+          "config_rules": [
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/address",
+                "resource_value": "172.25.0.3"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/port",
+                "resource_value": "51003"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/settings",
+                "resource_value": "{\"endpoints\": [], \"hw_ver\": \"BMv2\", \"id\": 3, \"name\": \"sat-53839\", \"p4bin\": \"/experiment/deploy/p4/bmv2.json\", \"p4info\": \"/experiment/deploy/p4/p4info.txt\", \"sw_ver\": \"simple_switch_grpc\", \"timeout\": 10, \"vendor\": \"P4.org\"}"
+              }
+            }
+          ]
+        },
+        "device_drivers": [
+          "DEVICEDRIVER_P4"
+        ],
+        "device_endpoints": [],
+        "device_id": {
+          "device_uuid": {
+            "uuid": "15851e36-6dff-573d-a974-ce83d79ce7a4"
+          }
+        },
+        "device_operational_status": "DEVICEOPERATIONALSTATUS_ENABLED",
+        "device_type": "p4-switch",
+        "name": "sat-53839"
+      },
+      {
+        "components": [],
+        "controller_id": {},
+        "device_config": {
+          "config_rules": [
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/endpoints/endpoint[053d81b9-195d-5b04-b02f-fadf0902bcef]",
+                "resource_value": "{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"053d81b9-195d-5b04-b02f-fadf0902bcef\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/address",
+                "resource_value": "172.25.0.3"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/port",
+                "resource_value": "51007"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/settings",
+                "resource_value": "{\"endpoints\": [{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"053d81b9-195d-5b04-b02f-fadf0902bcef\"}], \"hw_ver\": \"BMv2\", \"id\": 7, \"name\": \"sat-53853\", \"p4bin\": \"/experiment/deploy/p4/bmv2.json\", \"p4info\": \"/experiment/deploy/p4/p4info.txt\", \"sw_ver\": \"simple_switch_grpc\", \"timeout\": 10, \"vendor\": \"P4.org\"}"
+              }
+            }
+          ]
+        },
+        "device_drivers": [
+          "DEVICEDRIVER_P4"
+        ],
+        "device_endpoints": [
+          {
+            "capabilities": {},
+            "endpoint_id": {
+              "device_id": {
+                "device_uuid": {
+                  "uuid": "173da48c-bcb9-50d0-9cf5-1ba9762da1d2"
+                }
+              },
+              "endpoint_uuid": {
+                "uuid": "053d81b9-195d-5b04-b02f-fadf0902bcef"
+              },
+              "topology_id": {
+                "context_id": {
+                  "context_uuid": {
+                    "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                  }
+                },
+                "topology_uuid": {
+                  "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+                }
+              }
+            },
+            "endpoint_location": {},
+            "endpoint_type": "port",
+            "kpi_sample_types": [],
+            "name": "1"
+          }
+        ],
+        "device_id": {
+          "device_uuid": {
+            "uuid": "173da48c-bcb9-50d0-9cf5-1ba9762da1d2"
+          }
+        },
+        "device_operational_status": "DEVICEOPERATIONALSTATUS_ENABLED",
+        "device_type": "p4-switch",
+        "name": "sat-53853"
+      },
+      {
+        "components": [],
+        "controller_id": {},
+        "device_config": {
+          "config_rules": [
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/address",
+                "resource_value": "172.25.0.3"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/port",
+                "resource_value": "51017"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/settings",
+                "resource_value": "{\"endpoints\": [], \"hw_ver\": \"BMv2\", \"id\": 17, \"name\": \"sat-54060\", \"p4bin\": \"/experiment/deploy/p4/bmv2.json\", \"p4info\": \"/experiment/deploy/p4/p4info.txt\", \"sw_ver\": \"simple_switch_grpc\", \"timeout\": 10, \"vendor\": \"P4.org\"}"
+              }
+            }
+          ]
+        },
+        "device_drivers": [
+          "DEVICEDRIVER_P4"
+        ],
+        "device_endpoints": [],
+        "device_id": {
+          "device_uuid": {
+            "uuid": "1abb2f2b-e859-54ac-9cbc-7154daa53925"
+          }
+        },
+        "device_operational_status": "DEVICEOPERATIONALSTATUS_ENABLED",
+        "device_type": "p4-switch",
+        "name": "sat-54060"
+      },
+      {
+        "components": [],
+        "controller_id": {},
+        "device_config": {
+          "config_rules": [
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/endpoints/endpoint[822a7ac5-934a-51e0-9dfa-12f787eaf8ea]",
+                "resource_value": "{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"822a7ac5-934a-51e0-9dfa-12f787eaf8ea\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/address",
+                "resource_value": "172.25.0.3"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/port",
+                "resource_value": "51002"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/settings",
+                "resource_value": "{\"endpoints\": [{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"822a7ac5-934a-51e0-9dfa-12f787eaf8ea\"}], \"hw_ver\": \"BMv2\", \"id\": 2, \"name\": \"sat-53838\", \"p4bin\": \"/experiment/deploy/p4/bmv2.json\", \"p4info\": \"/experiment/deploy/p4/p4info.txt\", \"sw_ver\": \"simple_switch_grpc\", \"timeout\": 10, \"vendor\": \"P4.org\"}"
+              }
+            }
+          ]
+        },
+        "device_drivers": [
+          "DEVICEDRIVER_P4"
+        ],
+        "device_endpoints": [
+          {
+            "capabilities": {},
+            "endpoint_id": {
+              "device_id": {
+                "device_uuid": {
+                  "uuid": "37c8b228-467f-545a-becb-c90293434dcb"
+                }
+              },
+              "endpoint_uuid": {
+                "uuid": "822a7ac5-934a-51e0-9dfa-12f787eaf8ea"
+              },
+              "topology_id": {
+                "context_id": {
+                  "context_uuid": {
+                    "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                  }
+                },
+                "topology_uuid": {
+                  "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+                }
+              }
+            },
+            "endpoint_location": {},
+            "endpoint_type": "port",
+            "kpi_sample_types": [],
+            "name": "1"
+          }
+        ],
+        "device_id": {
+          "device_uuid": {
+            "uuid": "37c8b228-467f-545a-becb-c90293434dcb"
+          }
+        },
+        "device_operational_status": "DEVICEOPERATIONALSTATUS_ENABLED",
+        "device_type": "p4-switch",
+        "name": "sat-53838"
+      },
+      {
+        "components": [],
+        "controller_id": {},
+        "device_config": {
+          "config_rules": [
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/address",
+                "resource_value": "172.25.0.3"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/port",
+                "resource_value": "51013"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/settings",
+                "resource_value": "{\"endpoints\": [], \"hw_ver\": \"BMv2\", \"id\": 13, \"name\": \"sat-53918\", \"p4bin\": \"/experiment/deploy/p4/bmv2.json\", \"p4info\": \"/experiment/deploy/p4/p4info.txt\", \"sw_ver\": \"simple_switch_grpc\", \"timeout\": 10, \"vendor\": \"P4.org\"}"
+              }
+            }
+          ]
+        },
+        "device_drivers": [
+          "DEVICEDRIVER_P4"
+        ],
+        "device_endpoints": [],
+        "device_id": {
+          "device_uuid": {
+            "uuid": "3a68d6f6-c4be-518c-b59d-dae3d8272b8d"
+          }
+        },
+        "device_operational_status": "DEVICEOPERATIONALSTATUS_ENABLED",
+        "device_type": "p4-switch",
+        "name": "sat-53918"
+      },
+      {
+        "components": [],
+        "controller_id": {},
+        "device_config": {
+          "config_rules": [
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/address",
+                "resource_value": "172.25.0.3"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/port",
+                "resource_value": "51014"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/settings",
+                "resource_value": "{\"endpoints\": [], \"hw_ver\": \"BMv2\", \"id\": 14, \"name\": \"sat-53922\", \"p4bin\": \"/experiment/deploy/p4/bmv2.json\", \"p4info\": \"/experiment/deploy/p4/p4info.txt\", \"sw_ver\": \"simple_switch_grpc\", \"timeout\": 10, \"vendor\": \"P4.org\"}"
+              }
+            }
+          ]
+        },
+        "device_drivers": [
+          "DEVICEDRIVER_P4"
+        ],
+        "device_endpoints": [],
+        "device_id": {
+          "device_uuid": {
+            "uuid": "4c1c070a-c0e6-5a33-be77-951961ed64f4"
+          }
+        },
+        "device_operational_status": "DEVICEOPERATIONALSTATUS_ENABLED",
+        "device_type": "p4-switch",
+        "name": "sat-53922"
+      },
+      {
+        "components": [],
+        "controller_id": {},
+        "device_config": {
+          "config_rules": [
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/address",
+                "resource_value": "172.25.0.3"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/port",
+                "resource_value": "51015"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/settings",
+                "resource_value": "{\"endpoints\": [], \"hw_ver\": \"BMv2\", \"id\": 15, \"name\": \"sat-53923\", \"p4bin\": \"/experiment/deploy/p4/bmv2.json\", \"p4info\": \"/experiment/deploy/p4/p4info.txt\", \"sw_ver\": \"simple_switch_grpc\", \"timeout\": 10, \"vendor\": \"P4.org\"}"
+              }
+            }
+          ]
+        },
+        "device_drivers": [
+          "DEVICEDRIVER_P4"
+        ],
+        "device_endpoints": [],
+        "device_id": {
+          "device_uuid": {
+            "uuid": "6d39493a-617d-54aa-aa8b-91930581c2b9"
+          }
+        },
+        "device_operational_status": "DEVICEOPERATIONALSTATUS_ENABLED",
+        "device_type": "p4-switch",
+        "name": "sat-53923"
+      },
+      {
+        "components": [],
+        "controller_id": {},
+        "device_config": {
+          "config_rules": [
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/endpoints/endpoint[d1c5912b-d268-58a1-883d-d915199d5bd4]",
+                "resource_value": "{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"d1c5912b-d268-58a1-883d-d915199d5bd4\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/address",
+                "resource_value": "172.25.0.3"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/port",
+                "resource_value": "51005"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/settings",
+                "resource_value": "{\"endpoints\": [{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"d1c5912b-d268-58a1-883d-d915199d5bd4\"}], \"hw_ver\": \"BMv2\", \"id\": 5, \"name\": \"sat-53847\", \"p4bin\": \"/experiment/deploy/p4/bmv2.json\", \"p4info\": \"/experiment/deploy/p4/p4info.txt\", \"sw_ver\": \"simple_switch_grpc\", \"timeout\": 10, \"vendor\": \"P4.org\"}"
+              }
+            }
+          ]
+        },
+        "device_drivers": [
+          "DEVICEDRIVER_P4"
+        ],
+        "device_endpoints": [
+          {
+            "capabilities": {},
+            "endpoint_id": {
+              "device_id": {
+                "device_uuid": {
+                  "uuid": "74dd61b5-22ec-5fc1-b3e9-7ed38c946398"
+                }
+              },
+              "endpoint_uuid": {
+                "uuid": "d1c5912b-d268-58a1-883d-d915199d5bd4"
+              },
+              "topology_id": {
+                "context_id": {
+                  "context_uuid": {
+                    "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                  }
+                },
+                "topology_uuid": {
+                  "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+                }
+              }
+            },
+            "endpoint_location": {},
+            "endpoint_type": "port",
+            "kpi_sample_types": [],
+            "name": "1"
+          }
+        ],
+        "device_id": {
+          "device_uuid": {
+            "uuid": "74dd61b5-22ec-5fc1-b3e9-7ed38c946398"
+          }
+        },
+        "device_operational_status": "DEVICEOPERATIONALSTATUS_ENABLED",
+        "device_type": "p4-switch",
+        "name": "sat-53847"
+      },
+      {
+        "components": [],
+        "controller_id": {},
+        "device_config": {
+          "config_rules": [
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/endpoints/endpoint[0de2aa27-87f3-584f-858c-7b3d7ec054be]",
+                "resource_value": "{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"2\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"0de2aa27-87f3-584f-858c-7b3d7ec054be\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/endpoints/endpoint[a01396b9-ae0e-5f68-934a-4d5dacf11b38]",
+                "resource_value": "{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"a01396b9-ae0e-5f68-934a-4d5dacf11b38\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/endpoints/endpoint[d478f12b-89f4-5e72-8896-0d3d51960a9b]",
+                "resource_value": "{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"3\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"d478f12b-89f4-5e72-8896-0d3d51960a9b\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/address",
+                "resource_value": "172.25.0.3"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/port",
+                "resource_value": "51001"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/settings",
+                "resource_value": "{\"endpoints\": [{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"a01396b9-ae0e-5f68-934a-4d5dacf11b38\"}, {\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"2\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"0de2aa27-87f3-584f-858c-7b3d7ec054be\"}, {\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"3\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"d478f12b-89f4-5e72-8896-0d3d51960a9b\"}], \"hw_ver\": \"BMv2\", \"id\": 1, \"name\": \"sat-51726\", \"p4bin\": \"/experiment/deploy/p4/bmv2.json\", \"p4info\": \"/experiment/deploy/p4/p4info.txt\", \"sw_ver\": \"simple_switch_grpc\", \"timeout\": 10, \"vendor\": \"P4.org\"}"
+              }
+            }
+          ]
+        },
+        "device_drivers": [
+          "DEVICEDRIVER_P4"
+        ],
+        "device_endpoints": [
+          {
+            "capabilities": {},
+            "endpoint_id": {
+              "device_id": {
+                "device_uuid": {
+                  "uuid": "a8d87244-5adb-5c45-8f9a-148c6008d4ba"
+                }
+              },
+              "endpoint_uuid": {
+                "uuid": "0de2aa27-87f3-584f-858c-7b3d7ec054be"
+              },
+              "topology_id": {
+                "context_id": {
+                  "context_uuid": {
+                    "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                  }
+                },
+                "topology_uuid": {
+                  "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+                }
+              }
+            },
+            "endpoint_location": {},
+            "endpoint_type": "port",
+            "kpi_sample_types": [],
+            "name": "2"
+          },
+          {
+            "capabilities": {},
+            "endpoint_id": {
+              "device_id": {
+                "device_uuid": {
+                  "uuid": "a8d87244-5adb-5c45-8f9a-148c6008d4ba"
+                }
+              },
+              "endpoint_uuid": {
+                "uuid": "a01396b9-ae0e-5f68-934a-4d5dacf11b38"
+              },
+              "topology_id": {
+                "context_id": {
+                  "context_uuid": {
+                    "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                  }
+                },
+                "topology_uuid": {
+                  "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+                }
+              }
+            },
+            "endpoint_location": {},
+            "endpoint_type": "port",
+            "kpi_sample_types": [],
+            "name": "1"
+          },
+          {
+            "capabilities": {},
+            "endpoint_id": {
+              "device_id": {
+                "device_uuid": {
+                  "uuid": "a8d87244-5adb-5c45-8f9a-148c6008d4ba"
+                }
+              },
+              "endpoint_uuid": {
+                "uuid": "d478f12b-89f4-5e72-8896-0d3d51960a9b"
+              },
+              "topology_id": {
+                "context_id": {
+                  "context_uuid": {
+                    "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                  }
+                },
+                "topology_uuid": {
+                  "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+                }
+              }
+            },
+            "endpoint_location": {},
+            "endpoint_type": "port",
+            "kpi_sample_types": [],
+            "name": "3"
+          }
+        ],
+        "device_id": {
+          "device_uuid": {
+            "uuid": "a8d87244-5adb-5c45-8f9a-148c6008d4ba"
+          }
+        },
+        "device_operational_status": "DEVICEOPERATIONALSTATUS_ENABLED",
+        "device_type": "p4-switch",
+        "name": "sat-51726"
+      },
+      {
+        "components": [],
+        "controller_id": {},
+        "device_config": {
+          "config_rules": [
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/endpoints/endpoint[67bbbfc5-6582-57cc-aafc-65f41ded6985]",
+                "resource_value": "{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"67bbbfc5-6582-57cc-aafc-65f41ded6985\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/address",
+                "resource_value": "172.25.0.3"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/port",
+                "resource_value": "51010"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/settings",
+                "resource_value": "{\"endpoints\": [{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"67bbbfc5-6582-57cc-aafc-65f41ded6985\"}], \"hw_ver\": \"BMv2\", \"id\": 10, \"name\": \"sat-53911\", \"p4bin\": \"/experiment/deploy/p4/bmv2.json\", \"p4info\": \"/experiment/deploy/p4/p4info.txt\", \"sw_ver\": \"simple_switch_grpc\", \"timeout\": 10, \"vendor\": \"P4.org\"}"
+              }
+            }
+          ]
+        },
+        "device_drivers": [
+          "DEVICEDRIVER_P4"
+        ],
+        "device_endpoints": [
+          {
+            "capabilities": {},
+            "endpoint_id": {
+              "device_id": {
+                "device_uuid": {
+                  "uuid": "b05c48c7-fd4e-519e-8dfe-4c2f16052413"
+                }
+              },
+              "endpoint_uuid": {
+                "uuid": "67bbbfc5-6582-57cc-aafc-65f41ded6985"
+              },
+              "topology_id": {
+                "context_id": {
+                  "context_uuid": {
+                    "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                  }
+                },
+                "topology_uuid": {
+                  "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+                }
+              }
+            },
+            "endpoint_location": {},
+            "endpoint_type": "port",
+            "kpi_sample_types": [],
+            "name": "1"
+          }
+        ],
+        "device_id": {
+          "device_uuid": {
+            "uuid": "b05c48c7-fd4e-519e-8dfe-4c2f16052413"
+          }
+        },
+        "device_operational_status": "DEVICEOPERATIONALSTATUS_ENABLED",
+        "device_type": "p4-switch",
+        "name": "sat-53911"
+      },
+      {
+        "components": [],
+        "controller_id": {},
+        "device_config": {
+          "config_rules": [
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/address",
+                "resource_value": "172.25.0.3"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/port",
+                "resource_value": "51016"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/settings",
+                "resource_value": "{\"endpoints\": [], \"hw_ver\": \"BMv2\", \"id\": 16, \"name\": \"sat-53925\", \"p4bin\": \"/experiment/deploy/p4/bmv2.json\", \"p4info\": \"/experiment/deploy/p4/p4info.txt\", \"sw_ver\": \"simple_switch_grpc\", \"timeout\": 10, \"vendor\": \"P4.org\"}"
+              }
+            }
+          ]
+        },
+        "device_drivers": [
+          "DEVICEDRIVER_P4"
+        ],
+        "device_endpoints": [],
+        "device_id": {
+          "device_uuid": {
+            "uuid": "b0ee1ac1-2567-5bb6-bd7c-9e54681df60c"
+          }
+        },
+        "device_operational_status": "DEVICEOPERATIONALSTATUS_ENABLED",
+        "device_type": "p4-switch",
+        "name": "sat-53925"
+      },
+      {
+        "components": [],
+        "controller_id": {},
+        "device_config": {
+          "config_rules": [
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/endpoints/endpoint[fcfff2a6-fbfe-5304-99d3-4cab3fe6c426]",
+                "resource_value": "{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"fcfff2a6-fbfe-5304-99d3-4cab3fe6c426\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/address",
+                "resource_value": "172.25.0.3"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/port",
+                "resource_value": "51004"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/settings",
+                "resource_value": "{\"endpoints\": [{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"fcfff2a6-fbfe-5304-99d3-4cab3fe6c426\"}], \"hw_ver\": \"BMv2\", \"id\": 4, \"name\": \"sat-53843\", \"p4bin\": \"/experiment/deploy/p4/bmv2.json\", \"p4info\": \"/experiment/deploy/p4/p4info.txt\", \"sw_ver\": \"simple_switch_grpc\", \"timeout\": 10, \"vendor\": \"P4.org\"}"
+              }
+            }
+          ]
+        },
+        "device_drivers": [
+          "DEVICEDRIVER_P4"
+        ],
+        "device_endpoints": [
+          {
+            "capabilities": {},
+            "endpoint_id": {
+              "device_id": {
+                "device_uuid": {
+                  "uuid": "e52f4461-50fa-5785-9352-898ef4ae9676"
+                }
+              },
+              "endpoint_uuid": {
+                "uuid": "fcfff2a6-fbfe-5304-99d3-4cab3fe6c426"
+              },
+              "topology_id": {
+                "context_id": {
+                  "context_uuid": {
+                    "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                  }
+                },
+                "topology_uuid": {
+                  "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+                }
+              }
+            },
+            "endpoint_location": {},
+            "endpoint_type": "port",
+            "kpi_sample_types": [],
+            "name": "1"
+          }
+        ],
+        "device_id": {
+          "device_uuid": {
+            "uuid": "e52f4461-50fa-5785-9352-898ef4ae9676"
+          }
+        },
+        "device_operational_status": "DEVICEOPERATIONALSTATUS_ENABLED",
+        "device_type": "p4-switch",
+        "name": "sat-53843"
+      },
+      {
+        "components": [],
+        "controller_id": {},
+        "device_config": {
+          "config_rules": [
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/action_profiles/action_profile/FabricIngress.next.hashed_profile[2424891933]",
+                "resource_value": "{\"action-name\": \"FabricIngress.next.output_hashed\", \"action-params\": [{\"action-param\": \"port_num\", \"action-value\": \"2\"}], \"action-profile-name\": \"FabricIngress.next.hashed_profile\", \"member-id\": 2}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/action_profiles/action_profile/FabricIngress.next.hashed_profile[535135288]",
+                "resource_value": "{\"action-name\": \"FabricIngress.next.output_hashed\", \"action-params\": [{\"action-param\": \"port_num\", \"action-value\": \"3\"}], \"action-profile-name\": \"FabricIngress.next.hashed_profile\", \"member-id\": 3}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/endpoints/endpoint[272140a8-e251-59d5-a5db-e70736f2465e]",
+                "resource_value": "{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"3\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"272140a8-e251-59d5-a5db-e70736f2465e\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/endpoints/endpoint[8c438986-e2f4-5e22-b764-40b32bed6ad9]",
+                "resource_value": "{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"2\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"8c438986-e2f4-5e22-b764-40b32bed6ad9\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/endpoints/endpoint[d6150c59-bd0c-5745-88b7-b3036a694457]",
+                "resource_value": "{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"d6150c59-bd0c-5745-88b7-b3036a694457\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/tables/table/FabricEgress.egress_next.egress_vlan[1096091533]",
+                "resource_value": "{\"action-name\": \"FabricEgress.egress_next.pop_vlan\", \"action-params\": [], \"match-fields\": [{\"match-field\": \"eg_port\", \"match-value\": \"2\"}, {\"match-field\": \"vlan_id\", \"match-value\": \"4094\"}], \"table-name\": \"FabricEgress.egress_next.egress_vlan\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/tables/table/FabricEgress.egress_next.egress_vlan[2052000486]",
+                "resource_value": "{\"action-name\": \"FabricEgress.egress_next.pop_vlan\", \"action-params\": [], \"match-fields\": [{\"match-field\": \"eg_port\", \"match-value\": \"3\"}, {\"match-field\": \"vlan_id\", \"match-value\": \"4094\"}], \"table-name\": \"FabricEgress.egress_next.egress_vlan\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/tables/table/FabricIngress.filtering.fwd_classifier[1403892410]",
+                "resource_value": "{\"action-name\": \"FabricIngress.filtering.set_forwarding_type\", \"action-params\": [{\"action-param\": \"fwd_type\", \"action-value\": \"0\"}], \"match-fields\": [{\"match-field\": \"ig_port\", \"match-value\": \"2\"}, {\"match-field\": \"ip_eth_type\", \"match-value\": \"0x0800\"}], \"priority\": 1, \"table-name\": \"FabricIngress.filtering.fwd_classifier\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/tables/table/FabricIngress.filtering.fwd_classifier[2365748572]",
+                "resource_value": "{\"action-name\": \"FabricIngress.filtering.set_forwarding_type\", \"action-params\": [{\"action-param\": \"fwd_type\", \"action-value\": \"0\"}], \"match-fields\": [{\"match-field\": \"ig_port\", \"match-value\": \"3\"}, {\"match-field\": \"ip_eth_type\", \"match-value\": \"0x0800\"}], \"priority\": 1, \"table-name\": \"FabricIngress.filtering.fwd_classifier\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/tables/table/FabricIngress.filtering.ingress_port_vlan[4264497440]",
+                "resource_value": "{\"action-name\": \"FabricIngress.filtering.permit_with_internal_vlan\", \"action-params\": [{\"action-param\": \"port_type\", \"action-value\": \"1\"}, {\"action-param\": \"vlan_id\", \"action-value\": \"4094\"}], \"match-fields\": [{\"match-field\": \"ig_port\", \"match-value\": \"3\"}, {\"match-field\": \"vlan_is_valid\", \"match-value\": \"0\"}], \"priority\": 10, \"table-name\": \"FabricIngress.filtering.ingress_port_vlan\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/tables/table/FabricIngress.filtering.ingress_port_vlan[84188955]",
+                "resource_value": "{\"action-name\": \"FabricIngress.filtering.permit_with_internal_vlan\", \"action-params\": [{\"action-param\": \"port_type\", \"action-value\": \"2\"}, {\"action-param\": \"vlan_id\", \"action-value\": \"4094\"}], \"match-fields\": [{\"match-field\": \"ig_port\", \"match-value\": \"2\"}, {\"match-field\": \"vlan_is_valid\", \"match-value\": \"0\"}], \"priority\": 10, \"table-name\": \"FabricIngress.filtering.ingress_port_vlan\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/tables/table/FabricIngress.forwarding.bridging[3234750734]",
+                "resource_value": "{\"action-name\": \"FabricIngress.forwarding.set_next_id_bridging\", \"action-params\": [{\"action-param\": \"next_id\", \"action-value\": \"3\"}], \"match-fields\": [{\"match-field\": \"vlan_id\", \"match-value\": \"4094\"}, {\"match-field\": \"eth_dst\", \"match-value\": \"00:00:00:00:00:02\"}], \"priority\": 1, \"table-name\": \"FabricIngress.forwarding.bridging\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/tables/table/FabricIngress.forwarding.bridging[4161414]",
+                "resource_value": "{\"action-name\": \"FabricIngress.forwarding.set_next_id_bridging\", \"action-params\": [{\"action-param\": \"next_id\", \"action-value\": \"2\"}], \"match-fields\": [{\"match-field\": \"vlan_id\", \"match-value\": \"4094\"}, {\"match-field\": \"eth_dst\", \"match-value\": \"00:00:00:00:00:01\"}], \"priority\": 1, \"table-name\": \"FabricIngress.forwarding.bridging\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/tables/table/FabricIngress.next.hashed[2199619772]",
+                "resource_value": "{\"match-fields\": [{\"match-field\": \"next_id\", \"match-value\": \"3\"}], \"member-id\": 3, \"table-name\": \"FabricIngress.next.hashed\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/tables/table/FabricIngress.next.hashed[4030187307]",
+                "resource_value": "{\"match-fields\": [{\"match-field\": \"next_id\", \"match-value\": \"2\"}], \"member-id\": 2, \"table-name\": \"FabricIngress.next.hashed\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/address",
+                "resource_value": "172.25.0.3"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/port",
+                "resource_value": "51012"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/settings",
+                "resource_value": "{\"endpoints\": [{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"d6150c59-bd0c-5745-88b7-b3036a694457\"}, {\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"2\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"8c438986-e2f4-5e22-b764-40b32bed6ad9\"}, {\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"3\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"272140a8-e251-59d5-a5db-e70736f2465e\"}], \"hw_ver\": \"BMv2\", \"id\": 12, \"name\": \"sat-53913\", \"p4bin\": \"/experiment/deploy/p4/bmv2.json\", \"p4info\": \"/experiment/deploy/p4/p4info.txt\", \"sw_ver\": \"simple_switch_grpc\", \"timeout\": 10, \"vendor\": \"P4.org\"}"
+              }
+            }
+          ]
+        },
+        "device_drivers": [
+          "DEVICEDRIVER_P4"
+        ],
+        "device_endpoints": [
+          {
+            "capabilities": {},
+            "endpoint_id": {
+              "device_id": {
+                "device_uuid": {
+                  "uuid": "e65cd631-994c-5849-ab56-5904c0f55c3d"
+                }
+              },
+              "endpoint_uuid": {
+                "uuid": "272140a8-e251-59d5-a5db-e70736f2465e"
+              },
+              "topology_id": {
+                "context_id": {
+                  "context_uuid": {
+                    "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                  }
+                },
+                "topology_uuid": {
+                  "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+                }
+              }
+            },
+            "endpoint_location": {},
+            "endpoint_type": "port",
+            "kpi_sample_types": [],
+            "name": "3"
+          },
+          {
+            "capabilities": {},
+            "endpoint_id": {
+              "device_id": {
+                "device_uuid": {
+                  "uuid": "e65cd631-994c-5849-ab56-5904c0f55c3d"
+                }
+              },
+              "endpoint_uuid": {
+                "uuid": "8c438986-e2f4-5e22-b764-40b32bed6ad9"
+              },
+              "topology_id": {
+                "context_id": {
+                  "context_uuid": {
+                    "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                  }
+                },
+                "topology_uuid": {
+                  "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+                }
+              }
+            },
+            "endpoint_location": {},
+            "endpoint_type": "port",
+            "kpi_sample_types": [],
+            "name": "2"
+          },
+          {
+            "capabilities": {},
+            "endpoint_id": {
+              "device_id": {
+                "device_uuid": {
+                  "uuid": "e65cd631-994c-5849-ab56-5904c0f55c3d"
+                }
+              },
+              "endpoint_uuid": {
+                "uuid": "d6150c59-bd0c-5745-88b7-b3036a694457"
+              },
+              "topology_id": {
+                "context_id": {
+                  "context_uuid": {
+                    "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                  }
+                },
+                "topology_uuid": {
+                  "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+                }
+              }
+            },
+            "endpoint_location": {},
+            "endpoint_type": "port",
+            "kpi_sample_types": [],
+            "name": "1"
+          }
+        ],
+        "device_id": {
+          "device_uuid": {
+            "uuid": "e65cd631-994c-5849-ab56-5904c0f55c3d"
+          }
+        },
+        "device_operational_status": "DEVICEOPERATIONALSTATUS_ENABLED",
+        "device_type": "p4-switch",
+        "name": "sat-53913"
+      },
+      {
+        "components": [],
+        "controller_id": {},
+        "device_config": {
+          "config_rules": [
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/action_profiles/action_profile/FabricIngress.next.hashed_profile[2424891933]",
+                "resource_value": "{\"action-name\": \"FabricIngress.next.output_hashed\", \"action-params\": [{\"action-param\": \"port_num\", \"action-value\": \"2\"}], \"action-profile-name\": \"FabricIngress.next.hashed_profile\", \"member-id\": 2}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/action_profiles/action_profile/FabricIngress.next.hashed_profile[535135288]",
+                "resource_value": "{\"action-name\": \"FabricIngress.next.output_hashed\", \"action-params\": [{\"action-param\": \"port_num\", \"action-value\": \"3\"}], \"action-profile-name\": \"FabricIngress.next.hashed_profile\", \"member-id\": 3}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/endpoints/endpoint[0e335612-6de7-5dbb-9cb3-c62b0e7d237f]",
+                "resource_value": "{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"0e335612-6de7-5dbb-9cb3-c62b0e7d237f\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/endpoints/endpoint[20c235d3-36c3-5495-80c9-569eda225167]",
+                "resource_value": "{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"2\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"20c235d3-36c3-5495-80c9-569eda225167\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/endpoints/endpoint[c335c8d5-aaf1-5b81-b54b-7a0a0ea6daa8]",
+                "resource_value": "{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"3\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"c335c8d5-aaf1-5b81-b54b-7a0a0ea6daa8\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/tables/table/FabricEgress.egress_next.egress_vlan[1096091533]",
+                "resource_value": "{\"action-name\": \"FabricEgress.egress_next.pop_vlan\", \"action-params\": [], \"match-fields\": [{\"match-field\": \"eg_port\", \"match-value\": \"2\"}, {\"match-field\": \"vlan_id\", \"match-value\": \"4094\"}], \"table-name\": \"FabricEgress.egress_next.egress_vlan\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/tables/table/FabricEgress.egress_next.egress_vlan[2052000486]",
+                "resource_value": "{\"action-name\": \"FabricEgress.egress_next.pop_vlan\", \"action-params\": [], \"match-fields\": [{\"match-field\": \"eg_port\", \"match-value\": \"3\"}, {\"match-field\": \"vlan_id\", \"match-value\": \"4094\"}], \"table-name\": \"FabricEgress.egress_next.egress_vlan\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/tables/table/FabricIngress.filtering.fwd_classifier[1403892410]",
+                "resource_value": "{\"action-name\": \"FabricIngress.filtering.set_forwarding_type\", \"action-params\": [{\"action-param\": \"fwd_type\", \"action-value\": \"0\"}], \"match-fields\": [{\"match-field\": \"ig_port\", \"match-value\": \"2\"}, {\"match-field\": \"ip_eth_type\", \"match-value\": \"0x0800\"}], \"priority\": 1, \"table-name\": \"FabricIngress.filtering.fwd_classifier\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/tables/table/FabricIngress.filtering.fwd_classifier[2365748572]",
+                "resource_value": "{\"action-name\": \"FabricIngress.filtering.set_forwarding_type\", \"action-params\": [{\"action-param\": \"fwd_type\", \"action-value\": \"0\"}], \"match-fields\": [{\"match-field\": \"ig_port\", \"match-value\": \"3\"}, {\"match-field\": \"ip_eth_type\", \"match-value\": \"0x0800\"}], \"priority\": 1, \"table-name\": \"FabricIngress.filtering.fwd_classifier\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/tables/table/FabricIngress.filtering.ingress_port_vlan[4264497440]",
+                "resource_value": "{\"action-name\": \"FabricIngress.filtering.permit_with_internal_vlan\", \"action-params\": [{\"action-param\": \"port_type\", \"action-value\": \"1\"}, {\"action-param\": \"vlan_id\", \"action-value\": \"4094\"}], \"match-fields\": [{\"match-field\": \"ig_port\", \"match-value\": \"3\"}, {\"match-field\": \"vlan_is_valid\", \"match-value\": \"0\"}], \"priority\": 10, \"table-name\": \"FabricIngress.filtering.ingress_port_vlan\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/tables/table/FabricIngress.filtering.ingress_port_vlan[84188955]",
+                "resource_value": "{\"action-name\": \"FabricIngress.filtering.permit_with_internal_vlan\", \"action-params\": [{\"action-param\": \"port_type\", \"action-value\": \"2\"}, {\"action-param\": \"vlan_id\", \"action-value\": \"4094\"}], \"match-fields\": [{\"match-field\": \"ig_port\", \"match-value\": \"2\"}, {\"match-field\": \"vlan_is_valid\", \"match-value\": \"0\"}], \"priority\": 10, \"table-name\": \"FabricIngress.filtering.ingress_port_vlan\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/tables/table/FabricIngress.forwarding.bridging[4030056975]",
+                "resource_value": "{\"action-name\": \"FabricIngress.forwarding.set_next_id_bridging\", \"action-params\": [{\"action-param\": \"next_id\", \"action-value\": \"3\"}], \"match-fields\": [{\"match-field\": \"vlan_id\", \"match-value\": \"4094\"}, {\"match-field\": \"eth_dst\", \"match-value\": \"00:00:00:00:00:01\"}], \"priority\": 1, \"table-name\": \"FabricIngress.forwarding.bridging\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/tables/table/FabricIngress.forwarding.bridging[4052770857]",
+                "resource_value": "{\"action-name\": \"FabricIngress.forwarding.set_next_id_bridging\", \"action-params\": [{\"action-param\": \"next_id\", \"action-value\": \"2\"}], \"match-fields\": [{\"match-field\": \"vlan_id\", \"match-value\": \"4094\"}, {\"match-field\": \"eth_dst\", \"match-value\": \"00:00:00:00:00:02\"}], \"priority\": 1, \"table-name\": \"FabricIngress.forwarding.bridging\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/tables/table/FabricIngress.next.hashed[2199619772]",
+                "resource_value": "{\"match-fields\": [{\"match-field\": \"next_id\", \"match-value\": \"3\"}], \"member-id\": 3, \"table-name\": \"FabricIngress.next.hashed\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/tables/table/FabricIngress.next.hashed[4030187307]",
+                "resource_value": "{\"match-fields\": [{\"match-field\": \"next_id\", \"match-value\": \"2\"}], \"member-id\": 2, \"table-name\": \"FabricIngress.next.hashed\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/address",
+                "resource_value": "172.25.0.3"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/port",
+                "resource_value": "51006"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/settings",
+                "resource_value": "{\"endpoints\": [{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"0e335612-6de7-5dbb-9cb3-c62b0e7d237f\"}, {\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"2\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"20c235d3-36c3-5495-80c9-569eda225167\"}, {\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"3\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"c335c8d5-aaf1-5b81-b54b-7a0a0ea6daa8\"}], \"hw_ver\": \"BMv2\", \"id\": 6, \"name\": \"sat-53848\", \"p4bin\": \"/experiment/deploy/p4/bmv2.json\", \"p4info\": \"/experiment/deploy/p4/p4info.txt\", \"sw_ver\": \"simple_switch_grpc\", \"timeout\": 10, \"vendor\": \"P4.org\"}"
+              }
+            }
+          ]
+        },
+        "device_drivers": [
+          "DEVICEDRIVER_P4"
+        ],
+        "device_endpoints": [
+          {
+            "capabilities": {},
+            "endpoint_id": {
+              "device_id": {
+                "device_uuid": {
+                  "uuid": "f7f1379d-0550-5a69-b6b5-9a7801028621"
+                }
+              },
+              "endpoint_uuid": {
+                "uuid": "0e335612-6de7-5dbb-9cb3-c62b0e7d237f"
+              },
+              "topology_id": {
+                "context_id": {
+                  "context_uuid": {
+                    "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                  }
+                },
+                "topology_uuid": {
+                  "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+                }
+              }
+            },
+            "endpoint_location": {},
+            "endpoint_type": "port",
+            "kpi_sample_types": [],
+            "name": "1"
+          },
+          {
+            "capabilities": {},
+            "endpoint_id": {
+              "device_id": {
+                "device_uuid": {
+                  "uuid": "f7f1379d-0550-5a69-b6b5-9a7801028621"
+                }
+              },
+              "endpoint_uuid": {
+                "uuid": "20c235d3-36c3-5495-80c9-569eda225167"
+              },
+              "topology_id": {
+                "context_id": {
+                  "context_uuid": {
+                    "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                  }
+                },
+                "topology_uuid": {
+                  "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+                }
+              }
+            },
+            "endpoint_location": {},
+            "endpoint_type": "port",
+            "kpi_sample_types": [],
+            "name": "2"
+          },
+          {
+            "capabilities": {},
+            "endpoint_id": {
+              "device_id": {
+                "device_uuid": {
+                  "uuid": "f7f1379d-0550-5a69-b6b5-9a7801028621"
+                }
+              },
+              "endpoint_uuid": {
+                "uuid": "c335c8d5-aaf1-5b81-b54b-7a0a0ea6daa8"
+              },
+              "topology_id": {
+                "context_id": {
+                  "context_uuid": {
+                    "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                  }
+                },
+                "topology_uuid": {
+                  "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+                }
+              }
+            },
+            "endpoint_location": {},
+            "endpoint_type": "port",
+            "kpi_sample_types": [],
+            "name": "3"
+          }
+        ],
+        "device_id": {
+          "device_uuid": {
+            "uuid": "f7f1379d-0550-5a69-b6b5-9a7801028621"
+          }
+        },
+        "device_operational_status": "DEVICEOPERATIONALSTATUS_ENABLED",
+        "device_type": "p4-switch",
+        "name": "sat-53848"
+      },
+      {
+        "components": [],
+        "controller_id": {},
+        "device_config": {
+          "config_rules": [
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/endpoints/endpoint[8c3b4cdf-f629-54af-999f-c320570ade8c]",
+                "resource_value": "{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"8c3b4cdf-f629-54af-999f-c320570ade8c\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/address",
+                "resource_value": "172.25.0.3"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/port",
+                "resource_value": "51009"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "_connect/settings",
+                "resource_value": "{\"endpoints\": [{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"1\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"8c3b4cdf-f629-54af-999f-c320570ade8c\"}], \"hw_ver\": \"BMv2\", \"id\": 9, \"name\": \"sat-53906\", \"p4bin\": \"/experiment/deploy/p4/bmv2.json\", \"p4info\": \"/experiment/deploy/p4/p4info.txt\", \"sw_ver\": \"simple_switch_grpc\", \"timeout\": 10, \"vendor\": \"P4.org\"}"
+              }
+            }
+          ]
+        },
+        "device_drivers": [
+          "DEVICEDRIVER_P4"
+        ],
+        "device_endpoints": [
+          {
+            "capabilities": {},
+            "endpoint_id": {
+              "device_id": {
+                "device_uuid": {
+                  "uuid": "ffca8322-e8a3-5833-8f17-300982a6a638"
+                }
+              },
+              "endpoint_uuid": {
+                "uuid": "8c3b4cdf-f629-54af-999f-c320570ade8c"
+              },
+              "topology_id": {
+                "context_id": {
+                  "context_uuid": {
+                    "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                  }
+                },
+                "topology_uuid": {
+                  "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+                }
+              }
+            },
+            "endpoint_location": {},
+            "endpoint_type": "port",
+            "kpi_sample_types": [],
+            "name": "1"
+          }
+        ],
+        "device_id": {
+          "device_uuid": {
+            "uuid": "ffca8322-e8a3-5833-8f17-300982a6a638"
+          }
+        },
+        "device_operational_status": "DEVICEOPERATIONALSTATUS_ENABLED",
+        "device_type": "p4-switch",
+        "name": "sat-53906"
+      }
+    ],
+    "links": [
+      {
+        "attributes": {
+          "is_bidirectional": false,
+          "total_capacity_gbps": 0.0,
+          "used_capacity_gbps": 0.0
+        },
+        "link_endpoint_ids": [
+          {
+            "device_id": {
+              "device_uuid": {
+                "uuid": "f7f1379d-0550-5a69-b6b5-9a7801028621"
+              }
+            },
+            "endpoint_uuid": {
+              "uuid": "20c235d3-36c3-5495-80c9-569eda225167"
+            },
+            "topology_id": {
+              "context_id": {
+                "context_uuid": {
+                  "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                }
+              },
+              "topology_uuid": {
+                "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+              }
+            }
+          },
+          {
+            "device_id": {
+              "device_uuid": {
+                "uuid": "e65cd631-994c-5849-ab56-5904c0f55c3d"
+              }
+            },
+            "endpoint_uuid": {
+              "uuid": "8c438986-e2f4-5e22-b764-40b32bed6ad9"
+            },
+            "topology_id": {
+              "context_id": {
+                "context_uuid": {
+                  "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                }
+              },
+              "topology_uuid": {
+                "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+              }
+            }
+          }
+        ],
+        "link_id": {
+          "link_uuid": {
+            "uuid": "08ff9af0-7016-5986-abc2-27b8f419c63a"
+          }
+        },
+        "link_type": "LINKTYPE_RADIO",
+        "name": "isl-53848-53913"
+      },
+      {
+        "attributes": {
+          "is_bidirectional": false,
+          "total_capacity_gbps": 0.0,
+          "used_capacity_gbps": 0.0
+        },
+        "link_endpoint_ids": [
+          {
+            "device_id": {
+              "device_uuid": {
+                "uuid": "066a8a8f-5054-5d27-93cb-027d33168ff4"
+              }
+            },
+            "endpoint_uuid": {
+              "uuid": "234a27b2-ca75-525e-89c6-ea70155b7454"
+            },
+            "topology_id": {
+              "context_id": {
+                "context_uuid": {
+                  "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                }
+              },
+              "topology_uuid": {
+                "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+              }
+            }
+          },
+          {
+            "device_id": {
+              "device_uuid": {
+                "uuid": "e52f4461-50fa-5785-9352-898ef4ae9676"
+              }
+            },
+            "endpoint_uuid": {
+              "uuid": "fcfff2a6-fbfe-5304-99d3-4cab3fe6c426"
+            },
+            "topology_id": {
+              "context_id": {
+                "context_uuid": {
+                  "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                }
+              },
+              "topology_uuid": {
+                "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+              }
+            }
+          }
+        ],
+        "link_id": {
+          "link_uuid": {
+            "uuid": "2984ccfc-0b9b-5716-a6bf-e390d041c51d"
+          }
+        },
+        "link_type": "LINKTYPE_RADIO",
+        "name": "isl-53912-53843"
+      },
+      {
+        "attributes": {
+          "is_bidirectional": false,
+          "total_capacity_gbps": 0.0,
+          "used_capacity_gbps": 0.0
+        },
+        "link_endpoint_ids": [
+          {
+            "device_id": {
+              "device_uuid": {
+                "uuid": "f7f1379d-0550-5a69-b6b5-9a7801028621"
+              }
+            },
+            "endpoint_uuid": {
+              "uuid": "0e335612-6de7-5dbb-9cb3-c62b0e7d237f"
+            },
+            "topology_id": {
+              "context_id": {
+                "context_uuid": {
+                  "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                }
+              },
+              "topology_uuid": {
+                "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+              }
+            }
+          },
+          {
+            "device_id": {
+              "device_uuid": {
+                "uuid": "a8d87244-5adb-5c45-8f9a-148c6008d4ba"
+              }
+            },
+            "endpoint_uuid": {
+              "uuid": "a01396b9-ae0e-5f68-934a-4d5dacf11b38"
+            },
+            "topology_id": {
+              "context_id": {
+                "context_uuid": {
+                  "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                }
+              },
+              "topology_uuid": {
+                "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+              }
+            }
+          }
+        ],
+        "link_id": {
+          "link_uuid": {
+            "uuid": "2c4e2839-4591-530c-b6a6-6b394052ee3a"
+          }
+        },
+        "link_type": "LINKTYPE_RADIO",
+        "name": "isl-53848-51726"
+      },
+      {
+        "attributes": {
+          "is_bidirectional": false,
+          "total_capacity_gbps": 0.0,
+          "used_capacity_gbps": 0.0
+        },
+        "link_endpoint_ids": [
+          {
+            "device_id": {
+              "device_uuid": {
+                "uuid": "e52f4461-50fa-5785-9352-898ef4ae9676"
+              }
+            },
+            "endpoint_uuid": {
+              "uuid": "fcfff2a6-fbfe-5304-99d3-4cab3fe6c426"
+            },
+            "topology_id": {
+              "context_id": {
+                "context_uuid": {
+                  "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                }
+              },
+              "topology_uuid": {
+                "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+              }
+            }
+          },
+          {
+            "device_id": {
+              "device_uuid": {
+                "uuid": "066a8a8f-5054-5d27-93cb-027d33168ff4"
+              }
+            },
+            "endpoint_uuid": {
+              "uuid": "234a27b2-ca75-525e-89c6-ea70155b7454"
+            },
+            "topology_id": {
+              "context_id": {
+                "context_uuid": {
+                  "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                }
+              },
+              "topology_uuid": {
+                "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+              }
+            }
+          }
+        ],
+        "link_id": {
+          "link_uuid": {
+            "uuid": "73ac1027-291b-522a-af8c-276b79cf997c"
+          }
+        },
+        "link_type": "LINKTYPE_RADIO",
+        "name": "isl-53843-53912"
+      },
+      {
+        "attributes": {
+          "is_bidirectional": false,
+          "total_capacity_gbps": 0.0,
+          "used_capacity_gbps": 0.0
+        },
+        "link_endpoint_ids": [
+          {
+            "device_id": {
+              "device_uuid": {
+                "uuid": "e65cd631-994c-5849-ab56-5904c0f55c3d"
+              }
+            },
+            "endpoint_uuid": {
+              "uuid": "d6150c59-bd0c-5745-88b7-b3036a694457"
+            },
+            "topology_id": {
+              "context_id": {
+                "context_uuid": {
+                  "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                }
+              },
+              "topology_uuid": {
+                "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+              }
+            }
+          },
+          {
+            "device_id": {
+              "device_uuid": {
+                "uuid": "a8d87244-5adb-5c45-8f9a-148c6008d4ba"
+              }
+            },
+            "endpoint_uuid": {
+              "uuid": "d478f12b-89f4-5e72-8896-0d3d51960a9b"
+            },
+            "topology_id": {
+              "context_id": {
+                "context_uuid": {
+                  "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                }
+              },
+              "topology_uuid": {
+                "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+              }
+            }
+          }
+        ],
+        "link_id": {
+          "link_uuid": {
+            "uuid": "7d961ee0-353a-59b6-8776-6d2adf194b4f"
+          }
+        },
+        "link_type": "LINKTYPE_RADIO",
+        "name": "isl-53913-51726"
+      },
+      {
+        "attributes": {
+          "is_bidirectional": false,
+          "total_capacity_gbps": 0.0,
+          "used_capacity_gbps": 0.0
+        },
+        "link_endpoint_ids": [
+          {
+            "device_id": {
+              "device_uuid": {
+                "uuid": "74dd61b5-22ec-5fc1-b3e9-7ed38c946398"
+              }
+            },
+            "endpoint_uuid": {
+              "uuid": "d1c5912b-d268-58a1-883d-d915199d5bd4"
+            },
+            "topology_id": {
+              "context_id": {
+                "context_uuid": {
+                  "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                }
+              },
+              "topology_uuid": {
+                "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+              }
+            }
+          },
+          {
+            "device_id": {
+              "device_uuid": {
+                "uuid": "b05c48c7-fd4e-519e-8dfe-4c2f16052413"
+              }
+            },
+            "endpoint_uuid": {
+              "uuid": "67bbbfc5-6582-57cc-aafc-65f41ded6985"
+            },
+            "topology_id": {
+              "context_id": {
+                "context_uuid": {
+                  "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                }
+              },
+              "topology_uuid": {
+                "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+              }
+            }
+          }
+        ],
+        "link_id": {
+          "link_uuid": {
+            "uuid": "a796cdbb-3780-5466-83f0-8ef6b261f091"
+          }
+        },
+        "link_type": "LINKTYPE_RADIO",
+        "name": "isl-53847-53911"
+      },
+      {
+        "attributes": {
+          "is_bidirectional": false,
+          "total_capacity_gbps": 0.0,
+          "used_capacity_gbps": 0.0
+        },
+        "link_endpoint_ids": [
+          {
+            "device_id": {
+              "device_uuid": {
+                "uuid": "a8d87244-5adb-5c45-8f9a-148c6008d4ba"
+              }
+            },
+            "endpoint_uuid": {
+              "uuid": "a01396b9-ae0e-5f68-934a-4d5dacf11b38"
+            },
+            "topology_id": {
+              "context_id": {
+                "context_uuid": {
+                  "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                }
+              },
+              "topology_uuid": {
+                "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+              }
+            }
+          },
+          {
+            "device_id": {
+              "device_uuid": {
+                "uuid": "f7f1379d-0550-5a69-b6b5-9a7801028621"
+              }
+            },
+            "endpoint_uuid": {
+              "uuid": "0e335612-6de7-5dbb-9cb3-c62b0e7d237f"
+            },
+            "topology_id": {
+              "context_id": {
+                "context_uuid": {
+                  "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                }
+              },
+              "topology_uuid": {
+                "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+              }
+            }
+          }
+        ],
+        "link_id": {
+          "link_uuid": {
+            "uuid": "a96869a0-9290-5d82-8192-6cbe97f8ab1b"
+          }
+        },
+        "link_type": "LINKTYPE_RADIO",
+        "name": "isl-51726-53848"
+      },
+      {
+        "attributes": {
+          "is_bidirectional": false,
+          "total_capacity_gbps": 0.0,
+          "used_capacity_gbps": 0.0
+        },
+        "link_endpoint_ids": [
+          {
+            "device_id": {
+              "device_uuid": {
+                "uuid": "b05c48c7-fd4e-519e-8dfe-4c2f16052413"
+              }
+            },
+            "endpoint_uuid": {
+              "uuid": "67bbbfc5-6582-57cc-aafc-65f41ded6985"
+            },
+            "topology_id": {
+              "context_id": {
+                "context_uuid": {
+                  "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                }
+              },
+              "topology_uuid": {
+                "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+              }
+            }
+          },
+          {
+            "device_id": {
+              "device_uuid": {
+                "uuid": "74dd61b5-22ec-5fc1-b3e9-7ed38c946398"
+              }
+            },
+            "endpoint_uuid": {
+              "uuid": "d1c5912b-d268-58a1-883d-d915199d5bd4"
+            },
+            "topology_id": {
+              "context_id": {
+                "context_uuid": {
+                  "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                }
+              },
+              "topology_uuid": {
+                "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+              }
+            }
+          }
+        ],
+        "link_id": {
+          "link_uuid": {
+            "uuid": "ca310af4-2e70-5328-9426-14cfe3058743"
+          }
+        },
+        "link_type": "LINKTYPE_RADIO",
+        "name": "isl-53911-53847"
+      },
+      {
+        "attributes": {
+          "is_bidirectional": false,
+          "total_capacity_gbps": 0.0,
+          "used_capacity_gbps": 0.0
+        },
+        "link_endpoint_ids": [
+          {
+            "device_id": {
+              "device_uuid": {
+                "uuid": "a8d87244-5adb-5c45-8f9a-148c6008d4ba"
+              }
+            },
+            "endpoint_uuid": {
+              "uuid": "d478f12b-89f4-5e72-8896-0d3d51960a9b"
+            },
+            "topology_id": {
+              "context_id": {
+                "context_uuid": {
+                  "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                }
+              },
+              "topology_uuid": {
+                "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+              }
+            }
+          },
+          {
+            "device_id": {
+              "device_uuid": {
+                "uuid": "e65cd631-994c-5849-ab56-5904c0f55c3d"
+              }
+            },
+            "endpoint_uuid": {
+              "uuid": "d6150c59-bd0c-5745-88b7-b3036a694457"
+            },
+            "topology_id": {
+              "context_id": {
+                "context_uuid": {
+                  "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                }
+              },
+              "topology_uuid": {
+                "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+              }
+            }
+          }
+        ],
+        "link_id": {
+          "link_uuid": {
+            "uuid": "d0d8a2b7-df19-5708-871d-d13201cbb534"
+          }
+        },
+        "link_type": "LINKTYPE_RADIO",
+        "name": "isl-51726-53913"
+      },
+      {
+        "attributes": {
+          "is_bidirectional": false,
+          "total_capacity_gbps": 0.0,
+          "used_capacity_gbps": 0.0
+        },
+        "link_endpoint_ids": [
+          {
+            "device_id": {
+              "device_uuid": {
+                "uuid": "e65cd631-994c-5849-ab56-5904c0f55c3d"
+              }
+            },
+            "endpoint_uuid": {
+              "uuid": "8c438986-e2f4-5e22-b764-40b32bed6ad9"
+            },
+            "topology_id": {
+              "context_id": {
+                "context_uuid": {
+                  "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                }
+              },
+              "topology_uuid": {
+                "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+              }
+            }
+          },
+          {
+            "device_id": {
+              "device_uuid": {
+                "uuid": "f7f1379d-0550-5a69-b6b5-9a7801028621"
+              }
+            },
+            "endpoint_uuid": {
+              "uuid": "20c235d3-36c3-5495-80c9-569eda225167"
+            },
+            "topology_id": {
+              "context_id": {
+                "context_uuid": {
+                  "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                }
+              },
+              "topology_uuid": {
+                "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+              }
+            }
+          }
+        ],
+        "link_id": {
+          "link_uuid": {
+            "uuid": "f97b4817-a19e-53f5-98cb-81e6e6d0e2b9"
+          }
+        },
+        "link_type": "LINKTYPE_RADIO",
+        "name": "isl-53913-53848"
+      }
+    ],
+    "services": [
+      {
+        "name": "migration-l2",
+        "service_config": {
+          "config_rules": [
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/device[sat-53848]/endpoint[2]/settings",
+                "resource_value": "{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"2\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"20c235d3-36c3-5495-80c9-569eda225167\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/device[sat-53848]/endpoint[3]/settings",
+                "resource_value": "{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"3\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"c335c8d5-aaf1-5b81-b54b-7a0a0ea6daa8\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/device[sat-53913]/endpoint[2]/settings",
+                "resource_value": "{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"2\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"8c438986-e2f4-5e22-b764-40b32bed6ad9\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/device[sat-53913]/endpoint[3]/settings",
+                "resource_value": "{\"context_uuid\": \"4270b8eb-9108-543a-a503-93e662160a13\", \"name\": \"3\", \"topology_uuid\": \"d70ad060-7109-5b8a-8eb2-d77bf74e2c3a\", \"type\": \"port\", \"uuid\": \"272140a8-e251-59d5-a5db-e70736f2465e\"}"
+              }
+            },
+            {
+              "action": "CONFIGACTION_SET",
+              "custom": {
+                "resource_key": "/settings",
+                "resource_value": "{\"switch_info\": [{\"sat-51726\": {\"arch\": \"v1model\", \"dpid\": 1, \"fwd_list\": [{\"host_mac\": \"00:00:00:00:00:01\", \"port_id\": 3}, {\"host_mac\": \"00:00:00:00:00:02\", \"port_id\": 3}], \"port_list\": [{\"port_id\": 1, \"port_type\": \"switch\", \"vlan_id\": 4094}, {\"port_id\": 2, \"port_type\": \"switch\", \"vlan_id\": 4094}, {\"port_id\": 3, \"port_type\": \"switch\", \"vlan_id\": 4094}]}}, {\"sat-53848\": {\"arch\": \"v1model\", \"dpid\": 6, \"fwd_list\": [{\"host_mac\": \"00:00:00:00:00:01\", \"port_id\": 3}, {\"host_mac\": \"00:00:00:00:00:02\", \"port_id\": 2}], \"port_list\": [{\"port_id\": 1, \"port_type\": \"switch\", \"vlan_id\": 4094}, {\"port_id\": 2, \"port_type\": \"switch\", \"vlan_id\": 4094}, {\"port_id\": 3, \"port_type\": \"host\", \"vlan_id\": 4094}]}}, {\"sat-53913\": {\"arch\": \"v1model\", \"dpid\": 12, \"fwd_list\": [{\"host_mac\": \"00:00:00:00:00:01\", \"port_id\": 2}, {\"host_mac\": \"00:00:00:00:00:02\", \"port_id\": 3}], \"port_list\": [{\"port_id\": 1, \"port_type\": \"switch\", \"vlan_id\": 4094}, {\"port_id\": 2, \"port_type\": \"switch\", \"vlan_id\": 4094}, {\"port_id\": 3, \"port_type\": \"host\", \"vlan_id\": 4094}]}}]}"
+              }
+            }
+          ]
+        },
+        "service_constraints": [],
+        "service_endpoint_ids": [
+          {
+            "device_id": {
+              "device_uuid": {
+                "uuid": "f7f1379d-0550-5a69-b6b5-9a7801028621"
+              }
+            },
+            "endpoint_uuid": {
+              "uuid": "c335c8d5-aaf1-5b81-b54b-7a0a0ea6daa8"
+            },
+            "topology_id": {
+              "context_id": {
+                "context_uuid": {
+                  "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                }
+              },
+              "topology_uuid": {
+                "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+              }
+            }
+          },
+          {
+            "device_id": {
+              "device_uuid": {
+                "uuid": "e65cd631-994c-5849-ab56-5904c0f55c3d"
+              }
+            },
+            "endpoint_uuid": {
+              "uuid": "272140a8-e251-59d5-a5db-e70736f2465e"
+            },
+            "topology_id": {
+              "context_id": {
+                "context_uuid": {
+                  "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+                }
+              },
+              "topology_uuid": {
+                "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+              }
+            }
+          }
+        ],
+        "service_id": {
+          "context_id": {
+            "context_uuid": {
+              "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+            }
+          },
+          "service_uuid": {
+            "uuid": "c853520e-8776-5497-8d35-8a76147662e7"
+          }
+        },
+        "service_status": {
+          "service_status": "SERVICESTATUS_ACTIVE"
+        },
+        "service_type": "SERVICETYPE_L2NM"
+      }
+    ],
+    "topologies": [
+      {
+        "device_ids": [
+          {
+            "device_uuid": {
+              "uuid": "066a8a8f-5054-5d27-93cb-027d33168ff4"
+            }
+          },
+          {
+            "device_uuid": {
+              "uuid": "173da48c-bcb9-50d0-9cf5-1ba9762da1d2"
+            }
+          },
+          {
+            "device_uuid": {
+              "uuid": "37c8b228-467f-545a-becb-c90293434dcb"
+            }
+          },
+          {
+            "device_uuid": {
+              "uuid": "74dd61b5-22ec-5fc1-b3e9-7ed38c946398"
+            }
+          },
+          {
+            "device_uuid": {
+              "uuid": "a8d87244-5adb-5c45-8f9a-148c6008d4ba"
+            }
+          },
+          {
+            "device_uuid": {
+              "uuid": "b05c48c7-fd4e-519e-8dfe-4c2f16052413"
+            }
+          },
+          {
+            "device_uuid": {
+              "uuid": "e52f4461-50fa-5785-9352-898ef4ae9676"
+            }
+          },
+          {
+            "device_uuid": {
+              "uuid": "e65cd631-994c-5849-ab56-5904c0f55c3d"
+            }
+          },
+          {
+            "device_uuid": {
+              "uuid": "f7f1379d-0550-5a69-b6b5-9a7801028621"
+            }
+          },
+          {
+            "device_uuid": {
+              "uuid": "ffca8322-e8a3-5833-8f17-300982a6a638"
+            }
+          }
+        ],
+        "link_ids": [
+          {
+            "link_uuid": {
+              "uuid": "08ff9af0-7016-5986-abc2-27b8f419c63a"
+            }
+          },
+          {
+            "link_uuid": {
+              "uuid": "2984ccfc-0b9b-5716-a6bf-e390d041c51d"
+            }
+          },
+          {
+            "link_uuid": {
+              "uuid": "2c4e2839-4591-530c-b6a6-6b394052ee3a"
+            }
+          },
+          {
+            "link_uuid": {
+              "uuid": "73ac1027-291b-522a-af8c-276b79cf997c"
+            }
+          },
+          {
+            "link_uuid": {
+              "uuid": "7d961ee0-353a-59b6-8776-6d2adf194b4f"
+            }
+          },
+          {
+            "link_uuid": {
+              "uuid": "a796cdbb-3780-5466-83f0-8ef6b261f091"
+            }
+          },
+          {
+            "link_uuid": {
+              "uuid": "a96869a0-9290-5d82-8192-6cbe97f8ab1b"
+            }
+          },
+          {
+            "link_uuid": {
+              "uuid": "ca310af4-2e70-5328-9426-14cfe3058743"
+            }
+          },
+          {
+            "link_uuid": {
+              "uuid": "d0d8a2b7-df19-5708-871d-d13201cbb534"
+            }
+          },
+          {
+            "link_uuid": {
+              "uuid": "f97b4817-a19e-53f5-98cb-81e6e6d0e2b9"
+            }
+          }
+        ],
+        "name": "starlink-17",
+        "optical_link_ids": [],
+        "topology_id": {
+          "context_id": {
+            "context_uuid": {
+              "uuid": "4270b8eb-9108-543a-a503-93e662160a13"
+            }
+          },
+          "topology_uuid": {
+            "uuid": "d70ad060-7109-5b8a-8eb2-d77bf74e2c3a"
+          }
+        }
+      }
+    ]
+  },
+  "schema_version": 1,
+  "source_commit": "fb8707871eba26806cac7ac373c70b2bb5bd26fc"
+}

@@ -3,7 +3,15 @@
   "job_id": "job-49e9cf75efe74ad5bdfe4a0df1142712",
   "operation": "complete",
   "parameters": {},
+  "recovery": {
+    "complete": true,
+    "controllers_fenced": true,
+    "orbital_s": 512075.72017570003,
+    "previous_job_id": "job-49e9cf75efe74ad5bdfe4a0df1142712",
+    "recovered": false,
+    "source_expired": true
+  },
   "started_utc": "2026-10-08T16:50:08.657518+00:00",
-  "status": "running",
+  "status": "recovered",
   "worker_pid": 10412
 }
