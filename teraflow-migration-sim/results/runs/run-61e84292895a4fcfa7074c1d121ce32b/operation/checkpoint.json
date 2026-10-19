@@ -1,5 +1,0 @@
-{
-  "ack": true,
-  "phase": "completed",
-  "requires_fenced_recovery_after_crash": false
-}
