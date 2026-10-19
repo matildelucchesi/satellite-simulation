@@ -1,0 +1,210 @@
+{
+  "ack": false,
+  "attempt": 3,
+  "bytes_received": 1823549774,
+  "bytes_sent": 1823549774,
+  "event": {
+    "contact_end_s": 6248,
+    "contact_window_s": 1870,
+    "deadline_s": 7571,
+    "deadline_window_s": 3193,
+    "event_id": "functional-53848-53913-4378",
+    "execution_purpose": "functional-calibration",
+    "sat_a": 53848,
+    "sat_b": 53913,
+    "trigger_causes": [
+      "functional_diagnostic"
+    ],
+    "trigger_s": 4378
+  },
+  "events": [
+    {
+      "causes": [
+        "functional_diagnostic"
+      ],
+      "elapsed_s": 30.00150259997463,
+      "id": 1,
+      "orbital_s": 4378.00150329998,
+      "phase": "trigger",
+      "timestamp_utc": "2026-10-19T14:05:01.428072+00:00"
+    },
+    {
+      "elapsed_s": 30.410099799977615,
+      "id": 2,
+      "orbital_s": 4378.410101199988,
+      "phase": "alignment",
+      "timestamp_utc": "2026-10-19T14:05:01.836612+00:00"
+    },
+    {
+      "elapsed_s": 90.49315929994918,
+      "id": 3,
+      "orbital_s": 4438.493159699952,
+      "phase": "snapshot_initial",
+      "timestamp_utc": "2026-10-19T14:06:01.919724+00:00"
+    },
+    {
+      "artifact": {
+        "bytes": 1823463936,
+        "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\artifacts\\images-l2-patched-v2\\teraflow-v7-images.tar",
+        "sha256": "9fc2920c12e4cc8867cd34ad294f1c240acc34b181dd462ce69e5abd51531c00"
+      },
+      "elapsed_s": 94.5572110999492,
+      "id": 4,
+      "orbital_s": 4442.557212299958,
+      "payload": "teraflow-v7-images.tar",
+      "phase": "transfer",
+      "timestamp_utc": "2026-10-19T14:06:05.983777+00:00"
+    },
+    {
+      "elapsed_s": 113.07798259996343,
+      "id": 5,
+      "orbital_s": 4461.07798349997,
+      "payload": "teraflow-v7-images.tar",
+      "phase": "transfer_verified",
+      "receipt": {
+        "configured_rate_bps": 1000000000,
+        "elapsed_s": 14.6586250999826,
+        "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\results\\runs\\run-f9b3fee9a2b140e3a4dcec69056e8c8a\\attempts\\1\\received\\teraflow-v7-images.tar",
+        "received_bytes": 1823463936,
+        "receiver_elapsed_s": 14.618697299971245,
+        "sent_bytes": 1823463936,
+        "sha256": "9fc2920c12e4cc8867cd34ad294f1c240acc34b181dd462ce69e5abd51531c00",
+        "tcp_retransmission_measurement": "unavailable on host transport",
+        "tcp_retransmissions": null,
+        "useful_throughput_bps": 995162328.560904
+      },
+      "timestamp_utc": "2026-10-19T14:06:24.504435+00:00"
+    },
+    {
+      "artifact": {
+        "bytes": 85838,
+        "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\results\\runs\\run-f9b3fee9a2b140e3a4dcec69056e8c8a\\operation\\snapshot-1.json",
+        "sha256": "9c175bcf6b028c00c4f1a44be364fcef3fe6997353f815de7c619a1d13199596"
+      },
+      "elapsed_s": 117.38094639999326,
+      "id": 6,
+      "orbital_s": 4465.380947999947,
+      "payload": "snapshot-1.json",
+      "phase": "transfer",
+      "timestamp_utc": "2026-10-19T14:06:28.807506+00:00"
+    },
+    {
+      "elapsed_s": 117.44389459997183,
+      "id": 7,
+      "orbital_s": 4465.44389569998,
+      "payload": "snapshot-1.json",
+      "phase": "transfer_verified",
+      "receipt": {
+        "configured_rate_bps": 1000000000,
+        "elapsed_s": 0.014128300012089312,
+        "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\results\\runs\\run-f9b3fee9a2b140e3a4dcec69056e8c8a\\attempts\\1\\received\\snapshot-1.json",
+        "received_bytes": 85838,
+        "receiver_elapsed_s": 0.006435299990698695,
+        "sent_bytes": 85838,
+        "sha256": "9c175bcf6b028c00c4f1a44be364fcef3fe6997353f815de7c619a1d13199596",
+        "tcp_retransmission_measurement": "unavailable on host transport",
+        "tcp_retransmissions": null,
+        "useful_throughput_bps": 48604856.87679344
+      },
+      "timestamp_utc": "2026-10-19T14:06:28.870462+00:00"
+    },
+    {
+      "elapsed_s": 117.49378919997253,
+      "id": 8,
+      "orbital_s": 4465.493789699976,
+      "phase": "target_start",
+      "timestamp_utc": "2026-10-19T14:06:28.920354+00:00"
+    },
+    {
+      "elapsed_s": 295.8398305999581,
+      "id": 9,
+      "orbital_s": 4643.83983079996,
+      "phase": "restore_initial",
+      "timestamp_utc": "2026-10-19T14:09:27.266403+00:00"
+    },
+    {
+      "attempt": 1,
+      "elapsed_s": 2133.6979527999647,
+      "id": 10,
+      "orbital_s": 6481.697954099975,
+      "phase": "attempt_failed",
+      "reason": "Observer failed: Operational deadline reached",
+      "timestamp_utc": "2026-10-19T14:40:04.804195+00:00"
+    },
+    {
+      "elapsed_s": 2147.919528899947,
+      "id": 11,
+      "orbital_s": 6495.919529099949,
+      "phase": "rollback",
+      "timestamp_utc": "2026-10-19T14:40:19.025779+00:00"
+    },
+    {
+      "attempt": 2,
+      "elapsed_s": 2164.4874891999643,
+      "id": 12,
+      "orbital_s": 6512.487489699968,
+      "phase": "attempt_failed",
+      "reason": "Observer failed: Operational deadline reached",
+      "timestamp_utc": "2026-10-19T14:40:35.593736+00:00"
+    },
+    {
+      "elapsed_s": 2164.5191395999864,
+      "id": 13,
+      "orbital_s": 6512.519139799988,
+      "phase": "rollback",
+      "timestamp_utc": "2026-10-19T14:40:35.625387+00:00"
+    },
+    {
+      "attempt": 3,
+      "elapsed_s": 2168.6473777999636,
+      "id": 14,
+      "orbital_s": 6516.647378399968,
+      "phase": "attempt_failed",
+      "reason": "Observer failed: Operational deadline reached",
+      "timestamp_utc": "2026-10-19T14:40:39.753624+00:00"
+    },
+    {
+      "elapsed_s": 2168.683559499972,
+      "id": 15,
+      "orbital_s": 6516.683559699974,
+      "phase": "rollback",
+      "timestamp_utc": "2026-10-19T14:40:39.789806+00:00"
+    },
+    {
+      "elapsed_s": 2172.951628699957,
+      "id": 16,
+      "orbital_s": 6520.951629199961,
+      "phase": "failed",
+      "timestamp_utc": "2026-10-19T14:40:44.057876+00:00"
+    }
+  ],
+  "execution_kind": "live-hybrid",
+  "failure_phase": "rollback",
+  "failure_reason": "Observer failed: Operational deadline reached",
+  "method": "hot",
+  "recoveries": [
+    {
+      "attempt": 1,
+      "controller_unavailable_until_recovery_s": 30.764804999984335,
+      "elapsed_s": 30.764802999969106,
+      "source_recovered": true,
+      "started_elapsed_s": 2133.7225085999817
+    },
+    {
+      "attempt": 2,
+      "controller_unavailable_until_recovery_s": 4.138062499987427,
+      "elapsed_s": 4.138061499979813,
+      "source_recovered": true,
+      "started_elapsed_s": 2164.5092831999646
+    },
+    {
+      "attempt": 3,
+      "controller_unavailable_until_recovery_s": 4.285173499956727,
+      "elapsed_s": 4.285172599949874,
+      "source_recovered": true,
+      "started_elapsed_s": 2168.6664313999936
+    }
+  ],
+  "schema_version": 2,
+  "success": false
+}

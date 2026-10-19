@@ -1,6 +1,6 @@
 # Configurazione TeraFlowSDN per SAT-A e SAT-B
 
-Usiamo due progetti Docker Compose distinti, `sat-a` e `sat-b`, con reti, database e broker indipendenti. Il deployment è un adattamento sperimentale dei manifest ETSI v7.0.0. Il tag verificato punta al commit `fb8707871eba26806cac7ac373c70b2bb5bd26fc`.
+Usiamo un unico progetto Docker Compose, `teraflow`, con reti, database e broker indipendenti per SAT-A e SAT-B. La configurazione operativa è `deploy/stack.yaml`, generata dai template con `tools/generate_stack.py`. Il deployment è un adattamento sperimentale dei manifest ETSI v7.0.0. Il tag verificato punta al commit `fb8707871eba26806cac7ac373c70b2bb5bd26fc`.
 
 ## Componenti e immagini
 
@@ -16,12 +16,16 @@ Da PowerShell, nella radice del nuovo progetto:
 
 ```powershell
 python tools/build_tfs_images.py
-docker compose --env-file deploy/sat-a.env -p sat-a -f deploy/compose.yaml config --quiet
-docker compose --env-file deploy/sat-a.env -p sat-a -f deploy/compose.yaml up -d
-docker compose --env-file deploy/sat-b.env -p sat-b -f deploy/compose.yaml up -d
+docker compose --env-file deploy/lab.env -p teraflow -f deploy/stack.yaml config --quiet
+.\.venv\Scripts\python.exe tools/stack.py up
+# SAT-B viene avviato dallo stesso comando insieme a SAT-A e al laboratorio P4.
 ```
 
 NBI è esposto solo localmente: SAT-A su `http://127.0.0.1:18080`, SAT-B su `http://127.0.0.1:18081`. Controllare `/healthz` e poi `/tfs-api/contexts`. La disponibilità HTTP non certifica il provisioning P4: serve una successiva prova di servizio tramite Device, PathComp e Service.
+
+Le reti private dei due controller hanno alias DNS locali (`contextservice`, `kafka`, ecc.), così ogni stack risolve soltanto le proprie dipendenze. I volumi esterni `sat-a_crdb-data`, `sat-a_kafka-data`, `sat-b_crdb-data`, `sat-b_kafka-data` e `migration-lab_proxy-state` mantengono i dati del deployment precedente. I container dei satelliti conservano i nomi `sat-a-...`/`sat-b-...` e hanno etichette `org.teraflow.role`; la contabilità del disco filtra sia il progetto `teraflow` sia il satellite.
+
+Le subnet predefinite sono 172.25.0.0/16 per il laboratorio, 172.26.0.0/16 per A e 172.27.0.0/16 per B. Mininet e proxy conservano gli indirizzi 172.25.0.2 e 172.25.0.3. Su un host con subnet già occupate, configurare `LAB_SUBNET`, `SAT_A_SUBNET`, `SAT_B_SUBNET`, `MININET_IP` e `P4_PROXY_IP` in `deploy/lab.env`, mantenendole distinte e adattando gli indirizzi statici alla subnet del laboratorio. Per modificare la configurazione generata, aggiornare i template e poi eseguire `tools/generate_stack.py`.
 
 ## Verifica runtime del 2 ottobre 2026
 
@@ -55,8 +59,8 @@ La correzione locale autorizzata mantiene il commit upstream come base e registr
 Con il laboratorio già avviato, usare gli override anche quando si riavviano i controller:
 
 ```powershell
-docker compose --env-file deploy/sat-a.env -p sat-a -f deploy/compose.yaml -f deploy/lab-controller.yaml -f deploy/l2-patched.yaml up -d
-docker compose --env-file deploy/sat-b.env -p sat-b -f deploy/compose.yaml -f deploy/lab-controller.yaml -f deploy/l2-patched.yaml up -d
+.\.venv\Scripts\python.exe tools/stack.py up
+# La configurazione unica include gli override P4 e le immagini con patch per entrambi i controller.
 python tools/live_preflight.py --reset-fixture
 ```
 

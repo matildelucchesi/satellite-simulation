@@ -8,6 +8,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from mininet.net import Mininet
 from mininet.node import Switch
+from .link_control import set_link_availability
 
 
 class Bmv2(Switch):
@@ -21,7 +22,9 @@ class Bmv2(Switch):
         command = ["simple_switch_grpc", "--device-id", str(self.device_id_value), "--no-p4",
                    "--log-console", "--log-level", "warn", "--thrift-port", str(9000+self.device_id_value)]
         for intf in self.intfList():
-            if intf.name != "lo": command.extend(["-i", str(self.ports[intf])+"@"+intf.name])
+            if intf.name != "lo":
+                intf.ifconfig('up')
+                command.extend(["-i", str(self.ports[intf])+"@"+intf.name])
         command.extend(["--", "--grpc-server-addr", "0.0.0.0:"+str(self.grpc_port), "--cpu-port", "255"])
         log = open("/results/"+self.name+".log", "a")
         self.process = self.popen(command, stdout=log, stderr=subprocess.STDOUT)
@@ -63,6 +66,7 @@ def run(fixture):
         other = next(host for host in fixture["emulator"]["hosts"] if host["name"] != row["name"])
         hosts[row["name"]].setARP(other["ip"].split("/")[0], other["mac"])
     probes = []
+    availability = {pair: True for pair in links}
     lock = threading.RLock()
     class Handler(BaseHTTPRequestHandler):
         def do_GET(self):
@@ -77,8 +81,10 @@ def run(fixture):
                     if self.path == "/links":
                         available = {tuple(sorted(pair)) for pair in body["pairs"]}
                         for pair, link in links.items():
-                            state = "up" if pair in available else "down"
-                            link.intf1.ifconfig(state); link.intf2.ifconfig(state)
+                            enabled = pair in available
+                            if enabled != availability[pair]:
+                                set_link_availability(link, enabled)
+                                availability[pair] = enabled
                     elif self.path == "/probes/start":
                         if probes: raise ValueError("Probes already running")
                         run_id = body["run_id"]

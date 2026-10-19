@@ -1,0 +1,20 @@
+{
+  "acquisition_engine_fingerprint": "11746177d1d31fa2739653bc87048fa8cd9198f2728eacdc0415a490cc30e05d",
+  "analysis_engine_fingerprint": "5c2a99874f780cc03e88bbca87cea949371e3d1af8c9d6d08bd3b937d99a793a",
+  "calibration_manifest_unchanged": true,
+  "complete": true,
+  "container_p4_passed": 9,
+  "host_passed": 114,
+  "javascript_check": "passed",
+  "job_id": "job-b02c28df95274126b05a409acef77139",
+  "lock_present": false,
+  "migration_success": true,
+  "post_run_changes": "Presentation only: break plots across stops/replacements and write derived analyses separately",
+  "recovery_required": false,
+  "runs": [
+    "run-9fc28d4d941f44aab61201b7df605547",
+    "run-fc0d676806b64b389ccde469d31cd8eb"
+  ],
+  "schema_version": 1,
+  "tests_collected": 123
+}

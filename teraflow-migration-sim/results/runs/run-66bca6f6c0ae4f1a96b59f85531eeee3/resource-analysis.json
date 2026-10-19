@@ -1,0 +1,3595 @@
+{
+  "complete": false,
+  "container_summaries": [
+    {
+      "above_2_4": 0,
+      "maximum": 1.9313999999999998,
+      "maximum_gap_s": 1.483725800004322,
+      "median": 0.035,
+      "median_interval_s": 0.49983859999338165,
+      "p95": 0.1638,
+      "phase": "preparation",
+      "samples": 82,
+      "service": "sat-b-nbiservice",
+      "slot": "sat-b"
+    },
+    {
+      "above_2_4": 0,
+      "maximum": 0.2487,
+      "maximum_gap_s": 1.4830564000003505,
+      "median": 0.0323,
+      "median_interval_s": 0.49982090000412427,
+      "p95": 0.182,
+      "phase": "preparation",
+      "samples": 54,
+      "service": "sat-a-nbiservice",
+      "slot": "sat-a"
+    },
+    {
+      "above_2_4": 0,
+      "maximum": 0.2306,
+      "maximum_gap_s": 1.4831173999991734,
+      "median": 0.0048,
+      "median_interval_s": 0.4998298000136856,
+      "p95": 0.1675,
+      "phase": "preparation",
+      "samples": 82,
+      "service": "sat-b-serviceservice",
+      "slot": "sat-b"
+    },
+    {
+      "above_2_4": 0,
+      "maximum": 0.21239999999999998,
+      "maximum_gap_s": 1.4842661000147928,
+      "median": 0.0044,
+      "median_interval_s": 0.4996017500088783,
+      "p95": 0.2097,
+      "phase": "preparation",
+      "samples": 55,
+      "service": "sat-a-serviceservice",
+      "slot": "sat-a"
+    },
+    {
+      "above_2_4": 0,
+      "maximum": 1.2241,
+      "maximum_gap_s": 1.484441299980972,
+      "median": 0.06770000000000001,
+      "median_interval_s": 0.4995618000102695,
+      "p95": 0.972,
+      "phase": "preparation",
+      "samples": 84,
+      "service": "sat-b-deviceservice",
+      "slot": "sat-b"
+    },
+    {
+      "above_2_4": 0,
+      "maximum": 1.2006000000000001,
+      "maximum_gap_s": 1.4863992999889888,
+      "median": 0.6517000000000001,
+      "median_interval_s": 0.4989538499939954,
+      "p95": 0.9562999999999999,
+      "phase": "preparation",
+      "samples": 57,
+      "service": "sat-a-deviceservice",
+      "slot": "sat-a"
+    },
+    {
+      "above_2_4": 0,
+      "maximum": 0.2491,
+      "maximum_gap_s": 1.4866272000072058,
+      "median": 0.0227,
+      "median_interval_s": 0.4992262500018114,
+      "p95": 0.19260000000000002,
+      "phase": "preparation",
+      "samples": 83,
+      "service": "sat-b-pathcompservice",
+      "slot": "sat-b"
+    },
+    {
+      "above_2_4": 0,
+      "maximum": 0.19149999999999998,
+      "maximum_gap_s": 1.4872442999912892,
+      "median": 0.0213,
+      "median_interval_s": 0.4986172000062652,
+      "p95": 0.1875,
+      "phase": "preparation",
+      "samples": 56,
+      "service": "sat-a-pathcompservice",
+      "slot": "sat-a"
+    },
+    {
+      "above_2_4": 0,
+      "maximum": 0.33640000000000003,
+      "maximum_gap_s": 1.4888113999913912,
+      "median": 0.0019,
+      "median_interval_s": 0.499135150006623,
+      "p95": 0.2673,
+      "phase": "preparation",
+      "samples": 77,
+      "service": "sat-a-contextservice",
+      "slot": "sat-a"
+    },
+    {
+      "above_2_4": 0,
+      "maximum": 0.3332,
+      "maximum_gap_s": 1.4897926999838091,
+      "median": 0.0010500000000000002,
+      "median_interval_s": 0.49959490000037476,
+      "p95": 0.2407,
+      "phase": "preparation",
+      "samples": 104,
+      "service": "sat-b-contextservice",
+      "slot": "sat-b"
+    },
+    {
+      "above_2_4": 0,
+      "maximum": 2.1725,
+      "maximum_gap_s": 1.4897543999832124,
+      "median": 0.0207,
+      "median_interval_s": 0.4995447000110289,
+      "p95": 2.1481,
+      "phase": "preparation",
+      "samples": 105,
+      "service": "sat-b-kafka",
+      "slot": "sat-b"
+    },
+    {
+      "above_2_4": 4,
+      "maximum": 2.4662,
+      "maximum_gap_s": 1.490188700001454,
+      "median": 0.0181,
+      "median_interval_s": 0.49947375000920147,
+      "p95": 1.8529,
+      "phase": "preparation",
+      "samples": 105,
+      "service": "sat-a-kafka",
+      "slot": "sat-a"
+    },
+    {
+      "above_2_4": 0,
+      "maximum": 0.035,
+      "maximum_gap_s": 1.4902416999975685,
+      "median": 0.0005,
+      "median_interval_s": 0.49974769999971613,
+      "p95": 0.028300000000000002,
+      "phase": "preparation",
+      "samples": 105,
+      "service": "sat-a-nats",
+      "slot": "sat-a"
+    },
+    {
+      "above_2_4": 0,
+      "maximum": 0.0775,
+      "maximum_gap_s": 1.4892728000122588,
+      "median": 0.0,
+      "median_interval_s": 0.4994573999865679,
+      "p95": 0.0406,
+      "phase": "preparation",
+      "samples": 103,
+      "service": "sat-b-pathcomp-backend",
+      "slot": "sat-b"
+    },
+    {
+      "above_2_4": 0,
+      "maximum": 1.034,
+      "maximum_gap_s": 1.4886233000142965,
+      "median": 0.050499999999999996,
+      "median_interval_s": 0.49909369998204056,
+      "p95": 0.6668000000000001,
+      "phase": "preparation",
+      "samples": 105,
+      "service": "sat-b-cockroachdb",
+      "slot": "sat-b"
+    },
+    {
+      "above_2_4": 0,
+      "maximum": 0.0665,
+      "maximum_gap_s": 1.488757999992231,
+      "median": 0.0,
+      "median_interval_s": 0.4987218000169378,
+      "p95": 0.0425,
+      "phase": "preparation",
+      "samples": 76,
+      "service": "sat-a-pathcomp-backend",
+      "slot": "sat-a"
+    },
+    {
+      "above_2_4": 0,
+      "maximum": 1.0458,
+      "maximum_gap_s": 1.4884848000074271,
+      "median": 0.0335,
+      "median_interval_s": 0.4988659499940695,
+      "p95": 0.6892,
+      "phase": "preparation",
+      "samples": 105,
+      "service": "sat-a-cockroachdb",
+      "slot": "sat-a"
+    },
+    {
+      "above_2_4": 0,
+      "maximum": 0.0323,
+      "maximum_gap_s": 1.488053300010506,
+      "median": 0.0005,
+      "median_interval_s": 0.49896675000491086,
+      "p95": 0.0285,
+      "phase": "preparation",
+      "samples": 105,
+      "service": "sat-b-nats",
+      "slot": "sat-b"
+    }
+  ],
+  "coverage": [
+    {
+      "complete": false,
+      "phase": "source_stable",
+      "slot": "sat-a"
+    },
+    {
+      "complete": false,
+      "phase": "target_stable",
+      "slot": "sat-b"
+    }
+  ],
+  "detail_available": true,
+  "errors": [
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 2 column 1 (char 1)",
+    "Expecting value: line 1 column 1 (char 0)"
+  ],
+  "gaps": [],
+  "limitations": [
+    "Docker interval samples, not continuous coverage",
+    "Concurrent operations do not establish causality",
+    "Shared daemon costs outside containers are excluded"
+  ],
+  "percentile_method": "floor(0.95*(N-1))",
+  "schema_version": 1,
+  "slot_samples": [
+    {
+      "cpu_cores": 0.4733,
+      "monotonic_s": 259414.3148851,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.9874,
+      "monotonic_s": 259414.3111075,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.4733,
+      "monotonic_s": 259415.8029384,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.9874,
+      "monotonic_s": 259415.7995923,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 1.1187,
+      "monotonic_s": 259415.8769015,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 1.1358,
+      "monotonic_s": 259415.8729469,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 1.1187,
+      "monotonic_s": 259415.9538627,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 1.1358,
+      "monotonic_s": 259415.949673,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 1.4838,
+      "monotonic_s": 259416.3260906,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 1.443,
+      "monotonic_s": 259416.3229869,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 1.4838,
+      "monotonic_s": 259416.8024345,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 1.443,
+      "monotonic_s": 259416.799924,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 1.1354,
+      "monotonic_s": 259417.3092361,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 1.4611999999999998,
+      "monotonic_s": 259417.306382,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 1.1354,
+      "monotonic_s": 259418.3997741,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 1.4611999999999998,
+      "monotonic_s": 259418.3970747,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 1.6930999999999998,
+      "monotonic_s": 259418.4494285,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 3.6289000000000002,
+      "monotonic_s": 259418.4467479,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 1.6930999999999998,
+      "monotonic_s": 259418.8041195,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 3.6289000000000002,
+      "monotonic_s": 259418.8016784,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 3.517,
+      "monotonic_s": 259419.2995438,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 1.6289,
+      "monotonic_s": 259419.2969865,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 3.517,
+      "monotonic_s": 259419.8048034,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 1.6289,
+      "monotonic_s": 259419.8015686,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.9764999999999999,
+      "monotonic_s": 259420.3028923,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.7917000000000001,
+      "monotonic_s": 259420.3004521,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.9764999999999999,
+      "monotonic_s": 259421.3216361,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.7917000000000001,
+      "monotonic_s": 259421.3178271,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 1.3361,
+      "monotonic_s": 259421.3735719,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.586,
+      "monotonic_s": 259421.3708482,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 1.3361,
+      "monotonic_s": 259421.8071647,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.586,
+      "monotonic_s": 259421.8043072,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 1.031,
+      "monotonic_s": 259422.3007386,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.5369,
+      "monotonic_s": 259422.2977884,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 1.031,
+      "monotonic_s": 259422.8005443,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.5369,
+      "monotonic_s": 259422.7981266,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 1.3939,
+      "monotonic_s": 259424.0080101,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.9882,
+      "monotonic_s": 259424.0045266,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 1.3939,
+      "monotonic_s": 259424.0688246,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.9882,
+      "monotonic_s": 259424.0651625,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 1.6262999999999999,
+      "monotonic_s": 259424.3099577,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 1.0502,
+      "monotonic_s": 259424.3072956,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 1.6262999999999999,
+      "monotonic_s": 259424.805504,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 1.0502,
+      "monotonic_s": 259424.8021396,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 2.0396,
+      "monotonic_s": 259425.3077809,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 1.3624,
+      "monotonic_s": 259425.3045239,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 2.0396,
+      "monotonic_s": 259425.8100888,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 1.3624,
+      "monotonic_s": 259425.8066758,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 1.2738,
+      "monotonic_s": 259426.8816591,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 1.3597000000000001,
+      "monotonic_s": 259426.878233,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 1.1819,
+      "monotonic_s": 259426.9478722,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.6624000000000001,
+      "monotonic_s": 259426.9448381,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 1.1819,
+      "monotonic_s": 259427.3191531,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.6624000000000001,
+      "monotonic_s": 259427.3149412,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 1.4203,
+      "monotonic_s": 259427.8110713,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.7126,
+      "monotonic_s": 259427.8078021,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 1.4203,
+      "monotonic_s": 259428.3139349,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.7126,
+      "monotonic_s": 259428.3109834,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 2.1307,
+      "monotonic_s": 259428.8012911,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 1.2952,
+      "monotonic_s": 259428.7988995,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 2.1307,
+      "monotonic_s": 259429.9923778,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 1.2952,
+      "monotonic_s": 259429.9896387,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.8795000000000001,
+      "monotonic_s": 259430.0410343,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 3.2472,
+      "monotonic_s": 259430.038411,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.8795000000000001,
+      "monotonic_s": 259430.2957681,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 3.2472,
+      "monotonic_s": 259430.2935398,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 2.9249,
+      "monotonic_s": 259430.7895578,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 3.5259,
+      "monotonic_s": 259430.7875366,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 2.9249,
+      "monotonic_s": 259431.2895549,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 3.5259,
+      "monotonic_s": 259431.2872856,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.6119,
+      "monotonic_s": 259431.8004161,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 1.1348,
+      "monotonic_s": 259431.7974842,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.6119,
+      "monotonic_s": 259432.7980089,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 1.1348,
+      "monotonic_s": 259432.7953205,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.0924,
+      "monotonic_s": 259432.8459771,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 1.0564,
+      "monotonic_s": 259432.8439044,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.0924,
+      "monotonic_s": 259433.3031793,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 1.0564,
+      "monotonic_s": 259433.3011816,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.41319999999999996,
+      "monotonic_s": 259433.8051977,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 1.6208,
+      "monotonic_s": 259433.8023182,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.41319999999999996,
+      "monotonic_s": 259434.3077125,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 1.6208,
+      "monotonic_s": 259434.3047699,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.5525,
+      "monotonic_s": 259435.3875261,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 1.6754,
+      "monotonic_s": 259435.3843913,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.5525,
+      "monotonic_s": 259435.435968,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 1.6754,
+      "monotonic_s": 259435.4340184,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.8197,
+      "monotonic_s": 259435.7966821,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 2.0418000000000003,
+      "monotonic_s": 259435.7947343,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.8197,
+      "monotonic_s": 259436.297923,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 2.0418000000000003,
+      "monotonic_s": 259436.2957978,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.19419999999999998,
+      "monotonic_s": 259436.817331,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.9585,
+      "monotonic_s": 259436.8144992,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.19419999999999998,
+      "monotonic_s": 259437.2966747,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.9585,
+      "monotonic_s": 259437.294098,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.1293,
+      "monotonic_s": 259438.3932919,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.7740000000000001,
+      "monotonic_s": 259438.390787,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.1293,
+      "monotonic_s": 259438.4362504,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.7740000000000001,
+      "monotonic_s": 259438.4341506,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.6034,
+      "monotonic_s": 259438.7971196,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 1.3056,
+      "monotonic_s": 259438.7950646,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.6034,
+      "monotonic_s": 259439.295897,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 1.3056,
+      "monotonic_s": 259439.2934175,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.26130000000000003,
+      "monotonic_s": 259439.7993577,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.8984000000000001,
+      "monotonic_s": 259439.7967978,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.4281,
+      "monotonic_s": 259440.3034608,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.9027000000000001,
+      "monotonic_s": 259440.3008449,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.4281,
+      "monotonic_s": 259441.5386397,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.9027000000000001,
+      "monotonic_s": 259441.5351383,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-nbiservice",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.384,
+      "monotonic_s": 259441.5917392,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": null,
+      "monotonic_s": 259441.5880224,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice",
+        "sat-a-serviceservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.384,
+      "monotonic_s": 259441.7950499,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": null,
+      "monotonic_s": 259441.7922758,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-pathcomp-backend",
+        "sat-a-pathcompservice"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 2.0877,
+      "monotonic_s": 259442.2930867,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": null,
+      "monotonic_s": 259442.290659,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-deviceservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-pathcomp-backend"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 2.0877,
+      "monotonic_s": 259442.78598,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": null,
+      "monotonic_s": 259442.783469,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-pathcomp-backend"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 1.7765,
+      "monotonic_s": 259443.2851361,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": null,
+      "monotonic_s": 259443.282477,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-pathcomp-backend"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 1.7765,
+      "monotonic_s": 259444.2986594,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.6676000000000001,
+      "monotonic_s": 259444.2963624,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-pathcomp-backend"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.4963,
+      "monotonic_s": 259444.3316459,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.306,
+      "monotonic_s": 259444.3288818,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-pathcomp-backend"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.4963,
+      "monotonic_s": 259444.7839379,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.306,
+      "monotonic_s": 259444.781915,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-pathcomp-backend"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.452,
+      "monotonic_s": 259445.2847371,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.028800000000000003,
+      "monotonic_s": 259445.28254,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-pathcomp-backend"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.452,
+      "monotonic_s": 259445.7903755,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.028800000000000003,
+      "monotonic_s": 259445.7883603,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-pathcomp-backend"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.176,
+      "monotonic_s": 259446.8047235,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.0641,
+      "monotonic_s": 259446.802357,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-pathcomp-backend"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.176,
+      "monotonic_s": 259446.8375716,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.0641,
+      "monotonic_s": 259446.8354338,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-pathcomp-backend"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.7863999999999999,
+      "monotonic_s": 259447.2843105,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.6582999999999999,
+      "monotonic_s": 259447.2824174,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-pathcomp-backend"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.7863999999999999,
+      "monotonic_s": 259447.7835218,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.6582999999999999,
+      "monotonic_s": 259447.7812658,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-pathcomp-backend"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.09770000000000001,
+      "monotonic_s": 259448.2851667,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.023200000000000002,
+      "monotonic_s": 259448.2832518,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-pathcomp-backend"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.09770000000000001,
+      "monotonic_s": 259448.7846676,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.023200000000000002,
+      "monotonic_s": 259448.7827667,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-pathcomp-backend"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.4792,
+      "monotonic_s": 259449.2991475,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.25060000000000004,
+      "monotonic_s": 259449.2967513,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-pathcomp-backend"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.4792,
+      "monotonic_s": 259449.7830311,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.25060000000000004,
+      "monotonic_s": 259449.7811229,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-pathcomp-backend"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.3573,
+      "monotonic_s": 259450.2829712,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.029599999999999998,
+      "monotonic_s": 259450.2810816,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-pathcomp-backend"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.3573,
+      "monotonic_s": 259450.784266,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.029599999999999998,
+      "monotonic_s": 259450.7822564,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-pathcomp-backend"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.20750000000000002,
+      "monotonic_s": 259451.7665988,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.0678,
+      "monotonic_s": 259451.7645097,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-pathcomp-backend"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.20750000000000002,
+      "monotonic_s": 259451.8016782,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.0678,
+      "monotonic_s": 259451.7993358,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-kafka",
+        "sat-a-nats",
+        "sat-a-pathcomp-backend"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.7458999999999999,
+      "monotonic_s": 259452.2819168,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": null,
+      "monotonic_s": 259452.2793526,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-contextservice",
+        "sat-a-kafka",
+        "sat-a-nats"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.7458999999999999,
+      "monotonic_s": 259452.783894,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": null,
+      "monotonic_s": 259452.7813766,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-kafka",
+        "sat-a-nats"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.4068,
+      "monotonic_s": 259453.2849057,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": null,
+      "monotonic_s": 259453.282299,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-kafka",
+        "sat-a-nats"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.4068,
+      "monotonic_s": 259454.5097128,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 1.5034999999999998,
+      "monotonic_s": 259454.5071281,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-kafka",
+        "sat-a-nats"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 4.787599999999999,
+      "monotonic_s": 259454.5416949,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 1.9428,
+      "monotonic_s": 259454.5390152,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-kafka",
+        "sat-a-nats"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 4.787599999999999,
+      "monotonic_s": 259454.7825965,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-nbiservice",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice",
+        "sat-b-serviceservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 1.9428,
+      "monotonic_s": 259454.7803274,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-kafka",
+        "sat-a-nats"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": null,
+      "monotonic_s": 259455.278908,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-pathcomp-backend",
+        "sat-b-pathcompservice"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 1.9428,
+      "monotonic_s": 259455.275085,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-kafka",
+        "sat-a-nats"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": null,
+      "monotonic_s": 259455.7735634,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-deviceservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-pathcomp-backend"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.4321,
+      "monotonic_s": 259455.7712298,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-kafka",
+        "sat-a-nats"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": null,
+      "monotonic_s": 259456.270146,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-pathcomp-backend"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.4321,
+      "monotonic_s": 259456.2681542,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-kafka",
+        "sat-a-nats"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.0653,
+      "monotonic_s": 259457.1996871,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-pathcomp-backend"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.0251,
+      "monotonic_s": 259457.1970285,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-kafka",
+        "sat-a-nats"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.0653,
+      "monotonic_s": 259457.2717958,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-pathcomp-backend"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.0251,
+      "monotonic_s": 259457.2692125,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-kafka",
+        "sat-a-nats"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.5337000000000001,
+      "monotonic_s": 259457.7690914,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-pathcomp-backend"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.5365,
+      "monotonic_s": 259457.7671045,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-kafka",
+        "sat-a-nats"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.5337000000000001,
+      "monotonic_s": 259458.2719988,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-pathcomp-backend"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.5365,
+      "monotonic_s": 259458.2698442,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-kafka",
+        "sat-a-nats"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.1956,
+      "monotonic_s": 259458.7720941,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-pathcomp-backend"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.1764,
+      "monotonic_s": 259458.7699579,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-kafka",
+        "sat-a-nats"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.1956,
+      "monotonic_s": 259459.6805047,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-pathcomp-backend"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.1764,
+      "monotonic_s": 259459.6778929,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-kafka",
+        "sat-a-nats"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.05210000000000001,
+      "monotonic_s": 259459.7699946,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-pathcomp-backend"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.0553,
+      "monotonic_s": 259459.7678695,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-kafka",
+        "sat-a-nats"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.05210000000000001,
+      "monotonic_s": 259460.2703758,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-pathcomp-backend"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.0553,
+      "monotonic_s": 259460.2676501,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-kafka",
+        "sat-a-nats"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.2094,
+      "monotonic_s": 259460.7714512,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-pathcomp-backend"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.0271,
+      "monotonic_s": 259460.7694272,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-kafka",
+        "sat-a-nats"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.2094,
+      "monotonic_s": 259461.2708798,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-pathcomp-backend"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.0271,
+      "monotonic_s": 259461.2689611,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-kafka",
+        "sat-a-nats"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.057300000000000004,
+      "monotonic_s": 259462.1681417,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-pathcomp-backend"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.0235,
+      "monotonic_s": 259462.1662759,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-kafka",
+        "sat-a-nats"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.057300000000000004,
+      "monotonic_s": 259462.2690997,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-pathcomp-backend"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.0235,
+      "monotonic_s": 259462.2671773,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-kafka",
+        "sat-a-nats"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.0257,
+      "monotonic_s": 259462.7691288,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-pathcomp-backend"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.024900000000000002,
+      "monotonic_s": 259462.7669924,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-kafka",
+        "sat-a-nats"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.0257,
+      "monotonic_s": 259463.269002,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-pathcomp-backend"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.024900000000000002,
+      "monotonic_s": 259463.2670546,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-kafka",
+        "sat-a-nats"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.6316,
+      "monotonic_s": 259463.771174,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-pathcomp-backend"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.6372,
+      "monotonic_s": 259463.7690448,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-kafka",
+        "sat-a-nats"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.6316,
+      "monotonic_s": 259464.6722836,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-pathcomp-backend"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.6372,
+      "monotonic_s": 259464.6696014,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-kafka",
+        "sat-a-nats"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.0772,
+      "monotonic_s": 259464.7712471,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-pathcomp-backend"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.0581,
+      "monotonic_s": 259464.768609,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-kafka",
+        "sat-a-nats"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": 0.0772,
+      "monotonic_s": 259465.2724158,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-kafka",
+        "sat-b-nats",
+        "sat-b-pathcomp-backend"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 0.0581,
+      "monotonic_s": 259465.2702331,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-kafka",
+        "sat-a-nats"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": null,
+      "monotonic_s": 259465.7694474,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-contextservice",
+        "sat-b-kafka",
+        "sat-b-nats"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 1.6956,
+      "monotonic_s": 259465.7670266,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-kafka",
+        "sat-a-nats"
+      ],
+      "slot": "sat-a"
+    },
+    {
+      "cpu_cores": null,
+      "monotonic_s": 259466.2669442,
+      "phase": "preparation",
+      "services": [
+        "sat-b-cockroachdb",
+        "sat-b-kafka",
+        "sat-b-nats"
+      ],
+      "slot": "sat-b"
+    },
+    {
+      "cpu_cores": 1.6956,
+      "monotonic_s": 259466.2644941,
+      "phase": "preparation",
+      "services": [
+        "sat-a-cockroachdb",
+        "sat-a-kafka",
+        "sat-a-nats"
+      ],
+      "slot": "sat-a"
+    }
+  ],
+  "slot_summaries": [
+    {
+      "above_2_4": 6,
+      "maximum": 3.6289000000000002,
+      "median": 0.7917000000000001,
+      "p95": 3.2472,
+      "phase": "preparation",
+      "samples": 97,
+      "slot": "sat-a"
+    },
+    {
+      "above_2_4": 6,
+      "maximum": 4.787599999999999,
+      "median": 0.6034,
+      "p95": 2.9249,
+      "phase": "preparation",
+      "samples": 100,
+      "slot": "sat-b"
+    }
+  ]
+}

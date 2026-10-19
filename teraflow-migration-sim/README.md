@@ -1,8 +1,12 @@
 # TeraFlowSDN controller migration simulation
 
+I contratti aggiornati di esito, recupero e metriche sono descritti in [Responsabilità e risultati](docs/consolidated-results.md). La validazione live del consolidamento viene registrata separatamente dalle prove precedenti.
+
+> Aggiornamento 16 ottobre 2026: il percorso principale è **Confronto FSO hot/cold**, su un evento a 1 Gbit/s con verifica API e ping. Simulazione continua e campagne rimangono funzioni avanzate con validazione separata. Avvio e criteri di successo sono nella [guida operativa](docs/operating-guide.md).
+
 This is the sole application in the repository. The previous seven-satellite simulator and its port-8081 dashboard have been removed. The local console is served directly on port 18092.
 
-The experiment compares hot and cold migration of a TeraFlowSDN Release 7 controller workload over a direct FSO/TCP link. The orbital inputs are frozen Starlink TLEs, propagated with SGP4. Mininet/BMv2/P4 is planned as the functional service data plane; its links follow orbital visibility, while the controller binding moves only after SAT-B passes restoration checks and ACKs.
+The experiment compares hot and cold migration of a TeraFlowSDN Release 7 controller workload over a direct FSO/TCP link. The orbital inputs are frozen Starlink TLEs, propagated with SGP4. Mininet/BMv2/P4 provides the functional service data plane; its links follow orbital visibility, while the controller binding moves only after SAT-B passes restoration checks and ACKs.
 
 ## Reproducible orbital preflight
 
@@ -39,7 +43,7 @@ The final matrix is intentionally gated on real measurements. Copy [`config/arti
 
 ## TeraFlow Docker Compose configuration
 
-The two independent SAT-A/SAT-B stacks are defined in [deploy/compose.yaml](deploy/compose.yaml), with local NBI ports 18080 and 18081. See [the deployment notes](docs/teraflow-compose.md) for build and launch commands. Official v7.0.0 manifests require six workload images for the five logical components: PathComp has separate frontend and backend images. CockroachDB, NATS and Kafka are preinstalled independently per host. The source commit is recorded in [config/teraflow-source.json](config/teraflow-source.json). Runtime verification remains required.
+The single `teraflow` Compose group is defined in [deploy/stack.yaml](deploy/stack.yaml), generated from the pinned source templates by `tools/generate_stack.py`. SAT-A/SAT-B retain separate networks, databases and brokers, with local NBI ports 18080 and 18081. Start the full group with `.\.venv\Scripts\python.exe tools/stack.py up`; `stop`, `down` and `status` use the same tool. Persistent volumes are retained across container recreation. See [the deployment notes](docs/teraflow-compose.md). Six workload images represent the five logical components because PathComp has separate frontend and backend images. The source commit is recorded in [config/teraflow-source.json](config/teraflow-source.json).
 
 ## Remaining work before final results
 

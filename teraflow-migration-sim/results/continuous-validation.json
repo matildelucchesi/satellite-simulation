@@ -1,0 +1,13 @@
+{
+  "complete": false,
+  "recovery_required": false,
+  "schema_version": 2,
+  "sessions": [
+    {
+      "method": "hot",
+      "passed": false,
+      "reason": "No feasible sequence in the requested frozen observation; inputs were not changed. Rejections: {'initial_resource_or_shadow': 82801}",
+      "recovery_required": false
+    }
+  ]
+}

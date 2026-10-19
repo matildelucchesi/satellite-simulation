@@ -27,6 +27,7 @@ class Migration:
         self.phase = phase
         event = {"id": len(self.events)+1, "timestamp_utc": utc_now(), "phase": phase,
                  "elapsed_s": self.clock.now(), "orbital_s": self.clock.orbital(), **details}
+        event.update(getattr(self.backend, 'event_context', {}))
         self.events.append(event)
         append_json(self.directory / 'events.jsonl', event)
         atomic_json(self.directory / 'checkpoint.json', {"phase": phase, "ack": self.ack,
@@ -72,12 +73,14 @@ class Migration:
     def run(self, method, event, image_bundle: Path):
         if method not in {"cold", "hot"}: raise ValueError("Invalid migration protocol")
         result = {"schema_version": 2, "execution_kind": "live-hybrid", "event": event,
-                  "method": method, "success": False, "ack": False}
+                  "method": method, "success": False, "ack": False, "recoveries": []}
         self.transition("trigger", causes=event["trigger_causes"])
         self.trigger_time = self.clock.now()
-        for attempt in range(1, self.scenario["fso"]["max_attempts"]+1):
+        for attempt in range(1, min(3,self.scenario["fso"]["max_attempts"])+1):
             try:
                 self.require_time(event)
+                if hasattr(self.backend, 'begin_attempt'):
+                    self.backend.begin_attempt(attempt)
                 self.backend.prepare_target()
                 self.alignment(event)
                 if method == 'cold' and hasattr(self.backend, 'quiesce_source'):
@@ -94,9 +97,10 @@ class Migration:
                 self.payload(image_bundle, event)
                 # Host inventory is accepted only from the verified receiver receipt.
                 image_receipt = self.events[-1]["receipt"]
-                self.inventory.accept("sat-b", describe(image_bundle), image_receipt)
+                destination = str(event.get('sat_b', 'sat-b'))
+                self.inventory.accept(destination, describe(image_bundle), image_receipt)
                 state_receipt = self.payload(snapshot_path, event)
-                self.inventory.require("sat-b")
+                self.inventory.require(destination)
                 self.transition("target_start")
                 self.backend.start_target(image_receipt)
                 self.require_time(event)
@@ -131,7 +135,7 @@ class Migration:
                 self.backend.cutover()
                 self.require_time(event)
                 self.transition("completed", attempt=attempt)
-                result.update(success=True, ack=True, attempt=attempt,
+                result.update(success=True, ack=True, attempt=attempt, failure_reason=None, failure_phase=None,
                               controller_downtime_s=self.clock.now()-self.downtime_start,
                               total_operation_s=self.clock.now()-self.trigger_time)
                 break
@@ -140,11 +144,15 @@ class Migration:
                 self.transition("attempt_failed", attempt=attempt, reason=str(exc))
                 result.update(attempt=attempt, failure_phase=self.events[-2]["phase"], failure_reason=str(exc))
                 interrupted = isinstance(exc, InterruptedError) or getattr(self.backend, 'cancelled', False)
+                recovery_started=self.clock.now()
+                recovery={'attempt':attempt,'started_elapsed_s':recovery_started,'source_recovered':False}
+                result['recoveries'].append(recovery)
                 try:
                     self.backend.abort_target()
                 except Exception as recovery_error:
                     self.transition("recovery_failed", operation="abort_target", reason=str(recovery_error))
                     result.update(recovery_required=True, recovery_failure=str(recovery_error))
+                    recovery.update(error=str(recovery_error),elapsed_s=self.clock.now()-recovery_started)
                     # Ownership cannot safely be restored while target fencing is
                     # unconfirmed. Preserve evidence and stop the retry loop.
                     break
@@ -155,12 +163,18 @@ class Migration:
                     except Exception as recovery_error:
                         self.transition("recovery_failed", operation="recover_source", reason=str(recovery_error))
                         result.update(recovery_required=True, recovery_failure=str(recovery_error))
+                        recovery.update(error=str(recovery_error),elapsed_s=self.clock.now()-recovery_started)
                         break
+                    recovery.update(source_recovered=True,elapsed_s=self.clock.now()-recovery_started,
+                        controller_unavailable_until_recovery_s=self.clock.now()-(self.downtime_start if self.downtime_start is not None else recovery_started))
                     if interrupted:
                         result['interrupted'] = True
                         break
                 else:
+                    result['source_expired']=True
+                    recovery.update(source_expired=True,elapsed_s=self.clock.now()-recovery_started)
                     break
+                self.downtime_start = None
         if not result["success"]:
             self.transition("recovery_required" if result.get('recovery_required') else "failed")
         result.update(bytes_sent=self.bytes_sent, bytes_received=self.bytes_received, events=self.events)

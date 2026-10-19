@@ -77,5 +77,6 @@
     "paired_by_event_destination_and_trigger": true,
     "primary_matrix": ["cold", "hot"],
     "fault_trials_separate": true
-  }
+  },
+  "live": {"preparation_timeout_s": 120}
 }

@@ -109,6 +109,12 @@ def state(fixture, graph, role="sat-a"):
 
 
 def for_destination(document, fixture):
+    return for_role(document, fixture, 'sat-b')
+
+
+def for_role(document, fixture, role):
+    if role not in ('sat-a', 'sat-b'):
+        raise ValueError('Unknown controller slot')
     result = copy.deepcopy(document)
     by_name = {f"sat-{row['norad']}": row for row in fixture["emulator"]["devices"]}
     for device in result["entities"]["devices"]:
@@ -116,5 +122,5 @@ def for_destination(document, fixture):
         for rule in device["device_config"]["config_rules"]:
             custom = rule.get("custom", {})
             if custom.get("resource_key") == "_connect/port":
-                custom["resource_value"] = str(row["proxy_port"]+1000)
+                custom["resource_value"] = str(row["proxy_port"] + (1000 if role == 'sat-b' else 0))
     return result

@@ -1,0 +1,63 @@
+{
+  "admission_report_simulation_id": "sim-a6583fb959514bb1afd515c12630cc20",
+  "created_utc": "2026-10-15T14:01:26.308708+00:00",
+  "final_engine_fingerprint": "932d9055da542638ee891987a39349f9462adb9c93a9cb51f220a945202f9812",
+  "final_lab_state": {
+    "ack": false,
+    "authority": null,
+    "frozen": true,
+    "mininet": {
+      "probes": [],
+      "switch_count": 17,
+      "switches_alive": true
+    },
+    "upstream_masters": 17
+  },
+  "frontend": {
+    "admission_rejection_verified": true,
+    "console_errors": 0,
+    "observed_nodes": 17
+  },
+  "historical_evidence": "Preserved; previous functional successes without this baseline do not substitute the current gates",
+  "host_suite": {
+    "discovered": 84,
+    "failures": 0,
+    "passed": 75,
+    "skipped_p4_executed_separately": 9
+  },
+  "implementation": "continuous engine, planner, interchangeable slots, CLI/API/frontend, persisted replay and reports",
+  "last_source_changes": "Campaign admission guards and pre-clock topology display; live preparation and P4 code unchanged",
+  "live_gate": {
+    "baseline_valid": false,
+    "initial_orbital_s": 4348,
+    "interpretation": "The preparation service did not forward probes. No migration began; this is not measured migration downtime.",
+    "job_id": "job-2e7e785c78fe4e85b7367bad105b942f",
+    "method": "hot",
+    "modeled_service_path": true,
+    "observed_pings": 198,
+    "orbital_clock_started": false,
+    "outcome": "invalid_baseline",
+    "preparation_timeout_s": 120,
+    "reason": "Operational deadline reached",
+    "run_id": "run-651935c5e36d40879e3b0978c9ddc170",
+    "successful_pings": 0,
+    "tested_engine_fingerprint": "9284335af3fd7bd7f64c40e52dbdb1af313f27ef88e8d92e29baf946d295a27c",
+    "udp_received": 0
+  },
+  "next_required_gate": "Restore and verify real ping/UDP forwarding during the unchanged preparation geometry, then restart complete workflow. Do not adjust constellation, resource thresholds or measured values to pass.",
+  "not_executed": [
+    "Cold baseline-valid functional gate",
+    "Six final calibrations",
+    "At least three consecutive live handovers per method",
+    "Final campaign freeze",
+    "Ten fault cases",
+    "Eighteen primary cases",
+    "Final ranking and sensitivity"
+  ],
+  "p4_suite": {
+    "failures": 0,
+    "passed": 9,
+    "real_checkpoint_excluded": true
+  },
+  "validation": "partial"
+}

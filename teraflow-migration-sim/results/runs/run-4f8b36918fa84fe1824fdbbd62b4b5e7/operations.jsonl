@@ -1,0 +1,10 @@
+{"operation": "snapshot", "elapsed_s": 0.8614131000013003, "timestamp_utc": "2026-10-16T11:25:19.278626+00:00"}
+{"operation": "source_stop", "elapsed_s": 13.307100699999864, "timestamp_utc": "2026-10-16T11:25:32.645182+00:00"}
+{"operation": "image_load_shared_daemon", "elapsed_s": 95.27865510000083, "timestamp_utc": "2026-10-16T11:27:29.584486+00:00"}
+{"operation": "controller_startup", "elapsed_s": 25.01495199999954, "timestamp_utc": "2026-10-16T11:27:54.603345+00:00"}
+{"operation": "target_perimeter_cleanup", "elapsed_s": 0.37730220000048575, "timestamp_utc": "2026-10-16T11:27:54.985109+00:00"}
+{"operation": "api_restore", "elapsed_s": 25.382504499999413, "timestamp_utc": "2026-10-16T11:28:20.397552+00:00"}
+{"operation": "api_verification", "elapsed_s": 0.7806978999997227, "timestamp_utc": "2026-10-16T11:28:21.204847+00:00"}
+{"operation": "queued_topology_apply", "elapsed_s": 15.716723600000478, "timestamp_utc": "2026-10-16T11:28:36.923671+00:00"}
+{"operation": "queued_topology_apply", "elapsed_s": 1.4609185999997862, "timestamp_utc": "2026-10-16T11:28:38.487694+00:00"}
+{"operation": "cutover", "elapsed_s": 0.39871689999927185, "timestamp_utc": "2026-10-16T11:28:38.938500+00:00"}

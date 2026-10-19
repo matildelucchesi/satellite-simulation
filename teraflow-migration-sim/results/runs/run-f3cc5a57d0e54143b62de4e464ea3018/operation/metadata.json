@@ -1,0 +1,185 @@
+{
+  "ack": true,
+  "attempt": 1,
+  "bytes_received": 1823549774,
+  "bytes_sent": 1823549774,
+  "controller_downtime_s": 219.16943430001265,
+  "event": {
+    "contact_end_s": 6248,
+    "contact_window_s": 1870,
+    "deadline_s": 7571,
+    "deadline_window_s": 3193,
+    "event_id": "functional-53848-53913-4378",
+    "execution_purpose": "functional-calibration",
+    "sat_a": 53848,
+    "sat_b": 53913,
+    "trigger_causes": [
+      "functional_diagnostic"
+    ],
+    "trigger_s": 4378
+  },
+  "events": [
+    {
+      "causes": [
+        "functional_diagnostic"
+      ],
+      "elapsed_s": 210.9020025000209,
+      "id": 1,
+      "orbital_s": 4378.007318299991,
+      "phase": "trigger",
+      "timestamp_utc": "2026-10-19T07:43:26.858444+00:00"
+    },
+    {
+      "elapsed_s": 211.21283100001165,
+      "id": 2,
+      "orbital_s": 4378.318147300015,
+      "phase": "alignment",
+      "timestamp_utc": "2026-10-19T07:43:27.169269+00:00"
+    },
+    {
+      "elapsed_s": 271.2580377999984,
+      "id": 3,
+      "orbital_s": 4438.363353099994,
+      "phase": "quiescence",
+      "timestamp_utc": "2026-10-19T07:44:27.214471+00:00"
+    },
+    {
+      "elapsed_s": 271.2882160000154,
+      "id": 4,
+      "orbital_s": 4438.393532199989,
+      "phase": "snapshot_initial",
+      "timestamp_utc": "2026-10-19T07:44:27.244651+00:00"
+    },
+    {
+      "elapsed_s": 272.11423920001835,
+      "id": 5,
+      "orbital_s": 4439.219555499993,
+      "phase": "source_stop",
+      "timestamp_utc": "2026-10-19T07:44:28.070670+00:00"
+    },
+    {
+      "elapsed_s": 285.92167820001487,
+      "id": 6,
+      "orbital_s": 4453.026994300046,
+      "phase": "source_stopped",
+      "timestamp_utc": "2026-10-19T07:44:41.878112+00:00"
+    },
+    {
+      "artifact": {
+        "bytes": 1823463936,
+        "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\artifacts\\images-l2-patched-v2\\teraflow-v7-images.tar",
+        "sha256": "9fc2920c12e4cc8867cd34ad294f1c240acc34b181dd462ce69e5abd51531c00"
+      },
+      "elapsed_s": 288.33550070002093,
+      "id": 7,
+      "orbital_s": 4455.440816899965,
+      "payload": "teraflow-v7-images.tar",
+      "phase": "transfer",
+      "timestamp_utc": "2026-10-19T07:44:44.291936+00:00"
+    },
+    {
+      "elapsed_s": 305.3985786999983,
+      "id": 8,
+      "orbital_s": 4472.503894399997,
+      "payload": "teraflow-v7-images.tar",
+      "phase": "transfer_verified",
+      "receipt": {
+        "configured_rate_bps": 1000000000,
+        "elapsed_s": 14.598711600003298,
+        "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\results\\runs\\run-f3cc5a57d0e54143b62de4e464ea3018\\attempts\\1\\received\\teraflow-v7-images.tar",
+        "received_bytes": 1823463936,
+        "receiver_elapsed_s": 14.589913399977377,
+        "sent_bytes": 1823463936,
+        "sha256": "9fc2920c12e4cc8867cd34ad294f1c240acc34b181dd462ce69e5abd51531c00",
+        "tcp_retransmission_measurement": "unavailable on host transport",
+        "tcp_retransmissions": null,
+        "useful_throughput_bps": 999246501.1773165
+      },
+      "timestamp_utc": "2026-10-19T07:45:01.355018+00:00"
+    },
+    {
+      "artifact": {
+        "bytes": 85838,
+        "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\results\\runs\\run-f3cc5a57d0e54143b62de4e464ea3018\\operation\\snapshot-1.json",
+        "sha256": "ccb0e8e83f0d86bd261c1061bc3847df0dcd2472611fcad0ab57a4f94b52aa28"
+      },
+      "elapsed_s": 307.8814651000139,
+      "id": 9,
+      "orbital_s": 4474.986781200016,
+      "payload": "snapshot-1.json",
+      "phase": "transfer",
+      "timestamp_utc": "2026-10-19T07:45:03.837902+00:00"
+    },
+    {
+      "elapsed_s": 307.9538472999993,
+      "id": 10,
+      "orbital_s": 4475.059162999998,
+      "payload": "snapshot-1.json",
+      "phase": "transfer_verified",
+      "receipt": {
+        "configured_rate_bps": 1000000000,
+        "elapsed_s": 0.03740909998305142,
+        "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\results\\runs\\run-f3cc5a57d0e54143b62de4e464ea3018\\attempts\\1\\received\\snapshot-1.json",
+        "received_bytes": 85838,
+        "receiver_elapsed_s": 0.003204799984814599,
+        "sent_bytes": 85838,
+        "sha256": "ccb0e8e83f0d86bd261c1061bc3847df0dcd2472611fcad0ab57a4f94b52aa28",
+        "tcp_retransmission_measurement": "unavailable on host transport",
+        "tcp_retransmissions": null,
+        "useful_throughput_bps": 18356603.08083109
+      },
+      "timestamp_utc": "2026-10-19T07:45:03.910288+00:00"
+    },
+    {
+      "elapsed_s": 307.98342530001537,
+      "id": 11,
+      "orbital_s": 4475.088740300009,
+      "phase": "target_start",
+      "timestamp_utc": "2026-10-19T07:45:03.939866+00:00"
+    },
+    {
+      "elapsed_s": 447.3864864000061,
+      "id": 12,
+      "orbital_s": 4614.491801600001,
+      "phase": "restore_initial",
+      "timestamp_utc": "2026-10-19T07:47:23.342926+00:00"
+    },
+    {
+      "elapsed_s": 473.0669120000093,
+      "id": 13,
+      "orbital_s": 4640.172227199975,
+      "phase": "verify",
+      "timestamp_utc": "2026-10-19T07:47:49.023351+00:00"
+    },
+    {
+      "elapsed_s": 489.21025740000186,
+      "id": 14,
+      "orbital_s": 4656.315573599975,
+      "phase": "ack",
+      "timestamp_utc": "2026-10-19T07:48:05.166694+00:00"
+    },
+    {
+      "elapsed_s": 489.2358693999995,
+      "id": 15,
+      "orbital_s": 4656.341184599994,
+      "phase": "cutover",
+      "timestamp_utc": "2026-10-19T07:48:05.192309+00:00"
+    },
+    {
+      "attempt": 1,
+      "elapsed_s": 491.28243120000116,
+      "id": 16,
+      "orbital_s": 4658.387747400004,
+      "phase": "completed",
+      "timestamp_utc": "2026-10-19T07:48:07.238834+00:00"
+    }
+  ],
+  "execution_kind": "live-hybrid",
+  "failure_phase": null,
+  "failure_reason": null,
+  "method": "cold",
+  "recoveries": [],
+  "schema_version": 2,
+  "success": true,
+  "total_operation_s": 280.37576990001253
+}

@@ -1,11 +1,14 @@
 @font-face{font-family:Space Grotesk;src:url('/fonts/SpaceGrotesk.ttf') format('truetype');font-weight:300 700;font-display:swap}
 @font-face{font-family:Inter;src:url('/fonts/Inter.ttf') format('truetype');font-weight:100 900;font-display:swap}
 :root{
- --color-paper:oklch(98.5% .004 250);--color-panel:oklch(96% .006 250);--color-ink:oklch(24% .02 258);
- --color-muted:oklch(44% .018 257);--color-rule:oklch(80% .012 250);--color-control:oklch(60% .014 250);
- --color-accent:oklch(49% .20 256);--color-focus:var(--color-accent);--color-accent-ink:oklch(98% .004 250);
- --color-error:oklch(43% .13 25);--color-success:oklch(39% .07 180);--color-graphite:oklch(24% .02 258);
- --color-dark-ink:oklch(95% .004 250);--color-shadow:oklch(88% .008 250);--color-path:var(--color-accent);
+ color-scheme:dark;
+ --color-paper:oklch(16% .012 250);--color-panel:oklch(20% .015 250);--color-ink:oklch(93% .008 240);
+ --color-muted:oklch(72% .023 245);--color-rule:oklch(32% .023 250);--color-control:oklch(57% .025 250);
+ --color-accent:oklch(82% .12 205);--color-focus:var(--color-accent);--color-accent-ink:oklch(16% .025 220);
+ --color-error:oklch(76% .14 25);--color-success:oklch(80% .12 155);--color-graphite:oklch(18% .014 250);
+ --color-dark-ink:var(--color-ink);--color-shadow:oklch(37% .025 250);--color-path:oklch(73% .10 285);
+ --color-migration:oklch(83% .14 80);--color-earth:oklch(26% .035 230);--color-orbit:oklch(45% .04 245);
+ --color-earth-grid:oklch(41% .04 230);--color-map:oklch(18% .018 250);
  --font-display:'Space Grotesk',sans-serif;--font-body:'Inter',sans-serif;
  --space-xs:.25rem;--space-sm:.5rem;--space-md:1rem;--space-lg:1.5rem;--space-xl:2.5rem;--space-2xl:4rem;
  --text-sm:.875rem;--text-base:1rem;--text-md:1.25rem;--text-lg:1.5625rem;--text-xl:2rem;

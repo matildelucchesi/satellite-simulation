@@ -6,6 +6,7 @@ import tarfile
 import tempfile
 from pathlib import Path
 from .storage import append_json, atomic_json, utc_now
+from .deployment import container_filters
 
 
 def size_bytes(text):
@@ -37,7 +38,7 @@ def resources(root):
 
 
 def disk_content(root, role, bundle):
-    process = subprocess.run(['docker','ps','-aq','--filter',f'label=com.docker.compose.project={role}'],
+    process = subprocess.run(['docker','ps','-aq',*container_filters(role)],
         cwd=root,capture_output=True,text=True,timeout=20,check=True)
     ids = process.stdout.split()
     if not ids: raise RuntimeError('No containers available for disk measurement')

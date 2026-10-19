@@ -52,6 +52,20 @@ class ProxyTests(unittest.TestCase):
         roundtrip = pb.Entity.FromString(content(member))
         self.assertEqual(roundtrip.WhichOneof('entity'), 'action_profile_member')
 
+    def test_a_can_stage_when_b_is_active(self):
+        state,member,group=self.setup_state()
+        state.authority.active='sat-b'
+        state.pipeline['sat-a']=state.pipeline['sat-b']
+        state.entries['sat-a']=dict(state.entries['sat-b'])
+        member.action_profile_member.ClearField('action')
+        request=pb.WriteRequest(device_id=6)
+        request.updates.add(type=pb.Update.DELETE,entity=member)
+        class Context:
+            def abort(self,code,message):raise AssertionError(message)
+        Proxy(state,'sat-a').Write(request,Context())
+        self.assertNotIn(entry_key(member),state.entries['sat-a'])
+        self.assertIn(entry_key(member),state.entries['sat-b'])
+
     def test_recovery_installs_pipeline_before_reading_restarted_switch(self):
         state, _, _ = self.setup_state()
         backend = state.backend

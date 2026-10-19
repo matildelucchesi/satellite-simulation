@@ -9,6 +9,7 @@ from .events import generate_events
 from .event_sampling import select_percentile_events
 from .migration_model import evaluate
 from .storage import atomic_json, utc_now
+from .results import campaign_summary, read_result, summary_metrics
 
 
 def variations(scenario):
@@ -69,28 +70,30 @@ class Analysis:
         return {'complete':True,'variations':len(output['variations']),'path':str(self.root/'results/sensitivity.json')}
 
     def report(self):
-        runs=[json.loads(p.read_text()) for p in sorted((self.root/'results/runs').glob('run-*/metadata.json'))]
+        runs=[read_result(json.loads(p.read_text())) for p in sorted((self.root/'results/runs').glob('run-*/metadata.json'))]
         primary=[row for row in runs if row['purpose']=='primary']
         combinations={(r.get('event',{}).get('event_id'),r['method'],r['configured_rate_bps']) for r in primary}
-        primary_complete=len(combinations)==18 and all(r.get('outcome')!='running' for r in primary)
+        campaign=campaign_summary(self.root,runs)
+        primary_complete=campaign['primary_complete']
         fields=['run_id','purpose','method','configured_rate_bps','outcome','success','ack',
                 'total_operation_s','controller_downtime_s','image_throughput_bps','attempt',
-                'bytes_sent','bytes_received','restarted_payload_bytes','failure_reason']
+                'bytes_sent','bytes_received','restarted_payload_bytes','failure_reason','migration_completed','experimental_valid','observation_complete','recovery_required','service_verification_s','observation_s','retries','service_verified']
         directory=self.root/'results/report';directory.mkdir(parents=True,exist_ok=True)
         with (directory/'runs.csv').open('w',encoding='utf-8',newline='') as stream:
             writer=csv.DictWriter(stream,fieldnames=fields);writer.writeheader()
-            writer.writerows({key:row.get(key) for key in fields} for row in runs)
-        summary={'schema_version':1,'created_utc':utc_now(),'runs':runs,'primary_count':len(primary),
+            writer.writerows({key:{**row,**summary_metrics(row)}.get(key) for key in fields} for row in runs)
+        summary={'schema_version':2,'created_utc':utc_now(),'runs':runs,'primary_count':len(primary),
             'expected_primary_count':18,'primary_complete':primary_complete,'unique_primary_cases':len(combinations),
             'interpretation':'Representative cases with one replica per combination; no statistical significance claim',
             'measurement_limits':['Shared Docker daemon: image load may reuse local layers',
                 'TCP retransmission counters unavailable; payload restart bytes measured separately',
                 'Orbit, FSO and synthetic source load modeled; operations and probes measured live']}
+        summary.update(campaign)
         atomic_json(directory/'report.json',summary)
         columns=['run_id','purpose','method','configured_rate_bps','outcome','controller_downtime_s']
         rows=''.join('<tr>'+''.join('<td>'+html.escape(str(row.get(key,'—')))+'</td>' for key in columns)+'</tr>' for row in runs)
         document='<!doctype html><html lang="it"><meta charset="utf-8"><title>Risultati TeraFlow</title><style>body{font:16px system-ui;margin:3rem;color:#172b34}table{border-collapse:collapse;width:100%}td,th{padding:.7rem;text-align:left;border-bottom:1px solid #ddd}img{max-width:100%}</style><h1>Esperimento di migrazione TeraFlowSDN</h1>'
-        document+=f'<p>Prove principali registrate: {len(primary)}/18. Una replica per caso rappresentativo.</p>'
+        document+=f'<p>Prove principali registrate: {campaign['primary_count']}/{campaign['expected_primary_count']}. Una replica per caso rappresentativo.</p>'
         document+='<p>'+html.escape(summary['interpretation'])+'</p><ul>'+''.join('<li>'+html.escape(x)+'</li>' for x in summary['measurement_limits'])+'</ul>'
         document+='<table><thead><tr>'+''.join('<th>'+html.escape(x)+'</th>' for x in columns)+'</tr></thead><tbody>'+rows+'</tbody></table>'
         try:
@@ -111,6 +114,7 @@ class Analysis:
             for filename,label in plots(directory,runs):
                 document+='<h2>'+html.escape(label)+'</h2><img src="'+filename+'" alt="'+html.escape(label)+'">'
         except ImportError:summary['plot_unavailable']='matplotlib is not installed'
+        summary.update(campaign)
         atomic_json(directory/'report.json',summary)
         (directory/'index.html').write_text(document+'</html>',encoding='utf-8')
         return {'complete':True,'primary_complete':primary_complete,'path':str(directory/'index.html'),'run_count':len(runs)}

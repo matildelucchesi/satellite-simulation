@@ -1,0 +1,261 @@
+{
+  "ack": true,
+  "attempt": 1,
+  "baseline": {
+    "criteria": "source_api+authority+10_fresh_consecutive_pings",
+    "ping": {
+      "baseline_path_available": null,
+      "continuous_during_observation": true,
+      "first_loss_unix_s": null,
+      "first_reply_after_loss_unix_s": null,
+      "longest_consecutive_successes": 11,
+      "loss_fraction": 0.0,
+      "lost_probes": 0,
+      "observed_probes": 11,
+      "recovery_metric": "confirmation latency, not exact service downtime",
+      "recovery_observed": false,
+      "rtt_max_ms": 6.08,
+      "rtt_mean_ms": 4.743636363636363,
+      "rtt_min_ms": 4.15,
+      "stable_recovery_unix_s": null,
+      "successful_probes": 11,
+      "time_to_first_reply_s": null,
+      "time_to_stable_recovery_s": null
+    },
+    "probe_id": "baseline-run-da5ae7d6ca1342b0b3fbe819f471dcf7",
+    "started_unix_s": 1792150244.7638228,
+    "success": true,
+    "udp_received": 98,
+    "verified_unix_s": 1792150245.8431952
+  },
+  "bytes_received": 1823549774,
+  "bytes_sent": 1823549774,
+  "configured_rate_bps": 1000000000,
+  "controller_downtime_s": 204.20459309999933,
+  "created_utc": "2026-10-16T11:29:22.891390+00:00",
+  "directory": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\results\\runs\\run-da5ae7d6ca1342b0b3fbe819f471dcf7",
+  "event": {
+    "contact_end_s": 6248,
+    "contact_window_s": 1870,
+    "deadline_s": 7571,
+    "deadline_window_s": 3193,
+    "event_id": "functional-53848-53913-4378",
+    "execution_purpose": "functional-calibration",
+    "sat_a": 53848,
+    "sat_b": 53913,
+    "trigger_causes": [
+      "functional_diagnostic"
+    ],
+    "trigger_s": 4378
+  },
+  "events": [
+    {
+      "causes": [
+        "functional_diagnostic"
+      ],
+      "elapsed_s": 30.000817600001028,
+      "id": 1,
+      "orbital_s": 4378.0008182,
+      "phase": "trigger",
+      "timestamp_utc": "2026-10-16T11:31:15.903235+00:00"
+    },
+    {
+      "elapsed_s": 30.3240063000012,
+      "id": 2,
+      "orbital_s": 4378.324007200001,
+      "phase": "alignment",
+      "timestamp_utc": "2026-10-16T11:31:16.226424+00:00"
+    },
+    {
+      "elapsed_s": 90.36773210000138,
+      "id": 3,
+      "orbital_s": 4438.3677324,
+      "phase": "quiescence",
+      "timestamp_utc": "2026-10-16T11:32:16.270147+00:00"
+    },
+    {
+      "elapsed_s": 90.4007711000013,
+      "id": 4,
+      "orbital_s": 4438.4007721,
+      "phase": "snapshot_initial",
+      "timestamp_utc": "2026-10-16T11:32:16.303185+00:00"
+    },
+    {
+      "elapsed_s": 91.22402730000067,
+      "id": 5,
+      "orbital_s": 4439.224028300001,
+      "phase": "source_stop",
+      "timestamp_utc": "2026-10-16T11:32:17.126442+00:00"
+    },
+    {
+      "elapsed_s": 104.27234860000135,
+      "id": 6,
+      "orbital_s": 4452.2723494,
+      "phase": "source_stopped",
+      "timestamp_utc": "2026-10-16T11:32:30.174768+00:00"
+    },
+    {
+      "artifact": {
+        "bytes": 1823463936,
+        "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\artifacts\\images-l2-patched-v2\\teraflow-v7-images.tar",
+        "sha256": "9fc2920c12e4cc8867cd34ad294f1c240acc34b181dd462ce69e5abd51531c00"
+      },
+      "elapsed_s": 106.7426000000014,
+      "id": 7,
+      "orbital_s": 4454.742601,
+      "payload": "teraflow-v7-images.tar",
+      "phase": "transfer",
+      "timestamp_utc": "2026-10-16T11:32:32.645013+00:00"
+    },
+    {
+      "elapsed_s": 123.77176190000137,
+      "id": 8,
+      "orbital_s": 4471.771762800001,
+      "payload": "teraflow-v7-images.tar",
+      "phase": "transfer_verified",
+      "receipt": {
+        "configured_rate_bps": 1000000000,
+        "elapsed_s": 14.598756299999877,
+        "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\results\\runs\\run-da5ae7d6ca1342b0b3fbe819f471dcf7\\attempts\\1\\received\\teraflow-v7-images.tar",
+        "received_bytes": 1823463936,
+        "receiver_elapsed_s": 14.589498100000128,
+        "sent_bytes": 1823463936,
+        "sha256": "9fc2920c12e4cc8867cd34ad294f1c240acc34b181dd462ce69e5abd51531c00",
+        "tcp_retransmission_measurement": "unavailable on host transport",
+        "tcp_retransmissions": null,
+        "useful_throughput_bps": 999243441.5800285
+      },
+      "timestamp_utc": "2026-10-16T11:32:49.674177+00:00"
+    },
+    {
+      "artifact": {
+        "bytes": 85838,
+        "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\results\\runs\\run-da5ae7d6ca1342b0b3fbe819f471dcf7\\operation\\snapshot-1.json",
+        "sha256": "9dd414da88594d72bdec933a9e00505997aad7076177c6f3b759dd4002834557"
+      },
+      "elapsed_s": 126.02216820000103,
+      "id": 9,
+      "orbital_s": 4474.022169100001,
+      "payload": "snapshot-1.json",
+      "phase": "transfer",
+      "timestamp_utc": "2026-10-16T11:32:51.924588+00:00"
+    },
+    {
+      "elapsed_s": 126.05883370000083,
+      "id": 10,
+      "orbital_s": 4474.0588345000015,
+      "payload": "snapshot-1.json",
+      "phase": "transfer_verified",
+      "receipt": {
+        "configured_rate_bps": 1000000000,
+        "elapsed_s": 0.011872800001583528,
+        "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\results\\runs\\run-da5ae7d6ca1342b0b3fbe819f471dcf7\\attempts\\1\\received\\snapshot-1.json",
+        "received_bytes": 85838,
+        "receiver_elapsed_s": 0.0024711999994906364,
+        "sent_bytes": 85838,
+        "sha256": "9dd414da88594d72bdec933a9e00505997aad7076177c6f3b759dd4002834557",
+        "tcp_retransmission_measurement": "unavailable on host transport",
+        "tcp_retransmissions": null,
+        "useful_throughput_bps": 57838420.58389018
+      },
+      "timestamp_utc": "2026-10-16T11:32:51.961254+00:00"
+    },
+    {
+      "elapsed_s": 126.08096579999983,
+      "id": 11,
+      "orbital_s": 4474.0809661,
+      "phase": "target_start",
+      "timestamp_utc": "2026-10-16T11:32:51.983386+00:00"
+    },
+    {
+      "elapsed_s": 247.7292847000008,
+      "id": 12,
+      "orbital_s": 4595.7292851,
+      "phase": "restore_initial",
+      "timestamp_utc": "2026-10-16T11:34:53.631700+00:00"
+    },
+    {
+      "elapsed_s": 276.2248380000001,
+      "id": 13,
+      "orbital_s": 4624.224838300001,
+      "phase": "verify",
+      "timestamp_utc": "2026-10-16T11:35:22.127252+00:00"
+    },
+    {
+      "elapsed_s": 293.3396823000003,
+      "id": 14,
+      "orbital_s": 4641.339683100001,
+      "phase": "ack",
+      "timestamp_utc": "2026-10-16T11:35:39.242103+00:00"
+    },
+    {
+      "elapsed_s": 293.3685877000007,
+      "id": 15,
+      "orbital_s": 4641.368588000001,
+      "phase": "cutover",
+      "timestamp_utc": "2026-10-16T11:35:39.271010+00:00"
+    },
+    {
+      "attempt": 1,
+      "elapsed_s": 295.43045429999984,
+      "id": 16,
+      "orbital_s": 4643.4304553,
+      "phase": "completed",
+      "timestamp_utc": "2026-10-16T11:35:41.332833+00:00"
+    }
+  ],
+  "execution_kind": "live-hybrid",
+  "experimental_valid": true,
+  "failure_phase": null,
+  "failure_reason": null,
+  "fault": null,
+  "image_throughput_bps": 999243441.5800285,
+  "images_inventory": "per-host verified receipts; not Docker cache",
+  "interrupted": false,
+  "method": "cold",
+  "migration_completed": true,
+  "migration_start_unix_s": 1792150275.9032261,
+  "observation_complete": false,
+  "outcome": "experimental_failure",
+  "probe_window_end_unix_s": 1792150542.4452338,
+  "purpose": "calibration",
+  "recoveries": [],
+  "recovery_required": false,
+  "restarted_payload_bytes": 0,
+  "retries": 0,
+  "run_id": "run-da5ae7d6ca1342b0b3fbe819f471dcf7",
+  "schema_version": 4,
+  "service_verification": {
+    "active_slot": "sat-b",
+    "criteria": "target_api+authority+10_fresh_consecutive_pings",
+    "cutover_unix_s": 1792150541.3328047,
+    "ping": {
+      "baseline_path_available": null,
+      "continuous_during_observation": true,
+      "first_loss_unix_s": null,
+      "first_reply_after_loss_unix_s": null,
+      "longest_consecutive_successes": 11,
+      "loss_fraction": 0.0,
+      "lost_probes": 0,
+      "observed_probes": 11,
+      "recovery_metric": "confirmation latency, not exact service downtime",
+      "recovery_observed": false,
+      "rtt_max_ms": 7.27,
+      "rtt_mean_ms": 5.361818181818182,
+      "rtt_min_ms": 4.11,
+      "stable_recovery_unix_s": null,
+      "successful_probes": 11,
+      "time_to_first_reply_s": null,
+      "time_to_stable_recovery_s": null
+    },
+    "success": true,
+    "target_slot": "sat-b",
+    "verified_unix_s": 1792150542.4222035
+  },
+  "service_verification_s": 1.0805666000014753,
+  "shared_docker_daemon": true,
+  "success": false,
+  "tcp_retransmissions": null,
+  "total_operation_s": 265.42431360000046,
+  "useful_payload_bytes": 1823549774
+}

@@ -1,6 +1,30 @@
 # Implementation status — 2026-10-02
 
+> Aggiornamento 16 ottobre 2026: il percorso principale è **Confronto FSO hot/cold**, su un evento a 1 Gbit/s con verifica API e ping. Simulazione continua e campagne rimangono funzioni avanzate con validazione separata. Avvio e criteri di successo sono nella [guida operativa](operating-guide.md).
+
+## Consolidamento di procedure, esiti e metriche — 2026-10-16
+
+Correzioni implementate: propagazione del recupero fino al lock del job, checkpoint del figlio attivo, verifica API/autorità/ping condivisa fra prova e continuo, esiti e metriche comuni, lettura compatibile dei risultati storici. Le responsabilità sono descritte in [Responsabilità e risultati](consolidated-results.md).
+
+La nuova coppia FSO e sei calibrazioni sono riuscite. La suite aggiornata comprende 112 test, verificati fra host e container P4. Il continuo resta **non validato**: ammissione hot e cold rifiutata per risorse CPU. Picco misurato 4,0817 core contro 2,4 core disponibili al controller nel profilo da 6 core, con fondo 40% e riserva 20%. Non sono stati eseguiti handover continui né modificati i parametri scientifici per forzare il risultato.
+
+Evidenze, identificatori dei job e misure sono nel [riepilogo del consolidamento](../results/validation/consolidation-2026-10-16.md).
+
+## Confronto FSO e correzione Mininet — 2026-10-16
+
+Il percorso principale della console è il confronto hot/cold sullo stesso evento a 1 Gbit/s. La coppia conserva input orbitali comuni, ricostruisce la fixture prima di ogni modalità e salva le misure aggregate e le differenze cold meno hot. Il successo richiede equivalenza API, ACK/cutover, autorità della destinazione e dieci ping freschi consecutivi; UDP è diagnostico.
+
+La diagnosi live ha riprodotto il blocco della baseline: chiudere amministrativamente una singola interfaccia dello switch BMv2 arresta la ricezione anche sulle altre porte. Con le stesse regole installate, il test è passato da 2/2 ping con la porta attiva a 0/2 abbassando una porta non usata dal percorso. I contatti sono ora chiusi con `tc netem loss 100%` in entrambe le direzioni, mantenendo attive le interfacce. Il controllo live ha confermato la disciplina di perdita sul contatto chiuso e la baseline valida con dieci ping consecutivi.
+
+La coppia live `compare-3367d7d511574e6798a7a4a6f08c4285` è riuscita, con un tentativo per modalità e baseline valide. Evento `functional-53848-53913-4378`: NORAD 53848 (piano 1) verso 53913 (piano 2), TCP utile configurato a 1 Gbit/s. Il controller ha downtime 17,435 s in hot e 283,314 s in cold; durata trigger→cutover rispettivamente 452,813 s e 346,205 s. In hot la conferma di ripristino ping richiede 13,646 s dalla prima perdita; in cold il forwarding continua senza perdite osservate. L'indisponibilità del controller e quella del servizio dati sono misure distinte. Questi due casi sono una validazione funzionale con daemon Docker condiviso, non una campagna replicata.
+
+Entrambe le prove hanno verificato equivalenza API, ACK, autorità B e almeno dieci ping freschi consecutivi dopo il cutover. Il job `job-4f9bb5ebd3584fd8aea5f203c15fbeba` è concluso con `application_success=true` e lock rilasciato. Riepilogo: `results/comparisons/compare-3367d7d511574e6798a7a4a6f08c4285/metadata.json`; prove `run-3d344ec3bef348949cbeea8ffbb6a39c` (hot) e `run-6e38db1cbce9438490eaace1f621e28d` (cold). Le precedenti baseline fallite rimangono conservate.
+
+La suite host comprende 96 test: esito positivo, nove test specifici di ambiente saltati. Il log è `results/fso-tests-final.log`. Queste verifiche non sostituiscono l'esito della coppia live né una campagna sperimentale replicata.
+
 ## Live verification — 2026-10-14
+
+The deployment was subsequently consolidated into the single `teraflow` Compose project. SAT-A/SAT-B keep separate private networks and existing external state volumes. All 20 permanent containers pass their health checks; the two Kafka initialization containers exit normally. Live selective SAT-B stop/start preserves SAT-A and BMv2 availability. The repeated API restore/service preflight passed with 50/50 pings and 512/514 UDP packets. Resource sampling still attributes nine containers to each host; disk selection requires both project and role labels. Evidence: `results/unified-compose-verification-2026-10-14.json`. This deployment check is separate from the migration trial below.
 
 After removal of the previous simulator, the TeraFlow/P4 laboratory and local console were restarted. The stale workflow job was recovered through the normal job service; its source orbital window had expired, so the controllers were fenced before a new trial.
 

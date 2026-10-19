@@ -1,0 +1,11 @@
+{
+  "complete": false,
+  "runs": [
+    {
+      "baseline_valid": false,
+      "outcome": "invalid_baseline",
+      "run_id": "run-7110fbd5e001439583dc4a1f51c817fe",
+      "success": false
+    }
+  ]
+}

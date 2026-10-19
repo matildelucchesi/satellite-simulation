@@ -1,0 +1,35 @@
+{
+  "comparison_id": "pair-c7f57fc774544c1486ca07c532eb6598",
+  "complete": false,
+  "created_utc": "2026-10-19T13:28:11.854980+00:00",
+  "current_method": null,
+  "events": [],
+  "finished_utc": "2026-10-19T14:40:59.455686+00:00",
+  "job_id": "job-3f28e0edb2c84c8490b47fb24363f45b",
+  "outcome": "failed",
+  "parameters": {
+    "duration_s": 3600,
+    "initial_satellite_id": null,
+    "max_migrations": null,
+    "rate_bps": 1000000000,
+    "start_orbital_s": null
+  },
+  "phase": "finished",
+  "policy_version": "continuous-paired-fixed-v1",
+  "preparation": [
+    {
+      "complete": false,
+      "reason": "experimental_failure",
+      "recovery_required": false,
+      "stage": "calibration"
+    }
+  ],
+  "reason": "Calibrazione non riuscita: experimental_failure",
+  "recovery_required": false,
+  "schema_version": 1,
+  "session_results": {},
+  "sessions": {},
+  "shared_plan_sha256": null,
+  "success": false,
+  "totals": {}
+}

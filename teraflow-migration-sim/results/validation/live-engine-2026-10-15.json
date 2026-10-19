@@ -1,0 +1,7 @@
+{
+  "code_changes_after_this_gate": "Campaign admission guards and pre-clock topology display; live preparation and P4 code unchanged",
+  "engine_fingerprint": "9284335af3fd7bd7f64c40e52dbdb1af313f27ef88e8d92e29baf946d295a27c",
+  "live_run_id": "run-651935c5e36d40879e3b0978c9ddc170",
+  "outcome": "invalid_baseline",
+  "workflow_job_id": "job-2e7e785c78fe4e85b7367bad105b942f"
+}

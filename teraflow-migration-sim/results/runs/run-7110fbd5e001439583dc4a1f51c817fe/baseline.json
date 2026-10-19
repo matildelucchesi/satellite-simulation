@@ -1,0 +1,206 @@
+{
+  "failure_reason": "Operational deadline reached",
+  "last_authority": {
+    "ack": false,
+    "active": "sat-a",
+    "frozen": false,
+    "generation": 17,
+    "ipv4": "172.25.0.3",
+    "states": [
+      {
+        "device_id": 1,
+        "ready_by_slot": {
+          "sat-a": true,
+          "sat-b": false
+        },
+        "staged_entries": 0,
+        "standby_ready": false,
+        "upstream_master": true
+      },
+      {
+        "device_id": 2,
+        "ready_by_slot": {
+          "sat-a": true,
+          "sat-b": false
+        },
+        "staged_entries": 0,
+        "standby_ready": false,
+        "upstream_master": true
+      },
+      {
+        "device_id": 3,
+        "ready_by_slot": {
+          "sat-a": true,
+          "sat-b": false
+        },
+        "staged_entries": 0,
+        "standby_ready": false,
+        "upstream_master": true
+      },
+      {
+        "device_id": 4,
+        "ready_by_slot": {
+          "sat-a": true,
+          "sat-b": false
+        },
+        "staged_entries": 0,
+        "standby_ready": false,
+        "upstream_master": true
+      },
+      {
+        "device_id": 5,
+        "ready_by_slot": {
+          "sat-a": true,
+          "sat-b": false
+        },
+        "staged_entries": 0,
+        "standby_ready": false,
+        "upstream_master": true
+      },
+      {
+        "device_id": 6,
+        "ready_by_slot": {
+          "sat-a": true,
+          "sat-b": false
+        },
+        "staged_entries": 0,
+        "standby_ready": false,
+        "upstream_master": true
+      },
+      {
+        "device_id": 7,
+        "ready_by_slot": {
+          "sat-a": true,
+          "sat-b": false
+        },
+        "staged_entries": 0,
+        "standby_ready": false,
+        "upstream_master": true
+      },
+      {
+        "device_id": 8,
+        "ready_by_slot": {
+          "sat-a": true,
+          "sat-b": false
+        },
+        "staged_entries": 0,
+        "standby_ready": false,
+        "upstream_master": true
+      },
+      {
+        "device_id": 9,
+        "ready_by_slot": {
+          "sat-a": true,
+          "sat-b": false
+        },
+        "staged_entries": 0,
+        "standby_ready": false,
+        "upstream_master": true
+      },
+      {
+        "device_id": 10,
+        "ready_by_slot": {
+          "sat-a": true,
+          "sat-b": false
+        },
+        "staged_entries": 0,
+        "standby_ready": false,
+        "upstream_master": true
+      },
+      {
+        "device_id": 11,
+        "ready_by_slot": {
+          "sat-a": true,
+          "sat-b": false
+        },
+        "staged_entries": 0,
+        "standby_ready": false,
+        "upstream_master": true
+      },
+      {
+        "device_id": 12,
+        "ready_by_slot": {
+          "sat-a": true,
+          "sat-b": false
+        },
+        "staged_entries": 0,
+        "standby_ready": false,
+        "upstream_master": true
+      },
+      {
+        "device_id": 13,
+        "ready_by_slot": {
+          "sat-a": true,
+          "sat-b": false
+        },
+        "staged_entries": 0,
+        "standby_ready": false,
+        "upstream_master": true
+      },
+      {
+        "device_id": 14,
+        "ready_by_slot": {
+          "sat-a": true,
+          "sat-b": false
+        },
+        "staged_entries": 0,
+        "standby_ready": false,
+        "upstream_master": true
+      },
+      {
+        "device_id": 15,
+        "ready_by_slot": {
+          "sat-a": true,
+          "sat-b": false
+        },
+        "staged_entries": 0,
+        "standby_ready": false,
+        "upstream_master": true
+      },
+      {
+        "device_id": 16,
+        "ready_by_slot": {
+          "sat-a": true,
+          "sat-b": false
+        },
+        "staged_entries": 0,
+        "standby_ready": false,
+        "upstream_master": true
+      },
+      {
+        "device_id": 17,
+        "ready_by_slot": {
+          "sat-a": true,
+          "sat-b": false
+        },
+        "staged_entries": 0,
+        "standby_ready": false,
+        "upstream_master": true
+      }
+    ]
+  },
+  "last_ping": {
+    "baseline_path_available": null,
+    "continuous_during_observation": false,
+    "first_loss_unix_s": 1792074233.67603,
+    "first_reply_after_loss_unix_s": null,
+    "longest_consecutive_successes": 0,
+    "loss_fraction": 1.0,
+    "lost_probes": 194,
+    "observed_probes": 194,
+    "recovery_metric": "confirmation latency, not exact service downtime",
+    "recovery_observed": false,
+    "rtt_max_ms": null,
+    "rtt_mean_ms": null,
+    "rtt_min_ms": null,
+    "stable_recovery_unix_s": null,
+    "successful_probes": 0,
+    "time_to_first_reply_s": null,
+    "time_to_stable_recovery_s": null
+  },
+  "probe_id": "baseline-run-7110fbd5e001439583dc4a1f51c817fe",
+  "started_unix_s": 1792074233.5532691,
+  "success": false,
+  "udp_received": 0,
+  "verified_unix_s": null
+}

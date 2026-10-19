@@ -41,6 +41,8 @@ class Authority:
 
     def cutover(self, destination, reconcile):
         with self.lock:
+            if destination not in ('sat-a', 'sat-b') or destination == self.active:
+                raise ValueError('Cutover requires the other controller slot')
             if not self.ack or not self.frozen:
                 raise RuntimeError("Cutover requires ACK and source fencing")
             previous = self.active
@@ -57,12 +59,15 @@ class Authority:
                 raise
             self.active = destination
             self.frozen = False
+            self.ack = self.verified = False
             self.persist()
             return previous
 
     def recover(self, source, restore):
         with self.lock:
+            if source not in ('sat-a', 'sat-b'): raise ValueError('Unknown controller slot')
             self.active = None
+            self.generation += 1
             self.ack = self.verified = False
             self.persist()
             restore()

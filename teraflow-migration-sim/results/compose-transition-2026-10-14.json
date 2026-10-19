@@ -1,0 +1,222 @@
+[
+  {
+    "id": "af5661e09fc2",
+    "name": "migration-lab-p4-proxy-1",
+    "project": "migration-lab"
+  },
+  {
+    "id": "50739e1d0276",
+    "name": "tfs-lab-p4-proxy-1",
+    "project": "tfs-lab"
+  },
+  {
+    "id": "7c675b870869",
+    "name": "sat-b-serviceservice-1",
+    "project": "sat-b"
+  },
+  {
+    "id": "57b0bc6e065e",
+    "name": "sat-a-serviceservice-1",
+    "project": "sat-a"
+  },
+  {
+    "id": "42618ac126ed",
+    "name": "sat-b-deviceservice-1",
+    "project": "sat-b"
+  },
+  {
+    "id": "c80da8fd1ac3",
+    "name": "sat-a-deviceservice-1",
+    "project": "sat-a"
+  },
+  {
+    "id": "8416c4be05eb",
+    "name": "tfs-lab-mininet-1",
+    "project": "tfs-lab"
+  },
+  {
+    "id": "9d7f1ee79bd1",
+    "name": "migration-lab-mininet-1",
+    "project": "migration-lab"
+  },
+  {
+    "id": "2a9469c0edbd",
+    "name": "sat-a-nbiservice-1",
+    "project": "sat-a"
+  },
+  {
+    "id": "5c0b4607e233",
+    "name": "sat-a-pathcompservice-1",
+    "project": "sat-a"
+  },
+  {
+    "id": "c3ac4bbb8c4e",
+    "name": "sat-b-nbiservice-1",
+    "project": "sat-b"
+  },
+  {
+    "id": "fc464422425a",
+    "name": "sat-a-kafka-1",
+    "project": "sat-a"
+  },
+  {
+    "id": "9681eca9d296",
+    "name": "sat-a-contextservice-1",
+    "project": "sat-a"
+  },
+  {
+    "id": "74980ff7ea94",
+    "name": "sat-a-kafka-volume-init-1",
+    "project": "sat-a"
+  },
+  {
+    "id": "26308360fd6c",
+    "name": "sat-a-pathcomp-backend-1",
+    "project": "sat-a"
+  },
+  {
+    "id": "c4679ac15f54",
+    "name": "sat-a-nats-1",
+    "project": "sat-a"
+  },
+  {
+    "id": "ea119df7efcb",
+    "name": "sat-a-cockroachdb-1",
+    "project": "sat-a"
+  },
+  {
+    "id": "57550334cda2",
+    "name": "sat-b-pathcompservice-1",
+    "project": "sat-b"
+  },
+  {
+    "id": "016f08ec418d",
+    "name": "sat-b-contextservice-1",
+    "project": "sat-b"
+  },
+  {
+    "id": "a73d7e9acbd7",
+    "name": "sat-b-kafka-1",
+    "project": "sat-b"
+  },
+  {
+    "id": "a81dba1a174a",
+    "name": "sat-b-cockroachdb-1",
+    "project": "sat-b"
+  },
+  {
+    "id": "63ee3cd31f3f",
+    "name": "sat-b-kafka-volume-init-1",
+    "project": "sat-b"
+  },
+  {
+    "id": "c86bd3fc3bee",
+    "name": "sat-b-pathcomp-backend-1",
+    "project": "sat-b"
+  },
+  {
+    "id": "fe7f3a4fedee",
+    "name": "sat-b-nats-1",
+    "project": "sat-b"
+  },
+  {
+    "id": "166f76dba23f",
+    "name": "tfs-sat-b-pathcomp-backend-1",
+    "project": "tfs-sat-b"
+  },
+  {
+    "id": "437a0f089b72",
+    "name": "tfs-sat-a-pathcomp-backend-1",
+    "project": "tfs-sat-a"
+  },
+  {
+    "id": "d1a3c21cd256",
+    "name": "tfs-sat-b-nbiservice-1",
+    "project": "tfs-sat-b"
+  },
+  {
+    "id": "0b10be2e1f32",
+    "name": "tfs-sat-b-serviceservice-1",
+    "project": "tfs-sat-b"
+  },
+  {
+    "id": "66a699a74197",
+    "name": "tfs-sat-b-deviceservice-1",
+    "project": "tfs-sat-b"
+  },
+  {
+    "id": "cf05400fab8f",
+    "name": "tfs-sat-b-pathcompservice-1",
+    "project": "tfs-sat-b"
+  },
+  {
+    "id": "31b4294451be",
+    "name": "tfs-sat-b-contextservice-1",
+    "project": "tfs-sat-b"
+  },
+  {
+    "id": "07cff2dc0c9e",
+    "name": "tfs-sat-a-nbiservice-1",
+    "project": "tfs-sat-a"
+  },
+  {
+    "id": "129314a4f8ac",
+    "name": "tfs-sat-a-serviceservice-1",
+    "project": "tfs-sat-a"
+  },
+  {
+    "id": "7ed05fb0db8a",
+    "name": "tfs-sat-a-deviceservice-1",
+    "project": "tfs-sat-a"
+  },
+  {
+    "id": "bbc4f1e76680",
+    "name": "tfs-sat-a-pathcompservice-1",
+    "project": "tfs-sat-a"
+  },
+  {
+    "id": "038177420b58",
+    "name": "tfs-sat-a-contextservice-1",
+    "project": "tfs-sat-a"
+  },
+  {
+    "id": "2635bcd75ba4",
+    "name": "tfs-sat-b-kafka-1",
+    "project": "tfs-sat-b"
+  },
+  {
+    "id": "30f6d419eb6a",
+    "name": "tfs-sat-b-cockroachdb-1",
+    "project": "tfs-sat-b"
+  },
+  {
+    "id": "1aca086a15d8",
+    "name": "tfs-sat-b-kafka-volume-init-1",
+    "project": "tfs-sat-b"
+  },
+  {
+    "id": "0ad988a35d83",
+    "name": "tfs-sat-b-nats-1",
+    "project": "tfs-sat-b"
+  },
+  {
+    "id": "6162be1f6d84",
+    "name": "tfs-sat-a-kafka-1",
+    "project": "tfs-sat-a"
+  },
+  {
+    "id": "820fe6de51a5",
+    "name": "tfs-sat-a-cockroachdb-1",
+    "project": "tfs-sat-a"
+  },
+  {
+    "id": "c969ca294ec1",
+    "name": "tfs-sat-a-kafka-volume-init-1",
+    "project": "tfs-sat-a"
+  },
+  {
+    "id": "0475f316e6a6",
+    "name": "tfs-sat-a-nats-1",
+    "project": "tfs-sat-a"
+  }
+]

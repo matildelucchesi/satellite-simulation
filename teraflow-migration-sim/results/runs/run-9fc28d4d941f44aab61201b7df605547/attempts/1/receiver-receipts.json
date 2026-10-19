@@ -1,0 +1,20 @@
+[
+  {
+    "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\results\\runs\\run-9fc28d4d941f44aab61201b7df605547\\attempts\\1\\received\\teraflow-v7-images.tar",
+    "received_bytes": 1823463936,
+    "receiver_elapsed_s": 14.590126999974018,
+    "sha256": "9fc2920c12e4cc8867cd34ad294f1c240acc34b181dd462ce69e5abd51531c00"
+  },
+  {
+    "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\results\\runs\\run-9fc28d4d941f44aab61201b7df605547\\attempts\\1\\received\\snapshot-1.json",
+    "received_bytes": 85838,
+    "receiver_elapsed_s": 0.027441299986094236,
+    "sha256": "1085c90a5e590981e2527abf02ac39813c4bdba35159b61850ae6dc409a3101e"
+  },
+  {
+    "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\results\\runs\\run-9fc28d4d941f44aab61201b7df605547\\attempts\\1\\received\\delta-1.json",
+    "received_bytes": 15626,
+    "receiver_elapsed_s": 0.0050583000120241195,
+    "sha256": "1973b9f2d7a15dee1d29e4624868fb565a2bfac9af847e7ffa5ccabb7dd23486"
+  }
+]

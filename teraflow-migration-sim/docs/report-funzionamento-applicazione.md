@@ -1,5 +1,7 @@
 # Report sul funzionamento dell'applicazione TeraFlow
 
+> Aggiornamento 16 ottobre 2026: il percorso principale è **Confronto FSO hot/cold**, su un evento a 1 Gbit/s con verifica API e ping. Simulazione continua e campagne rimangono funzioni avanzate con validazione separata. Avvio e criteri di successo sono nella [guida operativa](operating-guide.md).
+
 Data: 14 ottobre 2026. Questa guida descrive il codice presente nel repository, dopo la rimozione della precedente simulazione. I percorsi qui riportati sono relativi a `teraflow-migration-sim/`.
 
 ## 1. Scopo e natura dell'esperimento
@@ -26,6 +28,8 @@ Il frontend (`web/index.html`, `web/app.js`) comunica con il server locale `src/
 `src/orchestrator.py` governa le fasi della migrazione. `src/live_backend.py` esegue gli accessi Docker, alle API TeraFlow e al laboratorio P4. `src/tfs_adapter.py` esporta, riconcilia e verifica lo stato; `src/snapshot.py` calcola il delta tra snapshot. `src/transport.py` gestisce copia TCP, avanzamento e checksum. `src/probes.py` interpreta le osservazioni del servizio. `src/analysis.py` produce i report dai risultati già salvati.
 
 Ogni stack contiene Context, Device, Service, NBI e PathComp; PathComp è diviso in frontend e backend, quindi il workload utilizza sei immagini. CockroachDB, NATS e Kafka sono indipendenti per A e B e sono considerati preinstallati. I database dei due host non sono replicati tra loro: lo stato viene trasferito attraverso snapshot e restore applicativo.
+
+Tutti i servizi Docker sono raggruppati nel progetto Compose **teraflow**, definito in `deploy/stack.yaml`. SAT-A e SAT-B mantengono reti private e volumi distinti; soltanto Device accede anche alla rete del laboratorio P4. La console e i worker Python restano sul computer. `tools/stack.py up` avvia l'intero gruppo, `stop` lo arresta e `status` ne mostra i container. La configurazione Compose della radice del repository punta allo stesso gruppo. Il motore delle migrazioni seleziona sei servizi per satellite, così l'arresto della sorgente non ferma la destinazione, database, broker o Mininet.
 
 Il proxy P4 gestisce l'autorità del controller: B può preparare uno stato standby senza assumere il controllo dell'hardware. La destinazione ottiene il ruolo attivo dopo le verifiche e l'ACK. Le patch locali Service/Device e il bundle effettivamente usato sono dichiarati in `deploy/patches/` e `artifacts/images-l2-patched-v2/`.
 
@@ -202,3 +206,9 @@ La prova hot funzionale `run-c680093ed93447bcb7a5b6323c6dd7c8`, a 1 Gbit/s, è r
 La baseline iniziale del servizio nella prova era indisponibile: il recupero del servizio resta non attribuibile alla migrazione. La verifica preliminare indipendente aveva dato 50/50 ping riusciti e traffico UDP ricevuto. Questa verifica dimostra il funzionamento della migrazione hot e del forwarding dopo il cutover; non completa la calibrazione o la campagna di 18 casi e non include una nuova prova cold.
 
 Il report dei risultati è stato rigenerato in `results/report/index.html`. L'evidenza dei controlli finali è in `results/runtime-verification-2026-10-14.json`; i metadata dettagliati restano nella directory della prova.
+
+### Verifica del raggruppamento Docker
+
+Il 14 ottobre tutti i container TeraFlow/P4 sono stati ricreati nel gruppo unico `teraflow`, riutilizzando i cinque volumi persistenti esistenti. I container delle precedenti istanze separate, incluse le copie obsolete TFS, sono stati rimossi. Il gruppo ha 20 container permanenti attivi più due container di inizializzazione Kafka che terminano normalmente con codice 0.
+
+È stato verificato dal vivo l'arresto/riavvio selettivo del workload SAT-B: SAT-A e i 17 switch sono rimasti disponibili. La nuova verifica di restore API e servizio ha dato 50/50 ping riusciti e 512/514 pacchetti UDP ricevuti. CPU/RAM includono nove container per satellite; il disco viene selezionato tramite etichette di progetto e ruolo. Le evidenze sono in `results/unified-compose-verification-2026-10-14.json`. Questa verifica del deployment non aggiunge un caso alla campagna sperimentale.

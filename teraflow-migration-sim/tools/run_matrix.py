@@ -22,22 +22,8 @@ def load_workload(path: Path) -> Workload:
     issues = validate(document)
     if issues:
         raise ValueError("Artifact manifest is not ready:\n" + "\n".join(f"- {item}" for item in issues))
-    images = document["controller"]["images"]
-    state = document["operational_state"]
-    times = document["timing_measurements_s"]
-    return Workload(
-        image_bytes=document["image_bundle"]["bytes"],
-        cold_state_bytes=state["cold_snapshot_bytes"],
-        hot_initial_state_bytes=state["hot_initial_state_bytes"],
-        hot_final_delta_bytes=state["hot_final_delta_bytes"],
-        cold_snapshot_s=times["cold_snapshot"],
-        hot_freeze_s=times["hot_freeze"],
-        hot_delta_apply_s=times["hot_delta_apply"],
-        controller_startup_s=times["controller_startup"],
-        api_restore_s=times["api_restore"],
-        api_verification_s=times["api_verification"],
-        ack_cutover_s=times["ack_cutover"],
-    )
+    from src.migration_model import workload_from_manifest
+    return workload_from_manifest(document)
 
 
 def main() -> int:

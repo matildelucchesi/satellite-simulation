@@ -1,0 +1,10 @@
+{"operation": "snapshot", "elapsed_s": 0.9372722999996768, "timestamp_utc": "2026-10-16T09:26:48.991321+00:00"}
+{"operation": "image_load_shared_daemon", "elapsed_s": 285.2832449000007, "timestamp_utc": "2026-10-16T09:32:07.715240+00:00"}
+{"operation": "controller_startup", "elapsed_s": 25.309467900000527, "timestamp_utc": "2026-10-16T09:32:33.029654+00:00"}
+{"operation": "target_perimeter_cleanup", "elapsed_s": 0.40974259999984497, "timestamp_utc": "2026-10-16T09:32:33.443847+00:00"}
+{"operation": "api_restore", "elapsed_s": 29.171975499999462, "timestamp_utc": "2026-10-16T09:33:02.651004+00:00"}
+{"operation": "freeze", "elapsed_s": 0.013507599999684317, "timestamp_utc": "2026-10-16T09:33:02.681199+00:00"}
+{"operation": "snapshot", "elapsed_s": 0.768784500000038, "timestamp_utc": "2026-10-16T09:33:03.464565+00:00"}
+{"operation": "delta_apply", "elapsed_s": 15.007010399999672, "timestamp_utc": "2026-10-16T09:33:18.717251+00:00"}
+{"operation": "api_verification", "elapsed_s": 0.8738709000008384, "timestamp_utc": "2026-10-16T09:33:19.624131+00:00"}
+{"operation": "cutover", "elapsed_s": 0.34384120000049734, "timestamp_utc": "2026-10-16T09:33:20.086362+00:00"}

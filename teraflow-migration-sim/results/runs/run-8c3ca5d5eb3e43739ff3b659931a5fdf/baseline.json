@@ -1,0 +1,27 @@
+{
+  "criteria": "source_api+authority+10_fresh_consecutive_pings",
+  "ping": {
+    "baseline_path_available": null,
+    "continuous_during_observation": true,
+    "first_loss_unix_s": null,
+    "first_reply_after_loss_unix_s": null,
+    "longest_consecutive_successes": 10,
+    "loss_fraction": 0.0,
+    "lost_probes": 0,
+    "observed_probes": 10,
+    "recovery_metric": "confirmation latency, not exact service downtime",
+    "recovery_observed": false,
+    "rtt_max_ms": 4.57,
+    "rtt_mean_ms": 4.068,
+    "rtt_min_ms": 3.46,
+    "stable_recovery_unix_s": null,
+    "successful_probes": 10,
+    "time_to_first_reply_s": null,
+    "time_to_stable_recovery_s": null
+  },
+  "probe_id": "baseline-run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+  "started_unix_s": 1792151464.0720515,
+  "success": true,
+  "udp_received": 93,
+  "verified_unix_s": 1792151465.0607815
+}

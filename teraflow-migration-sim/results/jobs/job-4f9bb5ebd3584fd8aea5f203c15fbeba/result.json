@@ -1,0 +1,64 @@
+{
+  "acceptance": "api_equivalence+target_authority+10_fresh_consecutive_pings",
+  "cold_minus_hot": {
+    "attempt": 0,
+    "controller_downtime_s": 265.8790253999987,
+    "ping_recovery_s": null,
+    "total_operation_s": -106.60848710000027
+  },
+  "comparison_id": "compare-3367d7d511574e6798a7a4a6f08c4285",
+  "complete": true,
+  "configured_rate_bps": 1000000000,
+  "event": {
+    "contact_end_s": 6248,
+    "contact_window_s": 1870,
+    "deadline_s": 7571,
+    "deadline_window_s": 3193,
+    "event_id": "functional-53848-53913-4378",
+    "execution_purpose": "functional-calibration",
+    "sat_a": 53848,
+    "sat_b": 53913,
+    "trigger_causes": [
+      "functional_diagnostic"
+    ],
+    "trigger_s": 4378
+  },
+  "order": [
+    "hot",
+    "cold"
+  ],
+  "purpose": "functional-validation",
+  "runs": [
+    {
+      "attempt": 1,
+      "baseline_valid": true,
+      "controller_downtime_s": 17.43508550000024,
+      "failure_reason": null,
+      "method": "hot",
+      "outcome": "success",
+      "ping_continuous": false,
+      "ping_recovery_s": 13.645517826080322,
+      "restarted_payload_bytes": 0,
+      "run_id": "run-3d344ec3bef348949cbeea8ffbb6a39c",
+      "service_verified": true,
+      "success": true,
+      "total_operation_s": 452.81299599999966
+    },
+    {
+      "attempt": 1,
+      "baseline_valid": true,
+      "controller_downtime_s": 283.3141108999989,
+      "failure_reason": null,
+      "method": "cold",
+      "outcome": "success",
+      "ping_continuous": true,
+      "ping_recovery_s": null,
+      "restarted_payload_bytes": 0,
+      "run_id": "run-6e38db1cbce9438490eaace1f621e28d",
+      "service_verified": true,
+      "success": true,
+      "total_operation_s": 346.2045088999994
+    }
+  ],
+  "schema_version": 2
+}

@@ -1,0 +1,12 @@
+{
+  "application_success": false,
+  "created_utc": "2026-10-19T07:26:36.498588+00:00",
+  "finished_utc": "2026-10-19T07:51:01.795931+00:00",
+  "job_id": "job-0b616bdbf50f48228b243ac166c22b3a",
+  "operation": "resource_diagnostic",
+  "parameters": {},
+  "result_path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\results\\jobs\\job-0b616bdbf50f48228b243ac166c22b3a\\result.json",
+  "started_utc": "2026-10-19T07:26:36.917194+00:00",
+  "status": "completed",
+  "worker_pid": 31076
+}

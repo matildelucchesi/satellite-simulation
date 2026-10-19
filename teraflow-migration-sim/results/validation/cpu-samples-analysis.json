@@ -1,0 +1,2697 @@
+[
+  {
+    "run": "run-6432dfbcb42c4f8389633545088348ce",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:15:42.401231+00:00",
+    "cpu": 1.4873,
+    "phase": [
+      "baseline"
+    ],
+    "relative_s": -28.00090193748474
+  },
+  {
+    "run": "run-6432dfbcb42c4f8389633545088348ce",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:15:49.325318+00:00",
+    "cpu": 0.8687,
+    "phase": [
+      "baseline"
+    ],
+    "relative_s": -21.076814889907837
+  },
+  {
+    "run": "run-6432dfbcb42c4f8389633545088348ce",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:15:56.706728+00:00",
+    "cpu": 3.2222,
+    "phase": [
+      "baseline"
+    ],
+    "relative_s": -13.695405006408691
+  },
+  {
+    "run": "run-6432dfbcb42c4f8389633545088348ce",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:16:03.542940+00:00",
+    "cpu": 1.4721,
+    "phase": [
+      "baseline"
+    ],
+    "relative_s": -6.8591930866241455
+  },
+  {
+    "run": "run-6432dfbcb42c4f8389633545088348ce",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:16:10.950234+00:00",
+    "cpu": 0.8656,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 0.5481009483337402
+  },
+  {
+    "run": "run-6432dfbcb42c4f8389633545088348ce",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:16:18.261247+00:00",
+    "cpu": 1.4195,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 7.859113931655884
+  },
+  {
+    "run": "run-6432dfbcb42c4f8389633545088348ce",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:16:25.676990+00:00",
+    "cpu": 1.2279000000000002,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 15.27485704421997
+  },
+  {
+    "run": "run-6432dfbcb42c4f8389633545088348ce",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:16:32.416687+00:00",
+    "cpu": 2.1318,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 22.014554023742676
+  },
+  {
+    "run": "run-6432dfbcb42c4f8389633545088348ce",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:16:39.328844+00:00",
+    "cpu": 1.4331,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 28.926711082458496
+  },
+  {
+    "run": "run-6432dfbcb42c4f8389633545088348ce",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:16:46.737878+00:00",
+    "cpu": 0.8303,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 36.335745096206665
+  },
+  {
+    "run": "run-6432dfbcb42c4f8389633545088348ce",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:16:53.459780+00:00",
+    "cpu": 1.4449999999999998,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 43.05764698982239
+  },
+  {
+    "run": "run-6432dfbcb42c4f8389633545088348ce",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:17:00.835520+00:00",
+    "cpu": 1.273,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 50.43338704109192
+  },
+  {
+    "run": "run-6432dfbcb42c4f8389633545088348ce",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:17:07.287295+00:00",
+    "cpu": 0.8376,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 56.885162115097046
+  },
+  {
+    "run": "run-6432dfbcb42c4f8389633545088348ce",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:20:52.137563+00:00",
+    "cpu": 0.21,
+    "phase": [
+      "target_perimeter_cleanup"
+    ],
+    "relative_s": 281.7354300022125
+  },
+  {
+    "run": "run-6432dfbcb42c4f8389633545088348ce",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:20:59.483565+00:00",
+    "cpu": 1.2938,
+    "phase": [
+      "api_restore"
+    ],
+    "relative_s": 289.0814321041107
+  },
+  {
+    "run": "run-6432dfbcb42c4f8389633545088348ce",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:21:06.929346+00:00",
+    "cpu": 1.4999,
+    "phase": [
+      "api_restore"
+    ],
+    "relative_s": 296.52721309661865
+  },
+  {
+    "run": "run-6432dfbcb42c4f8389633545088348ce",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:21:13.836946+00:00",
+    "cpu": 3.5874,
+    "phase": [
+      "api_restore"
+    ],
+    "relative_s": 303.4348130226135
+  },
+  {
+    "run": "run-6432dfbcb42c4f8389633545088348ce",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:21:21.147643+00:00",
+    "cpu": 2.2182,
+    "phase": [
+      "queued_topology_apply"
+    ],
+    "relative_s": 310.74551010131836
+  },
+  {
+    "run": "run-6432dfbcb42c4f8389633545088348ce",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:21:28.574384+00:00",
+    "cpu": 1.8281,
+    "phase": [
+      "queued_topology_apply"
+    ],
+    "relative_s": 318.17225098609924
+  },
+  {
+    "run": "run-6432dfbcb42c4f8389633545088348ce",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:21:35.951409+00:00",
+    "cpu": 1.5867,
+    "phase": [
+      "ack"
+    ],
+    "relative_s": 325.54927611351013
+  },
+  {
+    "run": "run-6432dfbcb42c4f8389633545088348ce",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:21:42.611902+00:00",
+    "cpu": 1.2483,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 332.2097690105438
+  },
+  {
+    "run": "run-6432dfbcb42c4f8389633545088348ce",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:21:49.573752+00:00",
+    "cpu": 2.0211,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 339.17161893844604
+  },
+  {
+    "run": "run-6432dfbcb42c4f8389633545088348ce",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:21:56.983612+00:00",
+    "cpu": 0.8492,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 346.5814790725708
+  },
+  {
+    "run": "run-6432dfbcb42c4f8389633545088348ce",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:22:03.760886+00:00",
+    "cpu": 1.615,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 353.3587529659271
+  },
+  {
+    "run": "run-6432dfbcb42c4f8389633545088348ce",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:22:11.158358+00:00",
+    "cpu": 1.1624,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 360.75622510910034
+  },
+  {
+    "run": "run-4f8b36918fa84fe1824fdbbd62b4b5e7",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:23:49.588132+00:00",
+    "cpu": 1.247,
+    "phase": [
+      "baseline"
+    ],
+    "relative_s": -28.367619037628174
+  },
+  {
+    "run": "run-4f8b36918fa84fe1824fdbbd62b4b5e7",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:23:56.962653+00:00",
+    "cpu": 2.9766999999999997,
+    "phase": [
+      "baseline"
+    ],
+    "relative_s": -20.99309802055359
+  },
+  {
+    "run": "run-4f8b36918fa84fe1824fdbbd62b4b5e7",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:24:03.849181+00:00",
+    "cpu": 0.7768,
+    "phase": [
+      "baseline"
+    ],
+    "relative_s": -14.10657000541687
+  },
+  {
+    "run": "run-4f8b36918fa84fe1824fdbbd62b4b5e7",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:24:11.182830+00:00",
+    "cpu": 1.4146,
+    "phase": [
+      "baseline"
+    ],
+    "relative_s": -6.772920846939087
+  },
+  {
+    "run": "run-4f8b36918fa84fe1824fdbbd62b4b5e7",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:24:18.531009+00:00",
+    "cpu": 0.856,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 0.5752580165863037
+  },
+  {
+    "run": "run-4f8b36918fa84fe1824fdbbd62b4b5e7",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:24:25.209402+00:00",
+    "cpu": 0.795,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 7.253651142120361
+  },
+  {
+    "run": "run-4f8b36918fa84fe1824fdbbd62b4b5e7",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:24:32.577042+00:00",
+    "cpu": 2.1157,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 14.621291160583496
+  },
+  {
+    "run": "run-4f8b36918fa84fe1824fdbbd62b4b5e7",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:24:39.628816+00:00",
+    "cpu": 0.8082999999999999,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 21.673064947128296
+  },
+  {
+    "run": "run-4f8b36918fa84fe1824fdbbd62b4b5e7",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:24:46.940522+00:00",
+    "cpu": 0.8537,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 28.984771013259888
+  },
+  {
+    "run": "run-4f8b36918fa84fe1824fdbbd62b4b5e7",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:24:53.797213+00:00",
+    "cpu": 1.0147,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 35.84146213531494
+  },
+  {
+    "run": "run-4f8b36918fa84fe1824fdbbd62b4b5e7",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:25:01.137881+00:00",
+    "cpu": 0.9559000000000001,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 43.182130098342896
+  },
+  {
+    "run": "run-4f8b36918fa84fe1824fdbbd62b4b5e7",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:25:08.620146+00:00",
+    "cpu": 1.6362999999999999,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 50.66439509391785
+  },
+  {
+    "run": "run-4f8b36918fa84fe1824fdbbd62b4b5e7",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:25:15.985751+00:00",
+    "cpu": 0.8281999999999999,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 58.02999997138977
+  },
+  {
+    "run": "run-4f8b36918fa84fe1824fdbbd62b4b5e7",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:27:52.498802+00:00",
+    "cpu": 1.6120999999999999,
+    "phase": [
+      "controller_startup"
+    ],
+    "relative_s": 214.5430510044098
+  },
+  {
+    "run": "run-4f8b36918fa84fe1824fdbbd62b4b5e7",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:27:59.807710+00:00",
+    "cpu": 1.7254999999999998,
+    "phase": [
+      "api_restore"
+    ],
+    "relative_s": 221.85195899009705
+  },
+  {
+    "run": "run-4f8b36918fa84fe1824fdbbd62b4b5e7",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:28:07.213838+00:00",
+    "cpu": 3.3594000000000004,
+    "phase": [
+      "api_restore"
+    ],
+    "relative_s": 229.25808715820312
+  },
+  {
+    "run": "run-4f8b36918fa84fe1824fdbbd62b4b5e7",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:28:14.030331+00:00",
+    "cpu": 1.4171,
+    "phase": [
+      "api_restore"
+    ],
+    "relative_s": 236.07457995414734
+  },
+  {
+    "run": "run-4f8b36918fa84fe1824fdbbd62b4b5e7",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:28:21.359612+00:00",
+    "cpu": 1.4475,
+    "phase": [
+      "queued_topology_apply"
+    ],
+    "relative_s": 243.4038610458374
+  },
+  {
+    "run": "run-4f8b36918fa84fe1824fdbbd62b4b5e7",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:28:27.786390+00:00",
+    "cpu": 1.4930999999999999,
+    "phase": [
+      "queued_topology_apply"
+    ],
+    "relative_s": 249.83063912391663
+  },
+  {
+    "run": "run-4f8b36918fa84fe1824fdbbd62b4b5e7",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:28:35.202431+00:00",
+    "cpu": 2.9718,
+    "phase": [
+      "queued_topology_apply"
+    ],
+    "relative_s": 257.246680021286
+  },
+  {
+    "run": "run-4f8b36918fa84fe1824fdbbd62b4b5e7",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:28:42.627973+00:00",
+    "cpu": 0.9125,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 264.6722221374512
+  },
+  {
+    "run": "run-4f8b36918fa84fe1824fdbbd62b4b5e7",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:28:49.900936+00:00",
+    "cpu": 1.1335,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 271.9451849460602
+  },
+  {
+    "run": "run-4f8b36918fa84fe1824fdbbd62b4b5e7",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:28:57.325759+00:00",
+    "cpu": 1.8136,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 279.37000799179077
+  },
+  {
+    "run": "run-4f8b36918fa84fe1824fdbbd62b4b5e7",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:29:04.114596+00:00",
+    "cpu": 0.8222999999999999,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 286.15884494781494
+  },
+  {
+    "run": "run-4f8b36918fa84fe1824fdbbd62b4b5e7",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:29:11.488930+00:00",
+    "cpu": 2.4953000000000003,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 293.5331790447235
+  },
+  {
+    "run": "run-da5ae7d6ca1342b0b3fbe819f471dcf7",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:30:47.953177+00:00",
+    "cpu": 1.6511,
+    "phase": [
+      "baseline"
+    ],
+    "relative_s": -27.949591398239136
+  },
+  {
+    "run": "run-da5ae7d6ca1342b0b3fbe819f471dcf7",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:30:55.224134+00:00",
+    "cpu": 0.9853,
+    "phase": [
+      "baseline"
+    ],
+    "relative_s": -20.67863440513611
+  },
+  {
+    "run": "run-da5ae7d6ca1342b0b3fbe819f471dcf7",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:31:02.553334+00:00",
+    "cpu": 1.1342,
+    "phase": [
+      "baseline"
+    ],
+    "relative_s": -13.34943437576294
+  },
+  {
+    "run": "run-da5ae7d6ca1342b0b3fbe819f471dcf7",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:31:09.003852+00:00",
+    "cpu": 1.9526000000000001,
+    "phase": [
+      "baseline"
+    ],
+    "relative_s": -6.898916482925415
+  },
+  {
+    "run": "run-da5ae7d6ca1342b0b3fbe819f471dcf7",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:31:16.328680+00:00",
+    "cpu": 0.702,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 0.42591166496276855
+  },
+  {
+    "run": "run-da5ae7d6ca1342b0b3fbe819f471dcf7",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:31:23.097994+00:00",
+    "cpu": 0.7607999999999999,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 7.195225715637207
+  },
+  {
+    "run": "run-da5ae7d6ca1342b0b3fbe819f471dcf7",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:31:30.016589+00:00",
+    "cpu": 2.7121,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 14.113820552825928
+  },
+  {
+    "run": "run-da5ae7d6ca1342b0b3fbe819f471dcf7",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:31:37.367260+00:00",
+    "cpu": 1.0641,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 21.464491605758667
+  },
+  {
+    "run": "run-da5ae7d6ca1342b0b3fbe819f471dcf7",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:31:44.248059+00:00",
+    "cpu": 0.8429,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 28.345290660858154
+  },
+  {
+    "run": "run-da5ae7d6ca1342b0b3fbe819f471dcf7",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:31:51.603489+00:00",
+    "cpu": 1.0576,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 35.70072054862976
+  },
+  {
+    "run": "run-da5ae7d6ca1342b0b3fbe819f471dcf7",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:31:58.996436+00:00",
+    "cpu": 0.847,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 43.09366774559021
+  },
+  {
+    "run": "run-da5ae7d6ca1342b0b3fbe819f471dcf7",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:32:06.368692+00:00",
+    "cpu": 1.4873,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 50.46592354774475
+  },
+  {
+    "run": "run-da5ae7d6ca1342b0b3fbe819f471dcf7",
+    "method": "cold",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:32:13.255615+00:00",
+    "cpu": 0.8417999999999999,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 57.35284662246704
+  },
+  {
+    "run": "run-da5ae7d6ca1342b0b3fbe819f471dcf7",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:34:54.548943+00:00",
+    "cpu": 0.6826,
+    "phase": [
+      "api_restore"
+    ],
+    "relative_s": 218.64617466926575
+  },
+  {
+    "run": "run-da5ae7d6ca1342b0b3fbe819f471dcf7",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:35:01.934656+00:00",
+    "cpu": 1.3420999999999998,
+    "phase": [
+      "api_restore"
+    ],
+    "relative_s": 226.03188753128052
+  },
+  {
+    "run": "run-da5ae7d6ca1342b0b3fbe819f471dcf7",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:35:09.245729+00:00",
+    "cpu": 0.8743,
+    "phase": [
+      "api_restore"
+    ],
+    "relative_s": 233.3429605960846
+  },
+  {
+    "run": "run-da5ae7d6ca1342b0b3fbe819f471dcf7",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:35:16.641085+00:00",
+    "cpu": 1.8787,
+    "phase": [
+      "api_restore"
+    ],
+    "relative_s": 240.7383165359497
+  },
+  {
+    "run": "run-da5ae7d6ca1342b0b3fbe819f471dcf7",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:35:23.387002+00:00",
+    "cpu": 3.9704,
+    "phase": [
+      "queued_topology_apply"
+    ],
+    "relative_s": 247.4842336177826
+  },
+  {
+    "run": "run-da5ae7d6ca1342b0b3fbe819f471dcf7",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:35:30.177761+00:00",
+    "cpu": 1.9603,
+    "phase": [
+      "queued_topology_apply"
+    ],
+    "relative_s": 254.27499270439148
+  },
+  {
+    "run": "run-da5ae7d6ca1342b0b3fbe819f471dcf7",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:35:37.647925+00:00",
+    "cpu": 1.5324,
+    "phase": [
+      "queued_topology_apply"
+    ],
+    "relative_s": 261.74515652656555
+  },
+  {
+    "run": "run-da5ae7d6ca1342b0b3fbe819f471dcf7",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:35:44.439044+00:00",
+    "cpu": 1.2807,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 268.5362756252289
+  },
+  {
+    "run": "run-da5ae7d6ca1342b0b3fbe819f471dcf7",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:35:51.790961+00:00",
+    "cpu": 0.9319,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 275.888192653656
+  },
+  {
+    "run": "run-da5ae7d6ca1342b0b3fbe819f471dcf7",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:35:59.190416+00:00",
+    "cpu": 1.2258,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 283.2876477241516
+  },
+  {
+    "run": "run-da5ae7d6ca1342b0b3fbe819f471dcf7",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:36:06.566757+00:00",
+    "cpu": 0.9388,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 290.6639885902405
+  },
+  {
+    "run": "run-da5ae7d6ca1342b0b3fbe819f471dcf7",
+    "method": "cold",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:36:13.472794+00:00",
+    "cpu": 0.8895,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 297.57002568244934
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:37:50.342467+00:00",
+    "cpu": 1.6329,
+    "phase": [
+      "baseline"
+    ],
+    "relative_s": -27.6168155670166
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:37:57.704160+00:00",
+    "cpu": 0.873,
+    "phase": [
+      "baseline"
+    ],
+    "relative_s": -20.255122661590576
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:38:04.545064+00:00",
+    "cpu": 4.0817000000000005,
+    "phase": [
+      "baseline"
+    ],
+    "relative_s": -13.414218664169312
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:38:11.892243+00:00",
+    "cpu": 1.2806,
+    "phase": [
+      "baseline"
+    ],
+    "relative_s": -6.067039728164673
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:38:18.364342+00:00",
+    "cpu": 0.9208,
+    "phase": [
+      "trigger"
+    ],
+    "relative_s": 0.4050593376159668
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:38:25.669059+00:00",
+    "cpu": 0.8231999999999999,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 7.709776401519775
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:38:33.017653+00:00",
+    "cpu": 1.0764,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 15.058370351791382
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:38:40.386943+00:00",
+    "cpu": 1.8929,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 22.42766046524048
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:38:47.753559+00:00",
+    "cpu": 1.5806999999999998,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 29.794276475906372
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:38:54.632856+00:00",
+    "cpu": 1.4602000000000002,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 36.67357325553894
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:39:01.990995+00:00",
+    "cpu": 0.9056000000000001,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 44.03171229362488
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:39:09.358169+00:00",
+    "cpu": 0.9527,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 51.39888644218445
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:39:16.765442+00:00",
+    "cpu": 2.5997,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 58.806159257888794
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:39:23.676699+00:00",
+    "cpu": 1.0396999999999998,
+    "phase": [
+      "transfer"
+    ],
+    "relative_s": 65.7174162864685
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:39:30.432919+00:00",
+    "cpu": 1.1643,
+    "phase": [
+      "transfer"
+    ],
+    "relative_s": 72.47363638877869
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:39:37.822332+00:00",
+    "cpu": 1.1086,
+    "phase": [
+      "transfer"
+    ],
+    "relative_s": 79.86304926872253
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:39:44.764652+00:00",
+    "cpu": 2.123,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 86.80536937713623
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:39:52.201197+00:00",
+    "cpu": 3.8417000000000003,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 94.24191427230835
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:39:59.483033+00:00",
+    "cpu": 1.6679,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 101.52375030517578
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:40:06.878952+00:00",
+    "cpu": 1.3662,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 108.91966938972473
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:40:13.594533+00:00",
+    "cpu": 0.7481,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 115.63525032997131
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:40:20.696181+00:00",
+    "cpu": 0.7766,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 122.73689842224121
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:40:28.243989+00:00",
+    "cpu": 1.5459,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 130.28470635414124
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:40:35.723119+00:00",
+    "cpu": 0.7923,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 137.76383638381958
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:40:43.192396+00:00",
+    "cpu": 1.8196,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 145.2331132888794
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:40:50.577856+00:00",
+    "cpu": 0.8919,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 152.61857342720032
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:40:58.002071+00:00",
+    "cpu": 1.1971,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 160.04278826713562
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:41:04.710800+00:00",
+    "cpu": 1.0991,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 166.7515172958374
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:41:12.211658+00:00",
+    "cpu": 0.7223,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 174.2523753643036
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:41:20.072362+00:00",
+    "cpu": 3.2954,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 182.1130793094635
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:41:27.524624+00:00",
+    "cpu": 1.0796,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 189.56534147262573
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:41:34.767480+00:00",
+    "cpu": 1.2216,
+    "phase": [
+      "controller_startup"
+    ],
+    "relative_s": 196.80819725990295
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:41:43.278187+00:00",
+    "cpu": 1.6512,
+    "phase": [
+      "controller_startup"
+    ],
+    "relative_s": 205.31890439987183
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:41:50.700803+00:00",
+    "cpu": 1.1974,
+    "phase": [
+      "controller_startup"
+    ],
+    "relative_s": 212.74152040481567
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:41:50.700803+00:00",
+    "cpu": 1.5186,
+    "phase": [
+      "controller_startup"
+    ],
+    "relative_s": 212.74152040481567
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:41:58.234837+00:00",
+    "cpu": 1.2894999999999999,
+    "phase": [
+      "api_restore"
+    ],
+    "relative_s": 220.27555441856384
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:41:58.234837+00:00",
+    "cpu": 1.0352,
+    "phase": [
+      "api_restore"
+    ],
+    "relative_s": 220.27555441856384
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:42:05.794386+00:00",
+    "cpu": 0.9192,
+    "phase": [
+      "api_restore"
+    ],
+    "relative_s": 227.83510327339172
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:42:05.794386+00:00",
+    "cpu": 1.0619,
+    "phase": [
+      "api_restore"
+    ],
+    "relative_s": 227.83510327339172
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:42:13.333601+00:00",
+    "cpu": 1.0307,
+    "phase": [
+      "api_restore"
+    ],
+    "relative_s": 235.37431836128235
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:42:13.333601+00:00",
+    "cpu": 2.4979,
+    "phase": [
+      "api_restore"
+    ],
+    "relative_s": 235.37431836128235
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:42:20.685179+00:00",
+    "cpu": 3.9469000000000003,
+    "phase": [
+      "api_restore"
+    ],
+    "relative_s": 242.72589635849
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:42:20.685179+00:00",
+    "cpu": 2.3295,
+    "phase": [
+      "api_restore"
+    ],
+    "relative_s": 242.72589635849
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:42:28.305457+00:00",
+    "cpu": 0.8659999999999999,
+    "phase": [
+      "delta_apply"
+    ],
+    "relative_s": 250.34617447853088
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:42:28.305457+00:00",
+    "cpu": 2.2056999999999998,
+    "phase": [
+      "delta_apply"
+    ],
+    "relative_s": 250.34617447853088
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:42:35.873500+00:00",
+    "cpu": 1.1651,
+    "phase": [
+      "delta_apply"
+    ],
+    "relative_s": 257.9142174720764
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:42:35.873500+00:00",
+    "cpu": 1.6791,
+    "phase": [
+      "delta_apply"
+    ],
+    "relative_s": 257.9142174720764
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:42:43.337101+00:00",
+    "cpu": 1.8341,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 265.37781834602356
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:42:43.337101+00:00",
+    "cpu": 1.5848,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 265.37781834602356
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:42:50.569933+00:00",
+    "cpu": 0.8000999999999999,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 272.6106503009796
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:42:50.569933+00:00",
+    "cpu": 3.1569,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 272.6106503009796
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:42:58.058761+00:00",
+    "cpu": 1.6372,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 280.0994782447815
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:42:58.058761+00:00",
+    "cpu": 0.7898999999999999,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 280.0994782447815
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:43:04.866931+00:00",
+    "cpu": 1.0363,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 286.90764832496643
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:43:04.866931+00:00",
+    "cpu": 1.7013,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 286.90764832496643
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:43:12.328239+00:00",
+    "cpu": 1.0728,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 294.36895632743835
+  },
+  {
+    "run": "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:43:12.328239+00:00",
+    "cpu": 0.7605,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 294.36895632743835
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:44:28.574687+00:00",
+    "cpu": 1.2713999999999999,
+    "phase": [
+      "baseline"
+    ],
+    "relative_s": -28.09540367126465
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:44:35.765887+00:00",
+    "cpu": 0.9792,
+    "phase": [
+      "baseline"
+    ],
+    "relative_s": -20.90420365333557
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:44:43.125613+00:00",
+    "cpu": 3.3306999999999998,
+    "phase": [
+      "baseline"
+    ],
+    "relative_s": -13.544477701187134
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:44:49.632463+00:00",
+    "cpu": 1.7029,
+    "phase": [
+      "baseline"
+    ],
+    "relative_s": -7.037627696990967
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:44:57.027537+00:00",
+    "cpu": 0.9283,
+    "phase": [
+      "trigger"
+    ],
+    "relative_s": 0.35744643211364746
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:45:03.678166+00:00",
+    "cpu": 0.9798,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 7.00807523727417
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:45:10.714351+00:00",
+    "cpu": 1.0364,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 14.044260263442993
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:45:18.107226+00:00",
+    "cpu": 2.4518,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 21.437135219573975
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:45:24.739653+00:00",
+    "cpu": 0.9087,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 28.069562435150146
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:45:32.113327+00:00",
+    "cpu": 0.9384999999999999,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 35.443236351013184
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:45:38.660822+00:00",
+    "cpu": 0.9253,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 41.99073123931885
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:45:45.804439+00:00",
+    "cpu": 0.8507999999999999,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 49.13434839248657
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:45:53.171869+00:00",
+    "cpu": 1.2628000000000001,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 56.50177836418152
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:45:59.692551+00:00",
+    "cpu": 1.0686,
+    "phase": [
+      "snapshot_initial"
+    ],
+    "relative_s": 63.02246022224426
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:46:07.047331+00:00",
+    "cpu": 2.0023,
+    "phase": [
+      "transfer"
+    ],
+    "relative_s": 70.37724041938782
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:46:13.912502+00:00",
+    "cpu": 1.076,
+    "phase": [
+      "transfer"
+    ],
+    "relative_s": 77.24241137504578
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:46:20.834151+00:00",
+    "cpu": 1.8938000000000001,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 84.16406035423279
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:46:28.222605+00:00",
+    "cpu": 1.9494,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 91.55251431465149
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:46:34.845286+00:00",
+    "cpu": 2.5873,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 98.17519521713257
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:46:42.358542+00:00",
+    "cpu": 3.1666,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 105.68845129013062
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:46:49.870293+00:00",
+    "cpu": 1.2584,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 113.2002022266388
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:46:57.427388+00:00",
+    "cpu": 2.5879999999999996,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 120.75729727745056
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:47:04.910759+00:00",
+    "cpu": 0.8256,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 128.24066829681396
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:47:12.331329+00:00",
+    "cpu": 1.0587,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 135.66123843193054
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:47:18.820297+00:00",
+    "cpu": 1.6654,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 142.15020632743835
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:47:26.031363+00:00",
+    "cpu": 1.1727,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 149.3612723350525
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:47:33.438185+00:00",
+    "cpu": 1.8756,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 156.76809430122375
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:47:40.861706+00:00",
+    "cpu": 0.8205,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 164.19161534309387
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:47:48.280829+00:00",
+    "cpu": 1.6663,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 171.6107382774353
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:47:54.887385+00:00",
+    "cpu": 1.5331,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 178.217294216156
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:48:02.282485+00:00",
+    "cpu": 0.8324,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 185.61239433288574
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:48:08.813215+00:00",
+    "cpu": 3.2955,
+    "phase": [
+      "controller_startup"
+    ],
+    "relative_s": 192.14312434196472
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:48:15.908557+00:00",
+    "cpu": 2.2523,
+    "phase": [
+      "controller_startup"
+    ],
+    "relative_s": 199.23846626281738
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:48:23.422193+00:00",
+    "cpu": 0.8115000000000001,
+    "phase": [
+      "controller_startup"
+    ],
+    "relative_s": 206.75210237503052
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:48:29.958417+00:00",
+    "cpu": 1.0405,
+    "phase": [
+      "target_perimeter_cleanup"
+    ],
+    "relative_s": 213.28832626342773
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:48:29.958417+00:00",
+    "cpu": 0.2376,
+    "phase": [
+      "target_perimeter_cleanup"
+    ],
+    "relative_s": 213.28832626342773
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:48:37.397615+00:00",
+    "cpu": 1.1311,
+    "phase": [
+      "api_restore"
+    ],
+    "relative_s": 220.7275242805481
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:48:37.397615+00:00",
+    "cpu": 0.6669,
+    "phase": [
+      "api_restore"
+    ],
+    "relative_s": 220.7275242805481
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:48:44.921191+00:00",
+    "cpu": 1.5816999999999999,
+    "phase": [
+      "api_restore"
+    ],
+    "relative_s": 228.25110030174255
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:48:44.921191+00:00",
+    "cpu": 1.8897000000000002,
+    "phase": [
+      "api_restore"
+    ],
+    "relative_s": 228.25110030174255
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:48:52.381472+00:00",
+    "cpu": 1.4255,
+    "phase": [
+      "api_restore"
+    ],
+    "relative_s": 235.7113814353943
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:48:52.381472+00:00",
+    "cpu": 2.0886,
+    "phase": [
+      "api_restore"
+    ],
+    "relative_s": 235.7113814353943
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:48:59.902185+00:00",
+    "cpu": 0.8996,
+    "phase": [
+      "api_restore"
+    ],
+    "relative_s": 243.23209428787231
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:48:59.902185+00:00",
+    "cpu": 2.0781,
+    "phase": [
+      "api_restore"
+    ],
+    "relative_s": 243.23209428787231
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:49:07.363191+00:00",
+    "cpu": 1.0738,
+    "phase": [
+      "delta_apply"
+    ],
+    "relative_s": 250.69310021400452
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:49:07.363191+00:00",
+    "cpu": 2.5749999999999997,
+    "phase": [
+      "delta_apply"
+    ],
+    "relative_s": 250.69310021400452
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:49:13.960760+00:00",
+    "cpu": 1.0450000000000002,
+    "phase": [
+      "delta_apply"
+    ],
+    "relative_s": 257.29066944122314
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:49:13.960760+00:00",
+    "cpu": 1.578,
+    "phase": [
+      "delta_apply"
+    ],
+    "relative_s": 257.29066944122314
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:49:21.082239+00:00",
+    "cpu": 3.0525,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 264.4121482372284
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:49:21.082239+00:00",
+    "cpu": 1.5087,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 264.4121482372284
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:49:28.533634+00:00",
+    "cpu": 2.1001,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 271.86354327201843
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:49:28.533634+00:00",
+    "cpu": 3.3049,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 271.86354327201843
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:49:36.044218+00:00",
+    "cpu": 0.7789,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 279.3741273880005
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:49:36.044218+00:00",
+    "cpu": 0.8087,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 279.3741273880005
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:49:43.465731+00:00",
+    "cpu": 0.8763,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 286.79564023017883
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:49:43.465731+00:00",
+    "cpu": 1.1223,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 286.79564023017883
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:49:50.963656+00:00",
+    "cpu": 1.3197,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 294.2935652732849
+  },
+  {
+    "run": "run-ec606f1f32d049dd89af170d6749217b",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:49:50.963656+00:00",
+    "cpu": 1.6966,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 294.2935652732849
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:51:07.477033+00:00",
+    "cpu": 2.4709,
+    "phase": [
+      "baseline"
+    ],
+    "relative_s": -27.627245664596558
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:51:13.975293+00:00",
+    "cpu": 1.0943,
+    "phase": [
+      "baseline"
+    ],
+    "relative_s": -21.12898564338684
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:51:20.956160+00:00",
+    "cpu": 2.3646000000000003,
+    "phase": [
+      "baseline"
+    ],
+    "relative_s": -14.148118495941162
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:51:28.338304+00:00",
+    "cpu": 1.2125,
+    "phase": [
+      "baseline"
+    ],
+    "relative_s": -6.765974521636963
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:51:35.051835+00:00",
+    "cpu": 1.7905000000000002,
+    "phase": [
+      "baseline"
+    ],
+    "relative_s": -0.052443504333496094
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:51:42.422969+00:00",
+    "cpu": 0.8137999999999999,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 7.318690538406372
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:51:48.911463+00:00",
+    "cpu": 1.4337,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 13.80718445777893
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:51:56.074264+00:00",
+    "cpu": 3.5241000000000002,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 20.969985485076904
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:52:03.454391+00:00",
+    "cpu": 1.1734,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 28.350112438201904
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:52:09.981243+00:00",
+    "cpu": 1.3957,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 34.87696433067322
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:52:17.348499+00:00",
+    "cpu": 0.8122,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 42.244220495224
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:52:23.945399+00:00",
+    "cpu": 0.7775,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 48.84112048149109
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:52:30.955059+00:00",
+    "cpu": 2.8907,
+    "phase": [
+      "alignment"
+    ],
+    "relative_s": 55.85078048706055
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:52:38.342038+00:00",
+    "cpu": 0.8129,
+    "phase": [
+      "snapshot_initial"
+    ],
+    "relative_s": 63.23775935173035
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:52:45.085060+00:00",
+    "cpu": 0.9508999999999999,
+    "phase": [
+      "transfer"
+    ],
+    "relative_s": 69.9807813167572
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:52:52.420242+00:00",
+    "cpu": 1.6183,
+    "phase": [
+      "transfer"
+    ],
+    "relative_s": 77.31596350669861
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:52:59.001469+00:00",
+    "cpu": 1.2779999999999998,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 83.89719033241272
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:53:06.234827+00:00",
+    "cpu": 1.8605,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 91.13054847717285
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:53:13.659136+00:00",
+    "cpu": 1.6983,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 98.5548574924469
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:53:21.095343+00:00",
+    "cpu": 3.7188999999999997,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 105.99106454849243
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:53:28.500077+00:00",
+    "cpu": 1.2416,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 113.39579844474792
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:53:35.200449+00:00",
+    "cpu": 1.1723999999999999,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 120.09617042541504
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:53:42.597460+00:00",
+    "cpu": 1.4686,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 127.49318146705627
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:53:50.091997+00:00",
+    "cpu": 1.1217000000000001,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 134.98771834373474
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:53:57.503124+00:00",
+    "cpu": 1.5534,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 142.39884543418884
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:54:04.227801+00:00",
+    "cpu": 1.2892000000000001,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 149.1235225200653
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:54:11.152912+00:00",
+    "cpu": 1.448,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 156.04863333702087
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:54:18.536099+00:00",
+    "cpu": 0.8314,
+    "phase": [
+      "image_load_shared_daemon"
+    ],
+    "relative_s": 163.43182039260864
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:54:25.180589+00:00",
+    "cpu": 1.317,
+    "phase": [
+      "controller_startup"
+    ],
+    "relative_s": 170.07631039619446
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:54:33.614314+00:00",
+    "cpu": 3.2805,
+    "phase": [
+      "controller_startup"
+    ],
+    "relative_s": 178.51003551483154
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:54:41.154101+00:00",
+    "cpu": 0.9483,
+    "phase": [
+      "controller_startup"
+    ],
+    "relative_s": 186.04982233047485
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:54:48.595473+00:00",
+    "cpu": 1.0245,
+    "phase": [
+      "controller_startup"
+    ],
+    "relative_s": 193.49119448661804
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:54:48.595473+00:00",
+    "cpu": 0.41050000000000003,
+    "phase": [
+      "controller_startup"
+    ],
+    "relative_s": 193.49119448661804
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:54:55.219556+00:00",
+    "cpu": 1.5047,
+    "phase": [
+      "api_restore"
+    ],
+    "relative_s": 200.11527752876282
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:54:55.219556+00:00",
+    "cpu": 1.3398,
+    "phase": [
+      "api_restore"
+    ],
+    "relative_s": 200.11527752876282
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:55:02.677101+00:00",
+    "cpu": 0.9998,
+    "phase": [
+      "api_restore"
+    ],
+    "relative_s": 207.5728223323822
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:55:02.677101+00:00",
+    "cpu": 3.4219999999999997,
+    "phase": [
+      "api_restore"
+    ],
+    "relative_s": 207.5728223323822
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:55:10.161954+00:00",
+    "cpu": 2.2656,
+    "phase": [
+      "api_restore"
+    ],
+    "relative_s": 215.0576753616333
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:55:10.161954+00:00",
+    "cpu": 1.1139999999999999,
+    "phase": [
+      "api_restore"
+    ],
+    "relative_s": 215.0576753616333
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:55:17.630418+00:00",
+    "cpu": 1.7031,
+    "phase": [
+      "api_restore"
+    ],
+    "relative_s": 222.52613949775696
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:55:17.630418+00:00",
+    "cpu": 2.1661,
+    "phase": [
+      "api_restore"
+    ],
+    "relative_s": 222.52613949775696
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:55:24.210722+00:00",
+    "cpu": 0.9988,
+    "phase": [
+      "delta_apply"
+    ],
+    "relative_s": 229.10644340515137
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:55:24.210722+00:00",
+    "cpu": 2.0914,
+    "phase": [
+      "delta_apply"
+    ],
+    "relative_s": 229.10644340515137
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:55:31.335914+00:00",
+    "cpu": 0.7514000000000001,
+    "phase": [
+      "delta_apply"
+    ],
+    "relative_s": 236.23163533210754
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:55:31.335914+00:00",
+    "cpu": 1.5581,
+    "phase": [
+      "delta_apply"
+    ],
+    "relative_s": 236.23163533210754
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:55:38.786360+00:00",
+    "cpu": 0.7652,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 243.68208146095276
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:55:38.786360+00:00",
+    "cpu": 3.2134000000000005,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 243.68208146095276
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:55:46.254462+00:00",
+    "cpu": 2.9499,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 251.15018343925476
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:55:46.254462+00:00",
+    "cpu": 1.2104,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 251.15018343925476
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:55:53.711157+00:00",
+    "cpu": 1.054,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 258.6068785190582
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:55:53.711157+00:00",
+    "cpu": 0.7210000000000001,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 258.6068785190582
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:56:00.243223+00:00",
+    "cpu": 0.8201,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 265.1389443874359
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:56:00.243223+00:00",
+    "cpu": 2.09,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 265.1389443874359
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-a",
+    "timestamp": "2026-10-16T11:56:07.700729+00:00",
+    "cpu": 1.3907,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 272.5964503288269
+  },
+  {
+    "run": "run-8c3ca5d5eb3e43739ff3b659931a5fdf",
+    "method": "hot",
+    "slot": "sat-b",
+    "timestamp": "2026-10-16T11:56:07.700729+00:00",
+    "cpu": 1.4071,
+    "phase": [
+      "completed"
+    ],
+    "relative_s": 272.5964503288269
+  }
+]

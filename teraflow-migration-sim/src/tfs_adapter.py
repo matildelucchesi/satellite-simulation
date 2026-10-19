@@ -48,18 +48,24 @@ class TfsAdapter:
         self.timeout_s = timeout_s
         self.lock = threading.RLock()
         self.calls: list[dict] = []
+        self.guard = None
+        self.remaining = None
         selection = json.loads((Path(__file__).parents[1]/'config/selected_constellation.json').read_text())
         self.allowed_device_names = {f"sat-{row['norad_id']}" for row in selection['satellites']}
 
     def request(self, method: str, path: str, body=None):
+        if self.guard: self.guard()
         started = time.monotonic()
         request = Request(self.base_url + path, data=None if body is None else canonical_bytes(body),
                           headers={"Content-Type": "application/json"}, method=method)
         record = {"method": method, "path": path, "started_monotonic": started}
         try:
-            with urlopen(request, timeout=self.timeout_s) as response:
+            timeout = min(self.timeout_s, self.remaining()) if self.remaining else self.timeout_s
+            if timeout <= 0: raise TimeoutError('NBI deadline reached')
+            with urlopen(request, timeout=timeout) as response:
                 record["status"] = response.status
                 data = response.read()
+                if self.guard: self.guard()
                 return json.loads(data) if data else None
         except HTTPError as exc:
             record["status"] = exc.code

@@ -9,8 +9,11 @@ import traceback
 import uuid
 from pathlib import Path
 from .storage import atomic_json, append_json, utc_now
+from .results import requires_recovery
+from .checkpoints import ActiveCheckpoint
 
-OPERATIONS = {'environment','run','calibrate','select','campaign','faults','sensitivity','report','recover','diagnostic','complete'}
+OPERATIONS = {'resource_diagnostic','simulate','functional','continuous_validation','environment','run','calibrate','select','campaign','faults','sensitivity','report','recover','diagnostic','complete'}
+OPERATIONS.add('compare_continuous')
 
 
 def process_running(pid):
@@ -36,6 +39,14 @@ class JobManager:
 
     def validate(self, operation, parameters):
         if operation not in OPERATIONS: raise ValueError('Unknown application operation')
+        if operation == 'compare_continuous':
+            from .continuous_comparison import validate_parameters
+            validate_parameters(parameters)
+            return
+        if operation == 'simulate':
+            from .planner import validate_parameters
+            validate_parameters(parameters)
+            return
         allowed = {'method','rate_bps','event_id'} if operation == 'run' else set()
         if set(parameters)-allowed: raise ValueError('Unsupported job parameter')
         if operation == 'run':
@@ -47,6 +58,8 @@ class JobManager:
         self.validate(operation,parameters)
         if operation=='recover':
             return self.start_recovery()
+        # History may have been cleared while this server remained running.
+        self.directory.mkdir(parents=True, exist_ok=True)
         job_id = 'job-'+uuid.uuid4().hex
         try: descriptor = os.open(self.guard,os.O_CREAT|os.O_EXCL|os.O_WRONLY)
         except FileExistsError: raise BusyError('A laboratory job or recovery-required checkpoint already holds the lock')
@@ -128,10 +141,21 @@ class JobManager:
                 if (directory/'cancel.json').exists(): cancel.set();return
         threading.Thread(target=watch,daemon=True).start()
         sequence=[0]
+        event_lock=threading.Lock()
         def publish(event):
-            sequence[0]+=1
-            append_json(directory/'events.jsonl',{**event,'id':sequence[0],'job_id':job_id,'timestamp_utc':utc_now()})
+            with event_lock:
+                checkpoint=directory/'active-checkpoint.json'
+                if checkpoint.exists():
+                    active=json.loads(checkpoint.read_text())
+                    if active.get('kind') in ('run','simulation'):
+                        active.update({key:event[key] for key in ('phase','orbital_s','source_slot','target_slot','migration_id') if key in event})
+                        active['timestamp_utc']=utc_now()
+                        atomic_json(checkpoint,active)
+                sequence[0]+=1
+                append_json(directory/'events.jsonl',{**event,'id':sequence[0],'job_id':job_id,'timestamp_utc':utc_now()})
         application=Experiment(self.root,cancel,publish)
+        application.job_id=job_id
+        application.checkpoint=ActiveCheckpoint(directory/'active-checkpoint.json')
         recovery_required=False
         try:
             operation=job['operation'];parameters=job['parameters']
@@ -141,12 +165,19 @@ class JobManager:
                     events=json.loads((self.root/'config/selected_events.json').read_text())['events']
                     event=next(row for row in events if row['event_id']==parameters['event_id'])
                 output=application.run(parameters['method'],parameters['rate_bps'],event)
-            elif operation=='recover':output=application.recover(job['previous_job_id'])
+            elif operation=='recover':
+                output=application.recover(job['previous_job_id'])
+                from .continuous_comparison import reconcile_recovery
+                reconcile_recovery(application,job['previous_job_id'],output)
+            elif operation=='simulate':output=application.simulate(**parameters)
+            elif operation=='compare_continuous':output=application.compare_continuous(**parameters)
             else: output=getattr(application,operation)()
+            output['recovery_required']=requires_recovery(output)
             atomic_json(directory/'result.json',output)
-            recovery_required=output.get('outcome')=='recovery_required' or output.get('reason')=='recovery_required'
+            recovery_required=requires_recovery(output)
             job['status']='recovery_required' if recovery_required else 'interrupted' if cancel.is_set() else 'completed'
             job['result_path']=str(directory/'result.json')
+            job['application_success']=output.get('complete',output.get('success',False))
         except Exception as exc:
             job.update(status='failed',error=str(exc),traceback=traceback.format_exc())
             # An unknown failure of a mutating operation leaves the durable lock.

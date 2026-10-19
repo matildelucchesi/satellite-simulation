@@ -1,0 +1,27 @@
+{
+  "active_slot": "sat-b",
+  "criteria": "target_api+authority+10_fresh_consecutive_pings",
+  "cutover_unix_s": 1792416978.2530165,
+  "ping": {
+    "baseline_path_available": null,
+    "continuous_during_observation": true,
+    "first_loss_unix_s": null,
+    "first_reply_after_loss_unix_s": null,
+    "longest_consecutive_successes": 15,
+    "loss_fraction": 0.0,
+    "lost_probes": 0,
+    "observed_probes": 15,
+    "recovery_metric": "confirmation latency, not exact service downtime",
+    "recovery_observed": false,
+    "rtt_max_ms": 14.4,
+    "rtt_mean_ms": 6.243333333333334,
+    "rtt_min_ms": 4.21,
+    "stable_recovery_unix_s": null,
+    "successful_probes": 15,
+    "time_to_first_reply_s": null,
+    "time_to_stable_recovery_s": null
+  },
+  "success": true,
+  "target_slot": "sat-b",
+  "verified_unix_s": 1792416979.8308845
+}

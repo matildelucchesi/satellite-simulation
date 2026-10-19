@@ -1,0 +1,5 @@
+{"operation": "snapshot", "elapsed_s": 0.7023206999874674, "timestamp_utc": "2026-10-19T14:06:02.663372+00:00"}
+{"operation": "image_load_shared_daemon", "elapsed_s": 152.97109260002617, "timestamp_utc": "2026-10-19T14:09:01.930475+00:00"}
+{"operation": "controller_startup", "elapsed_s": 24.899835899996106, "timestamp_utc": "2026-10-19T14:09:26.836269+00:00"}
+{"operation": "target_perimeter_cleanup", "elapsed_s": 0.4212062999722548, "timestamp_utc": "2026-10-19T14:09:27.261354+00:00"}
+{"operation": "api_restore", "elapsed_s": 1837.8293377000373, "timestamp_utc": "2026-10-19T14:40:04.801935+00:00"}

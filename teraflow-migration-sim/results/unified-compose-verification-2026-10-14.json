@@ -1,0 +1,144 @@
+{
+  "verified_utc": "2026-10-14T15:22:02.2554515+00:00",
+  "project": "teraflow",
+  "container_count": 22,
+  "running_count": 20,
+  "old_project_container_count": 0,
+  "console_available": true,
+  "components": {
+    "mininet": {
+      "data": {
+        "probes": [],
+        "switch_count": 17,
+        "switches_alive": true
+      },
+      "reachable": true
+    },
+    "p4_proxy": {
+      "data": {
+        "ack": false,
+        "active": "sat-a",
+        "frozen": false,
+        "generation": 5,
+        "ipv4": "172.25.0.3",
+        "states": [
+          {
+            "device_id": 1,
+            "staged_entries": 0,
+            "standby_ready": true,
+            "upstream_master": true
+          },
+          {
+            "device_id": 2,
+            "staged_entries": 0,
+            "standby_ready": true,
+            "upstream_master": true
+          },
+          {
+            "device_id": 3,
+            "staged_entries": 0,
+            "standby_ready": true,
+            "upstream_master": true
+          },
+          {
+            "device_id": 4,
+            "staged_entries": 0,
+            "standby_ready": true,
+            "upstream_master": true
+          },
+          {
+            "device_id": 5,
+            "staged_entries": 0,
+            "standby_ready": true,
+            "upstream_master": true
+          },
+          {
+            "device_id": 6,
+            "staged_entries": 12,
+            "standby_ready": true,
+            "upstream_master": true
+          },
+          {
+            "device_id": 7,
+            "staged_entries": 0,
+            "standby_ready": true,
+            "upstream_master": true
+          },
+          {
+            "device_id": 8,
+            "staged_entries": 0,
+            "standby_ready": true,
+            "upstream_master": true
+          },
+          {
+            "device_id": 9,
+            "staged_entries": 0,
+            "standby_ready": true,
+            "upstream_master": true
+          },
+          {
+            "device_id": 10,
+            "staged_entries": 0,
+            "standby_ready": true,
+            "upstream_master": true
+          },
+          {
+            "device_id": 11,
+            "staged_entries": 0,
+            "standby_ready": true,
+            "upstream_master": true
+          },
+          {
+            "device_id": 12,
+            "staged_entries": 12,
+            "standby_ready": true,
+            "upstream_master": true
+          },
+          {
+            "device_id": 13,
+            "staged_entries": 0,
+            "standby_ready": true,
+            "upstream_master": true
+          },
+          {
+            "device_id": 14,
+            "staged_entries": 0,
+            "standby_ready": true,
+            "upstream_master": true
+          },
+          {
+            "device_id": 15,
+            "staged_entries": 0,
+            "standby_ready": true,
+            "upstream_master": true
+          },
+          {
+            "device_id": 16,
+            "staged_entries": 0,
+            "standby_ready": true,
+            "upstream_master": true
+          },
+          {
+            "device_id": 17,
+            "staged_entries": 0,
+            "standby_ready": true,
+            "upstream_master": true
+          }
+        ]
+      },
+      "reachable": true
+    },
+    "sat_a": {
+      "reachable": true
+    },
+    "sat_b": {
+      "reachable": true
+    }
+  },
+  "selective_stop_verified": true,
+  "api_restore_equivalent": true,
+  "ping_successful": 50,
+  "ping_observed": 50,
+  "udp_received": 512,
+  "udp_sent": 514
+}

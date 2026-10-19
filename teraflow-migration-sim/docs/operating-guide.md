@@ -1,5 +1,23 @@
 # Console e workflow sperimentale
 
+## Confronto continuo Hot/Cold nella console
+
+La console mostra un solo avvio: imposta la durata **per modalità** e premi «Avvia confronto Hot/Cold». Il sistema verifica i prerequisiti, ammette una sequenza comune, esegue Hot, ripristina il laboratorio ed esegue Cold sugli stessi eventi. Report e confronti vengono salvati automaticamente. Vedi la [guida dedicata](paired-continuous.md). Gli strumenti sperimentali precedenti restano disponibili tramite CLI.
+
+## Confronto FSO singolo tramite CLI
+
+Dalla directory del progetto, avviare il laboratorio con `.\.venv\Scripts\python.exe tools/stack.py up` e la console con `.\.venv\Scripts\python.exe tools/serve_gui.py`. Per il confronto FSO singolo usare `.\.venv\Scripts\python.exe tools/experiment.py functional --wait`.
+
+Un solo job seleziona e conserva un evento FSO diagnostico lungo, poi esegue hot e cold a 1 Gbit/s dallo stesso secondo orbitale e dalla stessa fixture. Entrambe le prove trasferiscono il bundle completo via TCP. La ricostruzione iniziale separa le due esecuzioni; non serve completare la calibrazione per questa verifica funzionale.
+
+La baseline ammette la prova solo con API sorgente, autorità P4 e dieci ping freschi consecutivi. Il successo richiede equivalenza dello stato API, ACK/cutover, autorità della destinazione e dieci ping freschi consecutivi dopo il cutover. UDP resta disponibile nei log senza bloccare il gate. La coppia si interrompe al primo esito non valido o non riuscito, conservando il motivo e gli eventuali requisiti di recupero.
+
+Il riepilogo mostra downtime controller, tempo dalla prima perdita alla conferma stabile dei ping, durata totale della migrazione e tentativi. Le differenze sono cold meno hot. Nessuna perdita osservata e misura non disponibile sono etichette distinte; non si inventano zeri. Gli identificativi e le misure di entrambe le prove sono salvati in `results/comparisons/compare-*/metadata.json`, nel risultato del job e nel riepilogo aggiornato `results/functional-gate.json`. Selezionando un job di confronto concluso si vedono le sue misure, anche dopo confronti successivi.
+
+La simulazione continua e gli altri strumenti restano nelle **Funzioni avanzate**; la matrice di campagna è richiudibile. Una sola coppia valida il funzionamento del flusso e non costituisce una campagna di ricerca conclusa.
+
+> Aggiornamento 16 ottobre 2026: il percorso principale è **Confronto FSO hot/cold**, su un evento a 1 Gbit/s con verifica API e ping. Simulazione continua e campagne rimangono funzioni avanzate con validazione separata. Avvio e criteri di successo sono nella [guida operativa](operating-guide.md).
+
 La console indipendente è disponibile su **http://127.0.0.1:18092/**. Da questa directory:
 
 La console sulla porta 18092 è l'unico frontend del progetto. La precedente dashboard Docker sulla porta 8081, la route `/legacy` e il relativo proxy sono stati rimossi. Avviare la GUI dalla directory `teraflow-migration-sim`; il worker è gestito dal motore sul computer.
@@ -12,13 +30,13 @@ Se si usa l'ambiente locale del progetto, installare prima le dipendenze e avvia
 
 ```powershell
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt matplotlib
-docker compose --env-file deploy/lab.env -p migration-lab -f deploy/lab.yaml up -d --no-build
-docker compose --env-file deploy/sat-a.env -p sat-a -f deploy/compose.yaml -f deploy/lab-controller.yaml -f deploy/l2-patched.yaml up -d --wait
-docker compose --env-file deploy/sat-b.env -p sat-b -f deploy/compose.yaml -f deploy/lab-controller.yaml -f deploy/l2-patched.yaml up -d --wait
+.\.venv\Scripts\python.exe tools/stack.py up
 .\.venv\Scripts\python.exe tools/serve_gui.py
 ```
 
 Questi comandi presuppongono le immagini già costruite e gli artefatti del laboratorio presenti. `matplotlib` abilita le figure del report; NumPy e Astropy appartengono alle dipendenze dichiarate del progetto. Se è rimasto un lock di un worker morto, eseguire `tools/experiment.py recover --wait` con lo stesso interprete prima di nuove prove. Il recupero di un job ormai oltre la scadenza orbitale termina con i controller fenced: la nuova prova ricostruisce il proprio scenario.
+
+Docker Desktop mostra SAT-A, SAT-B e Mininet/P4 in un unico gruppo **teraflow**. `tools/stack.py status` mostra tutti i container; `tools/stack.py stop` li ferma insieme; `tools/stack.py down` rimuove i container e le reti ma conserva i volumi e i risultati. I comandi di gestione rifiutano modifiche mentre un job o un recupero occupa il lock. La console Python resta sul computer, sulla porta 18092.
 
 Usa Python con le dipendenze di `requirements.txt` installate e Docker Desktop con engine Linux avviato. Il server ascolta soltanto il loopback. Le API `/api/v1` applicano same-origin, verifica Host e token di sessione per i comandi. Non pubblicare la porta sulla rete.
 

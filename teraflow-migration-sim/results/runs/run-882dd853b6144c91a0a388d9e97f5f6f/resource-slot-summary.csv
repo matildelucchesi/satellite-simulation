@@ -1,0 +1,17 @@
+slot,phase,samples,median,p95,maximum,above_2_4
+sat-a,cleanup,7,2.1225,3.1601,3.1601,2
+sat-a,dynamic_baseline,60,1.1191,2.993,4.0824,8
+sat-a,dynamic_observation,60,1.10395,3.0819,3.5142,4
+sat-a,migration,495,1.1897,3.3533999999999997,4.0962,66
+sat-a,preparation,175,1.1133,3.2089,8.4574,29
+sat-a,settling,120,1.24965,3.0837,4.1614,12
+sat-a,source_stable,242,1.11945,3.2325,4.0824,30
+sat-a,target_stable,241,1.0895,3.1974,3.6182,24
+sat-b,cleanup,7,0.848,1.4263,1.4263,0
+sat-b,dynamic_baseline,60,0.2774,2.5116,2.517,4
+sat-b,dynamic_observation,60,1.2482,3.2201000000000004,3.3721,6
+sat-b,migration,494,0.33335000000000004,2.4655,7.3018,30
+sat-b,preparation,161,0.36310000000000003,2.5334000000000003,7.388300000000001,10
+sat-b,settling,118,0.0612,2.0352,2.7281,6
+sat-b,source_stable,242,0.0747,2.2674000000000003,3.0921,10
+sat-b,target_stable,241,1.1523,3.3436000000000003,3.8523,22

@@ -1,0 +1,17 @@
+{
+  "admitted": false,
+  "created_utc": "2026-10-16T12:01:48.943719+00:00",
+  "engine_fingerprint": "e2cb698c8f61cae6c840b42f0d51a1dfa45217c555032e5a8a1cacd80b24a16e",
+  "execution_kind": "calibrated-model-admission-only",
+  "laboratory_modified": false,
+  "minimum_migrations": 3,
+  "parameters": {
+    "duration_s": 3600,
+    "max_migrations": 3,
+    "method": "cold"
+  },
+  "reason": "No feasible sequence in the requested frozen observation; inputs were not changed. Rejections: {'initial_resource_or_shadow': 82801}",
+  "rejections": {
+    "initial_resource_or_shadow": 82801
+  }
+}

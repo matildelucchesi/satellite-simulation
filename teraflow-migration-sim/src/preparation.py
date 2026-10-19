@@ -17,6 +17,9 @@ class Preparation:
     def calibrate(self):
         if (self.root/'config/campaign-manifest.json').exists():
             raise ValueError('Campaign is frozen; archive it explicitly before recalibration')
+        functional=self.root/'results/functional-gate.json'
+        if not functional.exists() or not json.loads(functional.read_text()).get('complete'):
+            return {'complete':False,'reason':'Baseline-valid hot and cold functional gates required before calibration'}
         runs=[]
         for method in ('cold','hot'):
             for replica in range(3):
@@ -24,7 +27,7 @@ class Preparation:
                 result=self.run(method,1000000000,purpose='calibration')
                 runs.append(result)
                 atomic_json(self.root/'results/calibration-progress.json',{'runs':[r['run_id'] for r in runs]})
-                if not result['success']:
+                if not result['success'] or not result.get('baseline',{}).get('success'):
                     return {'complete':False,'reason':result['outcome'],'runs':[r['run_id'] for r in runs]}
         manifest=self.calibration_manifest(runs)
         from tools.validate_artifact_manifest import validate
@@ -37,16 +40,15 @@ class Preparation:
         horizon=math.ceil(max(row['total_operation_s'] for row in estimates)*1.2)
         output={'complete':True,'execution_kind':'live-calibration','runs':[r['run_id'] for r in runs],
                 'estimates':estimates,'horizon_s':horizon,'manifest':describe(self.root/'config/artifact_manifest.json')}
+        from .simulation import engine_fingerprint
+        output['engine_fingerprint']=engine_fingerprint(self.root)
         atomic_json(self.root/'results/calibration.json',output)
         return output
 
     @staticmethod
     def workload(manifest):
-        state=manifest['operational_state'];times=manifest['timing_measurements_s']
-        return Workload(manifest['image_bundle']['bytes'],state['cold_snapshot_bytes'],
-            state['hot_initial_state_bytes'],state['hot_final_delta_bytes'],times['cold_snapshot'],
-            times['hot_freeze'],times['hot_delta_apply'],times['controller_startup'],times['api_restore'],
-            times['api_verification'],times['ack_cutover'])
+        from .migration_model import workload_from_manifest
+        return workload_from_manifest(manifest)
 
     def calibration_manifest(self,runs):
         bundle=self.bundle()
@@ -78,7 +80,7 @@ class Preparation:
             export_format='versioned ordered JSON UTF-8',sha256=file_digest(state))
         doc['timing_measurements_s'].update(cold_snapshot=maximum(cold,'snapshot')+maximum(cold,'source_stop'),
             hot_freeze=maximum(hot,'freeze')+maximum(hot,'snapshot'),hot_delta_apply=maximum(hot,'delta_apply'),
-            controller_startup=maximum(runs,'image_load_shared_daemon')+maximum(runs,'controller_startup'),
+            controller_startup=maximum(runs,'image_load_shared_daemon')+maximum(runs,'controller_startup')+maximum(runs,'target_perimeter_cleanup'),
             api_restore=maximum(runs,'api_restore'),api_verification=maximum(runs,'api_verification'),
             ack_cutover=maximum(runs,'queued_topology_apply')+maximum(runs,'cutover'))
         overhead=max(max(0,r['total_operation_s']-self.scenario['fso']['alignment_s']
@@ -100,6 +102,11 @@ class Preparation:
         if (self.root/'config/campaign-manifest.json').exists():raise ValueError('Campaign already frozen')
         calibration=json.loads((self.root/'results/calibration.json').read_text())
         if not calibration['complete']:raise ValueError('Six functional calibrations required')
+        from .simulation import engine_fingerprint
+        if calibration.get('engine_fingerprint')!=engine_fingerprint(self.root):raise ValueError('Implementation changed after calibration')
+        continuous=self.root/'results/continuous-validation.json'
+        if not continuous.exists() or not json.loads(continuous.read_text()).get('complete'):
+            raise ValueError('Three consecutive live handovers per mode required before campaign freeze')
         manifest=json.loads((self.root/'config/artifact_manifest.json').read_text())
         resources={key:manifest['resources']['measured_controller_'+key] for key in ('cpu_cores','ram_gib','disk_gib')}
         events=generate_events(self.orbit,self.scenario,calibration['horizon_s'],resources)

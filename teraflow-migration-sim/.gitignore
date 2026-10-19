@@ -7,3 +7,6 @@ artifacts/**/*.tar
 artifacts/**/*.partial
 artifacts/**/*.npz
 results/lab/
+# Generated image bundles received during simulation runs.
+results/runs/**/*.tar
+results/runs/**/*.partial

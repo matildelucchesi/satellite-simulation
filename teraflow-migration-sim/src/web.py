@@ -16,6 +16,7 @@ from .jobs import JobManager, BusyError, process_running
 from .live_backend import http
 from .probes import json_lines
 from .storage import atomic_json, utc_now
+from .results import read_result
 
 
 TERMINAL={'completed','failed','interrupted','recovery_required','recovered'}
@@ -68,6 +69,40 @@ class Application:
         return bool(session and session['expires']>time.monotonic() and token
                     and hmac.compare_digest(session['token'],token))
 
+    def simulation_readiness(self):
+        """Expose admission prerequisites before the user launches a worker."""
+        try:
+            functional_path=self.root/'results/functional-gate.json'
+            functional=json.loads(functional_path.read_text()) if functional_path.exists() else {}
+            functional_valid=functional.get('complete',False) and all(
+                (self.root/'results/runs'/row['run_id']/'metadata.json').exists()
+                for row in functional.get('runs',[]))
+            next_operation='calibrate' if functional_valid else 'functional'
+            path=self.root/'results/calibration.json'
+            if not path.exists():
+                failed=next((row for row in reversed(functional.get('runs',[]))
+                    if row.get('outcome')=='invalid_baseline'),None)
+                if failed:
+                    evidence_path=self.root/'results/runs'/failed['run_id']/'metadata.json'
+                    if evidence_path.exists():
+                        baseline=json.loads(evidence_path.read_text()).get('baseline',{})
+                        ping=baseline.get('last_ping',{})
+                        return {'ready':False,'next_operation':'functional','reason':
+                            'Simulazione bloccata: ultima verifica del servizio senza baseline valida. '
+                            f"Ping riusciti {ping.get('successful_probes','—')}/{ping.get('observed_probes','—')}, "
+                            f"pacchetti UDP ricevuti {baseline.get('udp_received','—')}. "
+                            'Occorre ripristinare il servizio del laboratorio prima di procedere alle calibrazioni.'}
+                return {'ready':False,'next_operation':next_operation,'reason':
+                    'Prima di avviare la simulazione servono le verifiche hot/cold del servizio e sei calibrazioni live.'
+                    if not functional_valid else 'Verifiche hot/cold completate. Eseguire le sei calibrazioni live prima della simulazione.'}
+            from .preconditions import calibration_inputs
+            calibration_inputs(self.root, full=False)
+            return {'ready':True,'next_operation':None,
+                'reason':'Calibrazione disponibile. Dopo l’avvio verranno verificate la sequenza orbitale e la baseline.'}
+        except Exception:
+            return {'ready':False,'next_operation':'functional',
+                'reason':'Evidenze di preparazione mancanti o non valide. Ripetere le verifiche hot/cold e la calibrazione.'}
+
     def status(self):
         with self.lock:
             if time.monotonic()-self.cached_at>3:
@@ -84,6 +119,7 @@ class Application:
                 self.cached_status=components;self.cached_at=time.monotonic()
         guard=json.loads(self.jobs.guard.read_text()) if self.jobs.guard.exists() else None
         return {'timestamp_utc':utc_now(),'components':self.cached_status,'lock':guard,
+            'simulation_readiness':self.simulation_readiness(),
             'frozen':(self.root/'config/campaign-manifest.json').exists(),
             'scenario':json.loads((self.root/'config/scenario.json').read_text()),
             'controller_health_source':'per-run heartbeat.jsonl; missing values are not health confirmations'}
@@ -92,7 +128,7 @@ class Application:
         result=[]
         for path in (self.root/'results/runs').glob('run-*/inputs.json'):
             metadata=path.parent/'metadata.json'
-            if metadata.exists():row=json.loads(metadata.read_text())
+            if metadata.exists():row=read_result(json.loads(metadata.read_text()))
             else:
                 inputs=json.loads(path.read_text())
                 row={'run_id':path.parent.name,'outcome':'running','method':inputs['method'],
@@ -100,11 +136,24 @@ class Application:
                     'execution_kind':'live-hybrid','created_utc':None}
             result.append({key:row.get(key) for key in ('run_id','outcome','method','configured_rate_bps',
                 'event','purpose','execution_kind','created_utc','controller_downtime_s','total_operation_s',
-                'image_throughput_bps','probes','success','ack','failure_reason')})
+                'image_throughput_bps','probes','success','ack','failure_reason','metrics','migration_completed',
+                'experimental_valid','observation_complete','recovery_required')})
         return sorted(result,key=lambda row:row.get('created_utc') or '9999',reverse=True)
+
+    def simulations(self):
+        return sorted([json.loads(p.read_text()) for p in (self.root/'results/simulations').glob('sim-*/metadata.json')],
+                      key=lambda row:row['created_utc'],reverse=True)
+
+    def continuous_comparisons(self):
+        return sorted([json.loads(path.read_text()) for path in
+            (self.root/'results/continuous-comparisons').glob('pair-*/metadata.json')],
+            key=lambda row:row['created_utc'],reverse=True)
 
     def topology(self,identifier=None,tick=None):
         from .orbit import Orbit,shortest_paths
+        from .topology_state import presentation
+        import numpy as np
+        replay=tick is not None
         if self.orbit is None:self.orbit=Orbit(self.root/'artifacts/orbit/replay.npz')
         event=None
         if identifier:
@@ -115,6 +164,24 @@ class Application:
         if tick is None:tick=0
         tick=int(tick);graph=self.orbit.graph(tick)
         selection={row['norad_id']:row for row in json.loads((self.root/'config/selected_constellation.json').read_text())['satellites']}
+        angles={}
+        for plane in (1,2):
+            ids=sorted((sid for sid in self.orbit.ids if selection[sid]['plane']==plane),
+                       key=lambda sid:selection[sid]['phase_rank'])
+            reference=self.orbit.positions[0,self.orbit.index[ids[0]]]
+            later=self.orbit.positions[min(60,len(self.orbit.positions)-1),self.orbit.index[ids[0]]]
+            u=reference/np.linalg.norm(reference)
+            normal=np.cross(reference,later);normal=normal/np.linalg.norm(normal)
+            v=np.cross(normal,u)
+            for sid in ids:
+                position=self.orbit.positions[tick,self.orbit.index[sid]]
+                angles[sid]=float(np.arctan2(np.dot(position,v),np.dot(position,u)))
+        display={'mode':'geometry','phase':'unknown','controller_satellite':None,'migration_status':'none'}
+        if identifier:
+            meta_path=directory/'metadata.json'
+            metadata=json.loads(meta_path.read_text()) if meta_path.exists() else {}
+            display=presentation(directory,tick,metadata=metadata,
+                replay=replay or metadata.get('outcome') not in (None,'running'))
         path=[];distances=shortest_paths(graph,53913)
         if 53848 in distances:
             node=53848;path=[node]
@@ -123,18 +190,45 @@ class Application:
                 node=min(neighbors)[1]
                 if node in path:raise ValueError('Invalid service path loop')
                 path.append(node)
-        return {'execution_kind':'modeled-geometry','orbital_s':tick,'sat_a':event.get('sat_a') if event else None,
+        return {'execution_kind':'modeled-geometry','orbital_s':tick,'presentation':display,'sat_a':event.get('sat_a') if event else None,
             'sat_b':event.get('sat_b') if event else None,'nodes':[{'norad':sid,'eclipsed':not self.orbit.operational(sid,tick),
-                'plane':selection[sid]['plane'],'phase_rank':selection[sid]['phase_rank'],
+                'plane':selection[sid]['plane'],'phase_rank':selection[sid]['phase_rank'],'orbital_angle_rad':angles[sid],
                 'position_teme_km':self.orbit.positions[tick,self.orbit.index[sid]].tolist()} for sid in self.orbit.ids],
             'links':[[a,b] for a in graph for b in graph[a] if a<b],'service_path':path}
+
+    def simulation_topology(self,directory,requested=None):
+        from .topology_state import presentation
+        observations=list(json_lines(directory/'observations.jsonl'))
+        metadata=json.loads((directory/'metadata.json').read_text())
+        # Telemetry continues during handovers, while session observations pause.
+        geometry=list(json_lines(directory/'geometry.jsonl'))
+        latest=max([r['orbital_s'] for r in observations+geometry] or [metadata.get('start_s') or 0])
+        tick=float(requested) if requested is not None else latest
+        previous=[row for row in observations if row['orbital_s']<=tick]
+        context=previous[-1] if previous else None
+        plan_file=directory/'plans/initial.json'
+        if context is None and plan_file.exists():
+            plan=json.loads(plan_file.read_text())
+            context={'controller_satellite':plan['initial_satellite_id'],
+                'active_slot':None,'proposed_slot':'sat-a','placement_status':'planned',
+                'next_migration':next(iter(plan['migrations']),None)}
+        topology=self.topology(tick=tick)
+        topology['simulation']=context
+        topology['presentation']=presentation(directory,tick,context=context,metadata=metadata,
+            replay=requested is not None or metadata.get('phase')=='finished')
+        return topology
 
     def artifacts(self):
         paths=[]
         fixed=('results/environment.json','results/calibration.json','results/events.json','results/campaign.json',
             'results/fault-campaign.json','results/sensitivity.json','results/ranking-diagnostic.json',
-            'results/workflow.json','config/campaign-manifest.json','config/selected_events.json')
+            'results/workflow.json','results/functional-gate.json','config/campaign-manifest.json','config/selected_events.json')
         paths.extend(self.root/p for p in fixed)
+        paths.extend((self.root/'results/comparisons').glob('compare-*/metadata.json'))
+        for folder in (self.root/'results/continuous-comparisons').glob('pair-*'):
+            paths.extend(p for p in folder.iterdir() if p.suffix in ('.json','.csv','.html'))
+        for folder in (self.root/'results/simulations').glob('sim-*'):
+            paths.extend(p for p in folder.rglob('*') if p.suffix in ('.json','.jsonl','.csv','.html','.svg','.log'))
         for folder in (self.root/'results/runs').glob('run-*'):
             paths.extend(p for p in folder.iterdir() if p.suffix in ('.json','.jsonl','.csv','.log'))
             operation=folder/'operation'
@@ -218,20 +312,42 @@ def make_server(root,port=18092):
                         if time.monotonic()-last_heartbeat>10:
                             self.wfile.write(b': heartbeat\n\n');last_heartbeat=time.monotonic()
                         self.wfile.flush();time.sleep(.25)
+                if job.get('operation') in ('functional','compare_continuous'):
+                    result=application.jobs.directory/identifier/'result.json'
+                    if result.exists():job['comparison']=json.loads(result.read_text())
                 return self.send(job)
             if path=='/api/v1/runs':return self.send({'runs':application.runs()})
+            if path=='/api/v1/simulations':return self.send({'simulations':application.simulations()})
+            if path=='/api/v1/continuous-comparisons':
+                return self.send({'comparisons':application.continuous_comparisons()})
+            if path.startswith('/api/v1/continuous-comparisons/'):
+                from .continuous_comparison import comparison_directory
+                directory=comparison_directory(application.root,path.split('/')[-1])
+                return self.send(json.loads((directory/'metadata.json').read_text()))
+            if path.startswith('/api/v1/simulations/'):
+                from .simulation import simulation_directory
+                parts=path.split('/');directory=simulation_directory(application.root,parts[4])
+                if len(parts)==6 and parts[5]=='observations':
+                    return self.send({name:list(json_lines(directory/(name+'.jsonl')))
+                        for name in ('observations','geometry','heartbeat','authority','resources','events')})
+                if len(parts)==6 and parts[5]=='topology':
+                    requested=query.get('orbital_s',[None])[0]
+                    return self.send(application.simulation_topology(directory,requested))
+                if len(parts)!=5:raise ValueError('Unknown simulation resource')
+                return self.send(json.loads((directory/'metadata.json').read_text()))
             if path.startswith('/api/v1/runs/'):
                 identifier=path.split('/')[4];directory=run_directory(application.root,identifier)
                 if path.endswith('/observations'):
                     return self.send({name:list(json_lines(directory/(name+'.jsonl'))) for name in ('geometry','heartbeat','authority','operations','resources')})
                 metadata=directory/'metadata.json'
-                return self.send(json.loads(metadata.read_text()) if metadata.exists() else {'inputs':json.loads((directory/'inputs.json').read_text()),'outcome':'running'})
+                return self.send(read_result(json.loads(metadata.read_text())) if metadata.exists() else {'inputs':json.loads((directory/'inputs.json').read_text()),'outcome':'running'})
             if path=='/api/v1/topology':
                 return self.send(application.topology(query.get('run_id',[None])[0],query.get('orbital_s',[None])[0]))
             if path=='/api/v1/campaigns':
                 return self.send({name:json.loads((application.root/file).read_text()) if (application.root/file).exists() else None
                     for name,file in [('primary','results/campaign.json'),('frozen','config/campaign-manifest.json'),
-                        ('events','config/selected_events.json'),('faults','results/fault-campaign.json'),('workflow','results/workflow.json')]})
+                        ('events','config/selected_events.json'),('faults','results/fault-campaign.json'),('workflow','results/workflow.json'),
+                        ('functional','results/functional-gate.json')]})
             if path=='/api/v1/artifacts':return self.send({'artifacts':application.artifacts()})
             if path.startswith('/api/v1/artifacts/'):
                 identifier=path.split('/')[-1];application.artifacts()
@@ -239,7 +355,7 @@ def make_server(root,port=18092):
                 if file is None:raise FileNotFoundError(identifier)
                 return self.send(file.read_bytes(),media=mimetypes.guess_type(file.name)[0] or 'application/octet-stream',
                     headers={'Content-Disposition':'attachment; filename="'+file.name+'"'})
-            assets={'/':'web/index.html','/app.js':'web/app.js','/style.css':'web/style.css','/tokens.css':'web/tokens.css'}
+            assets={'/':'web/index.html','/app.js':'web/app.js','/orbit-view.js':'web/orbit-view.js','/style.css':'web/style.css','/tokens.css':'web/tokens.css'}
             if path.startswith('/fonts/') and Path(path).name in {'SpaceGrotesk.ttf','Inter.ttf'}:
                 assets[path]='web/fonts/'+Path(path).name
             if path not in assets:raise FileNotFoundError(path)

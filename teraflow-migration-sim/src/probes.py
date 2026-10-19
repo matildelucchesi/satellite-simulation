@@ -10,6 +10,23 @@ SEQ = re.compile(r"icmp_seq[= ](\d+)")
 RTT = re.compile(r"time([=<])(\d+(?:\.\d+)?)\s*ms")
 
 
+def stable_ping(rows, started, count=10, *, now=None):
+    # A reply's estimated send time must belong to this fresh probe process.
+    fresh = [r for r in rows if r['unix_s'] >= started]
+    tail = fresh[-count:]
+    stable = len(tail)==count and all(r['success'] and r['rtt_ms'] <= 1000
+        and r['unix_s']-r['rtt_ms']/1000 >= started for r in tail)
+    stable = stable and all(b['sequence']==a['sequence']+1 for a,b in zip(tail,tail[1:]))
+    return stable and (now is None or 0 <= now-tail[-1]['unix_s'] <= 2)
+
+
+def baseline_ready(rows, udp, status, started, slot, *, now=None):
+    # Keep the existing argument contract; UDP is diagnostic, never a gate.
+    authority = (status.get('active')==slot and not status.get('frozen',True)
+        and bool(status.get('states')) and all(r['upstream_master'] for r in status['states']))
+    return stable_ping(rows, started, now=now) and authority
+
+
 def ping_observations(text: str) -> list[dict]:
     observed = {}
     for line in text.splitlines():
@@ -31,11 +48,15 @@ def ping_observations(text: str) -> list[dict]:
 
 
 def summarize_ping(observations, *, stable_successes=10, migration_start_unix_s=None,
-                   baseline_path_available=None):
+                   baseline_path_available=None, observation_end_unix_s=None):
     if stable_successes < 1:
         raise ValueError("Stable recovery needs positive consecutive successes")
+    observations = [row for row in observations
+        if (migration_start_unix_s is None or row['unix_s'] >= migration_start_unix_s)
+        and (observation_end_unix_s is None or row['unix_s'] <= observation_end_unix_s)]
     rtts = [row["rtt_ms"] for row in observations if row["success"]]
-    first_loss = recovery = None
+    first_loss = recovery = first_reply = None
+    streak_start = None
     consecutive = longest_consecutive = 0
     previous = None
     for row in observations:
@@ -45,8 +66,11 @@ def summarize_ping(observations, *, stable_successes=10, migration_start_unix_s=
             if first_loss is None:
                 first_loss = row["unix_s"]
             consecutive = 0
+            streak_start = None
         else:
             consecutive = consecutive + 1 if previous is None or row["sequence"] == previous + 1 else 1
+            if consecutive == 1: streak_start = row['unix_s']
+            if first_loss is not None and first_reply is None: first_reply = row['unix_s']
             longest_consecutive = max(longest_consecutive, consecutive)
             if first_loss is not None and recovery is None and consecutive >= stable_successes:
                 recovery = row["unix_s"]
@@ -59,6 +83,9 @@ def summarize_ping(observations, *, stable_successes=10, migration_start_unix_s=
             "rtt_mean_ms": sum(rtts)/len(rtts) if rtts else None,
             "rtt_min_ms": min(rtts) if rtts else None, "rtt_max_ms": max(rtts) if rtts else None,
             "first_loss_unix_s": first_loss, "stable_recovery_unix_s": recovery,
+            "first_reply_after_loss_unix_s": first_reply,
+            "time_to_first_reply_s": first_reply-first_loss if first_reply is not None and attributable else None,
+            "recovery_metric": "confirmation latency, not exact service downtime",
             "time_to_stable_recovery_s": recovery-first_loss if recovery is not None and attributable else None,
             "continuous_during_observation": total > 0 and losses == 0,
             "recovery_observed": recovery is not None,

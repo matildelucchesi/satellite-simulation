@@ -1,0 +1,2 @@
+run_id,purpose,execution_kind,method,configured_rate_bps,outcome,success,ack,controller_downtime_s,total_operation_s,bytes_sent,bytes_received,failure_reason,migration_completed,experimental_valid,observation_complete,recovery_required,service_verification_s,observation_s,retries
+run-aeeaefd6b9ee4d96ae4a2ae98730a6aa,functional-gate,live-hybrid,hot,1000000000,success,True,True,21.0374122000012,278.58772399999907,1823565400,1823565400,,True,True,True,False,1.2479256999995414,45.43633899999986,0

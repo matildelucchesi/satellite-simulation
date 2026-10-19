@@ -10,6 +10,28 @@ from src.storage import atomic_json
 
 
 class DurableStateTests(unittest.TestCase):
+    def test_continuous_comparison_worker_dispatches_one_composite_job(self):
+        with tempfile.TemporaryDirectory() as tmp, patch('src.jobs.subprocess.Popen') as launch, patch('src.experiment.Experiment') as factory:
+            launch.return_value.pid=12345
+            application=factory.return_value
+            application.compare_continuous.return_value={'complete':True,'success':True,'events':[]}
+            manager=JobManager(Path(tmp))
+            job=manager.start('compare_continuous',{'duration_s':600,'rate_bps':1000000000})
+            manager.work(job['job_id'])
+            application.compare_continuous.assert_called_once_with(duration_s=600,rate_bps=1000000000)
+            self.assertEqual(application.job_id,job['job_id'])
+            self.assertTrue(manager.get(job['job_id'])['application_success'])
+            self.assertFalse(manager.guard.exists())
+
+    def test_job_start_recreates_history_directory_removed_after_server_start(self):
+        with tempfile.TemporaryDirectory() as tmp, patch('src.jobs.subprocess.Popen') as launch:
+            launch.return_value.pid=12345
+            manager=JobManager(Path(tmp))
+            manager.directory.rmdir()
+            job=manager.start('environment')
+            self.assertEqual(job['status'],'queued')
+            self.assertEqual(json.loads(manager.guard.read_text())['job_id'],job['job_id'])
+
     def test_restart_requires_explicit_reconciliation(self):
         with tempfile.TemporaryDirectory() as tmp:
             journal = Path(tmp)/'authority.json'

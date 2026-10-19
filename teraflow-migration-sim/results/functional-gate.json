@@ -1,0 +1,77 @@
+{
+  "acceptance": "api_equivalence+target_authority+10_fresh_consecutive_pings",
+  "cold_minus_hot": {
+    "attempt": 0,
+    "controller_downtime_s": 211.4083026999997,
+    "ping_recovery_s": null,
+    "total_operation_s": 15.251741300000504
+  },
+  "comparison_id": "compare-f7846866871e459499cd0dbaabe10e2c",
+  "complete": true,
+  "configured_rate_bps": 1000000000,
+  "created_utc": "2026-10-16T10:58:47.443534+00:00",
+  "current_method": null,
+  "event": {
+    "contact_end_s": 6248,
+    "contact_window_s": 1870,
+    "deadline_s": 7571,
+    "deadline_window_s": 3193,
+    "event_id": "functional-53848-53913-4378",
+    "execution_purpose": "functional-calibration",
+    "sat_a": 53848,
+    "sat_b": 53913,
+    "trigger_causes": [
+      "functional_diagnostic"
+    ],
+    "trigger_s": 4378
+  },
+  "order": [
+    "hot",
+    "cold"
+  ],
+  "purpose": "functional-validation",
+  "recovery_required": false,
+  "runs": [
+    {
+      "attempt": 1,
+      "baseline_valid": true,
+      "controller_downtime_s": 21.0374122000012,
+      "failure_reason": null,
+      "image_throughput_bps": 999255680.0825963,
+      "method": "hot",
+      "observation_s": 45.43633899999986,
+      "outcome": "success",
+      "ping_continuous": false,
+      "ping_recovery_s": 14.882941007614136,
+      "recovery_required": false,
+      "restarted_payload_bytes": 0,
+      "retries": 0,
+      "run_id": "run-aeeaefd6b9ee4d96ae4a2ae98730a6aa",
+      "service_verification_s": 1.2479256999995414,
+      "service_verified": true,
+      "success": true,
+      "total_operation_s": 278.58772399999907
+    },
+    {
+      "attempt": 1,
+      "baseline_valid": true,
+      "controller_downtime_s": 232.4457149000009,
+      "failure_reason": null,
+      "image_throughput_bps": 999240998.0223798,
+      "method": "cold",
+      "observation_s": 48.569757400000526,
+      "outcome": "success",
+      "ping_continuous": true,
+      "ping_recovery_s": null,
+      "recovery_required": false,
+      "restarted_payload_bytes": 0,
+      "retries": 0,
+      "run_id": "run-af14138acdaa42c28b6ac347c9c8345c",
+      "service_verification_s": 1.1007818999987649,
+      "service_verified": true,
+      "success": true,
+      "total_operation_s": 293.8394652999996
+    }
+  ],
+  "schema_version": 3
+}

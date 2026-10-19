@@ -1,0 +1,45 @@
+{
+  "acceptance": "api_equivalence+target_authority+10_fresh_consecutive_pings",
+  "cold_minus_hot": {},
+  "comparison_id": "compare-7c1fa5855dd746eb9438e8ff8181eeb6",
+  "complete": false,
+  "configured_rate_bps": 1000000000,
+  "event": {
+    "contact_end_s": 6248,
+    "contact_window_s": 1870,
+    "deadline_s": 7571,
+    "deadline_window_s": 3193,
+    "event_id": "functional-53848-53913-4378",
+    "execution_purpose": "functional-calibration",
+    "sat_a": 53848,
+    "sat_b": 53913,
+    "trigger_causes": [
+      "functional_diagnostic"
+    ],
+    "trigger_s": 4378
+  },
+  "order": [
+    "hot",
+    "cold"
+  ],
+  "purpose": "functional-validation",
+  "reason": "invalid_baseline",
+  "runs": [
+    {
+      "attempt": null,
+      "baseline_valid": false,
+      "controller_downtime_s": null,
+      "failure_reason": "timed out",
+      "method": "hot",
+      "outcome": "invalid_baseline",
+      "ping_continuous": null,
+      "ping_recovery_s": null,
+      "restarted_payload_bytes": 0,
+      "run_id": "run-cdb40dfde56a4842bf64a99070296cac",
+      "service_verified": false,
+      "success": false,
+      "total_operation_s": null
+    }
+  ],
+  "schema_version": 2
+}

@@ -1,0 +1,95 @@
+{
+  "calibration_run_ids": [
+    "run-6432dfbcb42c4f8389633545088348ce",
+    "run-4f8b36918fa84fe1824fdbbd62b4b5e7",
+    "run-da5ae7d6ca1342b0b3fbe819f471dcf7",
+    "run-bbfd97d308f2468fbcf4fdc43cc6b2b8",
+    "run-ec606f1f32d049dd89af170d6749217b",
+    "run-8c3ca5d5eb3e43739ff3b659931a5fdf"
+  ],
+  "controller": {
+    "dependencies": [
+      {
+        "digest": "sha256:c0f188df42c238314d61f67aca61455125ecaa3c81bf0ba0be793fde7229d3e9",
+        "image": "cockroachdb/cockroach:latest-v22.2@sha256:c0f188df42c238314d61f67aca61455125ecaa3c81bf0ba0be793fde7229d3e9"
+      },
+      {
+        "digest": "sha256:d402af4147fc7ba334ecc45b1cb14a6f46f32ad6a36873fbd1a6a37ce42452dd",
+        "image": "nats:2.9-alpine@sha256:d402af4147fc7ba334ecc45b1cb14a6f46f32ad6a36873fbd1a6a37ce42452dd"
+      },
+      {
+        "digest": "sha256:4ceccc577f03f51f6af8dbfda55194d0d892f4fa7913ffbded567ce3895622ed",
+        "image": "apache/kafka:3.9.1@sha256:4ceccc577f03f51f6af8dbfda55194d0d892f4fa7913ffbded567ce3895622ed"
+      }
+    ],
+    "dependency_policy": "preinstalled-independent-cockroachdb-nats-kafka-per-host",
+    "images": {
+      "context": {
+        "digest": "sha256:1e5f589a1b198305ac41555ce6b39548940f34c0b69fca73e0b57d556151ded4",
+        "image": "tfs-migration/context:7.0.0-fb870787"
+      },
+      "device": {
+        "digest": "sha256:c39891f351ac0df0ca116966f1f4bb7580b369b25d60c136fa8dc3578078629e",
+        "image": "tfs-migration/device:7.0.0-fb870787-lab2"
+      },
+      "nbi": {
+        "digest": "sha256:4e787127caf54a5fde86b0dbe58d60cd128d656418f5ecbc7f142423c55dd7c9",
+        "image": "tfs-migration/nbi:7.0.0-fb870787"
+      },
+      "pathcomp-backend": {
+        "digest": "sha256:e17f6f08cdeae820d26616ad2ff2a5b1fc39e1c83b565e0885597f9698c08654",
+        "image": "tfs-migration/pathcomp-backend:7.0.0-fb870787"
+      },
+      "pathcomp-frontend": {
+        "digest": "sha256:320992810dd5dd02100b72c88cef3cbf41ecea5e8370f2f711df1678894954ac",
+        "image": "tfs-migration/pathcomp-frontend:7.0.0-fb870787"
+      },
+      "service": {
+        "digest": "sha256:5dea4352243855da7e1e2aa4a454f07c68864c1afe969471714ad395262b47fe",
+        "image": "tfs-migration/service:7.0.0-fb870787-lab2"
+      }
+    },
+    "release": "7.0.0",
+    "source_commit": "fb8707871eba26806cac7ac373c70b2bb5bd26fc",
+    "source_tag": "v7.0.0"
+  },
+  "image_bundle": {
+    "bytes": 1823463936,
+    "format": "docker-save-tar-uncompressed",
+    "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\artifacts\\images-l2-patched-v2\\teraflow-v7-images.tar",
+    "sha256": "9fc2920c12e4cc8867cd34ad294f1c240acc34b181dd462ce69e5abd51531c00"
+  },
+  "measurement_date_utc": "2026-10-16T11:56:18.501719+00:00",
+  "measurement_method": "Three full functional runs per mode; maxima of measured phases and host resources. Shared Docker daemon layer reuse explicitly retained.",
+  "notes": "Populate from the exact Release 7 images, deployment manifests, exported state fixture and repeated timing measurements. Do not infer transfer bytes from unpacked local image size.",
+  "operational_state": {
+    "cold_snapshot_bytes": 85838,
+    "contexts_bytes": 439,
+    "devices_bytes": 40798,
+    "export_format": "versioned ordered JSON UTF-8",
+    "hot_final_delta_bytes": 15626,
+    "hot_initial_state_bytes": 85838,
+    "links_bytes": 6729,
+    "services_connections_policies_bytes": 5093,
+    "sha256": "cb43d5fee40ce28391d1612f15d80859310fdb2be327fa4d4ea3688541deaf70",
+    "topologies_bytes": 1368
+  },
+  "resources": {
+    "measured_controller_cpu_cores": 4.0817000000000005,
+    "measured_controller_disk_gib": 3.4951947201043367,
+    "measured_controller_ram_gib": 1.986076171875
+  },
+  "schema_version": 2,
+  "status": "measured",
+  "timing_accounting": "Maxima per phase; cold snapshot includes stop, hot freeze includes both snapshots; startup includes shared-daemon load; cutover includes queued topology reconciliation. Conservative estimates.",
+  "timing_measurements_s": {
+    "ack_cutover": 27.391235099999903,
+    "api_restore": 29.877742200000284,
+    "api_verification": 1.0112881999993988,
+    "cold_snapshot": 14.50538890000098,
+    "controller_startup": 184.37561840000126,
+    "hot_delta_apply": 15.909617100000105,
+    "hot_freeze": 1.520900099998471,
+    "measured_protocol_overhead": 8.561887300002127
+  }
+}

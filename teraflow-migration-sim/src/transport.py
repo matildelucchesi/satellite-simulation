@@ -51,6 +51,7 @@ class Receiver:
         self.stop = threading.Event()
         self.errors = []
         self.receipts = []
+        self.connection = None
         self.thread = threading.Thread(target=self._serve, daemon=True)
 
     def __enter__(self):
@@ -59,7 +60,11 @@ class Receiver:
 
     def __exit__(self, *_):
         self.stop.set()
-        self.thread.join(timeout=self.timeout + 1)
+        connection = self.connection
+        if connection:
+            try: connection.shutdown(socket.SHUT_RDWR)
+            except OSError: pass
+        self.thread.join(timeout=2)
         self.server.close()
         if self.thread.is_alive():
             raise RuntimeError("Receiver failed to stop")
@@ -68,6 +73,7 @@ class Receiver:
         while not self.stop.is_set():
             try:
                 connection, _ = self.server.accept()
+                self.connection = connection
             except socket.timeout:
                 continue
             temporary = None
@@ -106,6 +112,7 @@ class Receiver:
                 self.errors.append(str(exc))
                 if temporary is not None:
                     temporary.unlink(missing_ok=True)
+            finally: self.connection = None
 
 
 def transfer(path: Path, address: tuple, useful_rate_bps: int, *, link=lambda: True,

@@ -301,10 +301,11 @@ class Proxy(rpc.P4RuntimeServicer):
         with self.state.authority.lock:
             config = pb.ForwardingPipelineConfig()
             config.CopyFrom(request.config)
-            other = self.state.pipeline.get("sat-a")
+            other_role = 'sat-b' if self.role=='sat-a' else 'sat-a'
+            other = self.state.pipeline.get(other_role)
             if other and config != other:
                 context.abort(grpc.StatusCode.FAILED_PRECONDITION, "Standby pipeline differs from active pipeline")
-            if self.state.authority.writable(self.role) and other is None:
+            if self.state.authority.writable(self.role) and other is None and self.role not in self.state.pipeline:
                 forwarded = pb.SetForwardingPipelineConfigRequest()
                 forwarded.CopyFrom(request)
                 forwarded.election_id.CopyFrom(self.state.backend.election)
@@ -441,36 +442,48 @@ def serve(fixture):
                                         "states": [{"device_id": state.backend.device_id,
                                                     "upstream_master": state.backend.master.is_set(),
                                                     "standby_ready": state.ready('sat-b'),
+                                                    "ready_by_slot": {role: state.ready(role) for role in ('sat-a', 'sat-b')},
                                                     "staged_entries": len(state.entries["sat-b"])} for state in states]}).encode())
         def do_POST(self):
             try:
                 body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
-                if self.path == "/freeze": authority.freeze()
-                elif self.path == "/ready":
-                    if not authority.ready(images=body["images"], api=body["api"],
-                                           staged=all(state.ready('sat-b') for state in states)):
-                        raise RuntimeError("Readiness checks incomplete")
-                elif self.path == "/cutover":
-                    authority.cutover("sat-b", lambda: [state.reconcile("sat-b") for state in states])
-                elif self.path == "/recover":
-                    authority.recover("sat-a", lambda: [state.reconcile("sat-a") for state in states])
-                elif self.path == "/revoke":
-                    with authority.lock:
-                        authority.active = None
-                        authority.frozen = True
-                        authority.ack = authority.verified = False
-                        authority.persist()
-                elif self.path == "/clear-standby":
-                    with authority.lock:
-                        if authority.active != 'sat-a': raise RuntimeError('Source ownership required')
-                        authority.ack = authority.verified = False
-                        authority.persist()
-                        for state in states:
-                            state.entries['sat-b'] = {}
-                            state.pipeline.pop('sat-b', None)
-                            state.persist()
-                else: raise ValueError("Unknown operation")
-                self.send_response(200); self.end_headers(); self.wfile.write(b'{}')
+                with authority.lock:
+                    if 'generation' in body and body['generation'] != authority.generation:
+                        raise RuntimeError('Stale operation generation')
+                    source = body.get('source_slot', 'sat-a')
+                    destination = body.get('target_slot', 'sat-b')
+                    if source not in ('sat-a', 'sat-b') or destination not in ('sat-a', 'sat-b'):
+                        raise ValueError('Unknown controller slot')
+                    if self.path in ('/freeze', '/ready', '/cutover', '/clear-standby') and 'source_slot' in body and authority.active != source:
+                        raise RuntimeError('Source no longer owns controller authority')
+                    if self.path == "/freeze": authority.freeze()
+                    elif self.path == "/ready":
+                        if not authority.ready(images=body["images"], api=body["api"],
+                                               staged=all(state.ready(destination) for state in states)):
+                            raise RuntimeError("Readiness checks incomplete")
+                    elif self.path == "/cutover":
+                        authority.cutover(destination, lambda: [state.reconcile(destination) for state in states])
+                    elif self.path == "/recover":
+                        authority.recover(source, lambda: [state.reconcile(source) for state in states])
+                    elif self.path == "/revoke":
+                        with authority.lock:
+                            authority.active = None
+                            authority.generation += 1
+                            authority.frozen = True
+                            authority.ack = authority.verified = False
+                            authority.persist()
+                    elif self.path == "/clear-standby":
+                        with authority.lock:
+                            if authority.active != source or destination == source: raise RuntimeError('Source ownership required')
+                            authority.ack = authority.verified = False
+                            authority.generation += 1
+                            authority.persist()
+                            for state in states:
+                                state.entries[destination] = {}
+                                state.pipeline.pop(destination, None)
+                                state.persist()
+                    else: raise ValueError("Unknown operation")
+                self.send_response(200); self.end_headers(); self.wfile.write(json.dumps({'generation': authority.generation, 'active': authority.active}).encode())
             except Exception as exc:
                 logging.exception('P4 administration failed: %s', self.path)
                 self.send_response(409); self.end_headers(); self.wfile.write(json.dumps({"error": str(exc) or repr(exc)}).encode())

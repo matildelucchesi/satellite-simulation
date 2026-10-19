@@ -1,0 +1,4 @@
+name: teraflow
+include:
+  - path: ./teraflow-migration-sim/deploy/stack.yaml
+    env_file: ./teraflow-migration-sim/deploy/lab.env

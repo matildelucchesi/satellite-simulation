@@ -1,5 +1,5 @@
 # Experimental Docker Compose adaptation of ETSI TFS v7.0.0.
-# Launch twice with different project names and env files; never share state volumes.
+# Source template for tools/generate_stack.py; run deploy/stack.yaml operationally.
 x-tfs-env: &tfs-env
   LOG_LEVEL: INFO
   CONTEXTSERVICE_SERVICE_HOST: contextservice

@@ -21,6 +21,16 @@ class Workload:
     ack_cutover_s: float
 
 
+def workload_from_manifest(manifest):
+    state, times = manifest['operational_state'], manifest['timing_measurements_s']
+    workload = Workload(manifest['image_bundle']['bytes'], state['cold_snapshot_bytes'],
+        state['hot_initial_state_bytes'], state['hot_final_delta_bytes'], times['cold_snapshot'],
+        times['hot_freeze'], times['hot_delta_apply'], times['controller_startup'],
+        times['api_restore'], times['api_verification'], times['ack_cutover'])
+    validate_workload(workload)
+    return workload
+
+
 @dataclass(frozen=True)
 class MigrationCase:
     method: str
