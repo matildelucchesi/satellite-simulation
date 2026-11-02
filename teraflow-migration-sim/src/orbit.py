@@ -82,7 +82,12 @@ class Orbit:
             raise ValueError("Orbital replay time outside frozen observation")
         changes = self.phase_changes[sid]
         upcoming = bisect.bisect_right(changes, tick)
+        shadow_start = upcoming - 1 if bool(self.eclipsed[tick, self.index[sid]]) else upcoming
+        shadow_end = shadow_start + 1
+        shadow_duration = (int(changes[shadow_end] - changes[shadow_start])
+                           if 0 <= shadow_start < shadow_end < len(changes) else None)
         return {
+            'shadow_duration_s': shadow_duration,
             'phase_start_s': int(changes[upcoming - 1]) if upcoming else 0,
             'next_transition_s': int(changes[upcoming]) if upcoming < len(changes) else None,
         }

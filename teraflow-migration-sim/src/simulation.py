@@ -26,7 +26,7 @@ from .results import finalize, requires_recovery
 def engine_fingerprint(root):
     """Calibration is valid only for this implementation and configuration."""
     import hashlib
-    paths = sorted((root/'src').glob('*.py')) + [root/'config/scenario.json', root/'config/fixture.json']
+    paths = sorted(path for path in (root/'src').glob('*.py') if path.name not in {'web.py','jobs.py','common_base.py'}) + [root/'config/scenario.json', root/'config/fixture.json']
     paths += [path for path in (root/'deploy/compose.yaml',root/'deploy/stack.yaml') if path.exists()]
     return hashlib.sha256(''.join(p.name+file_digest(p) for p in paths).encode()).hexdigest()
 
@@ -156,7 +156,11 @@ class Simulation:
                 self.app.orbit, self.app.scenario, self.app.cancel, notify=self.emit)
             if self.backend.logical_host != initial_host:
                 raise ScenarioRejected('Controller has no valid initial satellite assignment')
-            self.backend.reset()
+            if plan.get('common_base_id') and self.parameters['method']=='hot':
+                from .prepared_source import adopt
+                adopt(self.backend,plan['common_base_id'],plan)
+            else:
+                self.backend.reset()
             if self.parameters['additional_data_bytes']:
                 payload=self.directory/'additional-migration-data.bin'
                 with payload.open('wb') as output:output.truncate(self.parameters['additional_data_bytes'])

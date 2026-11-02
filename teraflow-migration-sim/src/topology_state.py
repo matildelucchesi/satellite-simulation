@@ -34,7 +34,7 @@ def presentation(directory, tick, *, context=None, metadata=None, replay=False):
     metadata = metadata or {}
     context = context or {}
     result = dict(controller_satellite=None, source_satellite=None, target_satellite=None,
-                  assigned_controller_satellite=None, placement_status='unassigned',
+                  assigned_controller_satellite=None, placement_status='unassigned', initial_controller_ready=False,
                   phase='unknown', migration_status='none', forwarding_observed=None,
                   updated_utc=None, stale=False, mode='replay' if replay else 'live')
     records = []
@@ -104,6 +104,7 @@ def presentation(directory, tick, *, context=None, metadata=None, replay=False):
             if source is not None:
                 result.update(source_satellite=source, target_satellite=target)
             if phase == 'controller_assigned' and row.get('baseline_verified') is True:
+                result['initial_controller_ready'] = True
                 controller = row.get('controller_satellite')
                 slots[row.get('active_slot', 'sat-a')] = controller
             elif phase == 'transfer':

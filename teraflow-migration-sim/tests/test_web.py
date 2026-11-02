@@ -58,7 +58,7 @@ class LocalWebTests(unittest.TestCase):
         atomic_json(self.root/'results/calibration.json',calibration)
         for identifier in identifiers:
             atomic_json(self.root/'results/runs'/identifier/'metadata.json',
-                {'success':True,'baseline':{'success':True}})
+                {'method':'cold' if identifiers.index(identifier)<3 else 'hot','success':True,'baseline':{'success':True}})
         bundle=self.root/'bundle.tar';bundle.write_bytes(b'images')
         atomic_json(self.root/'config/artifact_manifest.json',{'image_bundle':{
             'path':str(bundle),'bytes':6}})

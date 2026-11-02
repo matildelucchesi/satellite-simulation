@@ -1,10 +1,10 @@
-"""Bounded deterministic search; admission is never a claim of live success."""
+"""Bounded nearest-shadow departure search over admitted shared migration plans."""
 import copy
 import time
 from datetime import datetime, timedelta, timezone
 from .planner import ScenarioRejected
 
-POLICY = 'automatic-start-service-v2'
+POLICY = 'automatic-start-shadow-v3'
 
 
 class SearchDeadline(Exception):
@@ -45,7 +45,8 @@ def select_start(planner, parameters, rates=None, *, budget_s=600, clock=time.mo
     evidence = {'policy_version':POLICY,'search_start_s':0,
         'search_end_s_exclusive':planner.orbit.duration,'resolution_s':1,
         'budget_s':budget_s,'rates':rates,'examined_candidates':0,'exhaustive':False,
-        'rejections':{},'selected':None,'elapsed_s':0}
+        'rejections':{},'selected':None,'elapsed_s':0,
+        'selection_objective':'minimum_initial_time_to_shadow_then_maximum_safety_margin'}
     best = None; plans = None; last_publish = -1
     original_check = planner.check
     def check():
@@ -86,11 +87,19 @@ def select_start(planner, parameters, rates=None, *, budget_s=600, clock=time.mo
                     if not margins or min(margins)<0:
                         evidence['rejections']['negative_safety_margin']=evidence['rejections'].get('negative_safety_margin',0)+1
                         continue
-                    score = (min(margins),-tick,-host)
+                    period=working.index.period(host,tick)
+                    if period is None or period[1]>=working.orbit.duration:
+                        evidence['rejections']['initial_shadow_outside_observation']=evidence['rejections'].get('initial_shadow_outside_observation',0)+1
+                        continue
+                    # Rank proximity only after the shared plan and every safety margin pass.
+                    remaining_light=period[1]-tick
+                    score = (-remaining_light,min(margins),-tick,-host)
                     if best is None or score > best:
                         best=score; plans=candidate
                         evidence['selected']={'initial_satellite_id':host,'start_orbital_s':tick,
-                            'minimum_margin_s':score[0],
+                            'initial_time_to_shadow_s':remaining_light,
+                            'initial_shadow_entry_s':period[1],
+                            'minimum_margin_s':min(margins),
                             'margins_by_rate_s':dict(zip(map(str,rates),margins))}
                 publish()
         evidence['exhaustive'] = True

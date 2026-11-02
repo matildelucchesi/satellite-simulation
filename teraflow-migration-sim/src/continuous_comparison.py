@@ -28,12 +28,16 @@ def validate_parameters(parameters):
     defaults = {'duration_s':3600, 'rate_bps':1000000000, 'start_orbital_s':None,
                 'initial_satellite_id':None, 'max_migrations':None,
                 'migration_count':None, 'additional_data_bytes':0,
-                'selection_rates':None,'selection_id':None}
+                'selection_rates':None,'selection_id':None,'base_id':None}
     if set(parameters)-set(defaults):
         raise ValueError('Unsupported continuous comparison parameter')
     defaults.update(parameters)
     if not any(key in parameters for key in ('migration_count','duration_s')):defaults['migration_count']=3
-    rates=defaults.pop('selection_rates');identifier=defaults.pop('selection_id')
+    rates=defaults.pop('selection_rates');identifier=defaults.pop('selection_id');base_id=defaults.pop('base_id')
+    if base_id is not None:
+        from .common_base import directory
+        directory(Path('.'),base_id)
+        if identifier is not None or rates is not None or defaults['additional_data_bytes']!=0:raise ValueError('La base comune non accetta selezioni alternative o dati aggiuntivi')
     if rates is not None and (not isinstance(rates,list) or not rates or
             any(isinstance(rate,bool) or rate not in (100000000,1000000000,10000000000) for rate in rates)
             or defaults['rate_bps'] not in rates):raise ValueError('Invalid selection rates')
@@ -50,6 +54,7 @@ def validate_parameters(parameters):
     result['migration_count']=count
     if rates is not None:result['selection_rates']=sorted(set(rates))
     if identifier is not None:result['selection_id']=identifier
+    if base_id is not None:result['base_id']=base_id
     if count is not None:result['duration_s']=None
     return result
 
@@ -92,7 +97,7 @@ def shared_plan(planner, parameters):
     planner.rejections = common.rejections
     common.check = planner.check
     count=parameters.get('migration_count')
-    session={key:value for key,value in parameters.items() if key not in ('migration_count','selection_rates','selection_id')}
+    session={key:value for key,value in parameters.items() if key not in ('migration_count','selection_rates','selection_id','base_id')}
     if count is not None:
         start=session['start_orbital_s'] if session['start_orbital_s'] is not None else 0
         session.update(start_orbital_s=start,duration_s=planner.orbit.duration-start)
@@ -163,11 +168,25 @@ class ContinuousComparison:
             'image_bundle_identity':bundle_identity(self.app.bundle()['image_bundle'])}
 
     def automatic_plan(self, parameters):
-        from .automatic_start import select_start, SelectionInvalidated
+        from .automatic_start import select_start, SelectionInvalidated, POLICY as SELECTION_POLICY
         identity=self.selection_identity()
+        if parameters.get('base_id'):
+            from .common_base import load
+            metadata,plan=load(self.root,parameters['base_id'],full=True)
+            if parameters['migration_count']!=metadata['migration_count'] or parameters['rate_bps'] not in metadata['rates']:
+                raise SelectionInvalidated('Parametri diversi dalla base comune')
+            plan['parameters']['rate_bps']=parameters['rate_bps']
+            self.selection_context=identity
+            self.result['common_base_id']=metadata['base_id']
+            self.result['common_schedule_sha256']=metadata['schedule_sha256']
+            self.result['selection']=metadata['search']
+            self.result['resolved_configuration']=metadata['selected']
+            atomic_json(self.directory/'selection.json',metadata['search']);self.save()
+            return plan
         if parameters.get('selection_id'):
             origin=comparison_directory(self.root,parameters['selection_id'])
             selection=json.loads((origin/'selection.json').read_text())
+            if selection.get('policy_version')!=SELECTION_POLICY:raise SelectionInvalidated('La selezione congelata usa un criterio di partenza precedente')
             if selection['identity']!=identity:raise SelectionInvalidated('La selezione congelata non è compatibile con gli input correnti')
             if selection['migration_count']!=parameters['migration_count'] or selection['additional_data_bytes']!=parameters['additional_data_bytes']:
                 raise SelectionInvalidated('I parametri non coincidono con la selezione congelata')
@@ -210,28 +229,12 @@ class ContinuousComparison:
             return
         try:
             self.calibration,self.manifest = calibration_inputs(self.root,full=True)
-        except (ValueError,FileNotFoundError):
+        except (ValueError,OSError) as exc:
             self.stage('preparation')
-            functional = self.root/'results/functional-gate.json'
-            if not functional.exists() or not json.loads(functional.read_text()).get('complete'):
-                self.check()
-                gate = self.app.functional()
-                self.result['preparation'].append({'stage':'functional','complete':gate.get('complete',False),
-                    'recovery_required':requires_recovery(gate),'reason':gate.get('reason')})
-                if not gate.get('complete') or requires_recovery(gate):
-                    self.result['error'] = gate.get('error')
-                    raise ScenarioRejected('Verifica iniziale Hot/Cold non riuscita: '+str(gate.get('reason','servizio non valido')))
-            self.check()
-            self.stage('calibration')
-            calibration = self.app.calibrate()
-            self.result['preparation'].append({'stage':'calibration','complete':calibration.get('complete',False),
-                'recovery_required':requires_recovery(calibration),'reason':calibration.get('reason')})
-            if not calibration.get('complete') or requires_recovery(calibration):
-                self.result['error'] = calibration.get('error')
-                self.result['cleanup_verified'] = calibration.get('cleanup_verified',False)
-                raise ScenarioRejected('Calibrazione non riuscita: '+str(calibration.get('reason','misure incomplete')))
-            self.check()
-            self.calibration,self.manifest = calibration_inputs(self.root,full=True)
+            self.result['error']={'code':'calibration_required','phase':'preparation',
+                'message':'Calibrazione valida non disponibile. Eseguire la calibrazione separata prima del confronto.',
+                'technical_detail':str(exc)}
+            raise ScenarioRejected(self.result['error']['message']) from exc
         atomic_json(self.directory/'calibration.json',self.calibration)
         atomic_json(self.directory/'artifact-manifest.json',self.manifest)
         calibration = copy.deepcopy(self.calibration)
@@ -358,7 +361,7 @@ class ContinuousComparison:
                     raise SelectionInvalidated('Gli input della selezione sono cambiati; confronto fermato')
                 self.stage(method,method)
                 session = self.session_factory()
-                session_parameters={key:value for key,value in parameters.items() if key not in ('migration_count','selection_rates','selection_id')}
+                session_parameters={key:value for key,value in parameters.items() if key not in ('migration_count','selection_rates','selection_id','base_id')}
                 child = session.run({**session_parameters,'duration_s':plan['end_s']-plan['start_s'],
                     'method':method,'start_orbital_s':plan['start_s'],
                     'initial_satellite_id':plan['initial_satellite_id']}, fixed_plan=copy.deepcopy(plan),

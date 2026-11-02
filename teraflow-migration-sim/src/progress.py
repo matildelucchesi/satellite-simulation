@@ -16,14 +16,23 @@ def advance(previous, event):
         for key in ('label','operation_status','limit_s','deadline_utc','examined_candidates','elapsed_s','selected','rejections','exhaustive'):
             result[key]=event.get(key)
     elif phase == 'calibration':
-        result.update(phase='calibration', method=event.get('method'), replica=event.get('replica'),
-                      calibration_index=event.get('replica', 1)+(3 if event.get('method') == 'hot' else 0),
-                      calibration_total=6, phase_started_utc=now)
+        replicas=event.get('replicas_per_mode',3)
+        result.update(phase='calibration', method=event.get('method'), replica=event.get('replica'),replicas_per_mode=replicas,
+                      calibration_index=event.get('replica', 1)+(replicas if event.get('method') == 'hot' else 0),
+                      calibration_total=event.get('calibration_total',2*replicas), phase_started_utc=now)
     elif phase == 'preparation_operation':
         for key in ('operation', 'label', 'phase_started_utc', 'deadline_utc', 'limit_s', 'operation_status'):
             result[key] = event.get(key)
         result['subphase'] = event.get('operation')
         if event.get('error'): result['error'] = event['error']
+    elif phase == 'infrastructure_wait':
+        result.update(subphase='infrastructure',label=event.get('label'),
+                      infrastructure_status=event.get('infrastructure_status'))
+    elif phase == 'scenario_creation':
+        result.update(phase='scenario_creation',subphase='scenario_creation',label=event.get('label'),operation_status='running',deadline_utc=None)
+    elif phase == 'source_startup':
+        result.update(subphase='start_source',label=event.get('label'),
+                      startup_stage=event.get('startup_stage'),startup_status=event.get('operation_status'))
     elif phase == 'restore_progress':
         result['restore_counts'] = event.get('counts')
         result['restore_entity'] = event.get('entity')

@@ -10,7 +10,7 @@ from .storage import append_json, atomic_json, utc_now
 DEFAULTS = {'infrastructure': 15, 'start_source': 180, 'start_target': 180,
             'clean_target': 120, 'clean_source': 120, 'restore_scenario': 120,
             'restore_authority': 60, 'stop_target': 45, 'baseline': 60}
-LABELS = {'infrastructure': 'Verifica Mininet e autorità P4',
+LABELS = {'infrastructure': 'Attesa disponibilità Mininet e proxy P4',
           'start_source': 'Avvio controller sorgente', 'start_target': 'Avvio controller destinazione',
           'clean_target': 'Pulizia scenario destinazione', 'clean_source': 'Pulizia scenario sorgente',
           'restore_scenario': 'Caricamento scenario iniziale', 'restore_authority': 'Ripristino autorità P4',
@@ -76,6 +76,7 @@ class PreparationBudget:
             if self.remaining() <= 0: raise TimeoutError('Preparation operation exceeded its budget')
         except Exception as exc:
             code = ('interrupted' if isinstance(exc, InterruptedError) else
+                    'p4_not_ready' if name == 'infrastructure' else
                     'preparation_timeout' if self.remaining()<=0 else
                     'startup_timeout' if isinstance(exc, (TimeoutError, subprocess.TimeoutExpired)) and name.startswith('start_') else
                     'preparation_timeout' if isinstance(exc, (TimeoutError, subprocess.TimeoutExpired)) else
@@ -87,6 +88,10 @@ class PreparationBudget:
             self.error = {**row, 'code': code, 'detail': str(exc), 'elapsed_s': time.monotonic()-started,
                           'preparation_elapsed_s': time.monotonic()-self.started,
                           'timestamp_utc': utc_now()}
+            if getattr(exc,'infrastructure_status',None):
+                self.error['infrastructure_status']=exc.infrastructure_status
+            if getattr(exc,'startup_stage',None):
+                self.error.update(startup_stage=exc.startup_stage,startup_label=exc.startup_label)
             if self.diagnostics:
                 try:
                     self.error['services'] = self.diagnostics()
@@ -105,6 +110,9 @@ class PreparationBudget:
             messages.update(nbi_timeout='Una chiamata NBI ha superato il proprio limite di tempo.',
                             nbi_http_error='Una chiamata NBI è stata rifiutata dal controller.')
             self.error['message'] = messages.get(self.error['code'],'Preparazione del laboratorio non riuscita.')
+            if name=='infrastructure' and self.error['code']=='p4_not_ready' and self.error.get('infrastructure_status'):
+                unavailable=[component for component,status in self.error['infrastructure_status'].items() if not status['ready']]
+                if unavailable:self.error['message']='Infrastruttura non pronta entro il limite: '+', '.join(unavailable)+'.'
             self.error['recovery_hint'] = 'Consultare stato e log dei servizi indicati; risolvere la causa prima di riprovare.'
             atomic_json(self.directory/'preparation-error.json', self.error)
             self.notify({**row, 'operation_status': 'failed', 'error': self.error})

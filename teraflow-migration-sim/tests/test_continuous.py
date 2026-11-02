@@ -7,7 +7,7 @@ import threading
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from src.authority import Authority
 from src.clock import ManualClock
@@ -115,6 +115,27 @@ class ContinuousTests(unittest.TestCase):
                 self.assertTrue((Path(result['directory'])/'migrations'/migration['migration_id']/'service-verification.json').exists())
             for name in ('report.html','report.json','migrations.csv','observations.csv','downtime.svg'):
                 self.assertTrue((Path(result['directory'])/name).is_file())
+
+    def test_prepared_hot_source_is_adopted_before_clock_and_cold_still_resets(self):
+        p=planner();params={'duration_s':100,'start_orbital_s':0,'initial_satellite_id':IDS[0]}
+        plan=p.plan(params);plan['common_base_id']='base-'+'a'*32
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary);bundle=root/'image.tar';bundle.write_bytes(b'image')
+            app=SimpleNamespace(root=root,scenario=p.scenario,orbit=p.orbit,cancel=threading.Event(),
+                publish=Mock(),bundle=lambda:{'image_bundle':{'path':str(bundle)}})
+            with patch('src.prepared_source.adopt') as adopt:
+                for method in ('hot','cold'):
+                    session=Simulation(app,planner=p,backend_factory=SessionBackend,clock_factory=ManualClock)
+                    result=session.run({**params,'method':method},fixed_plan=plan)
+                    self.assertTrue(result['success'],result.get('failure_reason'))
+                    self.assertEqual(session.backend.reset_count,0 if method=='hot' else 1)
+                    self.assertTrue(result['baseline']['success'])
+                adopt.assert_called_once()
+            with patch('src.prepared_source.adopt',side_effect=ValueError('stale')):
+                session=Simulation(app,planner=p,backend_factory=SessionBackend,clock_factory=ManualClock)
+                result=session.run({**params,'method':'hot'},fixed_plan=plan)
+                self.assertFalse(result['success']);self.assertIsNone(session.clock)
+                self.assertEqual(session.backend.shutdown_count,1)
 
     def test_rejected_admission_never_mutates_lab_and_preserves_report(self):
         p=planner()

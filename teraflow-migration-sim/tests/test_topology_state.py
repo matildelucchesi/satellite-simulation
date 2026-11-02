@@ -80,15 +80,21 @@ class TopologyEvidenceTests(unittest.TestCase):
         self.assertEqual(view['assigned_controller_satellite'],11)
         self.assertEqual(view['placement_status'],'planned')
         self.assertIsNone(view['controller_satellite'])
+        self.assertFalse(view['initial_controller_ready'])
         self.assertIsNone(presentation(self.directory,0,context=context,
                                       metadata={'phase':'finished'})['assigned_controller_satellite'])
 
     def test_baseline_assignment_confirms_controller_before_first_sample(self):
         self.event(10,'controller_assigned',controller_satellite=11,active_slot='sat-a',baseline_verified=False)
         self.assertIsNone(self.view(10)['controller_satellite'])
+        self.assertFalse(self.view(10)['initial_controller_ready'])
         self.event(11,'controller_assigned',controller_satellite=11,active_slot='sat-a',baseline_verified=True)
         self.assertEqual(self.view(11)['controller_satellite'],11)
         self.assertEqual(self.view(11)['placement_status'],'confirmed')
+        self.assertTrue(self.view(11)['initial_controller_ready'])
+        self.event(12,'source_stopped')
+        self.assertTrue(self.view(12)['initial_controller_ready'])
+        self.assertIsNone(self.view(12)['controller_satellite'])
 
     def test_transfer_and_cutover_use_confirmations_not_phase_names(self):
         self.confirm(1)

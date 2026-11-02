@@ -14,7 +14,7 @@ from .results import requires_recovery
 from .checkpoints import ActiveCheckpoint
 
 OPERATIONS = {'resource_diagnostic','simulate','functional','continuous_validation','environment','run','calibrate','select','campaign','faults','sensitivity','report','recover','diagnostic','complete'}
-OPERATIONS.add('compare_continuous')
+OPERATIONS.update({'compare_continuous','prepare_base'})
 OPERATIONS.add('expand_constellation')
 
 
@@ -66,6 +66,17 @@ class JobManager:
     def start(self, operation, parameters=None):
         parameters = parameters or {}
         self.validate(operation,parameters)
+        if operation=='compare_continuous':
+            from .preconditions import calibration_inputs
+            try:calibration_inputs(self.root,full=False)
+            except (ValueError,OSError) as exc:
+                raise ValueError('Confronto bloccato: creare prima lo scenario iniziale. Le misure salvate sono mancanti o non valide.') from exc
+        if operation=='compare_continuous' and parameters.get('base_id'):
+            from .common_base import load
+            load(self.root,parameters['base_id'])
+            from .prepared_source import readiness
+            source=readiness(self.root,parameters['base_id'])
+            if not source['ready']:raise ValueError(source['reason'])
         if operation=='recover':
             return self.start_recovery()
         # History may have been cleared while this server remained running.

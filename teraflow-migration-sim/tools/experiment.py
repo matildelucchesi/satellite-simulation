@@ -17,6 +17,7 @@ def main():
     parser.add_argument('--method',choices=['cold','hot'],default='hot')
     parser.add_argument('--rate-bps',type=int,choices=[100000000,1000000000,10000000000],default=1000000000)
     parser.add_argument('--event-id')
+    parser.add_argument('--base-id')
     parser.add_argument('--duration-s',type=int,default=3600)
     parser.add_argument('--start-orbital-s',type=int)
     parser.add_argument('--initial-satellite-id',type=int)
@@ -37,6 +38,7 @@ def main():
         if args.start_orbital_s is not None or args.initial_satellite_id is not None:
             parser.error('La partenza è esclusivamente automatica')
         parameters={'rate_bps':args.rate_bps,'migration_count':3}
+        if args.base_id:parameters['base_id']=args.base_id
     job=manager.start(args.operation,parameters if args.operation in ('run','simulate','compare_continuous') else {})
     print(json.dumps(job,indent=2),flush=True)
     if args.wait:

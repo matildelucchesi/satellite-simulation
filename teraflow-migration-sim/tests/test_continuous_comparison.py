@@ -152,34 +152,33 @@ class ContinuousComparisonTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 validate_parameters(params)
 
-    def test_preparation_failure_preserves_recovery_and_never_starts_child(self):
-        self.app.functional = Mock(return_value={'complete':False,'reason':'invalid_baseline','recovery_required':True})
-        coordinator = ContinuousComparison(self.app,session_factory=Mock())
+    def test_missing_calibration_blocks_comparison_without_running_preliminary_migrations(self):
+        self.app.functional=Mock();self.app.calibrate=Mock()
+        coordinator=ContinuousComparison(self.app,session_factory=Mock())
         with patch('src.continuous_comparison.calibration_inputs',side_effect=ValueError('missing')):
-            result = coordinator.run(self.parameters)
-        self.assertEqual(result['outcome'],'recovery_required')
+            result=coordinator.run(self.parameters)
         self.assertEqual(result['sessions'],{})
+        self.assertEqual(result['error']['code'],'calibration_required')
+        self.assertFalse(result['recovery_required'])
+        self.app.functional.assert_not_called();self.app.calibrate.assert_not_called()
         coordinator.session_factory.assert_not_called()
 
-    def test_preparation_runs_required_checks_and_calibration_automatically(self):
-        self.app.functional=Mock(return_value={'complete':True})
-        self.app.calibrate=Mock(return_value={'complete':True})
+    def test_valid_calibration_is_reused_without_running_preliminary_migrations(self):
+        self.app.functional=Mock();self.app.calibrate=Mock()
         self.app.workload=lambda manifest:self.planner.workload
         calibration={'horizon_s':100}
         manifest={'resources':{'measured_controller_cpu_cores':.1,
                               'measured_controller_ram_gib':.1,'measured_controller_disk_gib':.1}}
         atomic_json(self.root/'results/direct_link_windows.json',{'windows':[
             dict(sat_a=a,sat_b=b,start_s=0,end_s=1500) for a in IDS for b in IDS if a<b]})
-        fake=Mock()
-        fake.run.return_value={'simulation_id':'sim-'+'a'*32,'migrations':[],
-            'success':False,'complete':False,'outcome':'rejected'}
-        with patch('src.continuous_comparison.calibration_inputs',side_effect=[ValueError('missing'),(calibration,manifest)]) as inputs:
-            result=ContinuousComparison(self.app,session_factory=lambda:fake).run(self.parameters)
-        self.app.functional.assert_called_once()
-        self.app.calibrate.assert_called_once()
-        self.assertEqual(inputs.call_count,2)
-        self.assertEqual([row['stage'] for row in result['preparation']],['functional','calibration'])
-        fake.run.assert_called_once()
+        coordinator=ContinuousComparison(self.app,session_factory=Mock())
+        coordinator.directory=self.root/'comparison';coordinator.directory.mkdir()
+        with patch('src.continuous_comparison.calibration_inputs',return_value=(calibration,manifest)) as inputs:
+            coordinator.prepare()
+        self.app.functional.assert_not_called();self.app.calibrate.assert_not_called()
+        inputs.assert_called_once_with(self.root,full=True)
+        self.assertIsNotNone(coordinator.planner)
+        self.assertTrue((coordinator.directory/'calibration.json').exists())
 
     def test_recovery_concludes_stale_parent_without_resuming_comparison(self):
         identifier='pair-'+'b'*32

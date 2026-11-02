@@ -21,6 +21,30 @@ from .handover import execute as execute_handover
 
 
 class Experiment(Preparation, Analysis):
+    def prepare_base(self):
+        """One explicit scenario-creation job owns preliminary measurements and base planning."""
+        from .common_base import prepare
+        from .preconditions import calibration_inputs
+        try:calibration_inputs(self.root,full=False)
+        except (ValueError,OSError):
+            path=self.root/'results/functional-gate.json'
+            try:gate=json.loads(path.read_text(encoding='utf-8'))
+            except (ValueError,OSError):gate={}
+            valid=gate.get('complete') and len(gate.get('runs',[]))==2 and all(
+                (self.root/'results/runs'/row['run_id']/'metadata.json').exists() for row in gate['runs'])
+            if not valid:
+                self.publish({'phase':'scenario_creation','label':'Verifica preliminare del laboratorio'})
+                gate=self.functional()
+                if not gate.get('complete') or requires_recovery(gate):return {**gate,'complete':False}
+            if self.cancel and self.cancel.is_set():raise InterruptedError('Creazione scenario interrotta')
+            self.publish({'phase':'scenario_creation','label':'Calibrazione dello scenario iniziale'})
+            calibration=self.calibrate()
+            if not calibration.get('complete') or requires_recovery(calibration):return {**calibration,'complete':False}
+        if self.cancel and self.cancel.is_set():raise InterruptedError('Creazione scenario interrotta')
+        self.publish({'phase':'scenario_creation','label':'Preparazione della base comune'})
+        from .prepared_source import prepare as prepare_source
+        return prepare_source(self, prepare(self))
+
     def expand_constellation(self):
         from .constellation import expand
         return expand(self)

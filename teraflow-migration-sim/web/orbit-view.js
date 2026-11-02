@@ -55,7 +55,7 @@ function drawOrbit(data){
  const view=data.presentation||{}, stale=view.stale||orbitDisconnected||(view.mode==='live'&&orbitStreamDisconnected);
  graph.classList.toggle('service-live',view.mode==='live'&&!stale&&view.forwarding_observed===true);
  const defs=svg('defs',{},graph);const marker=svg('marker',{id:'migration-head',viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:5,markerHeight:5,orient:'auto-start-reverse'},defs);svg('path',{d:'M 0 0 L 10 5 L 0 10 z',class:'migration-head'},marker);
- const center={x:500,y:310},locations=orbitLayout(data.nodes);
+ const center={x:500,y:310},locations=orbitLayout(data.nodes),labels=orbitLabelLayout(data.nodes,locations);
  for(const plane of [1,2]){
   svg('ellipse',{cx:center.x,cy:center.y,rx:365,ry:174,transform:`rotate(${plane===1?-24:38} 500 310)`,class:'orbit-track'+(plane===2?' secondary':'')},graph);
   svgText(graph,plane===1?90:760,plane===1?88:65,`PIANO ${plane}`,'plane-label');
@@ -86,16 +86,14 @@ function drawOrbit(data){
   const label=`NORAD ${node.norad} · Piano ${node.plane} · ${node.eclipsed?'Ombra':'Luce'}${role?' · '+role:''} · ${candidateLabel(node)}${node.next_controller?' · Prossimo controller':''}`;
   const group=svg('g',{class:'node'+(node.eclipsed?' shadow':'')+(active?' source':'')+(pending&&view.mode!=='preview'?' assignment-pending':'')+(destination?' destination':''),tabindex:0,role:'button','aria-label':label,'aria-pressed':String(node.norad===selectedSatellite),'data-norad':node.norad},graph);
   svg('circle',{cx:p.x,cy:p.y,r:23,class:'selection-ring'},group);
-  svg('circle',{cx:p.x,cy:p.y,r:11,class:'satellite-body'},group);
+  svg('circle',{cx:p.x,cy:p.y,r:6,class:'satellite-body'},group);
   if(node.next_controller)svg('circle',{cx:p.x,cy:p.y,r:17,class:'next-controller-ring'},group);
-  if(active){
-   svgText(group,p.x,p.y+4,'C','controller-letter');
-  }
+
   const old=previousLocations.get(node.norad);
   if(moving&&old){const trail=svg('path',{d:`M ${old.x} ${old.y} L ${p.x} ${p.y}`,class:'satellite-trail'},graph);graph.insertBefore(trail,links);}
-  const left=p.x<500,tx=p.x+(left?-20:20),anchor=left?'end':'start';
-  const name=svgText(group,tx,p.y-1,String(node.norad),'satellite-id');name.setAttribute('text-anchor',anchor);
-  if(role){const tag=svgText(group,tx,p.y+14,role.toUpperCase(),'role-label');tag.setAttribute('text-anchor',anchor);}
+  const labelPosition=labels.get(node.norad),tx=labelPosition.x,anchor='middle',labelY=labelPosition.y;
+  const name=svgText(group,tx,labelY,String(node.norad),'satellite-id');name.setAttribute('text-anchor',anchor);
+  if(role&&active){const tag=svgText(group,tx,labelY+12,role.toUpperCase(),'role-label');tag.setAttribute('text-anchor',anchor);}
   svgText(group,p.x,p.y+31,candidateLabel(node),'score-label'+(node.next_controller?' chosen':'')+(Number.isFinite(node.candidate_score)?'':' unavailable'));
   if(node.next_controller)svgText(group,p.x,p.y+45,'PROSSIMO','next-controller-label');
   const title=svg('title',{},group);title.textContent=label+(node.candidate_reason?' · '+(candidateReasons[node.candidate_reason]||node.candidate_reason):'');
@@ -155,7 +153,8 @@ function renderPhaseCountdowns(data,stale){
   const fill=document.createElement('span');
   const duration=node.next_transition_s-node.phase_start_s;
   fill.style.width=remaining!==null&&duration>0?`${Math.max(0,Math.min(100,remaining/duration*100))}%`:'0%';track.append(fill);
-  button.append(name,countdown,label,track);button.addEventListener('click',()=>{document.querySelector('.satellite-inspector').open=true;inspectSatellite(node.norad);});
+  const eclipse=document.createElement('span');eclipse.className='phase-duration';eclipse.textContent=phaseCountdown(node.shadow_duration_s??null);eclipse.title='Durata completa della fase in ombra attuale o successiva';
+  button.append(name,countdown,label,track,eclipse);button.addEventListener('click',()=>{document.querySelector('.satellite-inspector').open=true;inspectSatellite(node.norad);});
   row.append(button);list.append(row);
  }
  list.scrollTop=scroll;if(focus)list.querySelector(`[data-norad="${focus}"]`)?.focus({preventScroll:true});
@@ -180,6 +179,22 @@ function orbitLayout(nodes){
  }
  return locations;
 }
+function orbitLabelLayout(nodes,locations){
+ const placed=[],labels=new Map(),points=[...locations.values()];
+ for(const node of nodes){
+  const p=locations.get(node.norad);if(!p)continue;
+  let best=null,bestScore=Infinity;
+  for(const [dx,dy]of [[0,-14],[0,23],[29,-8],[-29,-8],[29,21],[-29,21],[0,-29],[0,38],[43,7],[-43,7]]){
+   const x=p.x+dx,y=p.y+dy,box={left:x-19,right:x+19,top:y-11,bottom:y+3};
+   const overlap=placed.filter(b=>box.left<b.right+3&&box.right>b.left-3&&box.top<b.bottom+3&&box.bottom>b.top-3).length;
+   const dots=points.filter(q=>q.x>box.left-7&&q.x<box.right+7&&q.y>box.top-7&&q.y<box.bottom+7).length;
+   const score=overlap*100+dots*100+Math.hypot(dx,dy)*.01;
+   if(score<bestScore){bestScore=score;best={x,y,box};}
+  }
+  placed.push(best.box);labels.set(node.norad,{x:best.x,y:best.y});
+ }
+ return labels;
+}
 function animateOrbit(data,baseLocations){
  const graph=$('topology'),view=data.presentation;
  const frames=[data,...data.motion_frames].map(frame=>({...frame,locations:orbitLayout(frame.nodes)}));
@@ -202,6 +217,7 @@ function animateOrbit(data,baseLocations){
    row.querySelector('strong').textContent=phaseCountdown(remaining);
    row.querySelector('.phase-next').textContent=remaining===null?'Nessun cambio nei dati disponibili':`all’ingresso in ${node.eclipsed?'luce':'ombra'}`;
    row.classList.toggle('shadow',node.eclipsed);
+   const shadowDuration=row.querySelector('.phase-duration');if(shadowDuration)shadowDuration.textContent=phaseCountdown(node.shadow_duration_s??null);
    const duration=node.next_transition_s-node.phase_start_s;
    row.querySelector('.phase-track>span').style.width=remaining!==null&&duration>0?`${Math.max(0,Math.min(100,remaining/duration*100))}%`:'0%';
   }
@@ -222,7 +238,7 @@ async function topology(queueLatest=false){
   const query=new URLSearchParams();if(selectedRun)query.set('run_id',selectedRun);if(replayTick!==null)query.set('orbital_s',replayTick);
   const data=selectedSimulation?await api('/simulations/'+selectedSimulation+'/topology'+(simulationTick!==null?'?orbital_s='+simulationTick:'')):selectedRun||replayTick!==null?await api('/topology?'+query):await api('/initial-topology'+(initialConfigurationRequest?'?'+new URLSearchParams(initialConfigurationRequest):''));
   if(request!==topologyRequest)return;
-  orbitReceivedAt=Date.now();orbitDisconnected=false;drawOrbit(data);renderLiveProgress(data);
+  orbitReceivedAt=Date.now();orbitDisconnected=false;drawOrbit(data);renderLiveProgress(data);if(typeof syncExperimentPage==='function')syncExperimentPage();
  }catch(error){if(request===topologyRequest){stopOrbit('Topologia non disponibile: '+error.message);$('orbital-time').textContent='Geometria non disponibile';if(!selectedSimulation){initialConfiguration=null;$('initial-assignment').textContent='Partenza non valida: '+error.message;if(state)renderState();}}}
  finally{topologyInFlight=false;if(topologyQueued){topologyQueued=false;void topology();}}
 }

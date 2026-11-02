@@ -10,7 +10,7 @@ from src.jobs import JobManager
 class AutomaticStartTests(unittest.TestCase):
     def planner(self):
         return SimpleNamespace(orbit=SimpleNamespace(ids=[2,1],duration=4),
-            index=SimpleNamespace(period=lambda sid,tick:(0,100)),
+            index=SimpleNamespace(period=lambda sid,tick:(0,3.5)),
             publish=Mock(),check=Mock(),rejections={})
 
     def plan(self,p):
@@ -19,13 +19,14 @@ class AutomaticStartTests(unittest.TestCase):
             {'sat_a':host,'sat_b':3,'trigger_s':tick,'estimated_operation_s':0.1,
              'deadline_s':100,'recovery_reserve_s':0.1,'contact_end_s':50+tick}]}
 
-    def test_complete_search_uses_margin_then_earliest_time_then_lowest_norad(self):
+    def test_complete_search_prefers_closest_feasible_shadow_then_lowest_norad(self):
         p=self.planner()
         with patch('src.continuous_comparison.shared_plan',side_effect=lambda _,args:self.plan(args)):
             evidence,plans=select_start(p,{'rate_bps':1000000000})
         self.assertTrue(evidence['exhaustive'])
         self.assertEqual(evidence['examined_candidates'],8)
-        self.assertEqual(evidence['selected']['start_orbital_s'],0)
+        self.assertEqual(evidence['selected']['start_orbital_s'],3)
+        self.assertEqual(evidence['selected']['initial_time_to_shadow_s'],.5)
         self.assertEqual(evidence['selected']['initial_satellite_id'],1)
 
     def test_all_rates_must_accept_the_same_start(self):
@@ -61,15 +62,57 @@ class AutomaticStartTests(unittest.TestCase):
         self.assertFalse(evidence['exhaustive'])
         self.assertIsNotNone(evidence['selected'])
 
-    def test_more_margin_beats_earlier_start(self):
-        p=self.planner();p.orbit.duration=20
+    def test_closer_shadow_beats_larger_margin(self):
+        p=self.planner();p.orbit.duration=20;p.index.period=lambda sid,tick:(0,19.5)
         def candidate(_,args):
             plan=self.plan(args)
             plan['migrations'][0]['contact_end_s']=args['start_orbital_s']+(5 if args['start_orbital_s']==2 else 1)
             return plan
         with patch('src.continuous_comparison.shared_plan',side_effect=candidate):
             evidence,_=select_start(p,{'rate_bps':1000000000})
+        self.assertEqual(evidence['selected']['start_orbital_s'],19)
+
+    def test_unsafe_nearest_start_is_rejected_before_ranking(self):
+        def candidate(_,args):
+            if args['start_orbital_s']==3:raise ScenarioRejected('insufficient source deadline')
+            return self.plan(args)
+        with patch('src.continuous_comparison.shared_plan',side_effect=candidate):
+            evidence,_=select_start(self.planner(),{'rate_bps':1000000000})
         self.assertEqual(evidence['selected']['start_orbital_s'],2)
+
+    def test_nearest_satellite_beats_lower_norad(self):
+        p=self.planner();p.index.period=lambda sid,tick:(0,3.3 if sid==2 else 3.5)
+        with patch('src.continuous_comparison.shared_plan',side_effect=lambda _,args:self.plan(args)):
+            evidence,_=select_start(p,{'rate_bps':1000000000})
+        self.assertEqual(evidence['selected']['initial_satellite_id'],2)
+        self.assertAlmostEqual(evidence['selected']['initial_time_to_shadow_s'],.3)
+        self.assertGreaterEqual(evidence['selected']['minimum_margin_s'],0)
+
+    def test_nearest_start_with_negative_margin_is_not_selected(self):
+        def candidate(_,args):
+            plan=self.plan(args)
+            if args['start_orbital_s']==3:plan['migrations'][0]['contact_end_s']=3
+            return plan
+        with patch('src.continuous_comparison.shared_plan',side_effect=candidate):
+            evidence,_=select_start(self.planner(),{'rate_bps':1000000000})
+        self.assertEqual(evidence['selected']['start_orbital_s'],2)
+        self.assertEqual(evidence['rejections']['negative_safety_margin'],2)
+
+    def test_same_shadow_distance_prefers_more_margin(self):
+        p=self.planner()
+        def candidate(_,args):
+            plan=self.plan(args)
+            plan['migrations'][0]['contact_end_s']=args['start_orbital_s']+(.25 if args['initial_satellite_id']==1 else 1)
+            return plan
+        with patch('src.continuous_comparison.shared_plan',side_effect=candidate):
+            evidence,_=select_start(p,{'rate_bps':1000000000})
+        self.assertEqual(evidence['selected']['initial_satellite_id'],2)
+
+    def test_observation_end_is_not_treated_as_shadow_entry(self):
+        p=self.planner();p.index.period=lambda sid,tick:(0,p.orbit.duration)
+        with patch('src.continuous_comparison.shared_plan',side_effect=lambda _,args:self.plan(args)):
+            with self.assertRaises(SelectionRejected) as raised:select_start(p,{'rate_bps':1000000000})
+        self.assertEqual(raised.exception.evidence['rejections']['initial_shadow_outside_observation'],8)
 
     def test_cancellation_is_not_reported_as_timeout(self):
         p=self.planner();p.check.side_effect=InterruptedError('cancelled')

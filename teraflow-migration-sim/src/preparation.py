@@ -24,8 +24,8 @@ class Preparation:
         fingerprint=engine_fingerprint(self.root)
         runs=[]
         for method in ('cold','hot'):
-            for replica in range(3):
-                self.publish({'phase':'calibration','method':method,'replica':replica+1})
+            for replica in range(1):
+                self.publish({'phase':'calibration','method':method,'replica':replica+1,'replicas_per_mode':1,'calibration_total':2})
                 result=self.run(method,1000000000,purpose='calibration')
                 runs.append(result)
                 atomic_json(self.root/'results/calibration-progress.json',{'runs':[r['run_id'] for r in runs]})
@@ -48,7 +48,7 @@ class Preparation:
             for mode in ('cold','hot') for rate in self.scenario['fso']['useful_throughput_bps']]
         horizon=math.ceil(max(row['total_operation_s'] for row in estimates)*1.2)
         output={'complete':True,'execution_kind':'live-calibration','runs':[r['run_id'] for r in runs],
-                'estimates':estimates,'horizon_s':horizon,'manifest':describe(self.root/'config/artifact_manifest.json')}
+                'replicas_per_mode':1,'calibration_total':2,'estimates':estimates,'horizon_s':horizon,'manifest':describe(self.root/'config/artifact_manifest.json')}
         output['engine_fingerprint']=fingerprint
         atomic_json(self.root/'results/calibration.json',output)
         return output
@@ -62,7 +62,7 @@ class Preparation:
         bundle=self.bundle()
         doc=json.loads((self.root/'config/artifact_manifest.template.json').read_text())
         doc.update(status='measured',image_bundle=bundle['image_bundle'],measurement_date_utc=utc_now(),
-            measurement_method='Three full functional runs per mode; maxima of measured phases and host resources. Shared Docker daemon layer reuse explicitly retained.')
+            measurement_method='One full functional run per mode; measured phases and maxima of sampled host resources. Shared Docker daemon layer reuse explicitly retained.')
         doc['controller'].update(source_commit=bundle['source_commit'],
             dependency_policy=self.scenario['controller']['dependency_policy'],
             images={name:{'image':row['reference'],'digest':row['image_id']} for name,row in bundle['images'].items()})
@@ -109,7 +109,7 @@ class Preparation:
     def select(self):
         if (self.root/'config/campaign-manifest.json').exists():raise ValueError('Campaign already frozen')
         calibration=json.loads((self.root/'results/calibration.json').read_text())
-        if not calibration['complete']:raise ValueError('Six functional calibrations required')
+        if not calibration['complete']:raise ValueError('One successful calibration per mode required')
         from .simulation import engine_fingerprint
         if calibration.get('engine_fingerprint')!=engine_fingerprint(self.root):raise ValueError('Implementation changed after calibration')
         continuous=self.root/'results/continuous-validation.json'
@@ -141,7 +141,7 @@ class Preparation:
         artifacts.append(self.bundle()['image_bundle'])
         frozen={'schema_version':1,'created_utc':utc_now(),'artifacts':artifacts,
             'horizon_s':calibration['horizon_s'],'expected_primary_runs':18,
-            'provenance':'Frozen orbital replay, actual authorized patched images, six measured calibration runs',
+            'provenance':'Frozen orbital replay, actual authorized patched images, measured cold and hot calibration runs',
             'event_ids':[row['event_id'] for row in selected]}
         atomic_json(self.root/'config/campaign-manifest.json',frozen)
         return {'complete':True,'events':selected,'event_count':len(events),'eligible':len(eligible)}

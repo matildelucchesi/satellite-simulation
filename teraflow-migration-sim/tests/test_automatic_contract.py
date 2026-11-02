@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import Mock, patch
-from src.automatic_start import SelectionInvalidated
+from src.automatic_start import SelectionInvalidated, POLICY
 from src.continuous_comparison import ContinuousComparison,validate_parameters
 from src.storage import atomic_json,append_json
 
@@ -22,12 +22,16 @@ class AutomaticContractTests(unittest.TestCase):
             atomic_json(coordinator.directory/'metadata.json',{})
             parameters=validate_parameters({'migration_count':3})
             chosen={'initial_satellite_id':7,'start_orbital_s':9,'minimum_margin_s':20}
-            evidence={'selected':chosen,'policy_version':'automatic-start-v1','exhaustive':True}
+            evidence={'selected':chosen,'policy_version':POLICY,'exhaustive':True}
             plan={'initial_satellite_id':7,'start_s':9,'migrations':[]}
             with patch('src.automatic_start.select_start',return_value=(evidence,{'1000000000':plan})):
                 self.assertEqual(coordinator.automatic_plan(parameters),plan)
             reuse={**parameters,'selection_id':identifier}
             self.assertEqual(coordinator.automatic_plan(reuse),plan)
+            path=coordinator.directory/'selection.json';saved=json.loads(path.read_text())
+            saved['policy_version']='automatic-start-service-v2';atomic_json(path,saved)
+            with self.assertRaisesRegex(SelectionInvalidated,'criterio di partenza precedente'):coordinator.automatic_plan(reuse)
+            saved['policy_version']=POLICY;atomic_json(path,saved)
             app.scenario['changed']=True
             with self.assertRaises(SelectionInvalidated):coordinator.automatic_plan(reuse)
             del app.scenario['changed']

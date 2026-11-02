@@ -25,6 +25,16 @@ from .preparation_budget import PreparationBudget
 WORKLOAD = ('nbiservice', 'serviceservice', 'deviceservice', 'pathcompservice',
             'pathcomp-backend', 'contextservice')
 
+SOURCE_STARTUP = (
+    ('dependencies', 'Avvio dipendenze del controller sorgente', ('cockroachdb', 'nats', 'kafka')),
+    ('context', 'Avvio servizio di contesto sorgente', ('contextservice',)),
+    ('devices', 'Avvio gestione dispositivi sorgente', ('deviceservice',)),
+    ('paths', 'Avvio calcolo percorsi sorgente', ('pathcomp-backend', 'pathcompservice')),
+    ('services', 'Avvio gestione servizi sorgente', ('serviceservice',)),
+    ('api', 'Attivazione API del controller sorgente', ('nbiservice',)),
+)
+
+
 
 def http(port, path='/', body=None, timeout=30):
     request = Request(f'http://127.0.0.1:{port}{path}',
@@ -142,6 +152,76 @@ class LiveBackend:
             self.measurements.append(item)
             append_json(self.directory/'operations.jsonl', item)
 
+    def start_source(self):
+        """Start the source in dependency order within the existing overall startup budget."""
+        for name, label, services in SOURCE_STARTUP:
+            self.check()
+            started=time.monotonic()
+            event={'phase':'source_startup','startup_stage':name,'label':label,
+                   'controller_slot':self.source_slot,'phase_started_utc':utc_now(),**self.event_context}
+            def publish(status, **extra):
+                row={**event,'operation_status':status,'elapsed_s':time.monotonic()-started,**extra}
+                append_json(self.directory/'source-startup.jsonl',{**row,'timestamp_utc':utc_now()})
+                self.notify(row)
+            publish('running')
+            try:
+                self.compose.command(self.source_slot,'up','-d','--wait','--wait-timeout','120',
+                                     *role_services(self.source_slot,services))
+                self.check()
+            except Exception as exc:
+                exc.startup_stage=name
+                exc.startup_label=label
+                publish('failed',error=str(exc))
+                raise
+            publish('completed')
+
+    def wait_infrastructure(self):
+        """Wait for both infrastructure endpoints within the current preparation budget."""
+        expected=len(self.orbit.ids)
+        last={}
+        previous=None
+        def expired():
+            detail='; '.join(name+': '+row['detail'] for name,row in last.items()) or 'nessuna risposta disponibile'
+            error=TimeoutError('Infrastruttura non pronta entro il limite. '+detail)
+            error.infrastructure_status=last
+            return error
+        def check():
+            try:self.check()
+            except TimeoutError as exc:raise expired() from exc
+        while True:
+            check()
+            proxy=None
+            for name,port in (('Mininet',18090),('Proxy P4',18091)):
+                if self.remaining()<=0:raise expired()
+                check()
+                try:
+                    data=http(port,timeout=min(2,self.remaining()))
+                    if name=='Mininet':
+                        count=data['switch_count']
+                        ready=count==expected and data['switches_alive'] is True
+                        detail=f'{count}/{expected} switch; '+('attivi' if data['switches_alive'] else 'non tutti attivi')
+                    else:
+                        states=data['states']
+                        masters=sum(row.get('upstream_master') is True for row in states)
+                        ready=len(states)==expected and masters==expected and isinstance(data.get('ipv4'),str) and bool(data['ipv4'])
+                        detail=f'{masters}/{expected} connessioni agli switch confermate'
+                        if not data.get('ipv4'):detail+='; indirizzo del proxy non disponibile'
+                        proxy=data
+                    last[name]={'ready':ready,'detail':detail}
+                except (OSError,ValueError,KeyError,TypeError,AttributeError) as exc:
+                    last[name]={'ready':False,'detail':str(exc) or type(exc).__name__}
+            if self.remaining()<=0:raise expired()
+            check()
+            ready=all(row['ready'] for row in last.values())
+            if last!=previous:
+                self.notify({'phase':'infrastructure_wait','label':'Attesa disponibilità Mininet e proxy P4',
+                    'operation_status':'completed' if ready else 'running',
+                    'detail':'; '.join(name+': '+row['detail'] for name,row in last.items()),
+                    'infrastructure_status':copy.deepcopy(last),**self.event_context})
+                previous=copy.deepcopy(last)
+            if ready:return proxy
+            if self.cancel.wait(min(1,self.remaining())):raise InterruptedError('Job interrupted by user')
+
     def reset(self):
         initial_tick = self.event.get('start_s', max(0, self.event['trigger_s']-30))
         self.initial_tick = initial_tick
@@ -155,16 +235,11 @@ class LiveBackend:
                                                     self.preparation_status, document=initial)
         stage = self.preparation_budget.stage
         with stage('infrastructure'):
-            emulator=http(18090,timeout=min(5,self.remaining()))
-            proxy=http(18091,timeout=min(5,self.remaining()))
+            proxy=self.wait_infrastructure()
             self.fixture['controller_proxy'] = proxy['ipv4']
-            if emulator['switch_count']!=len(self.orbit.ids) or not emulator['switches_alive']:
-                raise RuntimeError('Mininet/P4 switches are not ready')
-            if len(proxy['states'])!=len(self.orbit.ids) or not all(row['upstream_master'] for row in proxy['states']):
-                raise RuntimeError('P4 arbitration is not coherent')
-        with stage('start_source'): self.compose.start('sat-a')
-        with stage('start_target'): self.compose.start('sat-b')
-        with stage('clean_target'): self.b.cleanup(self.b.export())
+        with stage('stop_target'): self.compose.stop('sat-b')
+        self.target_started = False
+        with stage('start_source'): self.start_source()
         with stage('clean_source'): self.a.cleanup(self.a.export())
         with stage('restore_scenario'):
             self.set_links(graph)
@@ -195,8 +270,6 @@ class LiveBackend:
         with stage('restore_authority'):
             self.admin('/recover')
             self.admin('/clear-standby')
-        with stage('stop_target'): self.compose.stop('sat-b')
-        self.target_started = False
         self.graph_signature = self.signature(graph)
 
     def preparation_status(self):

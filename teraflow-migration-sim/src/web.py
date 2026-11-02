@@ -71,6 +71,7 @@ class Application:
 
     def simulation_readiness(self):
         """Expose admission prerequisites before the user launches a worker."""
+        next_operation='functional'
         try:
             functional_path=self.root/'results/functional-gate.json'
             functional=json.loads(functional_path.read_text()) if functional_path.exists() else {}
@@ -93,15 +94,28 @@ class Application:
                             f"pacchetti UDP ricevuti {baseline.get('udp_received','—')}. "
                             'Occorre ripristinare il servizio del laboratorio prima di procedere alle calibrazioni.'}
                 return {'ready':False,'next_operation':next_operation,'reason':
-                    'Prima di avviare la simulazione servono le verifiche hot/cold del servizio e sei calibrazioni live.'
-                    if not functional_valid else 'Verifiche hot/cold completate. Eseguire le sei calibrazioni live prima della simulazione.'}
+                    'Prima di avviare la simulazione servono le verifiche hot/cold del servizio e due prove di calibrazione live, una Cold e una Hot.'
+                    if not functional_valid else 'Verifiche hot/cold completate. Eseguire le due prove di calibrazione live, una Cold e una Hot prima della simulazione.'}
             from .preconditions import calibration_inputs
             calibration_inputs(self.root, full=False)
             return {'ready':True,'next_operation':None,
                 'reason':'Calibrazione disponibile. Dopo l’avvio verranno verificate la sequenza orbitale e la baseline.'}
         except Exception:
-            return {'ready':False,'next_operation':'functional',
-                'reason':'Evidenze di preparazione mancanti o non valide. Ripetere le verifiche hot/cold e la calibrazione.'}
+            return {'ready':False,'next_operation':next_operation,
+                'reason':'Confronto bloccato: misure mancanti o non valide. Eseguire la calibrazione separata prima di preparare lo scenario orbitale.'}
+
+    def migration_data(self):
+        """Expose measured transfer sizes without artifact paths or an expensive bundle hash."""
+        try:
+            manifest=read_json(self.root/'config/artifact_manifest.json')
+            state=manifest.get('operational_state',{})
+            values={'image_bytes':manifest.get('image_bundle',{}).get('bytes'),
+                'cold_state_bytes':state.get('cold_snapshot_bytes'),
+                'hot_initial_state_bytes':state.get('hot_initial_state_bytes'),
+                'hot_final_delta_bytes':state.get('hot_final_delta_bytes')}
+            return {key:value if type(value) is int and value>=0 else None for key,value in values.items()}
+        except (OSError,ValueError,TypeError,AttributeError):
+            return {}
 
     def status(self):
         with self.lock:
@@ -126,7 +140,7 @@ class Application:
             except (OSError,ValueError): pass
         return {'timestamp_utc':utc_now(),'components':self.cached_status,'lock':guard,
             'progress':active_job.get('progress') if active_job else None,'worker_alive':worker_alive,
-            'simulation_readiness':self.simulation_readiness(),
+            'simulation_readiness':self.simulation_readiness(),'migration_data':self.migration_data(),
             'frozen':(self.root/'config/campaign-manifest.json').exists(),
             'scenario':json.loads((self.root/'config/scenario.json').read_text()),
             'controller_health_source':'per-run heartbeat.jsonl; missing values are not health confirmations'}
@@ -368,6 +382,9 @@ def make_server(root,port=18092):
             if path=='/api/v1/session':
                 identifier,token=application.session(self.headers.get('Cookie'))
                 return self.send({'token':token},headers={'Set-Cookie':f'tfs_session={identifier}; HttpOnly; SameSite=Strict; Path=/; Max-Age=28800'})
+            if path=='/api/v1/common-base':
+                from .common_base import status
+                return self.send(status(application.root))
             if path=='/api/v1/state':return self.send(application.status())
             if path=='/api/v1/jobs':return self.send({'jobs':application.jobs.list()})
             if path.startswith('/api/v1/jobs/'):

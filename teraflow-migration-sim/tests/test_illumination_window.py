@@ -16,15 +16,15 @@ class IlluminationWindowTests(unittest.TestCase):
                                         [True, True], [False, True], [False, True], [False, True]]))
             orbit = Orbit(artifact)
             self.assertEqual(orbit.illumination_window(11, 1),
-                             {'phase_start_s': 0, 'next_transition_s': 2})
+                             {'phase_start_s': 0, 'next_transition_s': 2, 'shadow_duration_s': 2})
             self.assertEqual(orbit.illumination_window(11, 2),
-                             {'phase_start_s': 2, 'next_transition_s': 4})
+                             {'phase_start_s': 2, 'next_transition_s': 4, 'shadow_duration_s': 2})
             self.assertFalse(orbit.operational(11, 2))
             self.assertEqual(orbit.illumination_window(11, 4),
-                             {'phase_start_s': 4, 'next_transition_s': None})
+                             {'phase_start_s': 4, 'next_transition_s': None, 'shadow_duration_s': None})
             self.assertTrue(orbit.operational(11, 4))
             self.assertEqual(orbit.illumination_window(22, 3),
-                             {'phase_start_s': 0, 'next_transition_s': None})
+                             {'phase_start_s': 0, 'next_transition_s': None, 'shadow_duration_s': None})
             for tick in (-1, 7):
                 with self.assertRaises(ValueError):
                     orbit.illumination_window(11, tick)
