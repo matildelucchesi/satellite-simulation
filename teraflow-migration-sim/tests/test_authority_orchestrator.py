@@ -107,4 +107,19 @@ class AuthorityOrchestratorTests(unittest.TestCase):
                         self.assertEqual(len([e for e in result["events"] if e["phase"] == "alignment"]), 1)
 
 
+    def test_additional_payload_must_be_verified_before_target_start(self):
+        for mode in ('hot','cold'):
+            with self.subTest(mode=mode),tempfile.TemporaryDirectory() as temporary:
+                root=Path(temporary);image=root/'images.tar';image.write_bytes(b'image')
+                extra=root/'additional.bin';extra.write_bytes(b'additional-data')
+                clock=ManualClock();backend=Backend(clock);backend.additional_payload=extra
+                migration=Migration(backend,clock,root/'run',{'fso':{'alignment_s':1,'max_attempts':1}})
+                result=migration.run(mode,{'deadline_s':100,'trigger_causes':['resources']},image)
+                self.assertTrue(result['success'])
+                verified=next(index for index,event in enumerate(result['events'])
+                              if event['phase']=='transfer_verified' and event.get('payload')==extra.name)
+                start=next(index for index,event in enumerate(result['events']) if event['phase']=='target_start')
+                self.assertLess(verified,start)
+                self.assertEqual(result['additional_data_bytes'],len(b'additional-data'))
+
 if __name__ == "__main__": unittest.main()

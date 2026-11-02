@@ -15,7 +15,7 @@ from .artifacts import canonical_bytes
 from .jobs import JobManager, BusyError, process_running
 from .live_backend import http
 from .probes import json_lines
-from .storage import atomic_json, utc_now
+from .storage import atomic_json, utc_now, read_json
 from .results import read_result
 
 
@@ -117,8 +117,15 @@ class Application:
                             components[name]={'reachable':response.status==200}
                     except Exception as exc:components[name]={'reachable':False,'error':str(exc)}
                 self.cached_status=components;self.cached_at=time.monotonic()
-        guard=json.loads(self.jobs.guard.read_text()) if self.jobs.guard.exists() else None
+        guard=read_json(self.jobs.guard) if self.jobs.guard.exists() else None
+        active_job=None;worker_alive=None
+        if guard:
+            try:
+                active_job=self.jobs.get(guard['job_id'])
+                worker_alive=process_running(guard.get('worker_pid',guard.get('launcher_pid')))
+            except (OSError,ValueError): pass
         return {'timestamp_utc':utc_now(),'components':self.cached_status,'lock':guard,
+            'progress':active_job.get('progress') if active_job else None,'worker_alive':worker_alive,
             'simulation_readiness':self.simulation_readiness(),
             'frozen':(self.root/'config/campaign-manifest.json').exists(),
             'scenario':json.loads((self.root/'config/scenario.json').read_text()),
@@ -141,13 +148,16 @@ class Application:
         return sorted(result,key=lambda row:row.get('created_utc') or '9999',reverse=True)
 
     def simulations(self):
-        return sorted([json.loads(p.read_text()) for p in (self.root/'results/simulations').glob('sim-*/metadata.json')],
+        return sorted([read_json(p) for p in (self.root/'results/simulations').glob('sim-*/metadata.json')],
                       key=lambda row:row['created_utc'],reverse=True)
 
     def continuous_comparisons(self):
-        return sorted([json.loads(path.read_text()) for path in
-            (self.root/'results/continuous-comparisons').glob('pair-*/metadata.json')],
-            key=lambda row:row['created_utc'],reverse=True)
+        rows = [read_json(path) for path in
+            (self.root/'results/continuous-comparisons').glob('pair-*/metadata.json')]
+        for row in rows:
+            progress=self.root/'results/jobs'/str(row.get('job_id'))/'progress.json'
+            if progress.exists(): row['progress']=read_json(progress)
+        return sorted(rows,key=lambda row:row['created_utc'],reverse=True)
 
     def topology(self,identifier=None,tick=None):
         from .orbit import Orbit,shortest_paths
@@ -158,12 +168,14 @@ class Application:
         event=None
         if identifier:
             directory=run_directory(self.root,identifier)
+            historical=self.historical_geometry(directory)
+            if historical is not self:return historical.topology(identifier,tick)
             event=json.loads((directory/'inputs.json').read_text())['event']
             observations=list(json_lines(directory/'geometry.jsonl'))
             if tick is None:tick=observations[-1]['orbital_s'] if observations else max(0,event['trigger_s']-30)
         if tick is None:tick=0
         tick=int(tick);graph=self.orbit.graph(tick)
-        selection={row['norad_id']:row for row in json.loads((self.root/'config/selected_constellation.json').read_text())['satellites']}
+        selection={row['norad_id']:row for row in json.loads(getattr(self,'selection_file',self.root/'config/selected_constellation.json').read_text())['satellites']}
         angles={}
         for plane in (1,2):
             ids=sorted((sid for sid in self.orbit.ids if selection[sid]['plane']==plane),
@@ -192,12 +204,70 @@ class Application:
                 path.append(node)
         return {'execution_kind':'modeled-geometry','orbital_s':tick,'presentation':display,'sat_a':event.get('sat_a') if event else None,
             'sat_b':event.get('sat_b') if event else None,'nodes':[{'norad':sid,'eclipsed':not self.orbit.operational(sid,tick),
+                **self.orbit.illumination_window(sid,tick),
                 'plane':selection[sid]['plane'],'phase_rank':selection[sid]['phase_rank'],'orbital_angle_rad':angles[sid],
                 'position_teme_km':self.orbit.positions[tick,self.orbit.index[sid]].tolist()} for sid in self.orbit.ids],
             'links':[[a,b] for a in graph for b in graph[a] if a<b],'service_path':path}
 
+    def initial_topology(self, initial_satellite_id=None, start_orbital_s=0):
+        """A stationary initial assignment; launching must preserve both host and epoch."""
+        if self.orbit is None:
+            from .orbit import Orbit
+            self.orbit=Orbit(self.root/'artifacts/orbit/replay.npz')
+        if isinstance(start_orbital_s,bool) or not isinstance(start_orbital_s,int) or not 0 <= start_orbital_s < self.orbit.duration:
+            raise ValueError('Tempo iniziale fuori dall’osservazione orbitale')
+        topology=self.topology(tick=start_orbital_s)
+        if initial_satellite_id is None:
+            topology['initial_configuration']=None
+            topology['presentation']={'mode':'preview','phase':'departure_pending','stale':False,
+                'controller_satellite':None,'assigned_controller_satellite':None,
+                'placement_status':'unassigned','migration_status':'none','forwarding_observed':None}
+            from .topology_state import candidate_presentation
+            candidate_presentation(topology,controller=None)
+            return topology
+        connected={sid for edge in topology['links'] for sid in edge}
+        candidates=[node for node in topology['nodes'] if not node['eclipsed'] and node['norad'] in connected]
+        if not candidates:
+            raise ValueError('Nessun satellite iniziale illuminato e collegato disponibile')
+        if initial_satellite_id is not None:
+            if type(initial_satellite_id) is not int or initial_satellite_id not in {node['norad'] for node in candidates}:
+                raise ValueError('Il satellite scelto non è illuminato e collegato al tempo iniziale richiesto')
+            host=initial_satellite_id
+        else:
+            host=max(candidates,key=lambda node:(node['next_transition_s'] if node['next_transition_s'] is not None
+                                                   else self.orbit.duration,-node['norad']))['norad']
+        topology['initial_configuration']={'initial_satellite_id':host,'start_orbital_s':start_orbital_s}
+        topology['presentation']={'mode':'preview','phase':'initial_assignment','stale':False,
+            'controller_satellite':None,'assigned_controller_satellite':host,'placement_status':'initial',
+            'migration_status':'none','forwarding_observed':None}
+        from .topology_state import candidate_presentation
+        candidate_presentation(topology,controller=host)
+        return topology
+
+    def historical_geometry(self,directory):
+        """Never add the new satellites to a historical experiment's replay."""
+        inputs=json.loads((directory/'inputs.json').read_text())
+        orbital=inputs.get('scenario',{}).get('orbital',{})
+        count=orbital.get('satellites_total')
+        if count is None:return self
+        from .orbit import Orbit
+        if self.orbit is None:self.orbit=Orbit(self.root/'artifacts/orbit/replay.npz')
+        if len(self.orbit.ids)==count:return self
+        import copy
+        for selection_file in (self.root/'artifacts/constellation-profiles').glob('*/original/config/selected_constellation.json'):
+            selection=json.loads(selection_file.read_text())
+            if len(selection['satellites'])!=count:continue
+            archive=selection_file.parents[1]
+            replay=archive/'artifacts/orbit/replay.npz'
+            if replay.exists():
+                view=copy.copy(self);view.orbit=Orbit(replay);view.selection_file=selection_file
+                return view
+        raise ValueError('Geometria originale non disponibile per questo esperimento storico')
+
     def simulation_topology(self,directory,requested=None):
-        from .topology_state import presentation
+        historical=self.historical_geometry(directory)
+        if historical is not self:return historical.simulation_topology(directory,requested)
+        from .topology_state import presentation,candidate_presentation
         observations=list(json_lines(directory/'observations.jsonl'))
         metadata=json.loads((directory/'metadata.json').read_text())
         # Telemetry continues during handovers, while session observations pause.
@@ -216,6 +286,15 @@ class Application:
         topology['simulation']=context
         topology['presentation']=presentation(directory,tick,context=context,metadata=metadata,
             replay=requested is not None or metadata.get('phase')=='finished')
+        event=(context or {}).get('next_migration')
+        if topology['presentation'].get('migration_status')=='completed':event=None
+        candidate_presentation(topology,event,topology['presentation'].get('controller_satellite'))
+        topology['clock_running']=requested is None and metadata.get('phase') in {'running','migrating'}
+        if topology['clock_running'] and topology.get('nodes'):
+            # Only modeled geometry is looked ahead; controller/forwarding evidence stays at tick.
+            topology['motion_frames']=[
+                self.topology(tick=int(tick)+offset) for offset in (1,2)
+                if int(tick)+offset < self.orbit.duration]
         return topology
 
     def artifacts(self):
@@ -343,6 +422,11 @@ def make_server(root,port=18092):
                 return self.send(read_result(json.loads(metadata.read_text())) if metadata.exists() else {'inputs':json.loads((directory/'inputs.json').read_text()),'outcome':'running'})
             if path=='/api/v1/topology':
                 return self.send(application.topology(query.get('run_id',[None])[0],query.get('orbital_s',[None])[0]))
+            if path=='/api/v1/initial-topology':
+                if set(query)-{'initial_satellite_id','start_orbital_s'}:raise ValueError('Unknown initial configuration field')
+                host=query.get('initial_satellite_id',[None])[0]
+                return self.send(application.initial_topology(int(host) if host is not None else None,
+                    int(query.get('start_orbital_s',[0])[0])))
             if path=='/api/v1/campaigns':
                 return self.send({name:json.loads((application.root/file).read_text()) if (application.root/file).exists() else None
                     for name,file in [('primary','results/campaign.json'),('frozen','config/campaign-manifest.json'),
@@ -355,7 +439,7 @@ def make_server(root,port=18092):
                 if file is None:raise FileNotFoundError(identifier)
                 return self.send(file.read_bytes(),media=mimetypes.guess_type(file.name)[0] or 'application/octet-stream',
                     headers={'Content-Disposition':'attachment; filename="'+file.name+'"'})
-            assets={'/':'web/index.html','/app.js':'web/app.js','/orbit-view.js':'web/orbit-view.js','/style.css':'web/style.css','/tokens.css':'web/tokens.css'}
+            assets={'/':'web/index.html','/experiment-state.js':'web/experiment-state.js','/app.js':'web/app.js','/orbit-view.js':'web/orbit-view.js','/style.css':'web/style.css','/tokens.css':'web/tokens.css'}
             if path.startswith('/fonts/') and Path(path).name in {'SpaceGrotesk.ttf','Inter.ttf'}:
                 assets[path]='web/fonts/'+Path(path).name
             if path not in assets:raise FileNotFoundError(path)

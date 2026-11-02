@@ -2,4 +2,4 @@ services:
   deviceservice:
     image: tfs-migration/device:7.0.0-fb870787-lab2
   serviceservice:
-    image: tfs-migration/service:7.0.0-fb870787-lab2
+    image: tfs-migration/service:7.0.0-fb870787-lab3

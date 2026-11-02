@@ -46,6 +46,7 @@ class SessionBackend(Backend):
         self.event=event;self.active_role='sat-a';self.event_context={};self.cancel=cancel
         self.notify=notify;self.reset_count=0;self.shutdown_count=0;self.rate=rate
         self.clock=None;self.calls=[];self.failure=None;self.attempts=[]
+        self.logical_host=event.get('sat_a')
     def reset(self):self.reset_count+=1
     def establish_baseline(self,identifier):return {'success':True}
     def start_observation(self,clock,identifier):self.clock=clock
@@ -72,6 +73,27 @@ class SessionBackend(Backend):
 
 
 class ContinuousTests(unittest.TestCase):
+    def test_only_placed_controller_accumulates_load_from_placement(self):
+        p=planner()
+        candidate=p.node(IDS[2],80)
+        self.assertEqual(candidate['projected_cpu_fraction'],p.node(IDS[2],50)['projected_cpu_fraction'])
+        fresh=p.node(IDS[2],80,placed_at=80)
+        older=p.node(IDS[2],80,placed_at=50)
+        self.assertGreater(older['projected_cpu_fraction'],fresh['projected_cpu_fraction'])
+        self.assertEqual(candidate['resource_role'],'candidate')
+        self.assertIsNone(candidate['controller_placed_at_s'])
+        self.assertEqual(older['controller_placed_at_s'],50)
+
+    def test_trigger_uses_placement_and_full_recovery_window_without_changing_ramp(self):
+        p=planner();p.horizon=100;p.index.periods[IDS[0]]=[(0,1000)]
+        normal=p.trigger(IDS[0],500,1000,placed_at=490)
+        early=p.trigger(IDS[0],500,1000,placed_at=490,required_window_s=200)
+        self.assertEqual(normal[0],586)
+        self.assertEqual(early[0],519)
+        self.assertIn('resources',early[1])
+        self.assertEqual(p.horizon,100)
+        self.assertLessEqual(early[0]+200,1000)
+
     def test_three_logical_satellites_and_bidirectional_slot_reuse(self):
         p=planner();params={'duration_s':100,'start_orbital_s':0,'initial_satellite_id':IDS[0]}
         first=p.plan(params);self.assertEqual(first,p.plan(params))
@@ -120,9 +142,36 @@ class ContinuousTests(unittest.TestCase):
                 if fail_baseline:self.assertIsNone(session.clock)
                 else:self.assertEqual(result['outcome'],'interrupted')
 
+    def test_invalid_initial_assignment_rejected_before_backend_or_clock(self):
+        for host in (None,99999,IDS[1]):
+            with self.subTest(host=host),tempfile.TemporaryDirectory() as temporary:
+                p=planner();plan=p.plan({'duration_s':100,'start_orbital_s':0,'initial_satellite_id':IDS[0]})
+                plan['initial_satellite_id']=host
+                p.plan=Mock(return_value=plan)
+                factory=Mock();app=SimpleNamespace(root=Path(temporary),scenario=p.scenario,
+                    orbit=p.orbit,cancel=threading.Event(),publish=Mock())
+                session=Simulation(app,planner=p,backend_factory=factory,clock_factory=Mock())
+                result=session.run({'duration_s':100,'start_orbital_s':0})
+                factory.assert_not_called();self.assertIsNone(session.clock)
+                self.assertEqual(result['outcome'],'rejected')
+
+    def test_wrong_backend_assignment_never_resets_lab_or_starts_clock(self):
+        p=planner()
+        with tempfile.TemporaryDirectory() as temporary:
+            class Unassigned(SessionBackend):
+                def __init__(self,*args,**kwargs):
+                    super().__init__(*args,**kwargs);self.logical_host=None
+            app=SimpleNamespace(root=Path(temporary),scenario=p.scenario,orbit=p.orbit,
+                cancel=threading.Event(),publish=Mock(),bundle=lambda:{'image_bundle':{'path':'unused'}})
+            session=Simulation(app,planner=p,backend_factory=Unassigned,clock_factory=ManualClock)
+            result=session.run({'duration_s':100,'start_orbital_s':0,'initial_satellite_id':IDS[0]})
+            self.assertFalse(result['success']);self.assertIsNone(session.clock)
+            self.assertEqual(session.backend.reset_count,0)
+            self.assertEqual(result['controller_history'],[])
+
     def test_search_rejects_higher_score_future_dead_end(self):
         p=planner();p.index.periods[IDS[2]]=[(0,150)]
-        p.trigger=lambda sid,tick,end:(10,['test']) if sid==IDS[0] else (end,[])
+        p.trigger=lambda sid,tick,end,**kwargs:(10,['test']) if sid==IDS[0] else (end,[])
         p.ranked=lambda *args:([{'satellite_id':IDS[1],'score':99},{'satellite_id':IDS[2],'score':90}],[])
         chain=p.chain(IDS[0],0,100,'hot',10**9)
         self.assertEqual(chain[0]['sat_b'],IDS[2])
@@ -159,7 +208,9 @@ class ContinuousTests(unittest.TestCase):
         p=planner();before=p.node(IDS[1],25)
         p.chain(IDS[0],0,100,'hot',10**9)
         self.assertEqual(before,p.node(IDS[1],25))
-        self.assertGreater(p.node(IDS[1],35)['projected_cpu_fraction'],before['projected_cpu_fraction'])
+        self.assertEqual(p.node(IDS[1],35)['projected_cpu_fraction'],before['projected_cpu_fraction'])
+        self.assertGreater(p.node(IDS[1],35,placed_at=18)['projected_cpu_fraction'],
+                           p.node(IDS[1],25,placed_at=18)['projected_cpu_fraction'])
         with self.assertRaises(ScenarioRejected):p.plan({'duration_s':100,'start_orbital_s':30,'initial_satellite_id':IDS[0]})
         with self.assertRaises(ScenarioRejected):p.plan({'duration_s':151})
         with self.assertRaises(ValueError):validate_parameters({'duration_s':True})

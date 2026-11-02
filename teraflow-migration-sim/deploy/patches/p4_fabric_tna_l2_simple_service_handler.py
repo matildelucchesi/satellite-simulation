@@ -32,6 +32,20 @@ LOGGER = logging.getLogger(__name__)
 
 METRICS_POOL = MetricsPool('Service', 'Handler', labels={'handler': 'p4_fabric_tna_l2_simple'})
 
+def apply_rules(task_executor, device_obj, json_config_rules):
+    # ConfigureDevice accepts an ordered list and raises on driver failure.
+    # One RPC per port preserves P4 dependencies without repeating endpoint
+    # reconciliation and Context writes for every individual rule.
+    if device_obj is None: raise ValueError("Cannot configure an absent device")
+    if not json_config_rules: return 0, 0
+    from common.proto.context_pb2 import ConfigRule
+    rules = [ConfigRule(**rule) for rule in json_config_rules]
+    del device_obj.device_config.config_rules[:]
+    device_obj.device_config.config_rules.extend(rules)
+    task_executor.configure_device(device_obj)
+    return len(rules), 0
+
+
 class P4FabricL2SimpleServiceHandler(_ServiceHandler):
     def __init__(   # pylint: disable=super-init-not-called
         self, service : Service, task_executor : TaskExecutor, **settings # type: ignore

@@ -66,6 +66,8 @@ class ContinuousComparisonTests(unittest.TestCase):
         for session in self.sessions:
             plans.append(json.loads((session.directory/'plans/initial.json').read_text()))
             self.assertEqual(session.result['plan_revisions'],0)
+            self.assertEqual(session.result['start_s'],self.parameters['start_orbital_s'])
+            self.assertEqual(session.result['controller_history'][0]['satellite_id'],self.parameters['initial_satellite_id'])
             self.assertAlmostEqual(session.result['real_elapsed_s'],850)
             self.assertEqual(session.backend.reset_count,1)
             self.assertEqual(session.backend.shutdown_count,1)
@@ -130,6 +132,20 @@ class ContinuousComparisonTests(unittest.TestCase):
             self.assertFalse(row.get('comparable',False))
             self.assertTrue(row.get('cold_minus_hot') is None or
                             all(value is None for value in row['cold_minus_hot'].values()))
+
+    def test_invalid_throughput_reports_the_cause_and_verified_cleanup(self):
+        class InsufficientRate(SessionBackend):
+            def transfer(backend,path,event):
+                receipt=super().transfer(path,event)
+                receipt['useful_throughput_bps']=backend.rate*.5
+                return receipt
+        result=self.coordinator(InsufficientRate).run(self.parameters)
+        self.assertFalse(result['complete'])
+        self.assertIn('Measured bundle throughput below',result['reason'])
+        self.assertTrue(result['cleanup_verified'])
+        self.assertNotIn('cold',result['sessions'])
+        self.assertFalse(self.sessions[0].result['migrations'][0]['experimental_valid'])
+        self.assertNotIn('cold_minus_hot',result['totals'])
 
     def test_validation_rejects_independent_method_and_invalid_duration(self):
         for params in ({'method':'hot'},{'duration_s':True},{'duration_s':0},{'rate_bps':1}):
@@ -206,6 +222,72 @@ class ContinuousComparisonTests(unittest.TestCase):
                 self.assertEqual(result['outcome'],'rejected')
                 self.assertIsNone(session.backend)
 
+
+    def test_three_migrations_stop_after_verification_without_waiting_for_deadline(self):
+        parameters={key:value for key,value in self.parameters.items() if key!='duration_s'}
+        parameters.update(migration_count=3,additional_data_bytes=13)
+        result=self.coordinator().run(parameters)
+        self.assertTrue(result['success'],result.get('reason'))
+        self.assertEqual(len(result['events']),3)
+        self.assertIsNone(result['parameters']['duration_s'])
+        for session in self.sessions:
+            self.assertEqual(len(session.result['migrations']),3)
+            self.assertEqual(session.result['termination_reason'],'verified_migration_target')
+            self.assertLess(session.result['final_orbital_s'],session.result['end_s'])
+            for migration in session.result['migrations']:
+                self.assertTrue(migration['service_verification']['success'])
+                self.assertEqual(migration['additional_data_bytes'],13)
+                extra=[event for event in migration['events'] if event['phase']=='transfer_verified'
+                       and event.get('payload')=='additional-migration-data.bin']
+                self.assertEqual(len(extra),1)
+                self.assertEqual(extra[0]['receipt']['received_bytes'],13)
+
+    def test_additional_volume_is_accounted_for_in_admission_and_parameters_are_bounded(self):
+        baseline=shared_plan(self.planner,validate_parameters(self.parameters))
+        with self.assertRaises(ScenarioRejected):
+            shared_plan(self.planner,validate_parameters({**self.parameters,'additional_data_bytes':8*1024**3,
+                                                          'rate_bps':100000000}))
+        self.assertGreater(len(baseline['migrations']),0)
+        for extra in (-1,True,None,8*1024**3+1):
+            with self.subTest(extra=extra),self.assertRaises(ValueError):
+                validate_parameters({'additional_data_bytes':extra,'migration_count':3})
+        for count in (0,True,3.5,101):
+            with self.subTest(count=count),self.assertRaises(ValueError):
+                validate_parameters({'migration_count':count})
+
+    def test_acceptance_checker_detects_csv_tampering(self):
+        import csv
+        from tools.validate_guided_flow import check_comparison
+        parameters={key:value for key,value in self.parameters.items() if key!='duration_s'}
+        result=self.coordinator().run({**parameters,'migration_count':3})
+        checked=check_comparison(self.root,result['comparison_id'])
+        self.assertTrue(checked['success'])
+        path=self.root/'results/continuous-comparisons'/result['comparison_id']/'events.csv'
+        with path.open(newline='',encoding='utf-8') as handle:
+            reader=csv.DictReader(handle);fields=reader.fieldnames;rows=list(reader)
+        rows[0]['hot_controller_downtime_s']='999999'
+        with path.open('w',newline='',encoding='utf-8') as handle:
+            writer=csv.DictWriter(handle,fields);writer.writeheader();writer.writerows(rows)
+        with self.assertRaisesRegex(AssertionError,'CSV metric mismatch'):
+            check_comparison(self.root,result['comparison_id'])
+
+    def test_inadmissible_shared_plan_exposes_structured_cause_without_starting_session(self):
+        factory=Mock()
+        result=ContinuousComparison(self.app,planner=self.planner,session_factory=factory).run(
+            {**self.parameters,'initial_satellite_id':99999})
+        factory.assert_not_called()
+        self.assertFalse(result['success'])
+        self.assertEqual(result['error']['code'],'plan_not_admissible')
+        self.assertEqual(result['error']['phase'],'planning')
+        self.assertFalse(result['session_execution_started'])
+        self.assertEqual(result['sessions'],{})
+
+    def test_shared_deadlines_preserve_operation_time_after_backend_reserves_rollback(self):
+        plan=shared_plan(self.planner,validate_parameters({
+            'migration_count':3,'initial_satellite_id':IDS[0],'start_orbital_s':0}))
+        for event in plan['migrations']:
+            self.assertGreaterEqual(event['deadline_s']-event['recovery_reserve_s'],
+                                    event['trigger_s']+event['estimated_operation_s'])
 
 if __name__ == '__main__':
     unittest.main()

@@ -4,10 +4,37 @@ from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 from src.storage import append_json, atomic_json
-from src.topology_state import presentation
+from src.topology_state import presentation,candidate_presentation
 
 
 class TopologyEvidenceTests(unittest.TestCase):
+    def test_scores_preserve_actual_target_even_when_another_candidate_scores_higher(self):
+        topology={'nodes':[{'norad':sid} for sid in (11,22,33,44)]}
+        event={'sat_a':11,'sat_b':33,'trigger_s':100,
+               'candidates':[{'satellite_id':22,'score':95.5},{'satellite_id':33,'score':81.25}],
+               'excluded_candidates':[{'satellite_id':22,'reason':'future_dead_end','orbital_s':100},
+                                      {'satellite_id':44,'reason':'no_direct_contact'}]}
+        result=candidate_presentation(topology,event,11)
+        source,higher,selected,excluded=result['nodes']
+        self.assertIsNone(source['candidate_score'])
+        self.assertEqual(source['candidate_reason'],'current_controller')
+        self.assertEqual(higher['candidate_score'],95.5)
+        self.assertFalse(higher['next_controller'])
+        self.assertEqual(higher['candidate_reason'],'future_dead_end')
+        self.assertEqual(selected['candidate_score'],81.25)
+        self.assertTrue(selected['next_controller'])
+        self.assertEqual(selected['candidate_reason'],'eligible')
+        self.assertIsNone(excluded['candidate_score'])
+        self.assertEqual(excluded['candidate_reason'],'no_direct_contact')
+        self.assertEqual(result['ranking']['source_satellite'],11)
+
+    def test_no_plan_or_changed_controller_never_invents_a_ranking(self):
+        for controller,event in ((11,None),(33,{'sat_a':11,'sat_b':33,'candidates':[{'satellite_id':22,'score':99}]})):
+            with self.subTest(controller=controller):
+                result=candidate_presentation({'nodes':[{'norad':sid} for sid in (11,22,33)]},event,controller)
+                self.assertFalse(result['ranking']['available'])
+                self.assertTrue(all(node['candidate_score'] is None and not node['next_controller'] for node in result['nodes']))
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.directory = Path(self.temp.name)
@@ -45,6 +72,23 @@ class TopologyEvidenceTests(unittest.TestCase):
         self.assertEqual(self.view()['controller_satellite'], 11)
         self.confirm(3, frozen=True)
         self.assertIsNone(self.view()['controller_satellite'])
+
+    def test_planned_assignment_is_visible_without_claiming_active_controller(self):
+        append_json(self.directory/'events.jsonl', {'orbital_s': 0, 'phase': 'planning'})
+        context={'placement_status':'planned','controller_satellite':11}
+        view=presentation(self.directory,0,context=context,metadata={'phase':'preparation'})
+        self.assertEqual(view['assigned_controller_satellite'],11)
+        self.assertEqual(view['placement_status'],'planned')
+        self.assertIsNone(view['controller_satellite'])
+        self.assertIsNone(presentation(self.directory,0,context=context,
+                                      metadata={'phase':'finished'})['assigned_controller_satellite'])
+
+    def test_baseline_assignment_confirms_controller_before_first_sample(self):
+        self.event(10,'controller_assigned',controller_satellite=11,active_slot='sat-a',baseline_verified=False)
+        self.assertIsNone(self.view(10)['controller_satellite'])
+        self.event(11,'controller_assigned',controller_satellite=11,active_slot='sat-a',baseline_verified=True)
+        self.assertEqual(self.view(11)['controller_satellite'],11)
+        self.assertEqual(self.view(11)['placement_status'],'confirmed')
 
     def test_transfer_and_cutover_use_confirmations_not_phase_names(self):
         self.confirm(1)

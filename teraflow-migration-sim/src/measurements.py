@@ -33,7 +33,9 @@ def resources(root):
         selected = [row for row in rows if row['Name'].startswith(role+'-')]
         result['hosts'][role] = {'running_containers': len(selected),
             'cpu_cores': sum(float(row['CPUPerc'].rstrip('%'))/100 for row in selected),
-            'ram_gib': sum(size_bytes(row['MemUsage'].split('/')[0]) for row in selected)/1024**3}
+            'ram_gib': sum(size_bytes(row['MemUsage'].split('/')[0]) for row in selected)/1024**3,
+            'containers':[{'name':row['Name'],'cpu_cores':float(row['CPUPerc'].rstrip('%'))/100,
+                           'ram_gib':size_bytes(row['MemUsage'].split('/')[0])/1024**3} for row in selected]}
     return result
 
 

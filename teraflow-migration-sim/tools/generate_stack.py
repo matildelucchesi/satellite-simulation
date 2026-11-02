@@ -49,7 +49,7 @@ def build(root=ROOT):
                 'interval': '5s', 'timeout': '5s', 'retries': 30, 'start_period': '15s'}
         else:
             service['healthcheck'] = {'test': ['CMD', 'python3', '-c',
-                "import json,urllib.request; s=json.load(urllib.request.urlopen('http://localhost:8089/',timeout=3)); assert s['switch_count']==17 and s['switches_alive']"],
+                "import json,urllib.request; s=json.load(urllib.request.urlopen('http://localhost:8089/',timeout=3)); f=json.load(open('/experiment/config/fixture.json')); assert s['switch_count']==len(f['emulator']['devices']) and s['switches_alive']"],
                 'interval': '5s', 'timeout': '5s', 'retries': 30, 'start_period': '15s'}
         stack['services'][name] = service
     stack['volumes']['proxy-state'] = {'external': True, 'name': 'migration-lab_proxy-state'}

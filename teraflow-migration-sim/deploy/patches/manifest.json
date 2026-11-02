@@ -2,7 +2,8 @@
   "upstream_commit": "fb8707871eba26806cac7ac373c70b2bb5bd26fc",
   "upstream_file": "src/service/service/service_handlers/p4_fabric_tna_l2_simple/p4_fabric_tna_l2_simple_service_handler.py",
   "upstream_sha256": "ee4928041c0789797e4898945f411523452e5b2b5302a3adac9383ae60e60629",
-  "patched_sha256": "09fb85a9ac02ade7d03cfa626ae3298ab6a59451d708b08ec3e604e6afca9c11",
-  "patch_sha256": "b5bdc303b10292d43e33ffae86bd7f9cbd1e0bde4e9574a96b01c051deb4de3c",
-  "authorization": "User approved tracked local L2NM compatibility patch on 2026-10-02"
+  "patched_sha256": "dc1451ce3ed9865d3144bcd92d01c24d305a7c27c54a66198273db0109013beb",
+  "patch_sha256": "1f5373ca28d34281bca17b57a14c8ba5c03cf14b41929363a1ea44e82e90d3ac",
+  "authorization": "User approved L2NM compatibility patch and correction of provisioning HTTP 500 on 2026-10-23",
+  "provisioning_policy": "ordered-rules-one-configure-rpc-per-port-v1"
 }

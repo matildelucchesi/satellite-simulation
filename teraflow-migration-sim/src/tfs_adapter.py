@@ -13,6 +13,15 @@ from pathlib import Path
 
 from .artifacts import canonical_bytes
 from .snapshot import KINDS, identity, snapshot, validate
+from .storage import utc_now
+
+
+class NbiTimeout(TimeoutError):
+    code = 'nbi_timeout'
+
+
+class NbiHttpError(RuntimeError):
+    code = 'nbi_http_error'
 
 
 def uuid(identifier: dict, key: str) -> str:
@@ -50,17 +59,27 @@ class TfsAdapter:
         self.calls: list[dict] = []
         self.guard = None
         self.remaining = None
+        self.notify = None
+        self.restore_progress = None
+        self.current_entity = None
         selection = json.loads((Path(__file__).parents[1]/'config/selected_constellation.json').read_text())
         self.allowed_device_names = {f"sat-{row['norad_id']}" for row in selection['satellites']}
+        previous=selection['metadata'].get('expansion',{}).get('original_count',17)
+        self.allowed_topology_names={'starlink-17',f'starlink-{previous}',f"starlink-{len(selection['satellites'])}"}
 
     def request(self, method: str, path: str, body=None):
-        if self.guard: self.guard()
         started = time.monotonic()
         request = Request(self.base_url + path, data=None if body is None else canonical_bytes(body),
                           headers={"Content-Type": "application/json"}, method=method)
-        record = {"method": method, "path": path, "started_monotonic": started}
+        record = {"method": method, "path": path, "started_monotonic": started,
+                  'started_utc':utc_now(), 'entity':self.current_entity}
+        def announce(status):
+            if self.notify: self.notify({'phase':'restore_request', 'request_status':status,
+                                        'request':dict(record)})
+        announce('running')
         try:
-            timeout = min(self.timeout_s, self.remaining()) if self.remaining else self.timeout_s
+            if self.guard: self.guard()
+            timeout = min(30, self.timeout_s, self.remaining()) if self.remaining else min(30,self.timeout_s)
             if timeout <= 0: raise TimeoutError('NBI deadline reached')
             with urlopen(request, timeout=timeout) as response:
                 record["status"] = response.status
@@ -69,11 +88,38 @@ class TfsAdapter:
                 return json.loads(data) if data else None
         except HTTPError as exc:
             record["status"] = exc.code
+            record['error_code'] = 'nbi_http_error'
             record["error"] = exc.read().decode(errors="replace")
-            raise RuntimeError(f"NBI {method} {path}: {exc.code}: {record['error']}") from exc
+            raise NbiHttpError(f"NBI {method} {path}: {exc.code}: {record['error']}") from exc
+        except TimeoutError as exc:
+            record['error'] = str(exc)
+            record['error_code'] = 'nbi_timeout'
+            raise NbiTimeout(f'NBI {method} {path}: {exc}') from exc
+        except Exception as exc:
+            record['error'] = str(exc)
+            record['error_code'] = 'interrupted' if isinstance(exc,InterruptedError) else 'nbi_error'
+            raise
         finally:
             record["elapsed_s"] = time.monotonic() - started
+            record['finished_utc'] = utc_now()
             self.calls.append(record)
+            announce('failed' if 'error' in record else 'completed')
+
+    @contextmanager
+    def restoring_entity(self, kind, row):
+        self.current_entity = {'kind':kind, 'id':identity(kind,row), 'name':row.get('name')}
+        if self.notify: self.notify({'phase':'restore_progress','counts':copy.deepcopy(self.restore_progress),
+                                    'entity':self.current_entity})
+        try:
+            yield
+        except Exception:
+            raise
+        else:
+            if kind in self.restore_progress: self.restore_progress[kind]['completed'] += 1
+            if self.notify: self.notify({'phase':'restore_progress','counts':copy.deepcopy(self.restore_progress),
+                                        'entity':self.current_entity, 'entity_completed':True})
+        finally:
+            self.current_entity = None
 
     @contextmanager
     def quiescent(self):
@@ -102,7 +148,7 @@ class TfsAdapter:
         if slices or policies:
             raise ValueError("Slices or independent policy rules outside the migration perimeter")
         entities["topologies"] = self.request("GET", prefix + "/topologies").get("topologies", [])
-        if any(row.get('name') != 'starlink-17' for row in entities['topologies']):
+        if any(row.get('name') not in self.allowed_topology_names for row in entities['topologies']):
             raise ValueError('Topologies outside migration perimeter')
         entities["devices"] = devices
         foreign = [row.get('name') for row in entities['devices'] if row.get('name') not in self.allowed_device_names]
@@ -134,6 +180,8 @@ class TfsAdapter:
 
     def restore(self, document: dict, inject_failure_at: str | None = None) -> None:
         validate(document)
+        self.restore_progress = {kind:{'completed':0,'total':len(document['entities'][kind])}
+                                 for kind in ('devices','links','services')}
         with self.lock:
             # Release 7 SetDevice always associates even endpoint-free devices
             # with admin/admin. This static local scaffold must already exist.
@@ -154,59 +202,60 @@ class TfsAdapter:
                     raise RuntimeError(f"Injected restore failure: {kind}")
                 indexed = {identity(kind, row): row for row in existing[kind]}
                 for row in document["entities"][kind]:
-                    old = indexed.get(identity(kind, row))
-                    if kind == "devices" and old is not None and old.get("device_operational_status") in (
-                            None, "DEVICEOPERATIONALSTATUS_UNDEFINED", 0):
-                        self.request("DELETE", route(kind, old))
-                        old = None
-                    if old == row:
-                        continue
-                    if kind == "services" and old is not None and service_intent(old) == service_intent(row):
-                        continue
-                    if kind == "devices" and old is not None:
-                        old_rules = {rule.get("custom", {}).get("resource_key"): rule
-                                     for rule in old.get("device_config", {}).get("config_rules", [])}
-                        payload = copy.deepcopy(row)
-                        changes = []
-                        for rule in row.get("device_config", {}).get("config_rules", []):
-                            key = rule.get("custom", {}).get("resource_key", "")
-                            if key.startswith("_connect/"):
-                                if old_rules.get(key) != rule:
-                                    raise ValueError("Connection settings changed on existing device; clean target before restore")
-                                continue
-                            if old_rules.get(key) != rule: changes.append(rule)
-                        payload["device_config"] = {"config_rules": changes}
-                        if changes or old.get("device_endpoints", []) != row.get("device_endpoints", []):
-                            self.request("PUT", route(kind, row), payload)
-                        continue
-                    if old is None:
-                        payload = copy.deepcopy(row)
-                        if kind == "devices":
-                            # AddDevice discovers endpoints using the driver;
-                            # it explicitly rejects endpoints in its request.
-                            payload["device_endpoints"] = []
-                            payload["device_config"]["config_rules"] = [rule for rule in payload["device_config"]["config_rules"]
-                                if rule.get("custom", {}).get("resource_key", "").startswith("_connect/")]
-                        elif kind == "services":
-                            # Release 7 CreateService only creates a blank intent;
-                            # UpdateService then provisions endpoints and rules.
-                            payload["service_endpoint_ids"] = []
-                            payload["service_constraints"] = []
-                            payload["service_config"] = {"config_rules": []}
-                        self.request("POST", route(kind, row, True), {kind: [payload]})
-                        if kind == "devices":
-                            actual = self.request("GET", route(kind, row))
-                            old_rules = {canonical_bytes(rule) for rule in actual.get("device_config", {}).get("config_rules", [])}
-                            remaining = [rule for rule in row["device_config"]["config_rules"]
-                                if not rule.get("custom", {}).get("resource_key", "").startswith("_connect/")
-                                and canonical_bytes(rule) not in old_rules]
-                            if remaining:
-                                update = copy.deepcopy(row)
-                                update["device_config"] = {"config_rules": remaining}
-                                self.request("PUT", route(kind, row), update)
-                        if kind == "services": self.request("PUT", route(kind, row), row)
-                    else:
-                        self.request("PUT", route(kind, row), row)
+                    with self.restoring_entity(kind, row):
+                        old = indexed.get(identity(kind, row))
+                        if kind == "devices" and old is not None and old.get("device_operational_status") in (
+                                None, "DEVICEOPERATIONALSTATUS_UNDEFINED", 0):
+                            self.request("DELETE", route(kind, old))
+                            old = None
+                        if old == row:
+                            continue
+                        if kind == "services" and old is not None and service_intent(old) == service_intent(row):
+                            continue
+                        if kind == "devices" and old is not None:
+                            old_rules = {rule.get("custom", {}).get("resource_key"): rule
+                                         for rule in old.get("device_config", {}).get("config_rules", [])}
+                            payload = copy.deepcopy(row)
+                            changes = []
+                            for rule in row.get("device_config", {}).get("config_rules", []):
+                                key = rule.get("custom", {}).get("resource_key", "")
+                                if key.startswith("_connect/"):
+                                    if old_rules.get(key) != rule:
+                                        raise ValueError("Connection settings changed on existing device; clean target before restore")
+                                    continue
+                                if old_rules.get(key) != rule: changes.append(rule)
+                            payload["device_config"] = {"config_rules": changes}
+                            if changes or old.get("device_endpoints", []) != row.get("device_endpoints", []):
+                                self.request("PUT", route(kind, row), payload)
+                            continue
+                        if old is None:
+                            payload = copy.deepcopy(row)
+                            if kind == "devices":
+                                # AddDevice discovers endpoints using the driver;
+                                # it explicitly rejects endpoints in its request.
+                                payload["device_endpoints"] = []
+                                payload["device_config"]["config_rules"] = [rule for rule in payload["device_config"]["config_rules"]
+                                    if rule.get("custom", {}).get("resource_key", "").startswith("_connect/")]
+                            elif kind == "services":
+                                # Release 7 CreateService only creates a blank intent;
+                                # UpdateService then provisions endpoints and rules.
+                                payload["service_endpoint_ids"] = []
+                                payload["service_constraints"] = []
+                                payload["service_config"] = {"config_rules": []}
+                            self.request("POST", route(kind, row, True), {kind: [payload]})
+                            if kind == "devices":
+                                actual = self.request("GET", route(kind, row))
+                                old_rules = {canonical_bytes(rule) for rule in actual.get("device_config", {}).get("config_rules", [])}
+                                remaining = [rule for rule in row["device_config"]["config_rules"]
+                                    if not rule.get("custom", {}).get("resource_key", "").startswith("_connect/")
+                                    and canonical_bytes(rule) not in old_rules]
+                                if remaining:
+                                    update = copy.deepcopy(row)
+                                    update["device_config"] = {"config_rules": remaining}
+                                    self.request("PUT", route(kind, row), update)
+                            if kind == "services": self.request("PUT", route(kind, row), row)
+                        else:
+                            self.request("PUT", route(kind, row), row)
 
     def cleanup(self, document: dict) -> None:
         validate(document)

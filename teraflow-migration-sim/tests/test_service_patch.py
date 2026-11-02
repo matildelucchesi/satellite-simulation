@@ -2,9 +2,31 @@ import ast
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import Mock, patch
 
 
 class ServicePatchTests(unittest.TestCase):
+    def test_ordered_rules_are_applied_in_one_rpc_and_failures_propagate(self):
+        source=Path(__file__).parents[1]/'deploy/patches/p4_fabric_tna_l2_simple_service_handler.py'
+        method=next(node for node in ast.walk(ast.parse(source.read_text()))
+                    if isinstance(node,ast.FunctionDef) and node.name=='apply_rules')
+        namespace={}
+        exec(compile(ast.Module(body=[method],type_ignores=[]),str(source),'exec'),namespace)
+        apply=namespace['apply_rules']
+        device=SimpleNamespace(device_config=SimpleNamespace(config_rules=['previous']))
+        task=SimpleNamespace(configure_device=Mock())
+        rules=[{'action':1,'custom':{'resource_key':key}} for key in ('/tables/port','/action_profiles/member','/tables/hashed')]
+        with patch.dict('sys.modules',{'common.proto.context_pb2':SimpleNamespace(ConfigRule=lambda **kw:kw)}):
+            self.assertEqual(apply(task,device,rules),(3,0))
+            task.configure_device.assert_called_once_with(device)
+            self.assertEqual(device.device_config.config_rules,rules)
+            task.configure_device.reset_mock()
+            self.assertEqual(apply(task,device,[]),(0,0))
+            task.configure_device.assert_not_called()
+            task.configure_device.side_effect=RuntimeError('P4 rejected member')
+            with self.assertRaisesRegex(RuntimeError,'P4 rejected'):apply(task,device,rules)
+        self.assertNotIn('sleep',ast.unparse(method))
+
     def test_delete_rules_reverse_dependencies_with_stable_keys(self):
         source = Path(__file__).parents[1]/'deploy/patches/p4_fabric_tna_l2_simple_service_handler.py'
         method = next(node for node in ast.walk(ast.parse(source.read_text(encoding='utf-8')))

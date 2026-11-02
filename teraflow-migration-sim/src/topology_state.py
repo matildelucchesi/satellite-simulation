@@ -1,14 +1,40 @@
 """Read-only reconstruction of orbital UI state from durable evidence."""
 from datetime import datetime, timezone
 import json
+import math
 
 from .probes import json_lines
+
+
+def candidate_presentation(topology, event=None, controller=None):
+    """Expose the saved decision scores, including the selected residual-safe target."""
+    event=event or {}
+    ids={node['norad'] for node in topology.get('nodes',[])}
+    source=event.get('sat_a')
+    available=source in ids and isinstance(event.get('candidates'),list) and controller in (None,source)
+    scored={row['satellite_id']:row['score'] for row in (event.get('candidates') or [])
+            if available and isinstance(row.get('score'),(int,float)) and not isinstance(row['score'],bool)
+            and math.isfinite(row['score']) and 0 <= row['score'] <= 100}
+    reasons={row['satellite_id']:row.get('reason','not_eligible')
+             for row in (event.get('excluded_candidates') or []) if available
+             and row.get('orbital_s') in (None,event.get('trigger_s')) and row['satellite_id']!=event.get('sat_b')}
+    topology['ranking']={'available':available,'source_satellite':source if available else None,
+                         'target_satellite':event.get('sat_b') if available else None,
+                         'trigger_s':event.get('trigger_s') if available else None,'basis':'admitted-plan'}
+    for node in topology.get('nodes',[]):
+        sid=node['norad']
+        node.update(candidate_score=scored.get(sid),
+                    candidate_reason='current_controller' if sid==controller or available and sid==source else
+                        reasons.get(sid,'eligible' if sid in scored else 'not_eligible') if available else 'awaiting_plan',
+                    next_controller=available and sid==event.get('sat_b'))
+    return topology
 
 
 def presentation(directory, tick, *, context=None, metadata=None, replay=False):
     metadata = metadata or {}
     context = context or {}
     result = dict(controller_satellite=None, source_satellite=None, target_satellite=None,
+                  assigned_controller_satellite=None, placement_status='unassigned',
                   phase='unknown', migration_status='none', forwarding_observed=None,
                   updated_utc=None, stale=False, mode='replay' if replay else 'live')
     records = []
@@ -77,7 +103,10 @@ def presentation(directory, tick, *, context=None, metadata=None, replay=False):
             target = row.get('target_satellite', event.get('sat_b'))
             if source is not None:
                 result.update(source_satellite=source, target_satellite=target)
-            if phase == 'transfer':
+            if phase == 'controller_assigned' and row.get('baseline_verified') is True:
+                controller = row.get('controller_satellite')
+                slots[row.get('active_slot', 'sat-a')] = controller
+            elif phase == 'transfer':
                 result['migration_status'] = 'transferring'
             elif phase in {'completed', 'service_verified'}:
                 if target is not None:
@@ -94,10 +123,16 @@ def presentation(directory, tick, *, context=None, metadata=None, replay=False):
             elif phase in {'trigger', 'alignment', 'snapshot_initial', 'transfer_verified', 'target_start',
                            'restore_initial', 'restore_delta', 'verify', 'ack', 'quiescence'}:
                 result['migration_status'] = 'in_progress'
-    if not records and context.get('placement_status') == 'planned':
+    only_planning = all(kind == 'event' and row.get('phase') in {
+        'session_tick', 'planning', 'baseline_check', 'replanning', 'plan_admitted'
+    } for _, _, _, kind, row in records)
+    if only_planning and context.get('placement_status') == 'planned':
         next_event = context.get('next_migration') or {}
         result.update(phase='planned', source_satellite=context.get('controller_satellite'),
                       target_satellite=next_event.get('sat_b'), migration_status='planned')
+        if metadata.get('phase') in (None, 'planning', 'preparation') and not replay:
+            result.update(assigned_controller_satellite=context.get('controller_satellite'),
+                          placement_status='planned')
     result['controller_satellite'] = controller
     if latest_unix:
         result['updated_utc'] = datetime.fromtimestamp(latest_unix, timezone.utc).isoformat()
@@ -106,4 +141,6 @@ def presentation(directory, tick, *, context=None, metadata=None, replay=False):
         result['stale'] = not replay
     if metadata.get('controllers_fenced') and not replay:
         result['controller_satellite'] = None
+    if result['controller_satellite'] is not None:
+        result.update(assigned_controller_satellite=result['controller_satellite'], placement_status='confirmed')
     return result

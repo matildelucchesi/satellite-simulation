@@ -18,13 +18,19 @@ def finalize(result):
     result.setdefault('migration_completed', False)
     result.setdefault('observation_complete', False)
     result.setdefault('experimental_valid', True)
+    baseline = result.get('baseline') or {}
+    if (result.get('outcome') == 'invalid_baseline' or baseline.get('success') is False
+            or (result.get('run_id') and baseline.get('success') is not True)):
+        result['experimental_valid'] = False
+    result['measurement_valid'] = result['experimental_valid'] is True
     service = (result.get('service_verification') or {}).get('success') is True
     result['success'] = (result['migration_completed'] and service and result['observation_complete']
                          and result['experimental_valid'] is True and not interrupted
                          and not result['recovery_required'] and not result.get('failure_reason'))
     if result['recovery_required']: result['outcome'] = 'recovery_required'
     elif interrupted: result['outcome'] = 'interrupted'
-    elif result.get('outcome') == 'invalid_baseline' or result.get('baseline', {}).get('success') is False: result['outcome'] = 'invalid_baseline'
+    elif result.get('outcome') == 'preparation_failed': pass
+    elif result.get('outcome') == 'invalid_baseline' or baseline.get('success') is False or (result.get('run_id') and not baseline.get('success')): result['outcome'] = 'invalid_baseline'
     elif result['experimental_valid'] is False: result['outcome'] = 'invalid_lab'
     elif result['success']: result['outcome'] = 'success'
     else: result['outcome'] = 'experimental_failure'

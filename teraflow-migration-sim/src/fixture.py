@@ -13,6 +13,7 @@ HOSTS = [{"name": "h1", "satellite": 53848, "ip": "10.0.0.1/24", "mac": "00:00:0
 NAMESPACE = UUID("200e3a1f-2223-534f-a100-758e29c37f40")
 def stable_id(name): return str(uuid5(NAMESPACE, name))
 CONTEXT_UUID = stable_id("migration-lab")
+# Preserve the logical topology identity when membership expands.
 TOPOLOGY_UUID = stable_id(CONTEXT_UUID + "/starlink-17")
 TOPOLOGY_ID = {"context_id": {"context_uuid": {"uuid": CONTEXT_UUID}}, "topology_uuid": {"uuid": TOPOLOGY_UUID}}
 def device_id(sid): return {"device_uuid": {"uuid": stable_id(f"sat-{sid}")}}
@@ -36,7 +37,7 @@ def build(root: Path):
         if host: ports[sid][host["name"]] = len(neighbors)+1
         devices.append({"norad": sid, "dpid": index+1, "name": f"s{index+1}",
                         "grpc_port": 50001+index, "proxy_port": 51001+index, "ports": ports[sid]})
-    return {"schema_version": 1, "context": "migration-lab", "topology": "starlink-17",
+    return {"schema_version": 1, "context": "migration-lab", "topology": f"starlink-{len(ids)}",
             "service": "migration-l2", "emulator": {"devices": devices, "pairs": pairs, "hosts": HOSTS},
             "controller_proxy": "p4-proxy", "pipeline_binary": "/experiment/deploy/p4/bmv2.json",
             "pipeline_info": "/experiment/deploy/p4/p4info.txt"}

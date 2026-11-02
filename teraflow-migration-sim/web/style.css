@@ -41,3 +41,73 @@ main{max-width:1800px}.eyebrow{font-size:.7rem;letter-spacing:.15em;color:var(--
 .node text{font-size:16px}.node .role-label{font-size:10px}
 
 .comparison-phase{padding:.75rem 1rem;border-left:3px solid var(--color-accent);background:var(--color-panel);font-size:.875rem;color:var(--color-muted);margin-bottom:1.5rem}#plan-provenance{overflow-wrap:anywhere}.history-controls>button{margin-block:.5rem}
+
+.orbit-activity{padding:.85rem 0;margin:0;color:var(--color-ink);font-size:.9rem;border-bottom:1px solid var(--color-rule)}
+.controller-letter{display:none;text-anchor:middle;fill:var(--color-accent)!important;stroke:none!important;font:700 13px var(--font-body)!important}
+.node.source .controller-letter{display:block}
+.node .light-label{font:9px var(--font-body);text-anchor:middle;fill:var(--color-muted);stroke-width:3px}
+.satellite-trail{fill:none;stroke:var(--color-muted);stroke-width:3;opacity:.45;pointer-events:none}
+.illumination-caption{fill:var(--color-ink);font:600 12px var(--font-body)}
+.illumination-note{fill:var(--color-muted);font:11px var(--font-body)}
+.service-live .edge.service{stroke-dasharray:7 5;animation:service-flow 1.4s linear infinite}
+@keyframes service-flow{to{stroke-dashoffset:-24}}
+@media(prefers-reduced-motion:reduce){.service-live .edge.service{animation:none}}
+
+:root{--satellite-lit:#f5cf54;--satellite-shadow:#61a6ff;--controller-color:#c498ff}
+.node .satellite-body{fill:var(--satellite-lit);stroke:var(--satellite-lit);stroke-width:2;stroke-dasharray:none}
+.node.shadow .satellite-body{fill:var(--satellite-shadow);stroke:var(--satellite-shadow);stroke-dasharray:none}
+.node.source .satellite-body{fill:var(--controller-color);stroke:var(--controller-color);stroke-width:2}
+.node.source .controller-letter{fill:var(--color-map)!important}
+.node.source .role-label,#orbit-controller,.legend .key-controller{color:var(--controller-color);fill:var(--controller-color)}
+.legend .key-lit{color:var(--satellite-lit)}.legend .key-shadow{color:var(--satellite-shadow)}
+.orbit-layout{display:grid;grid-template-columns:minmax(0,1fr) 245px;gap:1rem;align-items:start}
+.phase-panel{min-width:0;border-top:1px solid var(--color-rule);padding-top:.85rem}
+.phase-panel h3{margin:0 0 .5rem;font-size:1rem}.phase-panel p{font-size:.72rem;margin-bottom:.75rem}
+.phase-countdowns{list-style:none;padding:0;margin:0 0 .75rem;max-height:440px;overflow-y:auto;scrollbar-color:var(--color-control) var(--color-map)}
+.phase-row{display:grid;grid-template-columns:1fr auto;gap:.25rem .5rem;width:100%;border:0;border-bottom:1px solid var(--color-rule);border-radius:0;padding:.65rem .25rem;text-align:left;white-space:normal;background:transparent;font-size:.78rem}
+.phase-name{color:var(--satellite-lit);font-weight:600}.phase-row.shadow .phase-name{color:var(--satellite-shadow)}.phase-row.controller .phase-name{color:var(--controller-color)}
+.phase-row strong{font-weight:500}.phase-next{grid-column:1/-1;color:var(--color-muted);font-size:.7rem}
+.phase-track{grid-column:1/-1;display:block;height:3px;background:var(--color-rule);margin-top:.2rem}
+.phase-track>span{display:block;height:100%;background:var(--satellite-lit)}.phase-row.shadow .phase-track>span{background:var(--satellite-shadow)}
+@media(hover:hover){.phase-row:hover{background:var(--color-panel)}}
+@media(max-width:65rem){.orbit-layout{grid-template-columns:minmax(0,1fr)}.phase-countdowns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 1rem;max-height:280px}}
+@media(max-width:39rem){.phase-countdowns{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.map-actions{flex-wrap:wrap}#show-initial{font-size:.75rem;padding:.4rem .7rem}
+.workbench{display:block}.workbench .control{position:static;margin:1.5rem 0;padding:1.5rem}
+.configuration-fields{border:0;padding:0;margin:1rem 0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.configuration-fields legend{font-weight:600;padding:0 0 .75rem}.configuration-fields label{display:grid;gap:.5rem;min-width:0;font-size:.875rem}
+.configuration-fields input:focus-visible{outline:2px solid var(--color-focus);outline-offset:3px}
+.control .buttons{display:flex;flex-wrap:wrap;gap:.75rem}.control .advanced-help{margin-block:.5rem}
+.completion-rule{font-size:.875rem;color:var(--color-ink);margin-block:1rem}.control #job-form{max-width:850px}
+@media(max-width:39rem){.configuration-fields{grid-template-columns:minmax(0,1fr)}.workbench .control{padding:1rem}}
+.node .score-label{font:600 12px var(--font-body);text-anchor:middle;fill:var(--color-ink);stroke-width:4px}
+.node .score-label.unavailable{fill:var(--color-muted)}.node .score-label.chosen{fill:var(--color-migration)}
+.node .next-controller-label{font:600 9px var(--font-body);text-anchor:middle;fill:var(--color-migration);stroke-width:3px}
+.node circle.next-controller-ring{fill:none;stroke:var(--color-migration);stroke-width:2;stroke-dasharray:3 3}
+#ranking-description{max-width:100ch;font-size:.78rem;line-height:1.6;margin-block:.75rem 1.25rem}
+
+/* Guided experiment: operational state precedes the orbital preview. */
+.experiment-console{margin-block:1.5rem 2.5rem;min-width:0}
+.experiment-steps{display:flex;flex-wrap:wrap;gap:.5rem 1.25rem;list-style-position:inside;padding:0;margin:1rem 0;font-size:.875rem;color:var(--color-muted)}
+.experiment-steps li[aria-current=step]{color:var(--color-accent);font-weight:700;text-decoration:underline;text-underline-offset:.35em}
+.experiment-status{position:sticky;top:0;z-index:5;background:var(--color-map);padding:1rem 0;border-block:1px solid var(--color-rule)}
+.experiment-status strong{font-size:1.2rem}.experiment-status p{max-width:75ch;margin:.5rem 0 0;font-size:.9rem;line-height:1.6}
+.experiment-times{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem;padding-block:1rem;font-variant-numeric:tabular-nums}
+.experiment-times dt{font-size:.75rem;color:var(--color-muted)}.experiment-times dd{margin:.35rem 0;overflow-wrap:anywhere;font-size:.875rem}
+.experiment-controls{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:2rem;align-items:start}
+.experiment-controls .control{position:static;padding:0;border:0;background:transparent;min-width:0}
+.experiment-controls .control h2{font-size:1.1rem}.experiment-controls .configuration-fields{grid-template-columns:minmax(0,1fr)}
+.experiment-controls .timeline{margin:0;min-width:0}.experiment-controls .timeline ol{max-height:26rem}
+.experiment-error{border:1px solid var(--color-error,var(--color-rule));padding:1rem;margin-bottom:1.5rem}.experiment-error p{max-width:75ch;line-height:1.6}
+.downloads a{overflow-wrap:anywhere}button:focus-visible,a:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--color-focus);outline-offset:3px}
+::selection{background:var(--color-accent);color:var(--color-map)}input,select{caret-color:var(--color-accent)}
+#show-all-phases{font-size:.8rem;margin-bottom:.75rem;min-height:44px}.comparison-phase{border-left:0}
+@media(max-width:50rem){.experiment-controls{grid-template-columns:minmax(0,1fr);gap:1.5rem}.experiment-times{grid-template-columns:repeat(2,minmax(0,1fr))}.experiment-steps{gap:.6rem 1rem}.experiment-status{position:static}}
+
+#console-health::before{display:none}
+
+#experiment-stop{float:right;margin-left:1rem;min-height:44px}.experiment-status::after{content:"";display:table;clear:both}.experiment-status strong{display:block}
+
+/* Extended constellations retain exact geometry without overlapping every label. */
+.node .score-label.unavailable{display:none}
+#topology.dense-constellation .node:not(.source):not(.destination):not(.selected):not(:hover):not(:focus) .satellite-id{display:none}

@@ -48,7 +48,7 @@ def main():
         source = a.export()
         (output/"source-snapshot.json").write_bytes(canonical_bytes(source))
         evidence["source_entity_counts"] = {key: len(value) for key,value in source["entities"].items()}
-        if len(source["entities"]["devices"]) != 17: raise RuntimeError("Fixture did not create all 17 devices")
+        if len(source["entities"]["devices"]) != len(fixture['emulator']['devices']): raise RuntimeError("Fixture did not create every configured device")
         evidence["stage"] = "restore_standby"
         expected = for_destination(source, fixture)
         b.restore(expected)

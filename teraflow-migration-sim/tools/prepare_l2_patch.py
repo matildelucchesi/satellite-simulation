@@ -6,6 +6,21 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 RELATIVE = 'src/service/service/service_handlers/p4_fabric_tna_l2_simple/p4_fabric_tna_l2_simple_service_handler.py'
+BATCH_RULES = '''def apply_rules(task_executor, device_obj, json_config_rules):
+    # ConfigureDevice accepts an ordered list and raises on driver failure.
+    # One RPC per port preserves P4 dependencies without repeating endpoint
+    # reconciliation and Context writes for every individual rule.
+    if device_obj is None: raise ValueError("Cannot configure an absent device")
+    if not json_config_rules: return 0, 0
+    from common.proto.context_pb2 import ConfigRule
+    rules = [ConfigRule(**rule) for rule in json_config_rules]
+    del device_obj.device_config.config_rules[:]
+    device_obj.device_config.config_rules.extend(rules)
+    task_executor.configure_device(device_obj)
+    return len(rules), 0
+
+
+'''
 REPLACEMENT = '''    def _create_rules(self, device_obj, port_id, action):
         # Local migration-lab patch: next IDs are actual egress port IDs.
         # L2 frames retain both host MACs; output_hashed selects a single port.
@@ -46,6 +61,7 @@ def main():
     if original.count(marker) != 1 or 'next_id = 2 if port_id == 1 else 1' not in original:
         raise ValueError('Unexpected upstream handler; patch refused')
     updated = original[:original.index(marker)] + REPLACEMENT
+    updated = updated.replace('class P4FabricL2SimpleServiceHandler', BATCH_RULES+'class P4FabricL2SimpleServiceHandler',1)
     directory = ROOT/'deploy/patches'; directory.mkdir(exist_ok=True)
     output = directory/source.name
     output.write_text(updated, encoding='utf-8', newline='\n')
@@ -56,7 +72,8 @@ def main():
                 'upstream_file': RELATIVE, 'upstream_sha256': hashlib.sha256(original.encode()).hexdigest(),
                 'patched_sha256': hashlib.sha256(output.read_bytes()).hexdigest(),
                 'patch_sha256': hashlib.sha256(patch.read_bytes()).hexdigest(),
-                'authorization': 'User approved tracked local L2NM compatibility patch on 2026-10-02'}
+                'authorization': 'User approved L2NM compatibility patch and correction of provisioning HTTP 500 on 2026-10-23',
+                'provisioning_policy': 'ordered-rules-one-configure-rpc-per-port-v1'}
     (directory/'manifest.json').write_text(json.dumps(metadata, indent=2)+'\n')
     print(json.dumps(metadata, indent=2))
 

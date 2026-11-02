@@ -11,6 +11,17 @@ from src.deployment import container_filters
 
 
 class UnifiedDeploymentTests(unittest.TestCase):
+    def test_controller_cpu_limits_fit_six_core_host_without_relaxing_reserve(self):
+        import json
+        stack=build();root=Path(__file__).parents[1]
+        controller=json.loads((root/'config/scenario.json').read_text())['controller']
+        self.assertEqual(controller['resource_profile']['cpu_cores'],6)
+        available=6*(1-controller['background_load_model']['candidate_cpu_start_percent']/100-controller['resource_reserve_fraction'])
+        for role in ('sat-a','sat-b'):
+            budget=sum(stack['services'][role+'-'+name]['cpus'] for name in ('cockroachdb','nats','kafka',*WORKLOAD))
+            self.assertAlmostEqual(budget,2.2)
+            self.assertLess(budget,available)
+
     def test_default_subnets_cannot_overlap_during_parallel_creation(self):
         networks = build()['networks']
         subnets = [ipaddress.ip_network(re.search(r':-([^}]+)',

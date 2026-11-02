@@ -20,6 +20,7 @@ from .measurements import resources
 from .deployment import compose_command, role_services
 from .processes import run_process
 from .probes import ping_observations, json_lines, summarize_ping, baseline_ready
+from .preparation_budget import PreparationBudget
 
 WORKLOAD = ('nbiservice', 'serviceservice', 'deviceservice', 'pathcompservice',
             'pathcomp-backend', 'contextservice')
@@ -39,7 +40,9 @@ class Compose:
     def command(self, role, *arguments, timeout=180):
         if role not in ('sat-a', 'sat-b'): raise ValueError('Unknown laboratory host')
         command = compose_command(*arguments)
+        if self.guard: self.guard()
         if self.remaining: timeout = min(timeout, self.remaining())
+        if timeout <= 0: raise TimeoutError('No budget left before Docker command')
         result = run_process(command, cwd=self.root, timeout=timeout, check=self.guard)
         if result.returncode: raise RuntimeError(result.stderr[-4000:] or result.stdout[-4000:])
         return result.stdout
@@ -63,7 +66,6 @@ class LiveBackend:
         self.compose = Compose(root)
         self.a, self.b = TfsAdapter('http://127.0.0.1:18080'), TfsAdapter('http://127.0.0.1:18081')
         self.fixture = json.loads((self.root/'config/fixture.json').read_text())
-        self.fixture['controller_proxy'] = http(18091)['ipv4']
         self.clock = None
         self.lock = threading.RLock()
         self.paused_updates = False
@@ -84,6 +86,7 @@ class LiveBackend:
         self.started_utc = utc_now()
         self.recovery_mode = False
         self.preparation_deadline = None
+        self.preparation_budget = None
         self.proxy_generation = None
         self.event_context = {}
         self.attempt = 0
@@ -106,6 +109,7 @@ class LiveBackend:
             deadline=self.event['deadline_s']-reserve
             if not self.recovery_mode: deadline=min(deadline,self.event.get('contact_end_s',deadline))
             return max(0, deadline - self.clock.orbital())
+        if self.preparation_budget: return self.preparation_budget.remaining()
         if self.preparation_deadline: return max(0, self.preparation_deadline-time.monotonic())
         return 180
 
@@ -139,36 +143,84 @@ class LiveBackend:
             append_json(self.directory/'operations.jsonl', item)
 
     def reset(self):
-        self.preparation_deadline = time.monotonic() + self.scenario.get('live', {}).get('preparation_timeout_s', 120)
-        emulator=http(18090,timeout=min(5,self.remaining()))
-        proxy=http(18091,timeout=min(5,self.remaining()))
-        if emulator['switch_count']!=len(self.orbit.ids) or not emulator['switches_alive']:
-            raise RuntimeError('Mininet/P4 switches are not ready')
-        if len(proxy['states'])!=len(self.orbit.ids) or not all(row['upstream_master'] for row in proxy['states']):
-            raise RuntimeError('P4 arbitration is not coherent')
-        self.compose.start('sat-a'); self.compose.start('sat-b')
-        # API cleanup is only applied to the explicit migration perimeter.
-        self.b.cleanup(self.b.export())
-        self.a.cleanup(self.a.export())
         initial_tick = self.event.get('start_s', max(0, self.event['trigger_s']-30))
         self.initial_tick = initial_tick
         graph = self.orbit.graph(initial_tick)
-        self.set_links(graph)
-        initial = state(self.fixture, graph)
-        if 53913 not in shortest_paths(graph, 53848): initial['entities']['services'] = []
-        self.a.restore(initial)
-        self.source_snapshot = self.a.export()
-        from .storage import atomic_json
-        atomic_json(self.directory/'prepared-snapshot.json', self.source_snapshot)
+        def initial_state():
+            document = state(self.fixture, graph)
+            if 53913 not in shortest_paths(graph, 53848): document['entities']['services'] = []
+            return document
+        initial = initial_state()
+        self.preparation_budget = PreparationBudget(self.directory, self.scenario, self.notify,
+                                                    self.preparation_status, document=initial)
+        stage = self.preparation_budget.stage
+        with stage('infrastructure'):
+            emulator=http(18090,timeout=min(5,self.remaining()))
+            proxy=http(18091,timeout=min(5,self.remaining()))
+            self.fixture['controller_proxy'] = proxy['ipv4']
+            if emulator['switch_count']!=len(self.orbit.ids) or not emulator['switches_alive']:
+                raise RuntimeError('Mininet/P4 switches are not ready')
+            if len(proxy['states'])!=len(self.orbit.ids) or not all(row['upstream_master'] for row in proxy['states']):
+                raise RuntimeError('P4 arbitration is not coherent')
+        with stage('start_source'): self.compose.start('sat-a')
+        with stage('start_target'): self.compose.start('sat-b')
+        with stage('clean_target'): self.b.cleanup(self.b.export())
+        with stage('clean_source'): self.a.cleanup(self.a.export())
+        with stage('restore_scenario'):
+            self.set_links(graph)
+            initial = initial_state()  # infrastructure resolved the proxy address
+            def restoring(event):
+                event = {**event, **self.event_context}
+                append_json(self.directory/'restore-operations.jsonl', {**event,'timestamp_utc':utc_now()})
+                self.notify(event)
+            self.a.notify = restoring
+            try:
+                self.a.restore(initial)
+                restoring({'phase':'restore_progress', 'counts':self.a.restore_progress,
+                           'verification':'running'})
+                self.source_snapshot = self.a.export()
+                from .snapshot import identity
+                mismatched = [kind for kind in ('contexts','topologies','devices','links','services')
+                    if {identity(kind,row) for row in initial['entities'][kind]} !=
+                       {identity(kind,row) for row in self.source_snapshot['entities'][kind]}]
+                if mismatched:
+                    raise RuntimeError('Initial inventory verification failed: '+str(mismatched))
+                restoring({'phase':'restore_progress', 'counts':self.a.restore_progress,
+                           'verification':'completed'})
+            finally:
+                self.a.notify = None
+            from .storage import atomic_json
+            atomic_json(self.directory/'prepared-snapshot.json', self.source_snapshot)
         # Explicit reconciliation also restores authority after a proxy restart.
-        self.admin('/recover')
-        self.admin('/clear-standby')
-        self.compose.stop('sat-b')
+        with stage('restore_authority'):
+            self.admin('/recover')
+            self.admin('/clear-standby')
+        with stage('stop_target'): self.compose.stop('sat-b')
         self.target_started = False
         self.graph_signature = self.signature(graph)
 
+    def preparation_status(self):
+        """Bounded, read-only evidence even after the operation budget expires."""
+        evidence = {}
+        for name, port in (('mininet',18090), ('p4_proxy',18091)):
+            try: evidence[name] = http(port, timeout=1)
+            except Exception as exc: evidence[name] = {'error':str(exc)}
+        result = run_process(compose_command('ps','--all','--format','json'), cwd=self.root, timeout=5)
+        rows = [json.loads(line) for line in result.stdout.splitlines() if line.strip()]
+        evidence['containers'] = [{'name':row.get('Name'), 'state':row.get('State'),
+                                  'health':row.get('Health'), 'service':row.get('Service')} for row in rows]
+        return evidence
+
     def establish_baseline(self, identifier):
         """Fresh probe process, fixed preparation geometry; orbital clock not started."""
+        if self.preparation_budget:
+            with self.preparation_budget.stage('baseline'):
+                result = self._establish_baseline(identifier)
+            self.preparation_budget = None
+            return result
+        return self._establish_baseline(identifier)
+
+    def _establish_baseline(self, identifier):
         probe_id = 'baseline-' + identifier
         directory = self.root/'results/lab'/probe_id
         started = time.time()
@@ -532,8 +584,11 @@ class LiveBackend:
         finally: self.recovery_mode = False
 
     def shutdown(self):
+        try: self.notify({'phase':'cleanup','label':'Messa in sicurezza del laboratorio'})
+        except OSError: pass
         self.recovery_mode = True
         self.preparation_deadline = None
+        self.preparation_budget = None
         errors = []
         self.stopping.set()
         try: http(18091, '/revoke', {})
@@ -545,7 +600,16 @@ class LiveBackend:
         for slot in ('sat-a', 'sat-b'):
             try: self.compose.stop(slot)
             except Exception as exc: errors.append(str(exc))
+        try:
+            status = http(18091)
+            if status.get('active') is not None: errors.append('P4 authority remains active after fencing')
+            for slot in ('sat-a', 'sat-b'):
+                if self.compose.command(slot, 'ps', '--status', 'running', '-q', *role_services(slot, WORKLOAD)).strip():
+                    errors.append('Controller workload still running: '+slot)
+        except Exception as exc: errors.append('Cleanup verification: '+str(exc))
         if errors: raise RuntimeError('; '.join(errors))
+        try: self.notify({'phase':'cleanup_verified','label':'Autorità revocata e controller arrestati: verifica conclusa'})
+        except OSError: pass
 
     def close(self):
         self.stopping.set()

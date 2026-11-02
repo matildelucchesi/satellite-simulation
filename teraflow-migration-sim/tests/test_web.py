@@ -11,6 +11,32 @@ from src.storage import atomic_json,append_json
 
 
 class LocalWebTests(unittest.TestCase):
+    def test_historical_geometry_uses_archived_constellation(self):
+        from types import SimpleNamespace
+        app=self.server.application;app.orbit=SimpleNamespace(ids=[1,2,3])
+        directory=self.root/'historical';atomic_json(directory/'inputs.json',{'scenario':{'orbital':{'satellites_total':2}}})
+        archive=self.root/'artifacts/constellation-profiles/old/original'
+        atomic_json(archive/'config/selected_constellation.json',{'satellites':[{'norad_id':1},{'norad_id':2}]})
+        replay=archive/'artifacts/orbit/replay.npz';replay.parent.mkdir(parents=True);replay.write_bytes(b'fixture')
+        with patch('src.orbit.Orbit',return_value=SimpleNamespace(ids=[1,2])) as load:
+            view=app.historical_geometry(directory)
+        self.assertIsNot(view,app);self.assertEqual(view.orbit.ids,[1,2])
+        self.assertEqual(app.orbit.ids,[1,2,3]);load.assert_called_once_with(replay)
+
+    def test_dead_worker_is_exposed_without_releasing_the_lab_lock(self):
+        import time
+        app=self.server.application
+        identifier='job-'+'e'*32
+        atomic_json(self.root/'config/scenario.json',{})
+        atomic_json(app.jobs.guard,{'job_id':identifier,'worker_pid':999999})
+        atomic_json(app.jobs.directory/identifier/'job.json',{'job_id':identifier,'status':'running'})
+        app.cached_status={};app.cached_at=time.monotonic()
+        with patch('src.web.process_running',return_value=False):
+            status=app.status()
+        self.assertIs(status['worker_alive'],False)
+        self.assertEqual(status['lock']['job_id'],identifier)
+        self.assertTrue(app.jobs.guard.exists())
+
     def test_simulation_readiness_explains_missing_preparation_and_deleted_evidence(self):
         application=self.server.application
         readiness=application.simulation_readiness()
@@ -149,6 +175,47 @@ class LocalWebTests(unittest.TestCase):
         self.assertEqual(data['simulation']['placement_status'],'planned')
         self.assertIsNone(data['simulation']['active_slot'])
 
+    def test_initial_configuration_assigns_lit_connected_host_and_stays_stationary(self):
+        from types import SimpleNamespace
+        self.server.application.orbit=SimpleNamespace(duration=86400)
+        fixture={'orbital_s':0,'links':[[11,22],[11,33]],'nodes':[
+            {'norad':11,'eclipsed':False,'next_transition_s':20},
+            {'norad':22,'eclipsed':True,'next_transition_s':500},
+            {'norad':33,'eclipsed':False,'next_transition_s':90},
+            {'norad':44,'eclipsed':False,'next_transition_s':900}]}
+        with patch.object(self.server.application,'topology',side_effect=lambda **kwargs:dict(fixture)) as topology:
+            views=[]
+            for _ in range(2):
+                with urlopen(self.url+'/api/v1/initial-topology',timeout=5) as response:
+                    views.append(json.load(response))
+        self.assertEqual(views[0],views[1])
+        self.assertIsNone(views[0]['initial_configuration'])
+        self.assertIsNone(views[0]['presentation']['assigned_controller_satellite'])
+        self.assertEqual(views[0]['presentation']['mode'],'preview')
+        self.assertIsNone(views[0]['presentation']['controller_satellite'])
+        topology.assert_called_with(tick=0)
+
+    def test_initial_configuration_without_lit_connected_host_blocks_preview(self):
+        from types import SimpleNamespace
+        self.server.application.orbit=SimpleNamespace(duration=86400)
+        with patch.object(self.server.application,'topology',return_value={
+            'links':[], 'nodes':[{'norad':11,'eclipsed':False,'next_transition_s':20}]}):
+            self.assertIsNone(self.server.application.initial_topology()['initial_configuration'])
+
+    def test_explicit_initial_configuration_is_preserved_and_invalid_choices_are_rejected(self):
+        from types import SimpleNamespace
+        app=self.server.application;app.orbit=SimpleNamespace(duration=86400)
+        fixture={'orbital_s':2979,'links':[[51726,53913]],'nodes':[
+            {'norad':51726,'eclipsed':False,'next_transition_s':4000},
+            {'norad':53913,'eclipsed':True,'next_transition_s':3100}]}
+        with patch.object(app,'topology',side_effect=lambda **kwargs:dict(fixture)) as topology:
+            with urlopen(self.url+'/api/v1/initial-topology?initial_satellite_id=51726&start_orbital_s=2979') as response:
+                data=json.load(response)
+            self.assertEqual(data['initial_configuration'],{'initial_satellite_id':51726,'start_orbital_s':2979})
+            topology.assert_called_with(tick=2979)
+            for host,tick in ((53913,2979),(99999,2979),(51726,-1),(51726,86400)):
+                with self.subTest(host=host,tick=tick),self.assertRaises(ValueError):app.initial_topology(host,tick)
+
     def test_simulation_topology_advances_during_migration_without_new_session_sample(self):
         directory=self.root/'simulation'
         atomic_json(directory/'inputs.json',{})
@@ -165,11 +232,34 @@ class LocalWebTests(unittest.TestCase):
             data=self.server.application.simulation_topology(directory)
         topology.assert_called_once_with(tick=120)
         self.assertEqual(data['presentation']['migration_status'],'transferring')
+        self.assertTrue(data['clock_running'])
         self.assertFalse(data['presentation']['forwarding_observed'])
         with patch.object(self.server.application,'topology',return_value={}):
             replay=self.server.application.simulation_topology(directory,105)
         self.assertEqual(replay['presentation']['migration_status'],'planned')
         self.assertEqual(replay['presentation']['mode'],'replay')
+        self.assertFalse(replay['clock_running'])
+
+    def test_live_motion_looks_ahead_in_geometry_without_changing_controller_evidence(self):
+        from types import SimpleNamespace
+        self.server.application.orbit=SimpleNamespace(duration=122)
+        directory=self.root/'motion-session'
+        atomic_json(directory/'inputs.json',{})
+        atomic_json(directory/'metadata.json',{'start_s':100,'phase':'running'})
+        append_json(directory/'observations.jsonl',{'orbital_s':120,'controller_satellite':53848,'active_slot':'sat-a'})
+        def geometry(tick):return {'orbital_s':tick,'nodes':[{'norad':53848,'orbital_angle_rad':tick/100}],
+                                   'presentation':{'controller_satellite':None}}
+        with patch.object(self.server.application,'topology',side_effect=geometry) as topology:
+            data=self.server.application.simulation_topology(directory)
+        self.assertEqual([call.kwargs['tick'] for call in topology.call_args_list],[120,121])
+        self.assertEqual(data['presentation']['controller_satellite'],53848)
+        self.assertEqual(data['motion_frames'][0]['orbital_s'],121)
+        self.assertGreater(data['motion_frames'][0]['nodes'][0]['orbital_angle_rad'],data['nodes'][0]['orbital_angle_rad'])
+        with patch.object(self.server.application,'topology',side_effect=geometry) as topology:
+            replay=self.server.application.simulation_topology(directory,120)
+        topology.assert_called_once_with(tick=120)
+        self.assertNotIn('motion_frames',replay)
+        self.assertFalse(replay['clock_running'])
 
     def test_schematic_orbit_angles_advance_with_frozen_positions(self):
         import numpy as np
@@ -178,7 +268,8 @@ class LocalWebTests(unittest.TestCase):
                              [np.cos(t/100),0,np.sin(t/100)]] for t in range(61)])
         self.server.application.orbit=SimpleNamespace(positions=positions,ids=[53913,53848],
             index={53913:0,53848:1},graph=lambda tick:{53913:{53848:1},53848:{53913:1}},
-            operational=lambda sid,tick:True)
+            operational=lambda sid,tick:True,
+            illumination_window=lambda sid,tick:{'phase_start_s':0,'next_transition_s':45})
         atomic_json(self.root/'config/selected_constellation.json',{'satellites':[
             {'norad_id':53913,'plane':1,'phase_rank':0},
             {'norad_id':53848,'plane':2,'phase_rank':0}]})
@@ -186,6 +277,7 @@ class LocalWebTests(unittest.TestCase):
         later=self.server.application.topology(tick=30)
         self.assertAlmostEqual(initial['nodes'][0]['orbital_angle_rad'],0)
         self.assertAlmostEqual(later['nodes'][0]['orbital_angle_rad'],.3)
+        self.assertEqual(later['nodes'][0]['next_transition_s'],45)
         self.assertIsNone(later['presentation']['controller_satellite'])
 
     def test_continuous_comparison_history_details_artifacts_and_validation(self):
@@ -210,13 +302,20 @@ class LocalWebTests(unittest.TestCase):
     def test_console_serves_only_paired_launch_and_orbit_script(self):
         source=Path(__file__).parents[1]/'web'
         (self.root/'web').mkdir()
-        for name in ('index.html','app.js','orbit-view.js'):
+        for name in ('index.html','app.js','orbit-view.js','experiment-state.js'):
             (self.root/'web'/name).write_bytes((source/name).read_bytes())
         with urlopen(self.url+'/',timeout=5) as response:
             document=response.read().decode('utf-8')
-            self.assertIn('Durata per modalità',document)
+            self.assertNotIn('id="duration"',document)
+            self.assertNotIn('id="additional-data"',document)
+            self.assertIn('id="channel-rate"',document)
+            self.assertIn('3 migrazioni verificate per HOT e 3 per COLD',document)
+            self.assertLess(document.index('class="control"'),document.index('id="topology"'))
+            self.assertLess(document.index('id="timeline"'),document.index('id="topology"'))
+            self.assertIn('/experiment-state.js',document)
+            self.assertLess(document.index('class="control"'),document.index('class="timeline"'))
             self.assertNotIn('id="operation"',document)
             self.assertNotIn('Funzioni avanzate',document)
-        for asset in ('app.js','orbit-view.js'):
+        for asset in ('app.js','orbit-view.js','experiment-state.js'):
             with urlopen(self.url+'/'+asset,timeout=5) as response:
                 self.assertEqual(response.status,200)

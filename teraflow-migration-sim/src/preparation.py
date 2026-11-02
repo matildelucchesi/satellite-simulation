@@ -20,6 +20,8 @@ class Preparation:
         functional=self.root/'results/functional-gate.json'
         if not functional.exists() or not json.loads(functional.read_text()).get('complete'):
             return {'complete':False,'reason':'Baseline-valid hot and cold functional gates required before calibration'}
+        from .simulation import engine_fingerprint
+        fingerprint=engine_fingerprint(self.root)
         runs=[]
         for method in ('cold','hot'):
             for replica in range(3):
@@ -28,7 +30,14 @@ class Preparation:
                 runs.append(result)
                 atomic_json(self.root/'results/calibration-progress.json',{'runs':[r['run_id'] for r in runs]})
                 if not result['success'] or not result.get('baseline',{}).get('success'):
-                    return {'complete':False,'reason':result['outcome'],'runs':[r['run_id'] for r in runs]}
+                    return {'complete':False,'reason':result['outcome'],'error':result.get('error'),
+                            'failure_reason':result.get('failure_reason'),
+                            'cleanup_verified':result.get('controllers_fenced') is True and not result.get('recovery_required'),
+                            'recovery_required':result.get('recovery_required',False),
+                            'runs':[r['run_id'] for r in runs]}
+        if engine_fingerprint(self.root)!=fingerprint:
+            return {'complete':False,'reason':'implementation_changed_during_calibration',
+                    'runs':[r['run_id'] for r in runs]}
         manifest=self.calibration_manifest(runs)
         from tools.validate_artifact_manifest import validate
         issues=validate(manifest)
@@ -40,8 +49,7 @@ class Preparation:
         horizon=math.ceil(max(row['total_operation_s'] for row in estimates)*1.2)
         output={'complete':True,'execution_kind':'live-calibration','runs':[r['run_id'] for r in runs],
                 'estimates':estimates,'horizon_s':horizon,'manifest':describe(self.root/'config/artifact_manifest.json')}
-        from .simulation import engine_fingerprint
-        output['engine_fingerprint']=engine_fingerprint(self.root)
+        output['engine_fingerprint']=fingerprint
         atomic_json(self.root/'results/calibration.json',output)
         return output
 
@@ -120,7 +128,7 @@ class Preparation:
             'reason':None if multiple else 'No trigger has two eligible candidates'})
         files=['config/scenario.json','config/fixture.json','config/selected_constellation.json',
             'config/artifact_manifest.json','config/selected_events.json','artifacts/orbit/replay.npz',
-            'artifacts/orbit/replay.json','artifacts/images-l2-patched-v2/bundle.json',
+            'artifacts/orbit/replay.json','artifacts/images-l2-patched-v3/bundle.json',
             'deploy/patches/manifest.json','deploy/patches/device-manifest.json',
             'results/calibration.json','results/events.json']
         files.extend(str(p.relative_to(self.root)) for p in (self.root/'src').glob('*.py'))

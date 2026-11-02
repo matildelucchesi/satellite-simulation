@@ -10,6 +10,49 @@ from src.storage import atomic_json
 
 
 class DurableStateTests(unittest.TestCase):
+    def test_missing_windows_process_output_keeps_owner_unconfirmed(self):
+        from src.jobs import process_running
+        with patch('src.jobs.os.name','nt'),patch('src.jobs.subprocess.check_output',return_value=None):
+            self.assertTrue(process_running(12345))
+
+    def test_explicit_recovery_fences_run_without_clock_instead_of_restoring_source(self):
+        from src.experiment import Experiment
+        with tempfile.TemporaryDirectory() as tmp,patch('src.live_backend.Compose.stop') as stop,patch('src.experiment.http'):
+            root=Path(tmp);atomic_json(root/'config/scenario.json',{})
+            job='job-'+'a'*32;run='run-'+'b'*32
+            atomic_json(root/'results/jobs'/job/'job.json',{'job_id':job,'status':'recovery_required'})
+            atomic_json(root/'results/jobs'/job/'active-checkpoint.json',{'kind':'run','run_id':run})
+            directory=root/'results/runs'/run
+            atomic_json(directory/'inputs.json',{'event':{'deadline_s':100}})
+            atomic_json(directory/'metadata.json',{'run_id':run,'outcome':'recovery_required','success':False})
+            output=Experiment(root).recover(job)
+            self.assertTrue(output['complete']);self.assertFalse(output['clock_resumed'])
+            self.assertFalse(output['source_restored']);self.assertEqual(stop.call_count,2)
+            metadata=json.loads((directory/'metadata.json').read_text())
+            self.assertFalse(metadata['success']);self.assertTrue(metadata['controllers_fenced'])
+            self.assertEqual(json.loads((directory/'pre-fenced-recovery.json').read_text())['outcome'],'recovery_required')
+
+    def test_recovery_retry_resolves_original_checkpoint_owner(self):
+        with tempfile.TemporaryDirectory() as tmp,patch('src.jobs.process_running',return_value=False),patch('src.jobs.subprocess.Popen') as launch:
+            launch.return_value.pid=12345;manager=JobManager(Path(tmp))
+            original='job-'+'a'*32;first='job-'+'b'*32;second='job-'+'c'*32
+            for identifier,operation,previous in ((original,'compare_continuous',None),(first,'recover',original),(second,'recover',first)):
+                atomic_json(manager.directory/identifier/'job.json',{'job_id':identifier,'operation':operation,
+                    'previous_job_id':previous,'status':'recovery_required'})
+            atomic_json(manager.guard,{'job_id':second,'worker_pid':99999})
+            job=manager.start_recovery()
+            self.assertEqual(job['previous_job_id'],original)
+            self.assertTrue((manager.directory/second/'interrupted-lock.json').exists())
+            self.assertEqual(manager.get(original)['status'],'recovery_required')
+
+    def test_recovery_cycle_is_rejected_without_replacing_lock(self):
+        with tempfile.TemporaryDirectory() as tmp,patch('src.jobs.process_running',return_value=False):
+            manager=JobManager(Path(tmp));identifier='job-'+'a'*32
+            atomic_json(manager.directory/identifier/'job.json',{'job_id':identifier,'operation':'recover','previous_job_id':identifier})
+            atomic_json(manager.guard,{'job_id':identifier,'worker_pid':99999})
+            with self.assertRaises(ValueError):manager.start_recovery()
+            self.assertEqual(json.loads(manager.guard.read_text())['job_id'],identifier)
+
     def test_continuous_comparison_worker_dispatches_one_composite_job(self):
         with tempfile.TemporaryDirectory() as tmp, patch('src.jobs.subprocess.Popen') as launch, patch('src.experiment.Experiment') as factory:
             launch.return_value.pid=12345

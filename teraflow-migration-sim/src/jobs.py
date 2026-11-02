@@ -5,15 +5,17 @@ import os
 import subprocess
 import sys
 import threading
+import time
 import traceback
 import uuid
 from pathlib import Path
-from .storage import atomic_json, append_json, utc_now
+from .storage import atomic_json, append_json, utc_now, read_json
 from .results import requires_recovery
 from .checkpoints import ActiveCheckpoint
 
 OPERATIONS = {'resource_diagnostic','simulate','functional','continuous_validation','environment','run','calibrate','select','campaign','faults','sensitivity','report','recover','diagnostic','complete'}
 OPERATIONS.add('compare_continuous')
+OPERATIONS.add('expand_constellation')
 
 
 def process_running(pid):
@@ -21,6 +23,8 @@ def process_running(pid):
     if os.name=='nt':
         import csv
         output=subprocess.check_output(['tasklist','/FI',f'PID eq {int(pid)}','/FO','CSV','/NH'],text=True,timeout=10)
+        # An unavailable process listing must not certify that the lab owner died.
+        if output is None:return True
         return any(len(row)>1 and row[1]==str(pid) for row in csv.reader(output.splitlines()))
     try:os.kill(pid,0);return True
     except ProcessLookupError:return False
@@ -39,7 +43,13 @@ class JobManager:
 
     def validate(self, operation, parameters):
         if operation not in OPERATIONS: raise ValueError('Unknown application operation')
+        if operation=='expand_constellation':
+            selection=read_json(self.root/'config/selected_constellation.json')
+            if len(selection['satellites']) not in (17,42):
+                raise ValueError('Espansione già completata; nessun ulteriore aggiornamento automatico previsto')
         if operation == 'compare_continuous':
+            if any(key in parameters for key in ('initial_satellite_id','start_orbital_s')):
+                raise ValueError('La partenza è esclusivamente automatica')
             from .continuous_comparison import validate_parameters
             validate_parameters(parameters)
             return
@@ -87,6 +97,7 @@ class JobManager:
         guard=json.loads(self.guard.read_text())
         if process_running(guard.get('worker_pid',guard.get('launcher_pid'))):
             raise BusyError('Worker is alive; request interruption and wait for its recovery')
+        target=self.recovery_target(guard['job_id'])
         claim=self.directory/'recovery.lock'
         if claim.exists():
             owner=json.loads(claim.read_text())
@@ -97,8 +108,8 @@ class JobManager:
         with os.fdopen(descriptor,'w') as stream:json.dump({'pid':os.getpid()},stream)
         try:
             # Retain previous lock as evidence, then acquire normal exclusivity.
-            previous=guard['job_id']
-            atomic_json(self.directory/previous/'interrupted-lock.json',guard)
+            previous=target
+            atomic_json(self.directory/guard['job_id']/'interrupted-lock.json',guard)
             job_id='job-'+uuid.uuid4().hex
             directory=self.directory/job_id;directory.mkdir()
             atomic_json(self.guard,{'job_id':job_id,'launcher_pid':os.getpid(),'created_utc':utc_now()})
@@ -112,13 +123,31 @@ class JobManager:
             return self.get(job_id)
         finally:claim.unlink(missing_ok=True)
 
+    def recovery_target(self, identifier):
+        """Retries recover the original operation and its checkpoint, never another recovery."""
+        seen=set()
+        while identifier not in seen:
+            seen.add(identifier)
+            job=self.get(identifier)
+            if job['operation']!='recover':return identifier
+            identifier=job.get('previous_job_id')
+            if not identifier:raise ValueError('Recovery has no original operation')
+        raise ValueError('Cyclic recovery history')
+
     def get(self, job_id):
         if not job_id.startswith('job-') or len(job_id)!=36 or any(c not in '0123456789abcdef' for c in job_id[4:]):
             raise ValueError('Invalid job identifier')
-        return json.loads((self.directory/job_id/'job.json').read_text(encoding='utf-8'))
+        return self.with_progress(read_json(self.directory/job_id/'job.json'))
+
+    def with_progress(self, job):
+        job['cancellation_requested'] = (self.directory/job['job_id']/'cancel.json').exists()
+        for name in ('progress', 'worker-heartbeat'):
+            path = self.directory/job['job_id']/(name+'.json')
+            if path.exists(): job[name.replace('-', '_')] = read_json(path)
+        return job
 
     def list(self):
-        return sorted([json.loads(p.read_text(encoding='utf-8')) for p in self.directory.glob('job-*/job.json')],
+        return sorted([self.with_progress(read_json(p)) for p in self.directory.glob('job-*/job.json')],
                       key=lambda row:row.get('created_utc',''),reverse=True)
 
     def stop(self, job_id):
@@ -137,13 +166,24 @@ class JobManager:
         guard['worker_pid']=os.getpid();atomic_json(self.guard,guard)
         cancel=threading.Event();finished=threading.Event()
         def watch():
+            last_heartbeat = 0
             while not finished.wait(.1):
-                if (directory/'cancel.json').exists(): cancel.set();return
+                if (directory/'cancel.json').exists(): cancel.set()
+                if time.monotonic()-last_heartbeat >= 2:
+                    try: atomic_json(directory/'worker-heartbeat.json', {'timestamp_utc': utc_now()})
+                    except OSError:
+                        # Liveness reporting must never disable cancellation.
+                        pass
+                    last_heartbeat = time.monotonic()
         threading.Thread(target=watch,daemon=True).start()
         sequence=[0]
         event_lock=threading.Lock()
         def publish(event):
             with event_lock:
+                from .progress import advance
+                progress_path = directory/'progress.json'
+                previous = read_json(progress_path) if progress_path.exists() else {}
+                atomic_json(progress_path, advance(previous, event))
                 checkpoint=directory/'active-checkpoint.json'
                 if checkpoint.exists():
                     active=json.loads(checkpoint.read_text())

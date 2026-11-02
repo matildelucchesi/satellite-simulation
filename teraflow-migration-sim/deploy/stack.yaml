@@ -2,6 +2,7 @@
 name: teraflow
 services:
   sat-a-cockroachdb:
+    cpus: 0.25
     image: cockroachdb/cockroach:latest-v22.2@sha256:c0f188df42c238314d61f67aca61455125ecaa3c81bf0ba0be793fde7229d3e9
     entrypoint:
     - /cockroach/cockroach
@@ -33,6 +34,7 @@ services:
         aliases:
         - cockroachdb
   sat-a-nats:
+    cpus: 0.05
     image: nats:2.9-alpine@sha256:d402af4147fc7ba334ecc45b1cb14a6f46f32ad6a36873fbd1a6a37ce42452dd
     command:
     - --http_port
@@ -73,6 +75,7 @@ services:
         aliases:
         - kafka-volume-init
   sat-a-kafka:
+    cpus: 0.25
     image: apache/kafka:3.9.1@sha256:4ceccc577f03f51f6af8dbfda55194d0d892f4fa7913ffbded567ce3895622ed
     environment:
       KAFKA_NODE_ID: '1'
@@ -101,10 +104,10 @@ services:
       - --bootstrap-server
       - localhost:9092
       - --list
-      interval: 10s
-      timeout: 10s
-      retries: 30
-      start_period: 30s
+      interval: 30s
+      timeout: 30s
+      retries: 5
+      start_period: 60s
     container_name: sat-a-kafka-1
     labels:
       org.teraflow.role: sat-a
@@ -113,6 +116,7 @@ services:
         aliases:
         - kafka
   sat-a-contextservice:
+    cpus: 0.35
     image: tfs-migration/context:7.0.0-fb870787
     environment:
       LOG_LEVEL: INFO
@@ -156,6 +160,7 @@ services:
         aliases:
         - contextservice
   sat-a-deviceservice:
+    cpus: 0.6
     image: tfs-migration/device:7.0.0-fb870787-lab2
     environment:
       LOG_LEVEL: INFO
@@ -196,6 +201,7 @@ services:
     volumes:
     - ..:/experiment:ro
   sat-a-pathcomp-backend:
+    cpus: 0.1
     image: tfs-migration/pathcomp-backend:7.0.0-fb870787
     healthcheck:
       test:
@@ -219,6 +225,7 @@ services:
         aliases:
         - pathcomp-backend
   sat-a-pathcompservice:
+    cpus: 0.1
     image: tfs-migration/pathcomp-frontend:7.0.0-fb870787
     environment:
       LOG_LEVEL: INFO
@@ -259,7 +266,8 @@ services:
         aliases:
         - pathcompservice
   sat-a-serviceservice:
-    image: tfs-migration/service:7.0.0-fb870787-lab2
+    cpus: 0.25
+    image: tfs-migration/service:7.0.0-fb870787-lab3
     environment:
       LOG_LEVEL: INFO
       CONTEXTSERVICE_SERVICE_HOST: contextservice
@@ -298,6 +306,7 @@ services:
         aliases:
         - serviceservice
   sat-a-nbiservice:
+    cpus: 0.25
     image: tfs-migration/nbi:7.0.0-fb870787
     environment:
       LOG_LEVEL: INFO
@@ -342,6 +351,7 @@ services:
         aliases:
         - nbiservice
   sat-b-cockroachdb:
+    cpus: 0.25
     image: cockroachdb/cockroach:latest-v22.2@sha256:c0f188df42c238314d61f67aca61455125ecaa3c81bf0ba0be793fde7229d3e9
     entrypoint:
     - /cockroach/cockroach
@@ -373,6 +383,7 @@ services:
         aliases:
         - cockroachdb
   sat-b-nats:
+    cpus: 0.05
     image: nats:2.9-alpine@sha256:d402af4147fc7ba334ecc45b1cb14a6f46f32ad6a36873fbd1a6a37ce42452dd
     command:
     - --http_port
@@ -413,6 +424,7 @@ services:
         aliases:
         - kafka-volume-init
   sat-b-kafka:
+    cpus: 0.25
     image: apache/kafka:3.9.1@sha256:4ceccc577f03f51f6af8dbfda55194d0d892f4fa7913ffbded567ce3895622ed
     environment:
       KAFKA_NODE_ID: '1'
@@ -441,10 +453,10 @@ services:
       - --bootstrap-server
       - localhost:9092
       - --list
-      interval: 10s
-      timeout: 10s
-      retries: 30
-      start_period: 30s
+      interval: 30s
+      timeout: 30s
+      retries: 5
+      start_period: 60s
     container_name: sat-b-kafka-1
     labels:
       org.teraflow.role: sat-b
@@ -453,6 +465,7 @@ services:
         aliases:
         - kafka
   sat-b-contextservice:
+    cpus: 0.35
     image: tfs-migration/context:7.0.0-fb870787
     environment:
       LOG_LEVEL: INFO
@@ -496,6 +509,7 @@ services:
         aliases:
         - contextservice
   sat-b-deviceservice:
+    cpus: 0.6
     image: tfs-migration/device:7.0.0-fb870787-lab2
     environment:
       LOG_LEVEL: INFO
@@ -536,6 +550,7 @@ services:
     volumes:
     - ..:/experiment:ro
   sat-b-pathcomp-backend:
+    cpus: 0.1
     image: tfs-migration/pathcomp-backend:7.0.0-fb870787
     healthcheck:
       test:
@@ -559,6 +574,7 @@ services:
         aliases:
         - pathcomp-backend
   sat-b-pathcompservice:
+    cpus: 0.1
     image: tfs-migration/pathcomp-frontend:7.0.0-fb870787
     environment:
       LOG_LEVEL: INFO
@@ -599,7 +615,8 @@ services:
         aliases:
         - pathcompservice
   sat-b-serviceservice:
-    image: tfs-migration/service:7.0.0-fb870787-lab2
+    cpus: 0.25
+    image: tfs-migration/service:7.0.0-fb870787-lab3
     environment:
       LOG_LEVEL: INFO
       CONTEXTSERVICE_SERVICE_HOST: contextservice
@@ -638,6 +655,7 @@ services:
         aliases:
         - serviceservice
   sat-b-nbiservice:
+    cpus: 0.25
     image: tfs-migration/nbi:7.0.0-fb870787
     environment:
       LOG_LEVEL: INFO
@@ -705,7 +723,8 @@ services:
       - python3
       - -c
       - import json,urllib.request; s=json.load(urllib.request.urlopen('http://localhost:8089/',timeout=3));
-        assert s['switch_count']==17 and s['switches_alive']
+        f=json.load(open('/experiment/config/fixture.json')); assert s['switch_count']==len(f['emulator']['devices'])
+        and s['switches_alive']
       interval: 5s
       timeout: 5s
       retries: 30

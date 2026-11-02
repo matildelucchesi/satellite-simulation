@@ -99,6 +99,10 @@ class Migration:
                 image_receipt = self.events[-1]["receipt"]
                 destination = str(event.get('sat_b', 'sat-b'))
                 self.inventory.accept(destination, describe(image_bundle), image_receipt)
+                additional=getattr(self.backend,'additional_payload',None)
+                if additional is not None:
+                    result['additional_data_bytes']=additional.stat().st_size
+                    self.payload(additional,event)
                 state_receipt = self.payload(snapshot_path, event)
                 self.inventory.require(destination)
                 self.transition("target_start")

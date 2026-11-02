@@ -34,9 +34,9 @@ def main():
         parameters.update(duration_s=args.duration_s,start_orbital_s=args.start_orbital_s,
             initial_satellite_id=args.initial_satellite_id,max_migrations=args.max_migrations)
     if args.operation=='compare_continuous':
-        parameters={'rate_bps':args.rate_bps,'duration_s':args.duration_s,
-            'start_orbital_s':args.start_orbital_s,'initial_satellite_id':args.initial_satellite_id,
-            'max_migrations':args.max_migrations}
+        if args.start_orbital_s is not None or args.initial_satellite_id is not None:
+            parser.error('La partenza è esclusivamente automatica')
+        parameters={'rate_bps':args.rate_bps,'migration_count':3}
     job=manager.start(args.operation,parameters if args.operation in ('run','simulate','compare_continuous') else {})
     print(json.dumps(job,indent=2),flush=True)
     if args.wait:

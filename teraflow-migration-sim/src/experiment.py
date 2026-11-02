@@ -21,6 +21,10 @@ from .handover import execute as execute_handover
 
 
 class Experiment(Preparation, Analysis):
+    def expand_constellation(self):
+        from .constellation import expand
+        return expand(self)
+
     def __init__(self, root, cancel=None, publish=None):
         self.root = Path(root).resolve()
         self.cancel = cancel
@@ -35,7 +39,7 @@ class Experiment(Preparation, Analysis):
         return self._orbit
 
     def bundle(self):
-        path = self.root/'artifacts/images-l2-patched-v2/bundle.json'
+        path = self.root/'artifacts/images-l2-patched-v3/bundle.json'
         manifest = json.loads(path.read_text())
         verify_artifact(manifest['image_bundle'])
         for name in ('local_patch','device_patch'):
@@ -101,8 +105,19 @@ class Experiment(Preparation, Analysis):
             orbital=latest['orbital_s']+max(0,elapsed)
         else:
             compose.stop('sat-a')
-            return {'complete':False,'recovery_required':True,'outcome':'recovery_required',
-                'controllers_fenced':True,'reason':'Active run has no trustworthy clock evidence'}
+            # Without a trustworthy clock, terminate the old run; never restore an expired source.
+            metadata_path=run_dir/'metadata.json'
+            metadata=json.loads(metadata_path.read_text()) if metadata_path.exists() else {'run_id':run_id}
+            atomic_json(run_dir/'pre-fenced-recovery.json',metadata)
+            metadata.update(success=False,outcome='interrupted',interrupted=True,recovery_required=False,
+                controllers_fenced=True,finished_utc=utc_now(),
+                failure_reason='Explicit recovery terminated the run without resuming an untrusted clock')
+            atomic_json(metadata_path,metadata)
+            output={'complete':True,'recovery_required':False,'controllers_fenced':True,
+                'run_id':run_id,'clock_resumed':False,'source_restored':False,'aborted_without_clock':True}
+            job=json.loads((directory/'job.json').read_text());job.update(status='recovered',recovery=output)
+            atomic_json(directory/'job.json',job)
+            return output
         if orbital>=event['deadline_s']:
             compose.stop('sat-a')
             output={'complete':True,'recovered':False,'source_expired':True,'controllers_fenced':True,
@@ -161,7 +176,7 @@ class Experiment(Preparation, Analysis):
                     status['transport_capacity'].append(receipt)
                     Path(receipt['path']).unlink()
             status['capacity_checked']=True
-            status['success'] = (status['mininet']['switch_count'] == 17 and status['mininet']['switches_alive']
+            status['success'] = (status['mininet']['switch_count'] == self.scenario['orbital']['satellites_total'] and status['mininet']['switches_alive']
                 and all(status['controllers'].values())
                 and all(row['upstream_master'] for row in status['proxy']['states']))
         except Exception as exc: status['error'] = str(exc)
@@ -220,6 +235,7 @@ class Experiment(Preparation, Analysis):
                 collector.start()
             self.publish({'phase':'prepare','run_id':run_id,'timestamp_utc':utc_now()})
             backend.reset()
+            baseline_started = True
             result['baseline'] = backend.establish_baseline(run_id)
             if resource_diagnostic:
                 from .resource_diagnostic import DiagnosticClock, window
@@ -278,6 +294,8 @@ class Experiment(Preparation, Analysis):
                     result.update(outcome='recovery_required',recovery_required=True,recovery_failure=str(recovery))
         except Exception as exc:
             result.update(success=False,ack=False,failure_reason=str(exc),outcome='recovery_required',recovery_required=True)
+            error_file=directory/'preparation-error.json'
+            if error_file.exists(): result['error']=json.loads(error_file.read_text())
             if backend:
                 try:
                     backend.abort_target()
@@ -289,8 +307,17 @@ class Experiment(Preparation, Analysis):
             service_file=directory/'service-verification.json'
             if service_file.exists():result['service_verification']=json.loads(service_file.read_text())
             if backend:
+                if backend.clock and ((self.cancel and self.cancel.is_set()) or result.get('failure_reason')):
+                    try:
+                        backend.shutdown()
+                        result.update(controllers_fenced=True,recovery_required=False)
+                    except Exception as exc:
+                        result.update(outcome='recovery_required',recovery_required=True,cleanup_failure=str(exc))
                 if not backend.clock:
-                    result.update(success=False,outcome='invalid_baseline')
+                    preparation_error = result.get('error') or {}
+                    result.update(success=False,outcome='interrupted' if result.get('interrupted') else
+                        'invalid_baseline' if preparation_error.get('operation')=='baseline' or locals().get('baseline_started',False) or (directory/'baseline.json').exists()
+                        else 'preparation_failed')
                     try:
                         backend.shutdown()
                         result['controllers_fenced']=True
@@ -438,6 +465,7 @@ class Experiment(Preparation, Analysis):
             save()
             self.publish({'phase':'comparison_run','comparison_id':output['comparison_id'],'method':method})
             result=self.run(method,1000000000,copy.deepcopy(event),purpose='functional-gate')
+            if result.get('error'): output['error'] = result['error']
             runs.append({**summary_metrics(result), **{key:result.get(key) for key in ('run_id','method','outcome','failure_reason')},
                 'recovery_required':requires_recovery(result),'success':result['success'],'baseline_valid':result.get('baseline',{}).get('success',False),
                 'service_verified':result.get('service_verification',{}).get('success',False)})

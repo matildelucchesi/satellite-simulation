@@ -8,7 +8,7 @@ from .resource_model import sat_a_load_percent
 from .score_model import CandidateMetrics, score_candidates
 from .orbit import shortest_paths
 
-POLICY = 'continuous-planned-v2'
+POLICY = 'continuous-placement-v3'
 
 
 class ScenarioRejected(ValueError):
@@ -17,17 +17,20 @@ class ScenarioRejected(ValueError):
 
 def validate_parameters(parameters):
     result = {'method': 'hot', 'rate_bps': 1000000000, 'duration_s': 3600,
-              'start_orbital_s': None, 'initial_satellite_id': None, 'max_migrations': None}
+              'start_orbital_s': None, 'initial_satellite_id': None, 'max_migrations': None,
+              'additional_data_bytes': 0}
     if set(parameters)-set(result): raise ValueError('Unsupported simulation parameter')
     result.update(parameters)
     if result['method'] not in ('hot', 'cold'): raise ValueError('Choose hot or cold')
     if isinstance(result['rate_bps'], bool) or result['rate_bps'] not in (100000000, 1000000000, 10000000000):
         raise ValueError('Unapproved throughput')
-    for field, minimum in (('duration_s', 1), ('start_orbital_s', 0), ('initial_satellite_id', 1), ('max_migrations', 1)):
+    for field, minimum in (('duration_s', 1), ('start_orbital_s', 0), ('initial_satellite_id', 1), ('max_migrations', 1), ('additional_data_bytes', 0)):
         value = result[field]
         if value is None and field != 'duration_s': continue
         if isinstance(value, bool) or not isinstance(value, int) or value < minimum:
             raise ValueError(field + ': invalid integer')
+    if result['additional_data_bytes'] is None or result['additional_data_bytes'] > 8*1024**3:
+        raise ValueError('Additional migration data must be between 0 and 8 GiB')
     return result
 
 
@@ -61,6 +64,25 @@ class OrbitIndex:
         interval = self.containing(self.contacts.get(tuple(sorted((a, b))), []), tick)
         return interval[1] if interval else tick
 
+    @lru_cache(maxsize=1)
+    def service_periods(self):
+        """Exact one-second service reachability intervals from frozen link windows."""
+        boundaries=sorted({0,self.orbit.duration}|{point for intervals in self.contacts.values()
+            for interval in intervals for point in interval if 0<=point<=self.orbit.duration})
+        periods=[]
+        for start,end in zip(boundaries,boundaries[1:]):
+            graph={sid:{} for sid in self.orbit.ids}
+            for (a,b),intervals in self.contacts.items():
+                if self.containing(intervals,start):graph[a][b]=graph[b][a]=1
+            if 53848 in graph and 53913 in shortest_paths(graph,53848):
+                if periods and periods[-1][1]==start:periods[-1]=(periods[-1][0],end)
+                else:periods.append((start,end))
+        return periods
+
+    def service_contact_end(self, tick):
+        interval=self.containing(self.service_periods(),tick)
+        return interval[1] if interval else tick
+
     def changes(self, start, end):
         return sorted({point for intervals in self.contacts.values() for interval in intervals
                        for point in interval if start < point < end})
@@ -80,30 +102,35 @@ class Planner:
     def check(self):
         if self.cancel and self.cancel.is_set(): raise InterruptedError('Planning interrupted')
 
-    def node(self, sid, tick):
+    def node(self, sid, tick, *, placed_at=None):
         period = self.index.period(sid, tick)
         profile = self.scenario['controller']['resource_profile']
         background = self.scenario['controller']['background_load_model']
-        curve = sat_a_load_percent(tick-period[0], self.horizon,
-            background['sat_a_cpu_ram_start_percent'], background['sat_a_cpu_ram_end_percent'])/100 if period else 1.0
+        # Candidates retain their background load, including the prospective
+        # controller footprint. Only a placed controller accumulates the ramp.
+        curve = sat_a_load_percent(max(0, tick-placed_at), self.horizon,
+            background['sat_a_cpu_ram_start_percent'], background['sat_a_cpu_ram_end_percent'])/100 if placed_at is not None else 0
         cpu = max(curve, background['candidate_cpu_start_percent']/100 + self.resources['cpu_cores']/profile['cpu_cores'])
         ram = max(curve, background['candidate_ram_start_percent']/100 + self.resources['ram_gib']/profile['ram_gib'])
         disk = self.resources['disk_gib']/profile['disk_gib']
         return {'satellite_id': sid, 'operational': period is not None, 'period': period,
                 'execution_kind': 'modeled-resources', 'policy_version': POLICY,
+                'controller_placed_at_s': placed_at, 'resource_role': 'controller' if placed_at is not None else 'candidate',
                 'projected_cpu_fraction': cpu, 'projected_ram_fraction': ram,
                 'projected_disk_fraction': disk, 'free': [1-cpu, 1-ram, 1-disk]}
 
-    def trigger(self, sid, tick, end):
+    def trigger(self, sid, tick, end, *, placed_at=None, required_window_s=None):
         period = self.index.period(sid, tick)
         if not period: return tick, ['source_in_shadow']
         config = self.scenario['controller']; background = config['background_load_model']
+        placed_at = tick if placed_at is None else placed_at
+        lookahead = max(self.horizon, required_window_s or self.horizon)
         threshold = config['resource_trigger_fraction']*100
         slope = (background['sat_a_cpu_ram_end_percent']-background['sat_a_cpu_ram_start_percent'])/(2*self.horizon)
         resource_time = math.inf
         if slope > 0:
-            resource_time = period[0] + math.ceil(max(0, (threshold-background['sat_a_cpu_ram_start_percent'])/slope-self.horizon)) + config['resource_persistence_s']-1
-        eclipse_time = period[1]-self.horizon if period[1] < self.orbit.duration else math.inf
+            resource_time = placed_at + math.ceil(max(0, (threshold-background['sat_a_cpu_ram_start_percent'])/slope-lookahead)) + config['resource_persistence_s']-1
+        eclipse_time = period[1]-lookahead if period[1] < self.orbit.duration else math.inf
         when = max(tick, min(resource_time, eclipse_time))
         return min(when, end), [name for name, value in (('resources',resource_time),('eclipse',eclipse_time)) if value <= when]
 
@@ -120,6 +147,7 @@ class Planner:
         candidates, excluded = [], [{'satellite_id':sid,'reason':'no_direct_contact'}
             for sid in self.orbit.ids if sid != source and sid not in graph[source]]
         for sid, distance in sorted(graph[source].items()):
+            self.check()
             node = self.node(sid, tick+operation_s) if tick+operation_s < self.orbit.duration else None
             reason = None
             if not node or not self.orbit.operational(sid, tick): reason = 'destination_in_shadow'
@@ -132,41 +160,50 @@ class Planner:
             paths = shortest_paths(graph, sid)
             continuity = min(self.horizon, node['period'][1]-tick)
             for change in self.index.changes(tick, min(end, tick+self.horizon)):
+                self.check()
                 if not set(paths).issubset(shortest_paths(self.orbit.graph(change), sid)):
                     continuity = min(continuity, change-tick); break
             candidates.append(CandidateMetrics(sid, sum(paths.values())/len(paths)*2/299792.458*1000,
                 len(paths), len(self.orbit.ids), continuity, self.horizon, *node['free'], distance))
         return score_candidates(candidates, reserve, self.scenario['score']['weights']), excluded
 
-    def chain(self, host, start, end, method, rate, maximum=None):
+    def chain(self, host, start, end, method, rate, maximum=None, *, placed_at=None):
         operation_s, recovery_s = self.estimate(method, rate)
         rejected = []
         @lru_cache(maxsize=100000)
-        def visit(source, tick, left):
+        def visit(source, tick, left, placement):
             self.check()
             period = self.index.period(source, tick)
             if not period: return None
             if left == 0: return ()
-            trigger, causes = self.trigger(source, tick, end)
+            trigger, causes = self.trigger(source, tick, end, placed_at=placement,
+                                          required_window_s=operation_s+recovery_s)
             if trigger >= end:
                 return () if period[1] >= end else None
             trigger = int(trigger)
             deadline = min(period[1], end)
-            if trigger+operation_s+recovery_s > deadline: return None
+            if trigger+operation_s+recovery_s > deadline:
+                self.rejections['source_deadline_before_safe_completion'] = self.rejections.get('source_deadline_before_safe_completion',0)+1
+                return None
             # If a contact is not open at the forecast trigger, wait only for
             # indexed contact/sunrise boundaries that still leave rollback time.
             opportunities={trigger}
+            opportunities.update(point for point in self.additional_opportunities()
+                if trigger<point<=deadline-operation_s-recovery_s)
             for pair,intervals in self.index.contacts.items():
                 if source not in pair: continue
                 target=pair[0] if pair[1]==source else pair[1]
                 opportunities.update(a for a,b in intervals if trigger<a<=deadline-operation_s-recovery_s)
                 opportunities.update(a for a,b in self.index.periods[target] if trigger<a<=deadline-operation_s-recovery_s)
             for operation_start in sorted(opportunities):
-                ranked, excluded = self.ranked(source, operation_start, operation_s+recovery_s, end)
+                # Rollback restores the source after fencing the target and
+                # does not require the failed FSO contact. Its full reserve is
+                # retained by the source deadline check above.
+                ranked, excluded = self.ranked(source, operation_start, operation_s, end)
                 for candidate in ranked:
                     target = candidate['satellite_id']
                     arrival = operation_start+operation_s
-                    remainder = visit(target, arrival, left-1)
+                    remainder = visit(target, arrival, left-1, arrival)
                     if remainder is not None:
                         return ({'event_id': f'{source}-{target}-{operation_start}', 'sat_a': source, 'sat_b': target,
                             'trigger_s': operation_start, 'deadline_s': deadline, 'trigger_causes': causes,
@@ -174,12 +211,17 @@ class Planner:
                             'contact_window_s': self.index.contact_end(source,target,operation_start)-operation_start,
                             'deadline_window_s': deadline-operation_start, 'recovery_reserve_s': recovery_s,
                             'estimated_operation_s': operation_s, 'estimated_arrival_s': arrival,
+                            'source_placed_at_s': placement, 'forecast_window_s': max(self.horizon,operation_s+recovery_s),
                             'candidates': ranked, 'excluded_candidates': excluded + rejected[-20:]}, *remainder)
                     rejected.append({'satellite_id': target, 'reason': 'future_dead_end', 'orbital_s': operation_start})
                     self.rejections['future_dead_end'] = self.rejections.get('future_dead_end',0)+1
             return None
-        result = visit(host, int(math.ceil(start)), maximum if maximum is not None else self.orbit.duration)
+        result = visit(host, int(math.ceil(start)), maximum if maximum is not None else self.orbit.duration,
+                       start if placed_at is None else placed_at)
         return list(result) if result is not None else None
+
+    def additional_opportunities(self):
+        return ()
 
     def plan(self, parameters, minimum_migrations=0):
         p = validate_parameters(parameters)

@@ -57,7 +57,9 @@ def report(directory, root):
             physical.append({'timestamp_utc':sample['timestamp_utc'],'slot':slot,**values})
     with (directory/'physical-resources.csv').open('w',encoding='utf-8',newline='') as handle:
         writer=csv.DictWriter(handle,['timestamp_utc','slot','running_containers','cpu_cores','ram_gib'])
-        writer.writeheader();writer.writerows(physical)
+        writer.writeheader()
+        for sample in physical:
+            writer.writerow({key:sample.get(key) for key in writer.fieldnames})
     result['physical_slot_resources']={slot:{
         'peak_cpu_cores':max((r['cpu_cores'] for r in physical if r['slot']==slot),default=None),
         'peak_ram_gib':max((r['ram_gib'] for r in physical if r['slot']==slot),default=None)}

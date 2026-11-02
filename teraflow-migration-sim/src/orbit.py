@@ -69,6 +69,23 @@ class Orbit:
         self.max_range = max_range_km
         self.radius = earth_radius_km
         self.index = {sid: index for index, sid in enumerate(self.ids)}
+        self.phase_changes = {
+            sid: np.flatnonzero(self.eclipsed[1:, column] != self.eclipsed[:-1, column]) + 1
+            for sid, column in self.index.items()
+        }
+
+    def illumination_window(self, sid, elapsed_s):
+        """Current phase start and next transition in the frozen one-second ephemeris."""
+        import bisect
+        tick = int(elapsed_s)
+        if not 0 <= tick < self.duration:
+            raise ValueError("Orbital replay time outside frozen observation")
+        changes = self.phase_changes[sid]
+        upcoming = bisect.bisect_right(changes, tick)
+        return {
+            'phase_start_s': int(changes[upcoming - 1]) if upcoming else 0,
+            'next_transition_s': int(changes[upcoming]) if upcoming < len(changes) else None,
+        }
 
     def graph(self, elapsed_s: float):
         return self._graph(int(elapsed_s))
