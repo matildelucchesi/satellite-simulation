@@ -9,3 +9,12 @@ __pycache__/
 .ruff_cache/
 .coverage
 htmlcov/
+
+# Local test scratch files and generated simulation outputs.
+/.test-tmp/
+/teraflow-migration-sim/results/
+/teraflow-migration-sim/artifacts/
+
+# Graphify is disabled for this project.
+**/graphify-out/
+/.graphify-venv/
