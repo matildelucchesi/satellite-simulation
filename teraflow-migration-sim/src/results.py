@@ -1,5 +1,4 @@
 """Shared acceptance, recovery propagation and measurement projections."""
-import json
 
 
 def requires_recovery(value):
@@ -74,24 +73,3 @@ def summary_metrics(result):
             'ping_recovery_s': ping.get('time_to_stable_recovery_s'),
             'service_verified': (result.get('service_verification') or {}).get('success'),
             'ping_continuous': ping.get('continuous_during_observation')}
-
-
-def campaign_summary(root, runs):
-    path = root/'results/campaign.json'
-    execution = json.loads(path.read_text()) if path.exists() else {}
-    selected = [r for r in runs if r.get('purpose') == 'primary']
-    if 'runs' in execution:
-        selected = [r for r in selected if r['run_id'] in execution['runs']]
-    recorded = {(r.get('event', {}).get('event_id'), r['method'], r['configured_rate_bps']) for r in selected}
-    expected = {tuple(row) for row in execution.get('expected_cases', [])}
-    valid = {(r.get('event', {}).get('event_id'), r['method'], r['configured_rate_bps'])
-             for r in selected if r.get('outcome') in ('success', 'experimental_failure')
-             and r.get('experimental_valid') is not False and r.get('observation_complete') is True
-             and not requires_recovery(r)}
-    return {'primary_count': len(selected), 'unique_primary_cases': len(recorded),
-            'expected_primary_count': len(expected) if expected else 18,
-            'primary_complete': bool(expected) and expected <= valid,
-            'all_primary_successful': bool(expected) and expected <= {
-                (r.get('event', {}).get('event_id'), r['method'], r['configured_rate_bps'])
-                for r in selected if r.get('success') and r.get('observation_complete') is True},
-            'campaign_id': execution.get('campaign_id')}

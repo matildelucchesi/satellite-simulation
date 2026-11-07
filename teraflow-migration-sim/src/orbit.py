@@ -66,38 +66,34 @@ def generate(root: Path, destination: Path, scenario: dict | None = None, select
 def load_orbit(root: Path, scenario: dict | None = None, artifact: Path | None = None):
     """Orbit for the installed scenario.
 
-    A scenario with ``fso.laser_terminals`` uses the frozen three-laser link intervals in
-    ``results/direct_link_windows.json`` and, when ``config/domain.json`` exists, exposes the
-    laboratory domain through ``lab_graph``. Older scenarios keep the all-pairs range model."""
+    Links are the frozen three-laser intervals in ``results/direct_link_windows.json``; when
+    ``config/domain.json`` exists the laboratory domain is exposed through ``lab_graph``."""
     root = Path(root)
     if scenario is None:
         scenario = json.loads((root / "config/scenario.json").read_text())
     artifact = artifact or root / "artifacts/orbit/replay.npz"
-    fso = scenario.get("fso", {})
-    if not fso.get("laser_terminals"):
-        return Orbit(artifact)
+    if not scenario.get("fso", {}).get("laser_terminals"):
+        raise ValueError("Scenario without the three-laser model: install a scenario profile")
     links = json.loads((root / "results/direct_link_windows.json").read_text())["windows"]
     domain_file = root / "config/domain.json"
     domain = None
     if domain_file.exists():
         document = json.loads(domain_file.read_text())
         domain = list(document["plane_1"]) + list(document["plane_2"])
-    return Orbit(artifact, max_range_km=fso.get("max_range_km", 1700), links=links, domain=domain)
+    return Orbit(artifact, links=links, domain=domain)
 
 
 class Orbit:
-    def __init__(self, artifact: Path, max_range_km=1700, earth_radius_km=6378.137, links=None, domain=None):
+    def __init__(self, artifact: Path, links, domain=None):
         import numpy as np
         arrays = np.load(artifact, allow_pickle=False)
         self.ids = [int(value) for value in arrays["ids"]]
         self.positions = arrays["positions"]
         self.eclipsed = arrays["eclipsed"]
         self.duration = len(self.positions)
-        self.max_range = max_range_km
-        self.radius = earth_radius_km
         self.index = {sid: index for index, sid in enumerate(self.ids)}
-        # Laser model: usable link intervals [start_s, end_s); None keeps the range model.
-        self.links = None if links is None else sorted(
+        # Usable laser link intervals [start_s, end_s).
+        self.links = sorted(
             (int(row["start_s"]), int(row["end_s"]), int(row["sat_a"]), int(row["sat_b"])) for row in links)
         self.domain = None if domain is None else [int(sid) for sid in domain]
         if self.domain is not None and not set(self.domain) <= set(self.ids):
@@ -130,34 +126,18 @@ class Orbit:
 
     @lru_cache(maxsize=8192)
     def _graph(self, index):
-        import numpy as np
         if not 0 <= index < self.duration:
             raise ValueError("Orbital replay time outside frozen observation")
         points = self.positions[index]
         edges = {sid: {} for sid in self.ids}
-        if getattr(self, 'links', None) is not None:
-            for start, end, a, b in self.links:
-                if start > index:
-                    break
-                if index < end:
-                    difference = points[self.index[b]] - points[self.index[a]]
-                    distance = math.sqrt(float(difference @ difference))
-                    edges[a][b] = distance
-                    edges[b][a] = distance
-            return edges
-        for ai, a in enumerate(self.ids):
-            for bi in range(ai + 1, len(self.ids)):
-                difference = points[bi] - points[ai]
-                squared = float(difference @ difference)
-                if squared == 0 or squared > self.max_range**2:
-                    continue
-                fraction = max(0.0, min(1.0, -float(points[ai] @ difference) / squared))
-                nearest = points[ai] + fraction * difference
-                if float(nearest @ nearest) <= self.radius**2:
-                    continue
-                distance = math.sqrt(squared)
-                edges[a][self.ids[bi]] = distance
-                edges[self.ids[bi]][a] = distance
+        for start, end, a, b in self.links:
+            if start > index:
+                break
+            if index < end:
+                difference = points[self.index[b]] - points[self.index[a]]
+                distance = math.sqrt(float(difference @ difference))
+                edges[a][b] = distance
+                edges[b][a] = distance
         return edges
 
     def contact(self, a, b, elapsed_s):
@@ -168,17 +148,15 @@ class Orbit:
     def lab_graph(self, elapsed_s: float):
         """Topology emulated in the laboratory: the domain's own links, or every link without a domain."""
         graph = self.graph(elapsed_s)
-        if getattr(self, 'domain', None) is None:
+        if self.domain is None:
             return graph
         members = set(self.domain)
         return {sid: {n: d for n, d in graph[sid].items() if n in members} for sid in self.domain}
 
     def migration_link(self, a, b, elapsed_s):
-        """Whether the migration transfer can flow: multi-hop path with lasers, direct contact otherwise."""
+        """Whether the migration transfer can flow over a multi-hop laser path."""
         if not 0 <= int(elapsed_s) < self.duration:
             return False
-        if getattr(self, 'links', None) is None:
-            return self.contact(a, b, elapsed_s)
         return b in shortest_paths(self.graph(elapsed_s), a)
 
     def migration_path(self, a, b, elapsed_s):

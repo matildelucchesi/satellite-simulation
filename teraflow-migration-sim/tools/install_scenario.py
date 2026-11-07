@@ -19,7 +19,6 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from src.artifacts import describe, file_digest, verify_artifact  # noqa: E402
-from src.constellation import invalidate_functional_gate  # noqa: E402
 from src.fixture import build  # noqa: E402
 from src.storage import atomic_json  # noqa: E402
 
@@ -27,6 +26,17 @@ ARCHIVED = ('config/scenario.json', 'config/selected_constellation.json', 'confi
             'config/lab-manifest.json', 'config/artifact_manifest.json', 'config/domain.json',
             'config/migration_events.json', 'results/calibration.json', 'results/functional-gate.json',
             'results/direct_link_windows.json', 'artifacts/orbit/replay.npz', 'artifacts/orbit/replay.json')
+
+
+def invalidate_functional_gate(root, profile):
+    """The previous verification belongs to the previous scenario: archive it and require a new one."""
+    gate = root / 'results/functional-gate.json'
+    archived = profile / 'original/results/functional-gate.json'
+    if gate.exists() and not archived.exists():
+        archived.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(gate, archived)
+    atomic_json(gate, {'complete': False, 'reason': 'Scenario installato: nuova verifica funzionale richiesta',
+                       'previous_evidence': str(archived)})
 
 
 def windows_from_links(document):

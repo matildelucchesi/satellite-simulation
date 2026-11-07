@@ -1,19 +1,17 @@
 # TeraFlowSDN — laboratorio di migrazioni satellitari
 
-Il programma confronta la migrazione **Hot e Cold** del controller TeraFlowSDN sullo stesso piano orbitale. Il progetto applicativo si trova in [`teraflow-migration-sim/`](teraflow-migration-sim/). La console locale è sulla porta **18092**.
+Il programma confronta due strategie di migrazione del controller TeraFlowSDN fra satelliti LEO, **Hot** e **Cold**, misurando downtime del controller, durata della migrazione e continuità del traffico. L'orbita (due piani Starlink reali, 3 laser per satellite) fornisce eventi realistici; la migrazione viene eseguita davvero in un laboratorio Docker con TeraFlowSDN 7.0, Mininet/BMv2 e P4Runtime. Il progetto applicativo è in [`teraflow-migration-sim/`](teraflow-migration-sim/); la console locale è sulla porta **18092**.
+
+- **Hot**: la destinazione si prepara mentre la sorgente controlla ancora la rete; dopo un breve freeze si trasferisce il delta e si passa l'autorità.
+- **Cold**: la sorgente si arresta, lo stato viene trasferito e ripristinato sulla destinazione, poi si passa l'autorità.
 
 ## 1. Prerequisiti
 
-Per il percorso Windows descritto qui servono:
+- **Python 3.13** e PowerShell (percorso Windows).
+- **Docker Desktop con engine Linux** e Docker Compose.
+- I materiali del laboratorio: immagini Docker TeraFlow con le patch previste, immagini Mininet/P4, file P4 e bundle registrati nei manifest (vedere il punto 3).
 
-- **Python 3.13** (versione usata nel progetto) e PowerShell.
-- **Docker Desktop avviato con engine Linux** e Docker Compose disponibile.
-- La copia completa del laboratorio: configurazioni, immagini Docker e artefatti congelati. Una sola copia del codice non contiene necessariamente gli archivi locali necessari; vedere il punto 3.
-- Connessione Internet per installare le dipendenze e scaricare le immagini mancanti.
-
-Durante la simulazione mantenere accesi PC, sessione Windows e Docker; evitare sospensione e riavvii. Le prove possono richiedere diverse ore, soprattutto al primo avvio con calibrazione.
-
-Controllare gli strumenti in PowerShell:
+Durante un esperimento mantenere accesi PC, sessione Windows e Docker.
 
 ```powershell
 py -3.13 --version
@@ -21,11 +19,9 @@ docker version
 docker compose version
 ```
 
-`docker version` deve mostrare anche il server: un errore di connessione indica che il motore Docker non è disponibile.
+`docker version` deve mostrare anche il server.
 
 ## 2. Installare le dipendenze Python (solo la prima volta)
-
-Aprire PowerShell e posizionarsi nella cartella applicativa. Nel percorso di questo workspace:
 
 ```powershell
 cd C:\UNIFI-workspaces\satellite-simulation\teraflow-migration-sim
@@ -34,109 +30,84 @@ py -3.13 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-Se il repository è stato copiato altrove, adattare soltanto il percorso del `cd`. Tutti i comandi successivi si eseguono da `teraflow-migration-sim`.
+Tutti i comandi successivi si eseguono da `teraflow-migration-sim`, con l'interprete `.venv`.
 
-Non occorre attivare l'ambiente: i comandi usano direttamente il suo interprete. `requirements.txt` include anche le librerie per orbite e grafici del report. Negli avvii successivi riutilizzare `.venv`; dopo un aggiornamento delle dipendenze ripetere il comando di installazione.
+## 3. Verificare i materiali del laboratorio
 
-## 3. Verificare che il laboratorio sia predisposto
-
-Il comando di avvio usa `--no-build`: **non costruisce le immagini**. Prima devono essere disponibili le immagini TeraFlow con le patch previste, quelle del laboratorio Mininet/P4, i file P4 e il bundle di trasferimento referenziato dai manifest.
-
-Verificare la configurazione e le immagini richieste:
+L'avvio usa `--no-build` e **non costruisce le immagini**: devono essere già presenti.
 
 ```powershell
 docker compose --env-file deploy/lab.env -p teraflow -f deploy/stack.yaml config --quiet
 docker compose --env-file deploy/lab.env -p teraflow -f deploy/stack.yaml config --images
-docker image ls
 ```
 
-La configurazione richiede `deploy/lab.env` e `deploy/stack.yaml`. Conservare inoltre `config/scenario.json`, `config/fixture.json`, i manifest in `config/`, gli artefatti orbitali e gli archivi in `artifacts/` con i percorsi e checksum registrati. Non sostituire il bundle con un archivio generico: il motore verifica la provenienza degli input.
+Su una macchina nuova seguire la [guida di deployment](teraflow-migration-sim/docs/teraflow-compose.md). Non sostituire bundle o immagini con archivi generici: il programma verifica provenienza e checksum degli input.
 
-**Su una macchina nuova:** procurarsi gli artefatti congelati e importare le immagini dalla copia del laboratorio, oppure ricostruirli seguendo la [guida di deployment](teraflow-migration-sim/docs/teraflow-compose.md). `tools/build_tfs_images.py` costruisce le sei immagini upstream a partire dagli input già presenti in `.reference/` (`tfs-src.tar.gz`, `tfs-proto.tar.gz`, `common_requirements.in`, `common_requirements_py313.in`, `LICENSE`): non scarica quegli input e non prepara da solo le varianti Service/Device con patch e il bundle attualmente configurato. La sola build upstream non completa l'installazione live. Il repository non offre un unico comando per ricreare da zero tutti questi materiali.
+## 4. Preparare lo scenario (una volta)
 
-Se immagini o archivi mancano, completare questa preparazione prima di proseguire. Per il laboratorio già predisposto non rigenerare fixture, costellazione o manifest a ogni avvio.
+Lo scenario si calcola offline una sola volta e resta congelato con i suoi hash: si rigenera solo se cambiano TLE, piani, parametri dei laser o dominio.
 
-## 4. Avviare laboratorio e console
+```powershell
+.\.venv\Scripts\python.exe tools/build_scenario.py
+.\.venv\Scripts\python.exe tools/install_scenario.py
+```
 
-Con Docker Desktop pronto, dalla cartella `teraflow-migration-sim` eseguire:
+`build_scenario.py` scrive il profilo `artifacts/constellation-profiles/starlink-53-463-2x31/`: due piani adiacenti del guscio 53°/463 km (31 + 31 satelliti), replay orbitale di 24 ore, collegamenti laser secondo per secondo, dominio del controller di 16 satelliti (8 + 8) e catalogo degli eventi di migrazione. `install_scenario.py` archivia la configurazione precedente nel profilo e installa il nuovo scenario in `config/` e `results/`. Su Windows, se la fixture cambia, fermare prima Mininet e proxy P4 (`--resume` completa un'installazione interrotta, `--refresh` aggiorna un profilo ricostruito) e riavviarli dopo.
+
+## 5. Avviare laboratorio e console
 
 ```powershell
 .\.venv\Scripts\python.exe tools/lab.py start
 ```
 
-Il comando verifica che il motore Docker risponda, crea i volumi persistenti e avvia il gruppo Compose **teraflow** (SAT-A, SAT-B e Mininet/P4) attendendo che i servizi siano pronti. Poi avvia la console su **[http://127.0.0.1:18092/](http://127.0.0.1:18092/)** e la apre nel browser. Se un job o un recupero detiene il lock del laboratorio, lo stack resta invariato e viene avviata solo la console; se la console è già attiva, il comando apre soltanto la pagina. Un'immagine mancante o un servizio non pronto interrompe l'avvio prima della console e va risolto prima della simulazione.
+Il comando verifica Docker, avvia il gruppo Compose **teraflow** (SAT-A, SAT-B, Mininet/P4) attendendo i servizi, poi avvia la console su **[http://127.0.0.1:18092/](http://127.0.0.1:18092/)** e la apre nel browser. Se un job detiene il lock del laboratorio, lo stack resta invariato. Opzioni: `--no-stack` (solo console), `--no-browser`; `tools/lab.py status` mostra Docker, lock, container e console. La console si chiude con **Ctrl+C**; i job proseguono nel worker.
 
-Lasciare aperto questo terminale: la console resta in primo piano e si chiude con **Ctrl+C**, mentre i job proseguono nel worker. Usare un secondo PowerShell, sempre nella cartella applicativa, per altri comandi. Opzioni utili:
+## 6. Eseguire l'esperimento
 
-- `--no-stack` avvia solo la console, senza toccare Docker;
-- `--no-browser` non apre il browser;
-- `tools/lab.py status` mostra Docker, lock, container e console.
+Nella console:
 
-Le API NBI locali sono su `http://127.0.0.1:18080` (SAT-A) e `http://127.0.0.1:18081` (SAT-B). La sola risposta HTTP non certifica il corretto forwarding P4: il confronto verifica anche il servizio.
+1. **Scenario** mostra il profilo installato, i 3 eventi e la vista dei due piani con dominio, laser, percorso del servizio e percorso della migrazione.
+2. **Esperimento** mostra lo stato del laboratorio. **Esegui verifica** fa una migrazione Hot e una Cold sul primo evento (circa 15 minuti). **Avvia esperimento** esegue Hot e Cold su ciascuno dei 3 eventi, alternando l'ordine fra un evento e l'altro (6 migrazioni, circa 45 minuti). L'avanzamento arriva in tempo reale; **Interrompi** mette in sicurezza il laboratorio.
+3. **Risultati** mostra, per ogni evento, downtime, durata, ping persi, fattibilità rispetto all'ombra e al percorso, Cold − Hot, le fasi misurate e i file scaricabili.
 
-## 5. Comandi separati
-
-`tools/lab.py start` equivale a `tools/stack.py up` seguito da `tools/serve_gui.py`. I due comandi restano disponibili, così come `tools/stack.py status`. Su Windows `teraflow-migration-sim\tools\start_gui.cmd`, aperto da Esplora file, avvia la sola console e richiede `.venv` già installato.
-
-## 6. Avviare la simulazione Hot/Cold
-
-1. Attendere il caricamento della console e controllare **Requisiti del laboratorio**. È ammesso un solo job alla volta.
-2. Scegliere **Velocità utile del canale**: 100 Mbit/s, 1 Gbit/s oppure 10 Gbit/s. Per la prima prova si può mantenere 1 Gbit/s.
-3. Premere **Avvia confronto Hot/Cold**.
-4. Seguire **Il tuo esperimento** e la **Timeline del confronto**. Se mancano calibrazioni compatibili, usare **Crea scenario iniziale**: il programma predispone prima la rete completa, esegue le verifiche funzionali necessarie e due prove di calibrazione (Cold e Hot), riutilizzando l'inventario compatibile e ripristinando il servizio tra le prove. Dopo le misure prepara la partenza della simulazione sulla stessa rete.
-5. Attendere la selezione automatica di satellite e istante iniziali. Durante preparazione e calibrazione il clock orbitale è fermo: la mappa immobile è prevista. Se non viene trovato un piano ammissibile, leggere il motivo registrato.
-6. Il programma esegue **Hot → Ripristino → Cold** sullo stesso piano. L'obiettivo attuale è **tre migrazioni verificate per Hot e tre per Cold**, senza durata prefissata. Non occorre scegliere manualmente satellite, partenza o durata.
-7. Alla conclusione controllare **Risultati del confronto** ed **Evento per evento**, quindi aprire o scaricare i file da **Report e dati**.
-
-Un processo terminato non garantisce un confronto riuscito: verificare l'esito delle due modalità e il numero di migrazioni riuscite. `—` indica una misura mancante. Il downtime del controller e il ripristino del forwarding sono misure distinte; Cold−Hot viene mostrato solo per eventi confrontabili.
-
-La [guida al flusso guidato](teraflow-migration-sim/docs/guided-flow.md) descrive preparazione, attese e interpretazione dei risultati. Le vecchie istruzioni basate su durata manuale e velocità fissa descrivono una versione precedente della console.
-
-### Alternativa da riga di comando
-
-Con il laboratorio avviato, la stessa operazione si può lanciare senza browser:
+Da riga di comando, con il laboratorio avviato:
 
 ```powershell
-.\.venv\Scripts\python.exe tools/experiment.py compare_continuous --rate-bps 1000000000 --wait
+.\.venv\Scripts\python.exe tools/experiment.py functional --wait
+.\.venv\Scripts\python.exe tools/experiment.py compare_events --wait
 ```
 
-Sostituire la velocità con `100000000` oppure `10000000000` per le altre opzioni. Non avviare contemporaneamente il confronto da GUI. Per questo comando la partenza è automatica e `--duration-s` non imposta la durata del confronto attuale. `--wait` segue il job fino all'esito.
+Ogni evento parte 15 minuti prima che il satellite sorgente entri in ombra; la destinazione è il satellite raggiungibile con meno salti laser che resta al sole almeno 30 minuti. Il clock orbitale scorre durante la migrazione. Migra solo lo stato del controller: il software è già a bordo di ogni satellite. La velocità del collegamento è 1 Gbit/s (valore prudente e riproducibile nel laboratorio; con il solo stato il trasferimento dura millisecondi). Una sola replica per evento e modalità: i risultati sono per evento, senza statistiche aggregate. Le misure assenti restano "non misurato".
 
-## 7. Consultare i risultati
+## 7. Dove sono i risultati
 
-I percorsi seguenti sono relativi a `teraflow-migration-sim/`:
+Relativi a `teraflow-migration-sim/`:
 
-- `results/continuous-comparisons/pair-*/`: piano condiviso, risultati, CSV e report HTML del confronto.
-- `results/simulations/sim-*/`: dettagli delle sessioni Hot e Cold.
-- `results/runs/run-*/`: evidenze delle singole migrazioni.
-- `results/jobs/job-*/`: stato persistente, eventi e log del worker.
-
-La console consente anche di selezionare confronti precedenti in **Storico e replay**. I report e le evidenze parziali restano disponibili anche dopo un fallimento. Orbite e FSO sono modellati; TCP, API, autorità P4 e sonde sono verificati live.
+- `results/event-comparisons/events-*/`: esperimento a eventi (`metadata.json`, `summary.csv`).
+- `results/comparisons/compare-*/` e `results/functional-gate.json`: verifiche.
+- `results/runs/run-*/`: evidenze di ogni migrazione (input, fasi, autorità, sonde, baseline).
+- `results/jobs/job-*/`: stato, eventi e log del worker.
 
 ## 8. Interrompere, recuperare e spegnere
 
-Per fermare una prova usare **Interrompi** nella console e attendere la messa in sicurezza. Chiudere la scheda non ferma il worker. Per controllare o interrompere da un secondo terminale:
+Per fermare un job usare **Interrompi** nella console, oppure:
 
 ```powershell
 .\.venv\Scripts\python.exe tools/experiment.py jobs
 .\.venv\Scripts\python.exe tools/experiment.py stop --job-id job-IDENTIFICATIVO
 ```
 
-Sostituire `job-IDENTIFICATIVO` con l'ID effettivo. Se compare **Ripristino necessario**, usare **Ripristina laboratorio** e attendere. Per un worker morto con lock ancora presente:
+Se un job richiede il ripristino (o il worker è morto con il lock presente) usare **Ripristina laboratorio** oppure:
 
 ```powershell
 .\.venv\Scripts\python.exe tools/experiment.py recover --wait
 ```
 
-Non cancellare manualmente `results/jobs/lab.lock`. Il recupero conclude la prova interrotta; una nuova simulazione richiede un nuovo avvio.
-
-Quando non ci sono job attivi o recuperi pendenti, fermare il server con **Ctrl+C** nel suo terminale e arrestare il laboratorio:
+Non cancellare a mano `results/jobs/lab.lock`. Per spegnere, senza job attivi:
 
 ```powershell
 .\.venv\Scripts\python.exe tools/lab.py stop
 ```
-
-Come `tools/stack.py stop`, il comando rifiuta l'arresto se il lock del laboratorio è presente. `tools/stack.py down` rimuove container e reti conservando i volumi persistenti; `stop` basta per lo spegnimento ordinario. Negli avvii successivi ripetere i punti **4 e 6**.
 
 ## Il satellite di riferimento: Starlink
 
@@ -146,43 +117,42 @@ Il modello prende come riferimento la struttura dei satelliti Starlink descritta
 
 | Componente (dichiarato da SpaceX) | Ruolo nella simulazione | Stato nel simulatore |
 | --- | --- | --- |
-| **3 laser spaziali** (collegamenti ottici intersatellitari, ISL), fino a 200 Gbps | Canale della migrazione e dei percorsi multi-hop fra satelliti | Da introdurre: al massimo 3 collegamenti FSO per satellite. Oggi il modello accetta ogni coppia entro 1.700 km, senza limite di terminali |
+| **3 laser spaziali** (collegamenti ottici intersatellitari, ISL), fino a 200 Gbps | Canale della migrazione e dei percorsi multi-hop fra satelliti | Modellati: 2 verso i vicini dello stesso piano e 1 verso l'altro piano, con allineamento di 60 s per i collegamenti che si formano durante la giornata |
 | **5 antenne phased array in banda Ku** | Collegamento con i terminali utente a terra | Non modellate. Candidate per la futura variante radio |
 | **3 antenne dual-band Ka/E** | Collegamento con le stazioni di terra (gateway) | Non modellate. Candidate per la futura variante radio |
-| **2 pannelli solari + batteria** | Il satellite è pienamente operativo solo al sole: l'ombra è l'evento che richiede la migrazione | Modellato come periodi di illuminazione dal replay orbitale |
+| **2 pannelli solari + batteria** | Il satellite è pienamente operativo solo al sole: l'ombra è l'evento che richiede la migrazione | Modellati come periodi di illuminazione dal replay orbitale |
 | **Propulsore elettrico ad argon** | Innalzamento d'orbita, manovre e rientro a fine vita | Non modellato. Il replay usa orbite da TLE senza manovre |
-| **Inseguitore stellare e 4 ruote di reazione** (una di scorta) | Assetto e puntamento, necessari anche per allineare i laser | Rappresentati solo dal tempo di allineamento FSO (60 s) |
+| **Inseguitore stellare e 4 ruote di reazione** (una di scorta) | Assetto e puntamento, necessari anche per allineare i laser | Rappresentati solo dal tempo di allineamento (60 s) |
 
-Ipotesi e limiti da tenere presenti:
+Ipotesi e limiti:
 
-- La pagina indica il numero di laser ma non la loro assegnazione. Nel modello si ipotizza **2 laser verso i vicini dello stesso piano e 1 verso il piano adiacente**. È un'ipotesi di progetto, non un dato SpaceX.
-- La portata dei laser **non è dichiarata**. I 1.700 km e i 60 s di allineamento sono parametri dello scenario (`config/scenario.json`), non specifiche Starlink.
-- SpaceX indica una quota di circa 550 km. I due piani scelti per il nuovo scenario appartengono al guscio a 53° a circa 463 km, ricavato dai TLE del catalogo.
+- La pagina indica il numero di laser ma non la loro assegnazione: 2 nel piano e 1 verso il piano adiacente è un'ipotesi di progetto.
+- La portata dei laser **non è dichiarata**. I 1.700 km e i 60 s di allineamento sono parametri dello scenario (`config/scenario.json`).
+- SpaceX indica una quota di circa 550 km; i due piani scelti appartengono al guscio a 53° a circa 463 km, ricavato dai TLE del catalogo.
 - Le orbite derivano da TLE pubblici, la cui accuratezza è limitata: i contatti vicini al limite di portata vanno considerati incerti (ESA, *Space Debris Mitigation for CubeSats and Smallsats*, ESA-TECQI-HO-2025-003724, 11/12/2025).
-- Per la variante radio, le antenne Ka/E e Ku collegano il satellite con la Terra, non con altri satelliti. Una migrazione via radio passerebbe quindi da una stazione di terra (satellite → gateway → satellite), con portata, velocità e disponibilità diverse dal laser.
+- Per la variante radio, le antenne Ka/E e Ku collegano il satellite con la Terra: una migrazione via radio passerebbe da una stazione di terra (satellite → gateway → satellite).
+- Il laboratorio gira su un solo host con un daemon Docker condiviso; il percorso multi-hop della migrazione è modellato, non emulato pacchetto per pacchetto.
 
 ## Problemi frequenti
 
-- **Python o `.venv` non trovato:** verificare il percorso corrente e completare il punto 2.
-- **Docker non raggiungibile:** avviare Docker Desktop, selezionare engine Linux e attendere che `docker version` mostri il server.
-- **Immagine, bundle o file mancante / checksum errato:** ripristinare gli artefatti previsti dai manifest (punto 3); non aggirare i controlli modificando i checksum.
-- **Porta 18092 occupata:** verificare se la console è già avviata; usare l'istanza esistente oppure arrestarla prima di riavviare il server.
-- **Pulsante di avvio disabilitato o laboratorio occupato:** controllare stato, job attivo ed eventuale richiesta di recupero.
-- **Preparazione ferma o fallita:** leggere sottofase, ultimo progresso, scadenza e log del job; non avviare altre operazioni Docker durante una prova.
-- **Conflitto di subnet Docker:** vedere le variabili di rete in `deploy/lab.env` nella guida di deployment.
+- **Docker non raggiungibile:** avviare Docker Desktop con engine Linux e attendere che `docker version` mostri il server.
+- **Immagine, bundle o file mancante / checksum errato:** ripristinare i materiali previsti dai manifest (punto 3).
+- **Porta 18092 occupata:** la console è probabilmente già avviata.
+- **Pulsanti disattivati:** laboratorio occupato da un job, ripristino necessario o scenario non installato.
+- **Prova fallita in preparazione:** leggere fase, motivo e log nel job (`results/jobs/job-*/`).
 
 ## Documentazione e verifiche locali
 
-- [Guida al confronto guidato attuale](teraflow-migration-sim/docs/guided-flow.md)
+- [Piano di riprogettazione e avanzamento](teraflow-migration-sim/docs/piano-riprogettazione-simulatore.md)
 - [Deployment e immagini Docker](teraflow-migration-sim/docs/teraflow-compose.md)
-- [Guida operativa e strumenti CLI avanzati](teraflow-migration-sim/docs/operating-guide.md)
+- [Adapter di stato TeraFlow v7](teraflow-migration-sim/docs/tfs-v7-state-adapter.md)
 - [Descrizione tecnica](teraflow-migration-sim/README.md)
-- [Stato di implementazione e limiti delle misure](teraflow-migration-sim/docs/implementation-status.md)
 
-Per eseguire i test locali dalla cartella applicativa:
+Test locali, dalla cartella applicativa:
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest discover -s tests -v
+node --test tests/test_experiment_state.cjs tests/test_orbit_motion.cjs
 ```
 
-I test locali non certificano il completamento della campagna live. La vecchia dashboard sulla porta 8081 è stata rimossa; l'unico frontend è la console sulla porta 18092.
+I test locali non sostituiscono la verifica live del laboratorio.

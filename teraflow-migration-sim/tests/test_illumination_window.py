@@ -14,7 +14,7 @@ class IlluminationWindowTests(unittest.TestCase):
             np.savez(artifact, ids=np.array([11, 22]), positions=np.zeros((7, 2, 3)),
                      eclipsed=np.array([[False, True], [False, True], [True, True],
                                         [True, True], [False, True], [False, True], [False, True]]))
-            orbit = Orbit(artifact)
+            orbit = Orbit(artifact, links=[])
             self.assertEqual(orbit.illumination_window(11, 1),
                              {'phase_start_s': 0, 'next_transition_s': 2, 'shadow_duration_s': 2})
             self.assertEqual(orbit.illumination_window(11, 2),

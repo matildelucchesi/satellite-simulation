@@ -8,7 +8,7 @@ from urllib.request import Request, urlopen
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from src.fixture import state, for_destination
-from src.orbit import Orbit, load_orbit
+from src.orbit import load_orbit
 from src.tfs_adapter import TfsAdapter
 from src.artifacts import canonical_bytes
 from src.probes import analyze_directory

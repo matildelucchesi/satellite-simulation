@@ -2,14 +2,14 @@
   "acceptance": "api_equivalence+target_authority+10_fresh_consecutive_pings",
   "cold_minus_hot": {
     "attempt": 0,
-    "controller_downtime_s": 103.08572239999194,
+    "controller_downtime_s": 111.69690210002591,
     "ping_recovery_s": null,
-    "total_operation_s": -6.09035800001584
+    "total_operation_s": 10.722401600010926
   },
-  "comparison_id": "compare-4e25327319944c39a32c4b7afe277c5b",
+  "comparison_id": "compare-9be817416b394611a5dd5ecabcd66c0d",
   "complete": true,
   "configured_rate_bps": 1000000000,
-  "created_utc": "2026-11-07T17:12:36.286271+00:00",
+  "created_utc": "2026-11-07T18:51:07.938580+00:00",
   "current_method": null,
   "event": {
     "catalog_event_id": "60150-1557",
@@ -18,7 +18,7 @@
     "deadline_s": 2457,
     "deadline_window_s": 900,
     "event_id": "functional-60150-68285-1557",
-    "execution_purpose": "functional-calibration",
+    "execution_purpose": "functional-verification",
     "hops": 5,
     "path": [
       60150,
@@ -46,42 +46,42 @@
     {
       "attempt": 1,
       "baseline_valid": true,
-      "controller_downtime_s": 20.566469500015955,
+      "controller_downtime_s": 5.2699505999917164,
       "failure_reason": null,
       "image_throughput_bps": null,
       "method": "hot",
-      "observation_s": 41.14171080000233,
+      "observation_s": 38.692341299989494,
       "outcome": "success",
       "ping_continuous": true,
       "ping_recovery_s": null,
       "recovery_required": false,
       "restarted_payload_bytes": 0,
       "retries": 0,
-      "run_id": "run-04d850876f144617a07d4c45220b9d58",
-      "service_verification_s": 1.2781199000019114,
+      "run_id": "run-999abf248b1d4dc9ba4560ab2a663cde",
+      "service_verification_s": 1.2085450000013225,
       "service_verified": true,
       "success": true,
-      "total_operation_s": 192.8339743000106
+      "total_operation_s": 167.85160689998884
     },
     {
       "attempt": 1,
       "baseline_valid": true,
-      "controller_downtime_s": 123.65219190000789,
+      "controller_downtime_s": 116.96685270001763,
       "failure_reason": null,
       "image_throughput_bps": null,
       "method": "cold",
-      "observation_s": 40.74790009998833,
+      "observation_s": 38.142385199986165,
       "outcome": "success",
       "ping_continuous": true,
       "ping_recovery_s": null,
       "recovery_required": false,
       "restarted_payload_bytes": 0,
       "retries": 0,
-      "run_id": "run-449844ecee11417aab89dd092e6d8f73",
-      "service_verification_s": 1.2336111000040546,
+      "run_id": "run-3325209c8495439699c50e2336539f65",
+      "service_verification_s": 1.175441300001694,
       "service_verified": true,
       "success": true,
-      "total_operation_s": 186.74361629999476
+      "total_operation_s": 178.57400849999976
     }
   ],
   "schema_version": 3

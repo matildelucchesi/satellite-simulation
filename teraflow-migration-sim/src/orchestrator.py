@@ -27,7 +27,6 @@ class Migration:
         self.phase = phase
         event = {"id": len(self.events)+1, "timestamp_utc": utc_now(), "phase": phase,
                  "elapsed_s": self.clock.now(), "orbital_s": self.clock.orbital(), **details}
-        event.update(getattr(self.backend, 'event_context', {}))
         self.events.append(event)
         append_json(self.directory / 'events.jsonl', event)
         atomic_json(self.directory / 'checkpoint.json', {"phase": phase, "ack": self.ack,
@@ -111,10 +110,6 @@ class Migration:
                     # Host inventory is accepted only from the verified receiver receipt.
                     image_receipt = self.events[-1]["receipt"]
                     self.inventory.accept(destination, describe(image_bundle), image_receipt)
-                additional=getattr(self.backend,'additional_payload',None)
-                if additional is not None:
-                    result['additional_data_bytes']=additional.stat().st_size
-                    self.payload(additional,event)
                 state_receipt = self.payload(snapshot_path, event)
                 self.inventory.require(destination)
                 self.transition("target_start")

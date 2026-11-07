@@ -1,73 +1,64 @@
-# TeraFlowSDN controller migration simulation
+# Descrizione tecnica
 
-I contratti aggiornati di esito, recupero e metriche sono descritti in [Responsabilità e risultati](docs/consolidated-results.md). La validazione live del consolidamento viene registrata separatamente dalle prove precedenti.
+Il simulatore confronta la migrazione **Hot** e **Cold** del controller TeraFlowSDN 7.0 fra satelliti LEO. La geometria orbitale è modellata da TLE reali; la migrazione (API TeraFlow, trasferimento TCP dello stato, autorità P4Runtime, forwarding Mininet/BMv2) è eseguita davvero nel laboratorio Docker. Istruzioni d'uso nel [README principale](../README.md).
 
-> Aggiornamento 16 ottobre 2026: il percorso principale è **Confronto FSO hot/cold**, su un evento a 1 Gbit/s con verifica API e ping. Simulazione continua e campagne rimangono funzioni avanzate con validazione separata. Avvio e criteri di successo sono nella [guida operativa](docs/operating-guide.md).
+## Fasi
 
-This is the sole application in the repository. The previous seven-satellite simulator and its port-8081 dashboard have been removed. The local console is served directly on port 18092.
+| Fase | Cosa fa | Quando | Laboratorio |
+| --- | --- | --- | --- |
+| 0. Scenario | Selezione dei piani, replay orbitale, laser, percorsi, dominio, catalogo eventi | Una volta (`tools/build_scenario.py`, `tools/install_scenario.py`) | No |
+| 1. Laboratorio | Stack Compose, rete del dominio in TeraFlow, baseline | A ogni prova, nella preparazione | Sì |
+| 2. Verifica | Una migrazione Hot e una Cold sul primo evento (`functional`) | Per sessione o dopo modifiche al codice | Sì |
+| 3. Esperimento | Hot e Cold su 3 eventi, ordine alternato (`compare_events`) | Per esperimento | Sì |
+| 4. Analisi | Fasi, Cold − Hot, fattibilità a posteriori, CSV | Alla fine di ogni esperimento | No |
 
-The experiment compares hot and cold migration of a TeraFlowSDN Release 7 controller workload over a direct FSO/TCP link. The orbital inputs are frozen Starlink TLEs, propagated with SGP4. Mininet/BMv2/P4 provides the functional service data plane; its links follow orbital visibility, while the controller binding moves only after SAT-B passes restoration checks and ACKs.
+## Moduli (`src/`)
 
-## Reproducible orbital preflight
+| Area | Moduli |
+| --- | --- |
+| Scenario | `starlink_scenario` (piani, 3 laser, percorsi multi-hop, dominio, eventi), `orbit` (replay, illuminazione, grafo laser, grafo del laboratorio, collegamento della migrazione), `fixture` (rete del dominio e servizio L2) |
+| Laboratorio | `live_backend` (Compose, preparazione, sonde, topologia, operazioni della migrazione), `tfs_adapter` (API TeraFlow: export, restore, reconcile, verify), `p4_proxy` (autorità P4Runtime), `emulator` e `link_control` (Mininet/BMv2, collegamenti con `tc netem`), `udp_probe`, `deployment`, `processes`, `preparation_budget` |
+| Migrazione | `orchestrator` (macchina a stati Hot/Cold), `handover`, `authority`, `snapshot`, `transport` (TCP con limitatore e verifica), `artifacts` (hash e ricevute), `probes`, `measurements`, `clock` |
+| Esperimento | `experiment` (verifica, singola prova, recupero, ambiente), `event_comparison` (esperimento a eventi, fasi, fattibilità, CSV), `results` |
+| Job e console | `jobs` (un job alla volta, worker separato, lock, recupero), `progress`, `checkpoints`, `storage`, `web` (API locale e SSE) |
 
-The frozen source is [`data/starlink_2026-10-01.tle`](data/starlink_2026-10-01.tle); retrieval URL, SHA-256, record count, epoch, and screening notes are in [`data/source_manifest.json`](data/source_manifest.json). The TLE is from CelesTrak's public Starlink GP query. The selected records and the full screening report are in [`config/selected_constellation.json`](config/selected_constellation.json).
+## Invarianti
 
-The selector propagates each TLE to the latest common epoch before grouping by orbital plane. It screens for inclination 52.5–53.5 degrees and SGP4 mean semi-major-axis altitude 520–580 km, then selects two planes with RAAN separation 10–30 degrees and keeps every candidate in those two groups. For this frozen snapshot that produces **17 satellites**, 6 in one plane and 11 in the other. Their RAAN centers are approximately 90.00 and 110.03 degrees at the reference epoch. The selected altitudes are about 521.9–540.1 km; 550 km remains the nominal shell label, while the stored TLE controls actual propagation. The 520–580 km screen is intentional: a tighter 530–570 km filter removes the multiple direct SAT-B choices needed for score-based election. STARLINK-3527 (NORAD 51726, 521.9 km) stays in the primary sample and will be identified as a boundary case; an optional sensitivity run can omit it.
+- Autorità esclusiva: la destinazione riceve l'ACK e il cutover solo dopo verifica del trasferimento, equivalenza delle API e stato P4 pronto; copia, staging o verifica falliti non producono ACK.
+- Contatti chiusi emulati con perdita `tc netem` al 100% nelle due direzioni; dopo la perdita del collegamento il trasferimento riparte da zero.
+- Il recupero si ferma se fallisce il fencing della destinazione o il ripristino della sorgente.
+- La baseline del servizio richiede API, autorità P4 e almeno 10 ping freschi consecutivi; UDP è diagnostico.
+- Il laboratorio accetta un solo job alla volta; il worker sopravvive alla chiusura della console.
+- Misure assenti restano assenti; Cold − Hot si calcola solo quando entrambi i valori esistono.
 
-The one-day, one-second preflight yields **168 direct FSO contact windows** within 1,700 km and without spherical-Earth occultation. It contains 7 distinct satellite pairs; 3 satellites have at least two direct candidate neighbors over the day. This is enough to exercise single-hop destination election on selected events. It remains a reduced two-plane sample, not a complete Starlink constellation.
+## Scelte del modello
 
-To reproduce the artifacts (Python 3.11+ and `sgp4==2.27`; tested here with Python 3.13.9):
+- Due piani adiacenti del guscio Starlink 53°/463 km (RAAN 80,8° e 82,8°, 31 + 31 satelliti). Con piani così coerenti la topologia laser resta stabile per tutto il giorno; ciò che cambia nel tempo è l'illuminazione.
+- 3 laser per satellite: 2 verso i vicini dell'anello, 1 verso un partner stabile sull'altro piano; 60 s di allineamento per i collegamenti che si formano durante il replay.
+- Il laboratorio emula solo il dominio del controller (16 satelliti); il resto della costellazione è modellato e fa da relè per il percorso multi-hop della migrazione.
+- Gli estremi del servizio di prova hanno un percorso minimo unico (capi dell'arco del piano 1), così il percorso di TeraFlow e le regole di inoltro coincidono; il servizio descrive solo gli switch del percorso.
+- Software del controller a bordo: migra solo lo stato. Il database della destinazione viene svuotato prima del trigger.
+- Velocità unica di 1 Gbit/s.
+
+## Configurazione
+
+- `config/scenario.json`: orbita, laser (`fso`), dominio, eventi, opzioni della migrazione (`migration`).
+- `config/selected_constellation.json`, `config/domain.json`, `config/migration_events.json`: scenario installato.
+- `config/fixture.json`: rete emulata (dispositivi, collegamenti, host del servizio).
+- `config/artifact_manifest.json`, `config/lab-manifest.json`, `config/teraflow-source.json`: materiali del laboratorio.
+- `deploy/stack.yaml`, `deploy/lab.env`: gruppo Compose `teraflow`; NBI su 18080/18081, Mininet 18090, proxy P4 18091, console 18092.
+
+## Strumenti (`tools/`)
+
+- Uso: `lab.py` (avvio, stato, arresto), `experiment.py` (job da riga di comando e worker), `stack.py`, `serve_gui.py`, `start_gui.cmd`.
+- Scenario: `build_scenario.py`, `install_scenario.py`, `tfs_context_cleanup.py` (svuota l'inventario del laboratorio in un database Context), `tle_catalog.py` (lettura del catalogo TLE).
+- Materiali del laboratorio: `generate_stack.py`, `prepare_lab.py`, `prepare_artifacts.py`, `build_tfs_images.py`, `prepare_tfs_source.py`, `prepare_device_patch.py`, `prepare_l2_patch.py`, `validate_artifact_manifest.py`, `check_tfs_hosts.py`, `live_preflight.py`.
+
+## Test
 
 ```powershell
-python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.venv\Scripts\python.exe tools/select_constellation.py
-.\.venv\Scripts\python.exe tools/check_direct_links.py
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
+node --test tests/test_experiment_state.cjs tests/test_orbit_motion.cjs
 ```
 
-The orbital preflight does not yet select the final migration events: those require the trigger/deadline timeline and the measured controller workload manifest. The current contact-window count is a geometry check, not the number of migration trials.
-
-The exact screening and percentile rules are documented in [`docs/orbital-selection.md`](docs/orbital-selection.md). The API order and the unresolved policy-rule write path are documented in [`docs/tfs-v7-state-adapter.md`](docs/tfs-v7-state-adapter.md).
-
-## Migration model and fail-closed inputs
-
-[`config/scenario.json`](config/scenario.json) stores the agreed common parameters: nominal 6-core/12-GiB/80-GiB node, 20% reserve, 1-second orbit step, 60-second FSO alignment, 1,700-km link range, TCP, three useful rates (100 Mbit/s, 1 Gbit/s, 10 Gbit/s), 120-second no-progress timeout, three total attempts, and restart-from-zero after interrupted copy.
-
-[`src/migration_model.py`](src/migration_model.py) computes transfer time, total operation time, controller downtime, contact/deadline completion, and both orbital and migration margins. It uses decimal useful bit/s and measured bytes. Cold downtime begins after the source snapshot and includes transfer, destination startup, restore, verification, and ACK/cutover. Hot migration includes image and initial-state pre-copy while SAT-A stays active; downtime is the final freeze, delta transfer/application, verification, and cutover.
-
-[`src/score_model.py`](src/score_model.py) applies the agreed 35/30/20/15 score weights. Candidate eligibility requires reachable network nodes and post-placement CPU/RAM/disk free capacity at or above the reserve. Latency utility is inverse min-max normalized among eligible candidates for the same event; if all candidate latencies are equal, they all receive 1. Connectivity is reachable managed nodes divided by modeled nodes. Continuity is predicted time until control reachability is lost, capped at the common forecast horizon. Resource utility is the weakest CPU/RAM/disk headroom above the reserve, normalized to [0,1]. Ties break by shorter FSO distance then lower NORAD ID. This is a transparent experimental ranking policy, not a claim that Starlink uses these weights.
-
-[`src/resource_model.py`](src/resource_model.py) computes the common forecast horizon as `ceil(1.2 × slowest completion estimate)` and the deterministic 55%→85% background-load ramp over two horizons. The 80% crossing forecast must persist for 30 one-second samples; the trigger clears below 70% for 60 s. [`src/failure_model.py`](src/failure_model.py) withholds ACK and the active role after failure, preserves the hot source, or restarts the cold source from its local state when operational; retries are limited to three total attempts.
-
-The final matrix is intentionally gated on real measurements. Copy [`config/artifact_manifest.template.json`](config/artifact_manifest.template.json) to `config/artifact_manifest.json`, then record the exact Release 7 source commit; image references, OCI digests and bytes actually sent; dependency placement; operational state export sizes/checksum; restore and verification timings; resource measurements; and measurement method/date. `tools/validate_artifact_manifest.py` reports all missing fields. The template values are null: no placeholder sizes are treated as real results.
-
-## TeraFlow Docker Compose configuration
-
-The single `teraflow` Compose group is defined in [deploy/stack.yaml](deploy/stack.yaml), generated from the pinned source templates by `tools/generate_stack.py`. SAT-A/SAT-B retain separate networks, databases and brokers, with local NBI ports 18080 and 18081. Start the full group with `.\.venv\Scripts\python.exe tools/stack.py up`; `stop`, `down` and `status` use the same tool. Persistent volumes are retained across container recreation. See [the deployment notes](docs/teraflow-compose.md). Six workload images represent the five logical components because PathComp has separate frontend and backend images. The source commit is recorded in [config/teraflow-source.json](config/teraflow-source.json).
-
-## Remaining work before final results
-
-### Live engine and local console (2026-10-08)
-
-The shared application service now connects Compose, TeraFlow restore, TCP transfer, orbital replay, probes and staged P4 cutover. Cold and hot functional migrations have completed with verified API equivalence, ACK and hardware cutover; these are diagnostics, not the 18 principal cases. Calibration and the experimental gates must finish before claiming final results.
-
-Start the independent local GUI with `python tools/serve_gui.py`, then open **http://127.0.0.1:18092/**. The SVG topology, persistent job timeline, experiment matrix, run details and registered downloads read the same results as the CLI. See [the operating guide](docs/operating-guide.md) for commands, interruption/recovery and measurement limits. `python tools/experiment.py complete` runs the gated workflow in a separate worker; the browser may be closed without stopping it.
-
-The historical checklist below describes the earlier preflight stage. Consult [implementation status](docs/implementation-status.md) and the saved job results for current acceptance status.
-
-The source and six original workload images are pinned. The lab, deterministic fixture, API adapter, snapshot/delta handling, TCP transport, migration state machine, orbital replay and standby P4 proxy have implementations. Their existence does not establish successful live migration. Current verification and the upstream compatibility failure are recorded in [docs/implementation-status.md](docs/implementation-status.md).
-
-1. Extend the successful L2NM restore/forwarding preflight to confirmed hardware cutover and live standby isolation checks. The authorized Service/Device compatibility patches and the separate six-image bundle are tracked; the original upstream bundle is preserved.
-2. Connect the live backend to the migration state machine; verify cold/hot cutover, crash recovery and every required injected failure. Confirm controller recovery and data-plane recovery independently.
-3. Complete the three functional calibration measurements per mode and transport capacity checks. Freeze the measured manifest, workload, horizon and selected events.
-4. Run the 18 paired cases and the separate ranking diagnostic, then publish raw evidence, aggregate results and modeled sensitivity separately.
-
-Until these measurements and integration checks are complete, the output is an orbital preflight and a parametric model, not final performance evidence for a running TeraFlowSDN deployment.
-
-## Sources
-
-- CelesTrak, [Current GP Element Sets and query documentation](https://celestrak.org/NORAD/documentation/gp-data-formats.php) and [TLE field format](https://celestrak.org/NORAD/documentation/tle-fmt.php).
-- ETSI TeraFlowSDN, [Release 7.0 Deployment Guide](https://tfs.etsi.org/documentation/v7.0.0/deployment_guide/) and [controller v7.0.0 source tag](https://labs.etsi.org/rep/tfs/controller/-/tree/v7.0.0).
-- A. U. Chaudhry and H. Yanikomeroglu, “Temporary Laser Inter-Satellite Links in Free-Space Optical Satellite Networks,” *IEEE Open Journal of the Communications Society*, 2022, [DOI 10.1109/OJCOMS.2022.3198391](https://doi.org/10.1109/OJCOMS.2022.3198391). The paper evaluates 1,700 km among its temporary-LISL range scenarios; this does not make 1,700 km a universal hardware limit.
-- ETSI TeraFlowSDN, [Supported SBIs and Network Elements](https://tfs.etsi.org/documentation/latest/supported_sbis_and_network_elements/), [Supported Service Handlers](https://tfs.etsi.org/documentation/latest/supported_service_handlers/), and [TFS#3 Mininet/P4 Hackfest](https://tfs.etsi.org/news/hackfest-3/).
-- [Mininet overview](https://mininet.org/overview/) and [P4 BMv2](https://github.com/p4lang/behavioral-model).
+Alcuni test P4 richiedono i protobuf dell'ambiente Linux del laboratorio e vengono saltati sull'host.

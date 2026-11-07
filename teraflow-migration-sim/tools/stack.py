@@ -7,7 +7,6 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from src.deployment import VOLUMES, compose_command
 
-# Kept outside src/: every src/*.py file is part of the calibration engine fingerprint.
 UP_ARGUMENTS = ('up', '-d', '--no-build', '--wait', '--wait-timeout', '180')
 
 

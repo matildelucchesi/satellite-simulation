@@ -16,7 +16,6 @@ from src.results import finalize, read_result
 from src.processes import run_process
 from src.jobs import process_running
 from src.storage import read_json
-from src.preparation import Preparation
 from src.storage import atomic_json
 
 
@@ -61,14 +60,15 @@ class PreparationProgressTests(unittest.TestCase):
         self.assertFalse(result['success'])
         self.assertIsNone(read_result({'success':True})['experimental_valid'])
 
-    def test_replica_and_operation_progress_survive_terminal_event(self):
-        p=advance({}, {'phase':'calibration','method':'hot','replica':2})
-        self.assertEqual(p['calibration_index'],5)
+    def test_event_and_operation_progress_survive_terminal_event(self):
+        p=advance({}, {'phase':'event_comparison','comparison_id':'events-x','event_index':2,'event_total':3,'method':'cold','label':'Evento 2/3 · COLD'})
+        self.assertEqual((p['event_index'],p['method'],p['label']),(2,'cold','Evento 2/3 · COLD'))
         p=advance(p,{'phase':'preparation_operation','operation':'start_source','label':'Avvio',
                      'operation_status':'failed','error':{'code':'startup_timeout'}})
-        p=advance(p,{'phase':'comparison_finished','outcome':'failed'})
+        p=advance(p,{'phase':'job_finished','status':'completed'})
         self.assertEqual(p['error']['code'],'startup_timeout')
-        self.assertEqual(p['phase'],'finished')
+        self.assertEqual(p['comparison_id'],'events-x')
+        self.assertEqual(p['worker_status'],'completed')
 
     def test_repeated_baseline_samples_do_not_fake_progress(self):
         sample={'phase':'baseline_check','fresh_ping_successes':0,'udp_packets':0,'active_slot':None}
@@ -91,18 +91,6 @@ class PreparationProgressTests(unittest.TestCase):
             with self.assertRaises(InterruptedError):
                 with budget.stage('start_source'):raise InterruptedError('cancel')
             self.assertEqual(budget.error['code'],'interrupted')
-
-    def test_calibration_rejects_implementation_changes_before_publishing_manifest(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root=Path(directory)
-            atomic_json(root/'results/functional-gate.json',{'complete':True})
-            app=SimpleNamespace(root=root,prepare_calibration_network=Mock(),publish=Mock(),calibration_manifest=Mock(),
-                run=Mock(side_effect=[{'run_id':str(i),'success':True,'baseline':{'success':True}} for i in range(6)]))
-            with patch('src.simulation.engine_fingerprint',side_effect=['before','after']):
-                result=Preparation.calibrate(app)
-            self.assertFalse(result['complete'])
-            self.assertEqual(result['reason'],'implementation_changed_during_calibration')
-            app.calibration_manifest.assert_not_called()
 
     @unittest.skipUnless(os.name == 'nt', 'Windows Compose process-tree regression')
     def test_cancellation_stops_descendants_that_hold_output_pipes(self):

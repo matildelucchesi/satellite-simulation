@@ -35,7 +35,7 @@ I digest e le dimensioni locali non compresse delle sei immagini sono registrati
 
 ## Verifiche e limiti prima delle misure
 
-- La verifica funzionale aggiornata include 17 dispositivi, topologia/link, restore del servizio L2NM e traffico ping/UDP end-to-end. Vedere `implementation-status.md` per le patch necessarie e le misure; cutover e campagna restano da validare.
+- La verifica funzionale include la rete del dominio installato, topologia/link, restore del servizio L2NM e traffico ping/UDP end-to-end. Le patch del servizio L2 sono descritte in `service-provisioning-validation.md`; misure ed esiti nel [piano di riprogettazione](piano-riprogettazione-simulatore.md).
 - Verificare avvio, riavvio e mantenimento dei dati locali. `depends_on` per i componenti TFS ordina l'avvio, ma non certifica la disponibilità delle loro API.
 - I digest immagine e i digest delle immagini dipendenza sono fissati. Registrare ancora dimensioni degli archivi effettivamente trasferiti, dipendenze Python risolte e consumi di tutti i container.
 - Il profilo 6 core / 12 GiB / 80 GiB è il budget complessivo di ogni host simulato. Questo file di preparazione non applica ancora quote aggregate: calibrazione e limiti vanno verificati prima di produrre risultati di prestazione.

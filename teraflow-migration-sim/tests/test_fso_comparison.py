@@ -46,7 +46,7 @@ class ComparisonTests(unittest.TestCase):
 
     def test_pair_freezes_one_event_and_preserves_both_runs_and_differences(self):
         with tempfile.TemporaryDirectory() as folder:
-            root=Path(folder);atomic_json(root/'config/scenario.json',{})
+            root=Path(folder);atomic_json(root/'config/scenario.json',{'fso':{'useful_throughput_bps':[10**9]}})
             app=Experiment(root)
             event={'event_id':'fso-one','trigger_s':100,'sat_a':1,'sat_b':2}
             app.functional_event=Mock(return_value=event)
@@ -72,7 +72,7 @@ class ComparisonTests(unittest.TestCase):
     def test_pair_stops_on_invalid_baseline_or_failed_post_cutover_ping(self):
         for outcome in ('invalid_baseline','experimental_failure','recovery_required'):
             with self.subTest(outcome=outcome),tempfile.TemporaryDirectory() as folder:
-                root=Path(folder);atomic_json(root/'config/scenario.json',{})
+                root=Path(folder);atomic_json(root/'config/scenario.json',{'fso':{'useful_throughput_bps':[10**9]}})
                 app=Experiment(root);app.functional_event=Mock(return_value={'event_id':'one'})
                 app.run=Mock(return_value={'run_id':'run-hot','method':'hot','success':False,
                     'outcome':outcome,'baseline':{'success':outcome!='invalid_baseline'}})

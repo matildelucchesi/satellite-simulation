@@ -1,7 +1,6 @@
 """Real Docker/NBI/TCP backend. Geometry is modeled; operations are measured."""
 from __future__ import annotations
 import copy
-import contextlib
 import json
 import subprocess
 import threading
@@ -10,7 +9,7 @@ from pathlib import Path
 from urllib.request import Request, urlopen
 
 from .artifacts import canonical_bytes
-from .fixture import state, for_role, with_endpoint_rules, service_endpoints
+from .fixture import state, for_role, service_endpoints
 from .orbit import lab_graph, shortest_paths
 from .snapshot import apply_delta
 from .storage import append_json, utc_now
@@ -98,7 +97,6 @@ class LiveBackend:
         self.preparation_deadline = None
         self.preparation_budget = None
         self.proxy_generation = None
-        self.event_context = {}
         self.attempt = 0
         self.received_images = []
         self.cutover_unix_s = None
@@ -142,11 +140,8 @@ class LiveBackend:
 
     def measure(self, operation, function):
         started = time.monotonic()
-        collector=getattr(self,'resource_collector',None)
-        slot=self.source_slot if operation in ('snapshot','freeze','source_stop') else self.target_slot
         try:
-            with collector.operation(operation,slot) if collector else contextlib.nullcontext():
-                return function()
+            return function()
         finally:
             item = {'operation': operation, 'elapsed_s': time.monotonic()-started, 'timestamp_utc': utc_now()}
             self.measurements.append(item)
@@ -158,7 +153,7 @@ class LiveBackend:
             self.check()
             started=time.monotonic()
             event={'phase':'source_startup','startup_stage':name,'label':label,
-                   'controller_slot':self.source_slot,'phase_started_utc':utc_now(),**self.event_context}
+                   'controller_slot':self.source_slot,'phase_started_utc':utc_now()}
             def publish(status, **extra):
                 row={**event,'operation_status':status,'elapsed_s':time.monotonic()-started,**extra}
                 append_json(self.directory/'source-startup.jsonl',{**row,'timestamp_utc':utc_now()})
@@ -218,12 +213,12 @@ class LiveBackend:
                 self.notify({'phase':'infrastructure_wait','label':'Attesa disponibilità Mininet e proxy P4',
                     'operation_status':'completed' if ready else 'running',
                     'detail':'; '.join(name+': '+row['detail'] for name,row in last.items()),
-                    'infrastructure_status':copy.deepcopy(last),**self.event_context})
+                    'infrastructure_status':copy.deepcopy(last)})
                 previous=copy.deepcopy(last)
             if ready:return proxy
             if self.cancel.wait(min(1,self.remaining())):raise InterruptedError('Job interrupted by user')
 
-    def reset(self, *, reuse_inventory=False):
+    def reset(self):
         initial_tick = self.event.get('start_s', max(0, self.event['trigger_s']-30))
         self.initial_tick = initial_tick
         graph = lab_graph(self.orbit, initial_tick)
@@ -243,43 +238,16 @@ class LiveBackend:
         if self.scenario.get('migration', {}).get('clean_target_store_before_trigger'):
             with stage('clean_target'): self.clean_target_store()
         with stage('start_source'): self.start_source()
-        incremental = False
-        if reuse_inventory:
-            from .snapshot import identity, snapshot
-            initial = initial_state()
-            current = self.a.export()
-            wanted = {identity('devices', row): row for row in initial['entities']['devices']}
-            def connection(row):
-                return {r.get('custom', {}).get('resource_key'): r
-                        for r in row.get('device_config', {}).get('config_rules', [])
-                        if r.get('custom', {}).get('resource_key', '').startswith('_connect/')}
-            incremental = all(connection(row) == connection(wanted[identity('devices', row)])
-                              for row in current['entities']['devices']
-                              if identity('devices', row) in wanted)
-            if incremental:
-                # Recreate the service intent so its generated forwarding rules
-                # cannot survive with a stale path. Keep the expensive devices.
-                with stage('reset_service'):
-                    self.a.cleanup(snapshot({'services': current['entities']['services']}))
-            else:
-                self.notify({'phase':'scenario_creation',
-                             'label':'Connessioni dispositivi cambiate: ripristino completo necessario'})
-        if not incremental:
-            with stage('clean_source'): self.a.cleanup(self.a.export())
+        with stage('clean_source'): self.a.cleanup(self.a.export())
         with stage('restore_scenario'):
             self.set_links(graph)
             initial = initial_state()  # infrastructure resolved the proxy address
             def restoring(event):
-                event = {**event, **self.event_context}
                 append_json(self.directory/'restore-operations.jsonl', {**event,'timestamp_utc':utc_now()})
                 self.notify(event)
             self.a.notify = restoring
             try:
-                if incremental:
-                    initial = with_endpoint_rules(initial)
-                    self.a.reconcile(initial)
-                else:
-                    self.a.restore(initial)
+                self.a.restore(initial)
                 restoring({'phase':'restore_progress', 'counts':self.a.restore_progress,
                            'verification':'running'})
                 self.source_snapshot = self.a.export()
@@ -340,7 +308,7 @@ class LiveBackend:
                 if elapsed != last_progress:
                     self.notify({'phase':'baseline_check','fresh_ping_successes':summary['longest_consecutive_successes'],
                         'udp_packets':len(udp),'active_slot':status.get('active'),
-                        'preparation_remaining_s':self.remaining(),**self.event_context})
+                        'preparation_remaining_s':self.remaining()})
                     last_progress=elapsed
                 if baseline_ready(fresh,udp,status,started,self.source_slot,now=time.time()):
                     with urlopen(self.source.base_url.removesuffix('/tfs-api')+'/healthz', timeout=min(2, self.remaining())) as response:
@@ -384,7 +352,7 @@ class LiveBackend:
                                  timeout=max(.1,min(2,self.remaining()))) as response:
                         if response.status != 200: raise RuntimeError('Target API not ready')
                     evidence.update(success=True,verified_unix_s=time.time())
-                    self.notify({'phase':'service_verified',**evidence,**self.event_context})
+                    self.notify({'phase':'service_verified',**evidence})
                     return evidence
                 if self.cancel.wait(.2): self.check()
             raise TimeoutError('Target service did not reach ten fresh consecutive pings after cutover')
@@ -399,25 +367,8 @@ class LiveBackend:
             self.receiver.__exit__(None, None, None)
             self.discard_images()
         self.attempt = attempt
-        base = self.directory/'migrations'/self.event_context['migration_id'] if 'migration_id' in self.event_context else self.directory
-        self.receiver = Receiver(base/'attempts'/str(attempt)/'received', progress_timeout_s=self.scenario['fso']['progress_timeout_s'])
+        self.receiver = Receiver(self.directory/'attempts'/str(attempt)/'received', progress_timeout_s=self.scenario['fso']['progress_timeout_s'])
         self.receiver.__enter__()
-
-    def set_migration(self, event, migration_id, simulation_id):
-        self.event = event
-        self.source_slot = self.active_role
-        self.target_slot = 'sat-b' if self.source_slot=='sat-a' else 'sat-a'
-        self.target_started = False
-        self.event_context = {'simulation_id': simulation_id, 'migration_id': migration_id,
-            'source_slot': self.source_slot, 'target_slot': self.target_slot,
-            'source_satellite': event['sat_a'], 'target_satellite': event['sat_b']}
-
-    def finish_handover(self):
-        self.logical_host = self.event['sat_b']
-        self.recovery_mode = True
-        try: self.compose.stop(self.source_slot)
-        finally: self.recovery_mode = False
-        self.discard_images()
 
     def discard_images(self):
         from .storage import atomic_json
@@ -492,9 +443,7 @@ class LiveBackend:
                 if self.paused_updates or self.pending_graph is None: continue
                 graph = self.pending_graph
                 try:
-                    collector=getattr(self,'resource_collector',None)
-                    with collector.operation('topology_update',self.active_role) if collector else contextlib.nullcontext():
-                        self._update_controller(graph)
+                    self._update_controller(graph)
                     self.graph_signature = self.signature(graph)
                     if self.pending_graph is graph: self.pending_graph = None
                 except Exception as exc:

@@ -54,7 +54,7 @@ class SourceStartupTests(unittest.TestCase):
             backend=self.backend(directory)
             backend.root=Path(directory)
             backend.event={'start_s':0,'trigger_s':0}
-            backend.fixture={}
+            backend.fixture={'emulator':{'devices':[{'norad':11}],'hosts':[{'satellite':11},{'satellite':11}]}}
             backend.scenario={}
             backend.clock=None
             backend.preparation_deadline=None
@@ -66,7 +66,7 @@ class SourceStartupTests(unittest.TestCase):
             backend.set_links=Mock();backend.admin=Mock();backend.signature=Mock(return_value='graph')
             backend.preparation_status=Mock(return_value={})
             backend.cancel=Mock();backend.cancel.wait.return_value=False
-            with patch('src.live_backend.state',return_value=document),patch('src.live_backend.shortest_paths',return_value={53913:0}),patch('src.live_backend.http',side_effect=[{'switch_count':1,'switches_alive':True},{'ipv4':'127.0.0.1','states':[{'upstream_master':True}]}]):
+            with patch('src.live_backend.state',return_value=document),patch('src.live_backend.shortest_paths',return_value={11:0}),patch('src.live_backend.http',side_effect=[{'switch_count':1,'switches_alive':True},{'ipv4':'127.0.0.1','states':[{'upstream_master':True}]}]):
                 backend.reset()
             backend.compose.stop.assert_called_once_with('sat-b')
             backend.compose.start.assert_not_called()

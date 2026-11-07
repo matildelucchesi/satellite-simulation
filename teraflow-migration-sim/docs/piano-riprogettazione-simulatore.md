@@ -276,3 +276,29 @@ Fasi M3. Hot: avvio controller 66,1 s, ripristino API 42,2 s, snapshot finale 14
 Lettura: Cold−Hot sul downtime è 103,1 s. In entrambe le modalità il piano dati non si è mai interrotto: le regole P4 restano negli switch mentre il controller migra, quindi il "tempo di ripristino dei ping" non è definito (nessuna perdita, non una misura mancante). Nel Cold il downtime è dominato da avvio del controller (circa 60 s) e ripristino API (circa 38 s). La durata totale di Hot e Cold è ora simile, perché in Hot avvio e ripristino avvengono prima del freeze.
 
 Restano per M5 i punti 6 e 7 del lavoro D (aggiunta in parallelo dei dispositivi, programma P4 alla riconnessione).
+
+### M4 — 7 novembre 2026
+
+Esperimento a eventi completo (`job-7c13b869165841e1860449b882994e17`, confronto `events-b9eb7fc7eb8c42a7a212922de096405c`): 3 eventi, Hot e Cold su ciascuno, ordine alternato, 1 Gbit/s, software a bordo. Tutte e 6 le migrazioni riuscite con baseline valida e servizio verificato. Durata complessiva del job: **40,6 minuti**.
+
+| Evento | Modalità | Downtime | Durata dell'operazione | Ping persi | Entro l'ombra | Preparazione | Prova completa |
+| --- | --- | ---: | ---: | ---: | --- | ---: | ---: |
+| 1 (60150 → 68285, 5 salti) | Hot | 6,3 s | 172,2 s | 0 su 2.059 | sì | 221 s | 433 s |
+| 1 | Cold | 125,2 s | 186,8 s | 0 su 2.204 | sì | 150 s | 377 s |
+| 2 (58883 → 62777, 5 salti) | Cold | 126,5 s | 189,4 s | 0 su 2.227 | sì | 217 s | 446 s |
+| 2 | Hot | 6,6 s | 172,6 s | 0 su 2.061 | sì | 211 s | 423 s |
+| 3 (62760 → 58878, 5 salti) | Hot | 6,7 s | 178,9 s | 0 su 2.126 | sì | 149 s | 367 s |
+| 3 | Cold | 122,2 s | 184,3 s | 0 su 2.190 | sì | 148 s | 374 s |
+
+Cold − Hot sul downtime: 118,9 s, 119,9 s e 115,5 s; sulla durata: 14,6 s, 16,9 s e 5,5 s. "Preparazione" va dall'inizio della prova al trigger (stack, pulizia della destinazione, rete del dominio, baseline); "prova completa" include anche migrazione, osservazione e messa in sicurezza. Il downtime Hot è sceso a circa 6 s rispetto ai 20,6 s di M3: il delta finale ora è piccolo (circa 3 s di applicazione) perché il servizio non viene più ricreato.
+
+### Pulizia del vecchio esperimento — 7 novembre 2026
+
+Su richiesta, rimosso tutto ciò che apparteneva al vecchio confronto continuo e agli strumenti collegati (commit separato dopo `f506552`):
+
+- 21 moduli `src/` (pianificazione, confronto continuo, simulazione continua, base comune, calibrazione, campagne, sensitivity, diagnostica delle risorse, report, modelli di risorse e punteggio, eventi e selezione storici, stato della vecchia topologia), 7 strumenti, 20 file di test, 13 documenti.
+- `experiment.py`, `jobs.py`, `progress.py` e la CLI ridotti alle operazioni `functional`, `compare_events`, `recover`, `environment`. `live_backend.py`, `orchestrator.py`, `orbit.py` e `fixture.py` senza i percorsi del vecchio flusso (riuso incrementale per la calibrazione, collettore delle risorse, sessioni continue, carico aggiuntivo, modello di contatto per distanza).
+- Console riscritta con tre pagine (Scenario, Esperimento, Risultati) e API ridotte; restano sessione, controlli same-origin, SSE e registro dei download.
+- I file di risultati storici restano su disco in `results/`; la console non li mostra più.
+- Suite locale: 142 test Python (9 saltati) in 13 s e 8 test JavaScript.
+- Verifica live sul codice ripulito, avviata dalla console (`job-f04bd2ddf6a443a5a64c0b1ccaea6639`): riuscita in **13,6 minuti**. Hot 5,3 s di downtime e 167,9 s di durata; Cold 117,0 s e 178,6 s; Cold − Hot 111,7 s. Preparazione 224 s e 161 s, prove complete 432 s e 378 s.

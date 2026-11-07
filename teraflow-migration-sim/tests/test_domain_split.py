@@ -55,11 +55,9 @@ class LaserOrbitTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             Orbit(replay(self.directory.name), links=LINKS, domain=[1, 9])
 
-    def test_range_model_unchanged_without_links(self):
-        orbit = Orbit(replay(self.directory.name), max_range_km=150)
-        self.assertEqual(set(orbit.graph(0)[1]), {2})
-        self.assertEqual(orbit.lab_graph(0), orbit.graph(0))
-        self.assertEqual(orbit.migration_link(1, 3, 0), orbit.contact(1, 3, 0))
+    def test_without_domain_the_lab_sees_every_link(self):
+        orbit = Orbit(replay(self.directory.name), links=LINKS)
+        self.assertEqual(orbit.lab_graph(10), orbit.graph(10))
 
 
 class DomainFixtureTests(unittest.TestCase):
@@ -111,9 +109,6 @@ class DomainFixtureTests(unittest.TestCase):
         settings = json.loads(document['entities']['services'][0]['service_config']['config_rules'][0]['custom']['resource_value'])
         # Satellite 4 is reachable but off the service path: TeraFlow would not program it.
         self.assertEqual(sorted(key for row in settings['switch_info'] for key in row), ['sat-1', 'sat-2', 'sat-3'])
-        legacy = {key: value for key, value in fixture.items() if key != 'forwarding'}
-        settings = json.loads(state(legacy, orbit.lab_graph(10))['entities']['services'][0]['service_config']['config_rules'][0]['custom']['resource_value'])
-        self.assertIn('sat-4', [key for row in settings['switch_info'] for key in row])
 
     def test_unique_shortest_path_rejects_ladder_ties(self):
         rail = {1: {2}, 2: {1, 3}, 3: {2}}
@@ -122,8 +117,10 @@ class DomainFixtureTests(unittest.TestCase):
         self.assertIsNone(unique_shortest_path(ladder, 1, 4))
         self.assertIsNone(unique_shortest_path({1: set(), 2: set()}, 1, 2))
 
-    def test_legacy_fixture_without_hosts_uses_fixed_pair(self):
-        self.assertEqual(service_endpoints({'emulator': {}}), (53848, 53913))
+    def test_load_orbit_requires_the_laser_model(self):
+        (self.root / 'config/scenario.json').write_text(json.dumps({'fso': {}}))
+        with self.assertRaises(ValueError):
+            load_orbit(self.root)
 
 
 if __name__ == '__main__':

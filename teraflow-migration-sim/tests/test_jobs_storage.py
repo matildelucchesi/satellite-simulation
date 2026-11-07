@@ -53,16 +53,16 @@ class DurableStateTests(unittest.TestCase):
             with self.assertRaises(ValueError):manager.start_recovery()
             self.assertEqual(json.loads(manager.guard.read_text())['job_id'],identifier)
 
-    def test_continuous_comparison_worker_dispatches_one_composite_job(self):
+    def test_event_experiment_worker_dispatches_one_job(self):
         with tempfile.TemporaryDirectory() as tmp, patch('src.jobs.subprocess.Popen') as launch, patch('src.experiment.Experiment') as factory:
             launch.return_value.pid=12345
             application=factory.return_value
-            application.compare_continuous.return_value={'complete':True,'success':True,'events':[]}
+            application.compare_events.return_value={'complete':True,'events':[]}
             manager=JobManager(Path(tmp))
-            with patch('src.preconditions.calibration_inputs'):
-                job=manager.start('compare_continuous',{'duration_s':600,'rate_bps':1000000000})
+            atomic_json(Path(tmp)/'config/migration_events.json',{'selected':[]})
+            job=manager.start('compare_events',{})
             manager.work(job['job_id'])
-            application.compare_continuous.assert_called_once_with(duration_s=600,rate_bps=1000000000)
+            application.compare_events.assert_called_once_with()
             self.assertEqual(application.job_id,job['job_id'])
             self.assertTrue(manager.get(job['job_id'])['application_success'])
             self.assertFalse(manager.guard.exists())
@@ -121,17 +121,18 @@ class DurableStateTests(unittest.TestCase):
         with self.assertRaises(ValueError):size_bytes('unavailable')
 
 
-class ComparisonAdmissionTests(unittest.TestCase):
-    def test_unavailable_prepared_source_is_rejected_before_worker_creation(self):
-        with tempfile.TemporaryDirectory() as tmp,patch('src.preconditions.calibration_inputs'),patch('src.common_base.load'),patch('src.prepared_source.readiness',return_value={'ready':False,'reason':'Ricrea lo scenario iniziale'}),patch('src.jobs.subprocess.Popen') as launch:
-            manager=JobManager(Path(tmp))
-            with self.assertRaisesRegex(ValueError,'Ricrea lo scenario iniziale'):
-                manager.start('compare_continuous',{'migration_count':3,'base_id':'base-'+'a'*32})
-            launch.assert_not_called();self.assertFalse(manager.guard.exists())
+class ScenarioAdmissionTests(unittest.TestCase):
+    def test_lab_jobs_require_an_installed_scenario_before_lock_or_worker(self):
+        for operation in ('functional','compare_events'):
+            with self.subTest(operation=operation),tempfile.TemporaryDirectory() as tmp,patch('src.jobs.subprocess.Popen') as launch:
+                manager=JobManager(Path(tmp))
+                with self.assertRaisesRegex(ValueError,'Scenario non installato'):manager.start(operation,{})
+                launch.assert_not_called();self.assertFalse(manager.guard.exists())
+                self.assertEqual(list(manager.directory.glob('job-*')),[])
 
-    def test_invalid_calibration_is_rejected_before_worker_or_lab_lock_creation(self):
-        with tempfile.TemporaryDirectory() as tmp,patch('src.preconditions.calibration_inputs',side_effect=ValueError('changed')),patch('src.jobs.subprocess.Popen') as launch:
+    def test_parameters_and_legacy_operations_are_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
             manager=JobManager(Path(tmp))
-            with self.assertRaisesRegex(ValueError,'scenario iniziale'):manager.start('compare_continuous',{'migration_count':3})
-            launch.assert_not_called();self.assertFalse(manager.guard.exists())
-            self.assertEqual(list(manager.directory.glob('job-*')),[])
+            for operation in ('compare_continuous','calibrate','simulate','prepare_base','campaign'):
+                with self.assertRaisesRegex(ValueError,'Unknown application operation'):manager.validate(operation,{})
+            with self.assertRaisesRegex(ValueError,'Unsupported job parameter'):manager.validate('compare_events',{'rate_bps':1})

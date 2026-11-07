@@ -23,7 +23,7 @@ sys.path.insert(0, str(ROOT))
 from src.artifacts import describe, file_digest  # noqa: E402
 from src.orbit import generate  # noqa: E402
 from src import starlink_scenario as model  # noqa: E402
-from tools.select_constellation import parse_tle  # noqa: E402
+from tools.tle_catalog import parse_tle  # noqa: E402
 
 DEFAULTS = {'profile': 'starlink-53-463-2x31', 'raan': [80.8, 82.8], 'domain_per_plane': 8,
             'trigger_lead_s': 900, 'minimum_destination_light_s': 1800, 'minimum_path_persistence_s': 900}

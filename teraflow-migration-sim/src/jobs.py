@@ -13,10 +13,10 @@ from .storage import atomic_json, append_json, utc_now, read_json
 from .results import requires_recovery
 from .checkpoints import ActiveCheckpoint
 
-OPERATIONS = {'resource_diagnostic','simulate','functional','continuous_validation','environment','run','calibrate','select','campaign','faults','sensitivity','report','recover','diagnostic','complete'}
-OPERATIONS.update({'compare_continuous','prepare_base'})
-OPERATIONS.add('expand_constellation')
-OPERATIONS.add('compare_events')
+# functional: one Hot and one Cold migration on the first catalogue event.
+# compare_events: Hot and Cold on every selected catalogue event.
+OPERATIONS = {'functional', 'compare_events', 'environment', 'recover'}
+NEEDS_SCENARIO = {'functional', 'compare_events'}
 
 
 def process_running(pid):
@@ -44,42 +44,13 @@ class JobManager:
 
     def validate(self, operation, parameters):
         if operation not in OPERATIONS: raise ValueError('Unknown application operation')
-        if operation=='expand_constellation':
-            selection=read_json(self.root/'config/selected_constellation.json')
-            if len(selection['satellites']) not in (17,42):
-                raise ValueError('Espansione già completata; nessun ulteriore aggiornamento automatico previsto')
-        if operation == 'compare_continuous':
-            if any(key in parameters for key in ('initial_satellite_id','start_orbital_s')):
-                raise ValueError('La partenza è esclusivamente automatica')
-            from .continuous_comparison import validate_parameters
-            validate_parameters(parameters)
-            return
-        if operation == 'simulate':
-            from .planner import validate_parameters
-            validate_parameters(parameters)
-            return
-        allowed = {'method','rate_bps','event_id'} if operation == 'run' else set()
-        if set(parameters)-allowed: raise ValueError('Unsupported job parameter')
-        if operation == 'run':
-            if parameters.get('method') not in ('cold','hot'): raise ValueError('Choose cold or hot')
-            if parameters.get('rate_bps') not in (100000000,1000000000,10000000000): raise ValueError('Unapproved rate')
+        if parameters: raise ValueError('Unsupported job parameter')
 
     def start(self, operation, parameters=None):
         parameters = parameters or {}
         self.validate(operation,parameters)
-        if operation=='compare_continuous':
-            from .preconditions import calibration_inputs
-            try:calibration_inputs(self.root,full=False)
-            except (ValueError,OSError) as exc:
-                raise ValueError('Confronto bloccato: creare prima lo scenario iniziale. Le misure salvate sono mancanti o non valide.') from exc
-        if operation=='compare_continuous' and parameters.get('base_id'):
-            from .common_base import load
-            load(self.root,parameters['base_id'])
-            from .prepared_source import readiness
-            source=readiness(self.root,parameters['base_id'])
-            if not source['ready']:raise ValueError(source['reason'])
-        if operation=='compare_events' and not (self.root/'config/migration_events.json').exists():
-            raise ValueError('Esperimento a eventi non disponibile: installare prima un profilo di scenario')
+        if operation in NEEDS_SCENARIO and not (self.root/'config/migration_events.json').exists():
+            raise ValueError('Scenario non installato: eseguire tools/build_scenario.py e tools/install_scenario.py')
         if operation=='recover':
             return self.start_recovery()
         # History may have been cleared while this server remained running.
@@ -201,7 +172,7 @@ class JobManager:
                 checkpoint=directory/'active-checkpoint.json'
                 if checkpoint.exists():
                     active=json.loads(checkpoint.read_text())
-                    if active.get('kind') in ('run','simulation'):
+                    if active.get('kind')=='run':
                         active.update({key:event[key] for key in ('phase','orbital_s','source_slot','target_slot','migration_id') if key in event})
                         active['timestamp_utc']=utc_now()
                         atomic_json(checkpoint,active)
@@ -212,19 +183,8 @@ class JobManager:
         application.checkpoint=ActiveCheckpoint(directory/'active-checkpoint.json')
         recovery_required=False
         try:
-            operation=job['operation'];parameters=job['parameters']
-            if operation=='run':
-                event=None
-                if parameters.get('event_id'):
-                    events=json.loads((self.root/'config/selected_events.json').read_text())['events']
-                    event=next(row for row in events if row['event_id']==parameters['event_id'])
-                output=application.run(parameters['method'],parameters['rate_bps'],event)
-            elif operation=='recover':
-                output=application.recover(job['previous_job_id'])
-                from .continuous_comparison import reconcile_recovery
-                reconcile_recovery(application,job['previous_job_id'],output)
-            elif operation=='simulate':output=application.simulate(**parameters)
-            elif operation=='compare_continuous':output=application.compare_continuous(**parameters)
+            operation=job['operation']
+            if operation=='recover':output=application.recover(job['previous_job_id'])
             else: output=getattr(application,operation)()
             output['recovery_required']=requires_recovery(output)
             atomic_json(directory/'result.json',output)
@@ -235,7 +195,7 @@ class JobManager:
         except Exception as exc:
             job.update(status='failed',error=str(exc),traceback=traceback.format_exc())
             # An unknown failure of a mutating operation leaves the durable lock.
-            recovery_required=job['operation'] not in ('environment','report','select','sensitivity')
+            recovery_required=job['operation']!='environment'
             if recovery_required: job['status']='recovery_required'
         finally:
             finished.set()
