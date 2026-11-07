@@ -2,11 +2,25 @@
 
 Aprire `http://127.0.0.1:18092/`. Un solo esperimento può occupare il laboratorio.
 
+### Preparazione della rete prima della calibrazione
+
+Con «Crea scenario iniziale», quando servono nuove misure, il programma crea
+prima la rete completa e ne verifica il servizio. Seguono le eventuali prove
+funzionali e una calibrazione Cold e una Hot. Le prove riutilizzano i dispositivi
+già presenti: viene ripristinato il servizio e riconciliata la configurazione,
+con nuove verifiche di API, autorità P4 e ping prima di ogni migrazione.
+Connessioni dei dispositivi incompatibili richiedono un ripristino completo.
+
+Dopo le misure viene scelta la partenza orbitale e predisposta la sorgente della
+simulazione riutilizzando lo stesso inventario. Collegamenti e servizio vengono
+aggiornati per l'istante scelto; la rete non viene cancellata sistematicamente.
+Le calibrazioni compatibili già disponibili continuano a essere riutilizzate.
+
 ## Dalla configurazione al risultato
 
 1. Scegliere soltanto la velocità utile del canale: 100 Mbit/s, 1 Gbit/s oppure 10 Gbit/s. Satellite e tempo iniziali sono scelti esclusivamente dal simulatore, dopo le calibrazioni compatibili. La costellazione installata e le soglie restano fisse durante ogni confronto. Il profilo attuale usa 64 satelliti reali, 28+36 nei due gruppi, dalla fascia di selezione 450–580 km autorizzata.
 2. Premere **Avvia confronto Hot/Cold**. Seguire il pannello **Il tuo esperimento**, non il movimento della mappa: durante la preparazione il clock orbitale è fermo.
-3. Se mancano calibrazioni compatibili, il laboratorio esegue le verifiche funzionali necessarie e sei test preliminari, prima Cold e poi Hot. Non sono ancora le due esecuzioni del confronto. Una calibrazione precedente viene riutilizzata soltanto se implementazione, artefatti e baseline risultano compatibili.
+3. Se mancano calibrazioni compatibili, creare lo scenario con **Crea scenario iniziale**: prima viene predisposta la rete completa, poi si eseguono le verifiche funzionali necessarie e due prove di calibrazione, una Cold e una Hot. L'inventario compatibile viene riutilizzato tra le prove e nella preparazione finale. Una calibrazione precedente viene riutilizzata soltanto se implementazione, artefatti e baseline risultano compatibili.
 4. Il programma cerca la partenza nell’intero replay, con risoluzione di un secondo e budget separato di 600 s (`live.departure_search_budget_s`). Prima campiona il replay ogni 300 s, poi completa i secondi rimanenti; valuta una sequenza completa per ciascuna partenza. Preferisce il maggior margine temporale minimo fisico, poi l’istante minore e il NORAD minore. Se il budget termina, usa solo una soluzione già verificata e dichiara la ricerca parziale; senza una soluzione dichiara ricerca incompleta, non impossibilità. Solo una ricerca esaustiva può concludere che non esistono partenze ammissibili. Una selezione limitata nel tempo può dipendere dalla porzione esplorata; non è dichiarata ottima globalmente.
 5. Sono escluse le sequenze in cui il percorso geometrico del servizio scompare durante una migrazione. Un contatto diretto fra i due controller non basta: deve restare disponibile anche il percorso fra gli estremi del servizio.
 6. Seguire **Hot → Ripristino → Cold**. Il clock procede in tempo reale. Hot prepara la destinazione prima del passaggio finale; Cold arresta la sorgente prima del trasferimento. Le due esecuzioni seguono lo stesso piano.
@@ -37,7 +51,7 @@ In **Report e dati**, aprire il report leggibile oppure scaricare risultati JSON
 
 ## Budget operativi e riproduzione del collaudo
 
-I limiti in secondi sono configurabili in `live.preparation_budgets_s` nello scenario. Valori predefiniti: infrastruttura 15; avvio sorgente 180; avvio destinazione 180; pulizia destinazione 120; pulizia sorgente 120; scenario iniziale 120; autorità P4 60; arresto destinazione 45; baseline 60. Il tetto complessivo è la loro somma (900 secondi); ogni sottofase resta soggetta al proprio limite. Le scadenze orbitali sono separate.
+I limiti in secondi sono configurabili in `live.preparation_budgets_s` nello scenario. Valori predefiniti: infrastruttura 120; avvio sorgente 180; avvio destinazione 180; pulizia destinazione 120; pulizia sorgente 120; scenario iniziale 120; autorità P4 60; arresto destinazione 45; baseline 60; ripristino del servizio sulla rete esistente 120. Il budget del caricamento viene calcolato dal numero di dispositivi, collegamenti, regole e servizi, salvo override esplicito. Il tetto complessivo è la somma dei limiti effettivi; ogni sottofase resta soggetta al proprio limite. Le scadenze orbitali sono separate.
 
 Da una shell nella cartella del simulatore, con il laboratorio libero:
 

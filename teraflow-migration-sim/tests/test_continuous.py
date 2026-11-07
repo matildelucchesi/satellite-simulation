@@ -33,6 +33,7 @@ class TinyOrbit:
 
 def planner():
     scenario=json.loads((ROOT/'config/scenario.json').read_text())
+    scenario.pop('migration',None)  # the legacy continuous flow transfers the image bundle
     scenario['fso']['alignment_s']=1
     orbit=TinyOrbit()
     windows=[dict(sat_a=a,sat_b=b,start_s=0,end_s=150) for a in IDS for b in IDS if a<b]

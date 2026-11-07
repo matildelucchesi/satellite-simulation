@@ -83,7 +83,7 @@ class ScenarioCreationWorkflowTests(unittest.TestCase):
         self.activation=patch('src.prepared_source.prepare',side_effect=lambda app,metadata:metadata)
         self.activation.start();self.addCleanup(self.activation.stop)
     def app(self,root):
-        return SimpleNamespace(root=Path(root),cancel=threading.Event(),publish=Mock(),
+        return SimpleNamespace(root=Path(root),prepare_calibration_network=Mock(),cancel=threading.Event(),publish=Mock(),
             functional=Mock(return_value={'complete':True}),calibrate=Mock(return_value={'complete':True}))
     def test_valid_measurements_skip_calibration(self):
         from src.experiment import Experiment
@@ -95,10 +95,11 @@ class ScenarioCreationWorkflowTests(unittest.TestCase):
         from src.experiment import Experiment
         with tempfile.TemporaryDirectory() as root,patch('src.preconditions.calibration_inputs',side_effect=ValueError('missing')),patch('src.common_base.prepare',return_value={'complete':True}) as prepare:
             app=self.app(root);calls=[]
+            app.prepare_calibration_network.side_effect=lambda:calls.append('network')
             app.functional.side_effect=lambda:calls.append('functional') or {'complete':True}
             app.calibrate.side_effect=lambda:calls.append('calibrate') or {'complete':True}
             prepare.side_effect=lambda app:calls.append('prepare') or {'complete':True}
-            Experiment.prepare_base(app);self.assertEqual(calls,['functional','calibrate','prepare'])
+            Experiment.prepare_base(app);self.assertEqual(calls,['network','functional','calibrate','prepare'])
     def test_failed_calibration_does_not_publish_a_base_and_preserves_recovery(self):
         from src.experiment import Experiment
         with tempfile.TemporaryDirectory() as root,patch('src.preconditions.calibration_inputs',side_effect=ValueError('missing')),patch('src.common_base.prepare') as prepare:

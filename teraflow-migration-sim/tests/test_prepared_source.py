@@ -67,3 +67,12 @@ class PreparedSourceTests(unittest.TestCase):
         with patch('src.live_backend.LiveBackend',return_value=backend):
             result=source.prepare(app,{'base_id':BASE,'rates':[100000000],'complete':True})
         self.assertTrue(result['recovery_required'])
+    def test_final_source_reuses_the_inventory_created_before_calibration(self):
+        backend=self.backend();backend.directory=self.snapshot.parent
+        backend.establish_baseline.return_value={'success':True}
+        app=SimpleNamespace(root=self.root,orbit=Mock(),scenario={},cancel=threading.Event(),
+                            publish=Mock(),checkpoint=Mock(),_calibration_network_ready=True)
+        with patch('src.live_backend.LiveBackend',return_value=backend):
+            result=source.prepare(app,{'base_id':BASE,'rates':[100000000],'complete':True})
+        self.assertTrue(result['source_ready'])
+        backend.reset.assert_called_once_with(reuse_inventory=True)

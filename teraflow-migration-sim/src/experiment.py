@@ -10,7 +10,8 @@ from .artifacts import canonical_bytes, describe, file_digest, verify_artifact
 from .clock import LiveClock
 from .live_backend import LiveBackend, http
 from .measurements import disk_content
-from .orbit import Orbit, shortest_paths
+from .orbit import Orbit, lab_graph, load_orbit, shortest_paths
+from .fixture import service_endpoints
 from .orchestrator import Migration
 from .probes import analyze_directory, classify_observations, json_lines, ping_observations
 from .storage import append_json, atomic_json, utc_now
@@ -27,6 +28,7 @@ class Experiment(Preparation, Analysis):
         from .preconditions import calibration_inputs
         try:calibration_inputs(self.root,full=False)
         except (ValueError,OSError):
+            self.prepare_calibration_network()
             path=self.root/'results/functional-gate.json'
             try:gate=json.loads(path.read_text(encoding='utf-8'))
             except (ValueError,OSError):gate={}
@@ -37,7 +39,7 @@ class Experiment(Preparation, Analysis):
                 gate=self.functional()
                 if not gate.get('complete') or requires_recovery(gate):return {**gate,'complete':False}
             if self.cancel and self.cancel.is_set():raise InterruptedError('Creazione scenario interrotta')
-            self.publish({'phase':'scenario_creation','label':'Calibrazione dello scenario iniziale'})
+            self.publish({'phase':'scenario_creation','label':'Calibrazione Cold/Hot sulla rete predisposta'})
             calibration=self.calibrate()
             if not calibration.get('complete') or requires_recovery(calibration):return {**calibration,'complete':False}
         if self.cancel and self.cancel.is_set():raise InterruptedError('Creazione scenario interrotta')
@@ -49,6 +51,31 @@ class Experiment(Preparation, Analysis):
         from .constellation import expand
         return expand(self)
 
+    def prepare_calibration_network(self):
+        """Build the full inventory once, before functional/calibration trials."""
+        if getattr(self, '_calibration_network_ready', False):
+            return
+        if (self.root/'config/campaign-manifest.json').exists():
+            raise ValueError('Campaign is frozen; archive it explicitly before recalibration')
+        directory = self.root/'results/network-preparations'/('network-'+uuid.uuid4().hex)
+        backend = LiveBackend(self.root, directory, self.functional_event(), 1000000000,
+                              self.orbit, self.scenario, self.cancel, notify=self.publish)
+        self.checkpoint(kind='between_runs', phase='network_preparation')
+        self.publish({'phase':'scenario_creation','label':'Creazione della rete completa prima della calibrazione'})
+        try:
+            backend.reset()
+            baseline = backend.establish_baseline(directory.name)
+            if not baseline.get('success'):
+                raise RuntimeError('Baseline della rete di calibrazione non valida')
+            backend.check()
+            atomic_json(directory/'ready.json', {'ready':True, 'baseline':baseline})
+        except Exception:
+            backend.shutdown()
+            raise
+        finally:
+            backend.close()
+        self._calibration_network_ready = True
+
     def __init__(self, root, cancel=None, publish=None):
         self.root = Path(root).resolve()
         self.cancel = cancel
@@ -59,7 +86,7 @@ class Experiment(Preparation, Analysis):
 
     @property
     def orbit(self):
-        if self._orbit is None: self._orbit = Orbit(self.root/'artifacts/orbit/replay.npz')
+        if self._orbit is None: self._orbit = load_orbit(self.root, self.scenario)
         return self._orbit
 
     def bundle(self):
@@ -200,14 +227,37 @@ class Experiment(Preparation, Analysis):
                     status['transport_capacity'].append(receipt)
                     Path(receipt['path']).unlink()
             status['capacity_checked']=True
-            status['success'] = (status['mininet']['switch_count'] == self.scenario['orbital']['satellites_total'] and status['mininet']['switches_alive']
+            status['success'] = (status['mininet']['switch_count'] == len(json.loads((self.root/'config/fixture.json').read_text())['emulator']['devices']) and status['mininet']['switches_alive']
                 and all(status['controllers'].values())
                 and all(row['upstream_master'] for row in status['proxy']['states']))
         except Exception as exc: status['error'] = str(exc)
         atomic_json(self.root/'results/environment.json',status)
         return status
 
+    def catalog_event(self, selected, prefix, causes, purpose):
+        """Live event from a frozen catalogue entry: shadow entry is the deadline, the multi-hop path the link."""
+        source, target, tick = selected['source'], selected['destination'], selected['trigger_s']
+        path_end = selected.get('path_end_s') or self.orbit.duration
+        return {'event_id':f'{prefix}-{source}-{target}-{tick}', 'sat_a':source, 'sat_b':target, 'trigger_s':tick,
+            'deadline_s':selected['source_shadow_entry_s'], 'trigger_causes':causes,
+            'contact_window_s':path_end-tick, 'deadline_window_s':selected['source_shadow_entry_s']-tick,
+            'contact_end_s':path_end, 'path':selected['path'], 'hops':selected['hops'],
+            'catalog_event_id':selected['event_id'], 'execution_purpose':purpose}
+
+    def compare_events(self):
+        """Phase 3: Hot and Cold on each selected catalogue event, order alternated between events.
+
+        Every run starts from the same orbital instant of its event. The comparison stops at the
+        first run that fails or needs recovery; missing measures stay missing."""
+        from .event_comparison import compare
+        return compare(self)
+
     def functional_event(self):
+        catalog = self.root/'config/migration_events.json'
+        if catalog.exists():
+            # Laser profile: the first selected event of the frozen catalogue (multi-hop path).
+            selected = json.loads(catalog.read_text())['selected'][0]
+            return self.catalog_event(selected, 'functional', ['functional_diagnostic','source_shadow'], 'functional-calibration')
         windows = json.loads((self.root/'results/direct_link_windows.json').read_text())['windows']
         # Calibration/fault diagnostics deliberately use a long real contact,
         # separately identified from the percentile-selected primary events.
@@ -258,7 +308,10 @@ class Experiment(Preparation, Analysis):
                 backend.resource_collector=collector
                 collector.start()
             self.publish({'phase':'prepare','run_id':run_id,'timestamp_utc':utc_now()})
-            backend.reset()
+            if getattr(self, '_calibration_network_ready', False):
+                backend.reset(reuse_inventory=True)
+            else:
+                backend.reset()
             baseline_started = True
             result['baseline'] = backend.establish_baseline(run_id)
             if resource_diagnostic:
@@ -296,7 +349,7 @@ class Experiment(Preparation, Analysis):
                 # Finish queued reconciliation before the fixed destination window.
                 collector.set_phase('target_reconciliation')
                 end=time.monotonic()+60
-                expected_signature=backend.signature(self.orbit.graph(int(clock.orbital())))
+                expected_signature=backend.signature(lab_graph(self.orbit, int(clock.orbital())))
                 while backend.pending_graph is not None or backend.graph_signature != expected_signature:
                     backend.check()
                     if time.monotonic()>end: raise TimeoutError('Target reconciliation did not settle')
@@ -375,8 +428,9 @@ class Experiment(Preparation, Analysis):
                 started = result.get('migration_start_unix_s',float('inf'))
                 baseline_rows = [row for row in rows if row['unix_s'] < started]
                 baseline_service = result.get('baseline',{}).get('success',False)
-                baseline_graph = self.orbit.graph(max(0,event['trigger_s']-1))
-                baseline_path = 53913 in shortest_paths(baseline_graph,53848)
+                baseline_graph = lab_graph(self.orbit, max(0,event['trigger_s']-1))
+                source_host,target_host = service_endpoints(backend.fixture)
+                baseline_path = source_host in baseline_graph and target_host in shortest_paths(baseline_graph,source_host)
                 result['probe_window_end_unix_s']=time.time()
                 result['probes'] = analyze_directory(probe_dir,migration_start_unix_s=result.get('migration_start_unix_s'),
                     observation_end_unix_s=result['probe_window_end_unix_s'],

@@ -83,7 +83,8 @@ def prepare(app):
             raise ValueError('La base non è sicura per tutte le velocità')
     replay=json.loads((app.root/'artifacts/orbit/replay.json').read_text(encoding='utf-8'))
     if file_digest(app.root/'artifacts/orbit/replay.npz')!=replay['artifact']['sha256']:raise ValueError('Replay orbitale non integro')
-    snapshot=state(json.loads((app.root/'config/fixture.json').read_text(encoding='utf-8')),app.orbit.graph(plan['start_s']))
+    from .orbit import lab_graph
+    snapshot=state(json.loads((app.root/'config/fixture.json').read_text(encoding='utf-8')),lab_graph(app.orbit,plan['start_s']))
     if identity(app.root)!=before:raise ValueError('Input cambiati durante la preparazione della base')
     atomic_json(path/'plan.json',plan);atomic_json(path/'initial-state.json',snapshot)
     for name,source in [('scenario.json','config/scenario.json'),('fixture.json','config/fixture.json'),

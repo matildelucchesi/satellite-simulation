@@ -5,6 +5,7 @@ const outcomeLabels={success:'Riuscita',running:'In corso',failed:'Fallita',expe
 const phaseLabels={comparison_run:'Prova della coppia FSO',service_verified:'Servizio Mininet verificato',planning:'Pianificazione',admission_rejected:'Sequenza non ammissibile',plan_admitted:'Piano ammesso',baseline_valid:'Baseline valida',baseline_check:'Verifica baseline',replanning:'Ripianificazione',simulation_finished:'Sessione terminata',trigger:'Trigger',alignment:'Allineamento FSO',quiescence:'Quiescenza',snapshot_initial:'Snapshot iniziale',source_stop:'Arresto sorgente',source_stopped:'Sorgente arrestata',transfer:'Trasferimento',transfer_verified:'Checksum verificato',target_start:'Importazione immagini e avvio destinazione',restore_initial:'Restore iniziale',freeze:'Freeze sorgente',source_frozen:'Sorgente congelata',restore_delta:'Applicazione delta',verify:'Verifica API',ack:'ACK',cutover:'Cutover hardware',completed:'Migrazione completata',attempt_failed:'Tentativo fallito',rollback:'Recupero sorgente',failed:'Migrazione fallita',prepare:'Preparazione fixture',run_finished:'Prova terminata',job_finished:'Job terminato',calibration:'Calibrazione',transport_capacity:'Verifica capacità TCP',workflow_stage:'Fase del workflow'};
 const comparisonLabels={planning:'Ricerca di una sequenza comune',preparation:'Verifica iniziale Hot/Cold',calibration:'Calibrazione separata',departure_search:'Ricerca della partenza',hot:'Esecuzione Hot',resetting:'Ripristino dello scenario iniziale',cold:'Esecuzione Cold',finished:'Confronto terminato'};
 let timelineRenderTimer=null,calibrationJobId='';
+let legacyFlowRetired=false;
 let token='',state=null,jobs=[],comparisons=[],simulations=[],artifacts=[],commonBase=null;
 let launchedComparisonJob='';
 try{launchedComparisonJob=sessionStorage.getItem('teraflow-launched-comparison')||'';}catch{}
@@ -34,7 +35,7 @@ function renderState(){
  const reachable=Object.values(state.components).filter(row=>row.reachable).length;
  $('console-health').textContent=locked?'Verifica requisiti per la fase corrente':'Laboratorio in attesa di verifica';$('console-health').dataset.offline=String(!state.components.mininet?.reachable||!state.components.p4_proxy?.reachable);
  $('console-operation').textContent=locked?operationName(busy?.operation):'Nessun confronto in corso';
- $('start').disabled=locked||!!pendingJob||state.simulation_readiness?.ready!==true||commonBase?.ready!==true;$('stop').disabled=state.worker_alive===false||!busy||!['queued','running'].includes(busy.status)||stoppingJob===busy.job_id;
+ $('start').disabled=legacyFlowRetired||locked||!!pendingJob||state.simulation_readiness?.ready!==true||commonBase?.ready!==true;$('stop').disabled=state.worker_alive===false||!busy||!['queued','running'].includes(busy.status)||stoppingJob===busy.job_id;
  $('channel-rate').disabled=locked;if(locked&&configuration?.rate_bps)$('channel-rate').value=String(configuration.rate_bps);
  const resolved=currentPair()?.resolved_configuration;
  initialConfigurationRequest=resolved?{initial_satellite_id:resolved.initial_satellite_id,start_orbital_s:resolved.start_orbital_s}:null;
@@ -123,7 +124,7 @@ $('simulation-select').addEventListener('change',()=>{selectSimulation($('simula
 let replayDelay;$('simulation-replay').addEventListener('input',()=>{simulationTick=Number($('simulation-replay').value);following=false;clearTimeout(replayDelay);replayDelay=setTimeout(topology,100);});
 $('follow-current').addEventListener('click',()=>{following=true;simulationTick=null;refresh();});
 
-document.addEventListener('DOMContentLoaded',async()=>{try{token=(await api('/session')).token;await topology();await refresh();setInterval(refresh,5000);setInterval(()=>{updateLiveFreshness();renderExperiment();},1000);}catch(error){notice('Sessione locale non disponibile: '+error.message,true);}});
+document.addEventListener('DOMContentLoaded',async()=>{try{token=(await api('/session')).token;await topology();await refresh();loadScenarioProfiles();loadEventComparisons();setInterval(loadEventComparisons,5000);setInterval(refresh,5000);setInterval(()=>{updateLiveFreshness();renderExperiment();},1000);}catch(error){notice('Sessione locale non disponibile: '+error.message,true);}});
 
 function renderExperiment(){
  if(!state)return;
@@ -159,7 +160,7 @@ function controllerRequirement(name,job){
  const target=p?.active_slot==='sat-a'?'sat_b':p?.active_slot==='sat-b'?'sat_a':null;
  if(p?.subphase==='target_start'&&name===target)return 'Avvio destinazione in corso · API non ancora pronta';
  if(!state.lock&&state.components.p4_proxy?.data?.active===null)return 'API non disponibile · autorità revocata';
- if(name==='sat_b'&&['infrastructure','stop_target','start_source','clean_source','restore_scenario','restore_authority','baseline'].includes(p?.subphase))return 'Arrestato · avvio durante la migrazione';
+ if(name==='sat_b'&&['infrastructure','stop_target','start_source','clean_source','reset_service','restore_scenario','restore_authority','baseline'].includes(p?.subphase))return 'Arrestato · avvio durante la migrazione';
  return state.lock?'API non pronta · verifica in corso':'API non disponibile · verificare prima dell’esecuzione';
 }
 
@@ -263,7 +264,7 @@ $('experiment-info-dialog').addEventListener('click',event=>{if(event.target!==e
 function renderRestoreGroup(event){
  const row=document.createElement('li'),time=document.createElement('time'),label=document.createElement('span');
  time.dateTime=event.timestamp_utc;time.textContent=new Date(event.timestamp_utc).toLocaleTimeString('it-IT');
- label.textContent='Caricamento scenario iniziale · '+(event.status==='failed'?'Fallito':event.status==='completed'?'Completato':event.verification==='running'?'Verifica finale in corso':'In corso');
+ label.textContent='Configurazione della rete · '+(event.status==='failed'?'Fallita':event.status==='completed'?'Completata':event.verification==='running'?'Verifica finale in corso':'In corso');
  row.append(time,label);return row;
 }
 function renderScenarioCreationProgress(job){
@@ -341,7 +342,7 @@ $('calibration-start').addEventListener('click',async()=>{
 function renderCommonBase(){
  const job=jobs.find(row=>row.job_id===calibrationJobId&&row.operation==='prepare_base');
  const active=job&&['queued','running'].includes(job.status);
- $('common-base-start').disabled=!!state?.lock||!state;
+ $('common-base-start').disabled=legacyFlowRetired||!!state?.lock||!state;
  $('common-base-start').textContent='Crea scenario iniziale';
  $('common-base-status').textContent=active?'Creazione scenario · '+(job.progress?.phase==='calibration'?'Calibrazione '+(job.progress.method||'').toUpperCase()+' · prova '+(job.progress.replica||1)+'/'+(job.progress.replicas_per_mode||3)+' · ':'')+(job.progress?.label||phaseLabels[job.progress?.subphase]||'Avvio in corso'):job&&!job.application_success&&!['queued','running'].includes(job.status)?'Creazione non completata: '+(job.progress?.error?.message||job.error||'verifica la diagnostica del laboratorio.'):commonBase?.reason||'Base comune non disponibile.';
  if(commonBase?.ready){const selected=commonBase.selected;$('common-base-status').textContent+=' NORAD '+selected.initial_satellite_id+' · t = '+seconds(selected.start_orbital_s)+' · ombra fra '+seconds(selected.initial_time_to_shadow_s)+'.';}
@@ -349,5 +350,101 @@ function renderCommonBase(){
 $('common-base-start').addEventListener('click',async()=>{
  $('common-base-start').disabled=true;
  try{const job=await api('/jobs',{operation:'prepare_base',parameters:{}});calibrationJobId=job.job_id;jobs=[job,...jobs.filter(row=>row.job_id!==job.job_id)];selectJob(job.job_id);previousAutomaticPage='';showExperimentPage('preparation',true);syncExperimentPage();await refresh();}
- catch(error){$('common-base-status').textContent='Preparazione non riuscita: '+error.message;$('common-base-start').disabled=!!state?.lock||!state;}
+ catch(error){$('common-base-status').textContent='Preparazione non riuscita: '+error.message;$('common-base-start').disabled=legacyFlowRetired||!!state?.lock||!state;}
 });
+function node(tag,text,className){const element=document.createElement(tag);if(text!==undefined)element.textContent=text;if(className)element.className=className;return element;}
+function clockOfDay(value){return value===null||value===undefined?'—':clockText(value);}
+function minutesText(value){return value===null||value===undefined?'—':Math.round(value/60)+' min';}
+async function loadScenarioProfiles(){
+ try{renderScenarioProfiles((await api('/scenario-profiles')).profiles);}
+ catch(error){$('scenario-profile').replaceChildren(node('p','Profilo non leggibile: '+error.message,'small error'));}
+}
+function renderScenarioProfiles(profiles){
+ const box=$('scenario-profile');box.replaceChildren();
+ const profile=profiles.find(row=>row.summary);
+ if(!profile){box.append(node('p','Nessun profilo preparato. Si crea offline con tools/build_scenario.py.','small'));return;}
+ const summary=profile.summary,statistics=profile.statistics||{},laser=profile.laser_terminals||{},parameters=profile.event_parameters||{};
+ legacyFlowRetired=!!profile.installed;
+ if(legacyFlowRetired&&!$('legacy-flow-retired')){const note=node('p','Percorso storico disattivato: questo confronto continuo usa la pianificazione con tre migrazioni concatenate e i satelliti dello scenario precedente, non compatibili con lo scenario installato. Il nuovo esperimento a eventi arriverà nella console con il traguardo M4.','small error');note.id='legacy-flow-retired';$('common-base-start').before(note);$('common-base-start').disabled=true;$('start').disabled=true;}
+ $('scenario-profile-installation').textContent=profile.installed?'Installato: la vista orbitale e il laboratorio usano questo scenario; nel laboratorio sono emulati solo i satelliti del dominio.':'Non è ancora installato nel laboratorio: il confronto attuale usa ancora lo scenario precedente.';
+ const rows=[
+  ['Profilo',profile.profile+(profile.installed?' · installato':' · non ancora installato')],
+  ['Piani (RAAN)',summary.raan_deg.map(value=>number(value,1)+'°').join(' e ')],
+  ['Satelliti',`${summary.satellites} (${summary.per_plane.join(' + ')})`],
+  ['Quota',`${number(summary.altitude_km[0],0)}–${number(summary.altitude_km[1],0)} km`],
+  ['Laser per satellite',`${(laser.intra_plane??0)+(laser.inter_plane??0)}: ${laser.intra_plane??0} nel piano, ${laser.inter_plane??0} verso l’altro piano`],
+  ['Velocità del collegamento',(profile.rate_bps||[]).map(value=>number(value/1e9,0)+' Gbit/s').join(', ')||'—'],
+  ['Dominio del controller',`${summary.domain} satelliti (${profile.domain.plane_1.length} + ${profile.domain.plane_2.length})`],
+  ['Partner sull’altro piano',statistics.inter_partner_time_fraction?number(statistics.inter_partner_time_fraction.median*100,1)+'% del tempo (mediana)':'—'],
+  ['Cambi di topologia nel giorno',statistics.path_segments!==undefined?String(Math.max(0,statistics.path_segments-1)):'—'],
+  ['Eventi di migrazione',`${summary.feasible_events} con destinazione su ${summary.events}`],
+  ['File del profilo',profile.integrity==='sizes_match'?'coerenti con il manifest':'cambiati: '+(profile.changed_files||[]).join(', ')]];
+ const list=node('dl');for(const [term,value] of rows)list.append(node('dt',term),node('dd',value));box.append(list);
+ box.append(node('h3','Eventi scelti per l’esperimento'));
+ const table=node('table','', 'scenario-events'),head=node('thead'),headRow=node('tr'),body=node('tbody');
+ for(const [title,hint] of [['N.','Evento'],['Migrazione','Sorgente → destinazione (NORAD)'],['Salti','Salti laser del percorso'],['Ora','Istante nella giornata simulata'],['Luce sorg.','Luce residua della sorgente'],['Luce dest.','Luce residua della destinazione']]){const cell=node('th',title);cell.title=hint;headRow.append(cell);}
+ head.append(headRow);
+ profile.selected_events.forEach((event,index)=>{const row=node('tr');row.append(node('td',String(index+1)),node('td',`${event.source} → ${event.destination}`),node('td',String(event.hops)),node('td',clockOfDay(event.trigger_s)),node('td',minutesText(event.source_light_remaining_s)),node('td',minutesText(event.destination_light_remaining_s)));body.append(row);});
+ table.append(head,body);const scroller=node('div',undefined,'table-scroll');scroller.append(table);box.append(scroller);
+ box.append(node('p',`Ogni evento parte ${minutesText(parameters.trigger_lead_s)} prima che la sorgente entri in ombra. La destinazione è il satellite raggiungibile con meno salti che resta al sole almeno ${minutesText(parameters.minimum_destination_light_s)}, con un percorso stabile per almeno ${minutesText(parameters.minimum_path_persistence_s)}.`,'small muted'));
+}
+let eventComparisons=[];
+const methodLabel=method=>method==='hot'?'Hot':'Cold';
+const yesNo=value=>value===true?'sì':value===false?'no':'—';
+async function loadEventComparisons(){
+ try{eventComparisons=(await api('/event-comparisons')).comparisons;}catch(error){return;}
+ renderEventExperiment();renderEventResults();
+}
+function activeLabJob(){const id=state?.lock?.job_id;return id?jobs.find(row=>row.job_id===id):null;}
+function renderEventExperiment(){
+ const job=activeLabJob(),busy=!!state?.lock,ready=legacyFlowRetired;
+ $('event-start').disabled=!ready||busy||!state;$('event-verify').disabled=!ready||busy||!state;
+ const progress=$('event-progress');
+ if(job&&['compare_events','functional'].includes(job.operation)){
+  const p=job.progress||{},label=p.label||phaseLabels[p.subphase]||p.subphase||p.phase||'In corso';
+  const current=eventComparisons.find(row=>row.comparison_id===p.comparison_id)?.current||eventComparisons.find(row=>!row.complete&&!row.reason)?.current;
+  progress.textContent=(job.operation==='functional'?'Verifica in corso':'Esperimento in corso')+(current?` · evento ${current.event} · ${methodLabel(current.method)}`:'')+' · '+label+(job.cancellation_requested?' · interruzione richiesta':'');
+ }else if(busy){progress.textContent='Laboratorio occupato da un altro job: attendere la sua conclusione.';}
+ else if(!ready){progress.textContent='Disponibile quando il profilo dello scenario è installato.';}
+ else{const last=eventComparisons[0];progress.textContent=last?`Ultimo esperimento: ${last.complete?'completato':'non completato'+(last.reason?' ('+last.reason+')':'')} · ${new Date(last.created_utc).toLocaleString('it-IT')}. I risultati sono nella pagina Risultati.`:'Nessun esperimento eseguito.';}
+}
+async function launchLabJob(operation){
+ $('event-start').disabled=true;$('event-verify').disabled=true;
+ try{const job=await api('/jobs',{operation,parameters:{}});jobs=[job,...jobs.filter(row=>row.job_id!==job.job_id)];notice(operation==='functional'?'Verifica avviata.':'Esperimento a eventi avviato.');await refresh();renderEventExperiment();}
+ catch(error){$('event-progress').textContent='Avvio non riuscito: '+error.message;renderEventExperiment();}
+}
+$('event-start').addEventListener('click',()=>launchLabJob('compare_events'));
+$('event-verify').addEventListener('click',()=>launchLabJob('functional'));
+function phaseSummary(run){
+ const s=run.phases?.seconds||{};
+ const parts=[['avvio controller','controller_startup'],['ripristino API','api_restore'],['delta','delta_apply'],['arresto sorgente','source_stop'],['verifica','api_verification'],['riconciliazione accodata','queued_topology_apply'],['cutover','cutover']]
+  .filter(([,key])=>s[key]!==undefined).map(([label,key])=>`${label} ${number(s[key],1)} s`);
+ return parts.join(' · ')||'non disponibili';
+}
+function renderEventResults(){
+ const box=$('event-results'),status=$('event-results-status');box.replaceChildren();
+ const comparison=eventComparisons[0];
+ if(!comparison){status.textContent='Nessun esperimento a eventi registrato.';return;}
+ status.textContent=`${comparison.comparison_id} · ${comparison.complete?'completato':comparison.reason?'non completato: '+comparison.reason:'in corso'} · ${number(comparison.rate_bps/1e9,0)} Gbit/s · ${comparison.software_on_board?'software a bordo, migra solo lo stato':'con trasferimento delle immagini'}. Una replica per evento e modalità: i valori sono per evento, senza statistiche aggregate.`;
+ for(const row of comparison.events){
+  const card=node('div',undefined,'event-card');
+  card.append(node('h3',`Evento ${row.index}: ${row.source} → ${row.destination} · ${row.hops} salti · ${clockText(row.trigger_s)} · ordine ${row.order.map(methodLabel).join(' → ')}`));
+  const table=node('table',undefined,'scenario-events'),thead=node('thead'),head=node('tr'),body=node('tbody');
+  for(const title of ['','Downtime','Durata','Ping persi','Entro l’ombra','Percorso valido','Esito'])head.append(node('th',title));
+  thead.append(head);
+  for(const method of ['hot','cold']){
+   const run=row.runs[method],tr=node('tr');tr.append(node('th',methodLabel(method)));
+   if(!run){for(let i=0;i<6;i++)tr.append(node('td','—'));body.append(tr);continue;}
+   const lost=run.lost_pings===null||run.lost_pings===undefined?'non misurato':`${run.lost_pings} su ${run.observed_pings}`;
+   tr.append(node('td',seconds(run.controller_downtime_s)),node('td',seconds(run.total_operation_s)),node('td',lost),
+    node('td',yesNo(run.feasibility?.fits_before_shadow)),node('td',yesNo(run.feasibility?.multi_hop_path_whole_operation)),node('td',run.success?'riuscita':(run.outcome||'non riuscita')));
+   body.append(tr);
+  }
+  if(row.cold_minus_hot){const d=row.cold_minus_hot,tr=node('tr');tr.append(node('th','Cold − Hot'),node('td',seconds(d.controller_downtime_s)),node('td',seconds(d.total_operation_s)),node('td',d.lost_pings===null||d.lost_pings===undefined?'—':String(d.lost_pings)),node('td',''),node('td',''),node('td',''));body.append(tr);}
+  table.append(thead,body);const scroller=node('div',undefined,'table-scroll');scroller.append(table);card.append(scroller);
+  for(const method of ['hot','cold']){const run=row.runs[method];if(run)card.append(node('p',`${methodLabel(method)} · fasi: ${phaseSummary(run)}`,'small muted'));}
+  box.append(card);
+ }
+ const files=artifacts.filter(item=>item.label.startsWith(`results/event-comparisons/${comparison.comparison_id}/`));
+ if(files.length){const list=node('ul',undefined,'downloads');for(const file of files){const li=node('li'),name=file.label.split('/').pop(),a=node('a',{'metadata.json':'Risultati JSON','summary.csv':'Tabella CSV'}[name]||name);a.href=file.download_url;a.title=file.label;li.append(a);list.append(li);}box.append(list);}
+}

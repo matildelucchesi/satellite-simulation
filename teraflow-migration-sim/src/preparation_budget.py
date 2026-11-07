@@ -7,13 +7,14 @@ from datetime import datetime, timedelta, timezone
 
 from .storage import append_json, atomic_json, utc_now
 
-DEFAULTS = {'infrastructure': 15, 'start_source': 180, 'start_target': 180,
+DEFAULTS = {'infrastructure': 120, 'start_source': 180, 'start_target': 180,
             'clean_target': 120, 'clean_source': 120, 'restore_scenario': 120,
-            'restore_authority': 60, 'stop_target': 45, 'baseline': 60}
-LABELS = {'infrastructure': 'Attesa disponibilità Mininet e proxy P4',
+            'restore_authority': 60, 'stop_target': 45, 'baseline': 60, 'reset_service': 120}
+LABELS = {'reset_service': 'Ripristino del servizio sulla rete esistente',
+          'infrastructure': 'Attesa disponibilità Mininet e proxy P4',
           'start_source': 'Avvio controller sorgente', 'start_target': 'Avvio controller destinazione',
           'clean_target': 'Pulizia scenario destinazione', 'clean_source': 'Pulizia scenario sorgente',
-          'restore_scenario': 'Caricamento scenario iniziale', 'restore_authority': 'Ripristino autorità P4',
+          'restore_scenario': 'Configurazione e verifica della rete', 'restore_authority': 'Ripristino autorità P4',
           'stop_target': 'Arresto previsto della destinazione', 'baseline': 'Verifica API, autorità e sonde'}
 
 

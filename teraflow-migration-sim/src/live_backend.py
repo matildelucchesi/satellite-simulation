@@ -10,8 +10,8 @@ from pathlib import Path
 from urllib.request import Request, urlopen
 
 from .artifacts import canonical_bytes
-from .fixture import state, for_role
-from .orbit import shortest_paths
+from .fixture import state, for_role, with_endpoint_rules, service_endpoints
+from .orbit import lab_graph, shortest_paths
 from .snapshot import apply_delta
 from .storage import append_json, utc_now
 from .tfs_adapter import TfsAdapter, route, service_intent
@@ -177,7 +177,8 @@ class LiveBackend:
 
     def wait_infrastructure(self):
         """Wait for both infrastructure endpoints within the current preparation budget."""
-        expected=len(self.orbit.ids)
+        fixture=getattr(self,'fixture',None)
+        expected=len(fixture['emulator']['devices']) if fixture else len(self.orbit.ids)
         last={}
         previous=None
         def expired():
@@ -222,13 +223,13 @@ class LiveBackend:
             if ready:return proxy
             if self.cancel.wait(min(1,self.remaining())):raise InterruptedError('Job interrupted by user')
 
-    def reset(self):
+    def reset(self, *, reuse_inventory=False):
         initial_tick = self.event.get('start_s', max(0, self.event['trigger_s']-30))
         self.initial_tick = initial_tick
-        graph = self.orbit.graph(initial_tick)
+        graph = lab_graph(self.orbit, initial_tick)
         def initial_state():
             document = state(self.fixture, graph)
-            if 53913 not in shortest_paths(graph, 53848): document['entities']['services'] = []
+            if not self.service_path(graph): document['entities']['services'] = []
             return document
         initial = initial_state()
         self.preparation_budget = PreparationBudget(self.directory, self.scenario, self.notify,
@@ -239,8 +240,32 @@ class LiveBackend:
             self.fixture['controller_proxy'] = proxy['ipv4']
         with stage('stop_target'): self.compose.stop('sat-b')
         self.target_started = False
+        if self.scenario.get('migration', {}).get('clean_target_store_before_trigger'):
+            with stage('clean_target'): self.clean_target_store()
         with stage('start_source'): self.start_source()
-        with stage('clean_source'): self.a.cleanup(self.a.export())
+        incremental = False
+        if reuse_inventory:
+            from .snapshot import identity, snapshot
+            initial = initial_state()
+            current = self.a.export()
+            wanted = {identity('devices', row): row for row in initial['entities']['devices']}
+            def connection(row):
+                return {r.get('custom', {}).get('resource_key'): r
+                        for r in row.get('device_config', {}).get('config_rules', [])
+                        if r.get('custom', {}).get('resource_key', '').startswith('_connect/')}
+            incremental = all(connection(row) == connection(wanted[identity('devices', row)])
+                              for row in current['entities']['devices']
+                              if identity('devices', row) in wanted)
+            if incremental:
+                # Recreate the service intent so its generated forwarding rules
+                # cannot survive with a stale path. Keep the expensive devices.
+                with stage('reset_service'):
+                    self.a.cleanup(snapshot({'services': current['entities']['services']}))
+            else:
+                self.notify({'phase':'scenario_creation',
+                             'label':'Connessioni dispositivi cambiate: ripristino completo necessario'})
+        if not incremental:
+            with stage('clean_source'): self.a.cleanup(self.a.export())
         with stage('restore_scenario'):
             self.set_links(graph)
             initial = initial_state()  # infrastructure resolved the proxy address
@@ -250,7 +275,11 @@ class LiveBackend:
                 self.notify(event)
             self.a.notify = restoring
             try:
-                self.a.restore(initial)
+                if incremental:
+                    initial = with_endpoint_rules(initial)
+                    self.a.reconcile(initial)
+                else:
+                    self.a.restore(initial)
                 restoring({'phase':'restore_progress', 'counts':self.a.restore_progress,
                            'verification':'running'})
                 self.source_snapshot = self.a.export()
@@ -430,7 +459,7 @@ class LiveBackend:
         desired = state(self.fixture, graph, role)
         current = adapter.export()
         desired_service = desired['entities']['services'][0]
-        path = 53913 in shortest_paths(graph, 53848)
+        path = self.service_path(graph)
         old_services = current['entities']['services']
         changed = not old_services or service_intent(old_services[0]) != service_intent(desired_service)
         if changed or not path:
@@ -481,9 +510,9 @@ class LiveBackend:
                 self.stopping.wait(.05); continue
             previous = tick
             try:
-                graph = self.orbit.graph(tick)
+                graph = lab_graph(self.orbit, tick)
                 self.set_links(graph)
-                path = 53913 in shortest_paths(graph, 53848)
+                path = self.service_path(graph)
                 links = [(a,b) for a in graph for b in graph[a] if a < b]
                 forwarding=None
                 probe=self.root/'results/lab'/self.probe_id/'ping.log'
@@ -516,13 +545,44 @@ class LiveBackend:
             except Exception as exc:
                 self.telemetry_errors.append(str(exc)); return
 
+    def clean_target_store(self):
+        """A real destination satellite holds no state from earlier trials. Remove the laboratory
+        residue from the stopped target's Context database before the trigger, so that the
+        measured perimeter cleanup only verifies an empty destination."""
+        from .storage import atomic_json
+        role = self.target_slot
+        service = role + '-contextservice'
+        script = self.root/'tools/tfs_context_cleanup.py'
+        self.compose.command(role, 'up', '-d', '--no-deps', '--wait', '--wait-timeout', '60', service, timeout=90)
+        try:
+            container = self.compose.command(role, 'ps', '-q', service, timeout=30).strip()
+            if not container: raise RuntimeError('Target context service not running')
+            result = None
+            for command in (['docker', 'cp', str(script), container+':/tmp/tfs_context_cleanup.py'],
+                            ['docker', 'exec', '-e', 'PYTHONPATH=/var/teraflow', '-w', '/var/teraflow', container,
+                             'python', '/tmp/tfs_context_cleanup.py', '--remove']):
+                result = run_process(command, cwd=self.root, timeout=min(120, self.remaining()), check=self.check)
+                if result.returncode: raise RuntimeError((result.stderr or result.stdout)[-2000:])
+            report = json.loads(result.stdout.strip().splitlines()[-1])
+            if report.get('after', {}).get('devices') or report.get('after', {}).get('links'):
+                raise RuntimeError('Target context still holds laboratory inventory after cleanup')
+            atomic_json(self.directory/'target-store-cleanup.json', report)
+            self.target_store_cleanup = report
+        finally:
+            self.compose.command(role, 'stop', '-t', '10', service, timeout=60)
+
     def prepare_target(self):
         self.check()
         if self.target_started: raise RuntimeError('Target not clean after previous attempt')
         self.admin('/clear-standby')
 
     def contact(self, tick):
-        return self.orbit.contact(self.event['sat_a'], self.event['sat_b'], tick)
+        method = getattr(self.orbit, 'migration_link', self.orbit.contact)
+        return method(self.event['sat_a'], self.event['sat_b'], tick)
+
+    def service_path(self, graph):
+        source, target = service_endpoints(self.fixture)
+        return source in graph and target in shortest_paths(graph, source)
 
     def quiesce_source(self):
         with self.lock:
@@ -572,6 +632,12 @@ class LiveBackend:
     def start_target(self, receipt):
         self.check()
         if self.fault == 'target_start': raise RuntimeError('Injected SAT-B startup failure')
+        if receipt.get('mode') == 'software-on-board':
+            # Images are part of the satellite's installed software: nothing to import.
+            self.target_started = True
+            self.measure('controller_startup', lambda: self.compose.start(self.target_slot))
+            self.measure('target_perimeter_cleanup', lambda: self.target.cleanup(self.target.export()))
+            return
         path = Path(receipt['path'])
         def load():
             # Docker Desktop may spend several minutes importing a verified

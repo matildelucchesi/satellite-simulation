@@ -96,7 +96,7 @@ class PreparationProgressTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory)
             atomic_json(root/'results/functional-gate.json',{'complete':True})
-            app=SimpleNamespace(root=root,publish=Mock(),calibration_manifest=Mock(),
+            app=SimpleNamespace(root=root,prepare_calibration_network=Mock(),publish=Mock(),calibration_manifest=Mock(),
                 run=Mock(side_effect=[{'run_id':str(i),'success':True,'baseline':{'success':True}} for i in range(6)]))
             with patch('src.simulation.engine_fingerprint',side_effect=['before','after']):
                 result=Preparation.calibrate(app)

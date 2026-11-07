@@ -40,6 +40,34 @@ def events_after(path,after):
     return result
 
 
+def scenario_profiles(root):
+    """Summaries of offline scenario profiles built by tools/build_scenario.py (phase 0)."""
+    profiles=[]
+    for manifest_path in sorted(Path(root,'artifacts/constellation-profiles').glob('*/manifest.json')):
+        directory=manifest_path.parent
+        try:
+            manifest=json.loads(manifest_path.read_text(encoding='utf-8'))
+            events=json.loads((directory/'events.json').read_text(encoding='utf-8'))
+            domain=json.loads((directory/'domain.json').read_text(encoding='utf-8'))
+            scenario=json.loads((directory/'scenario.json').read_text(encoding='utf-8'))
+        except (OSError,ValueError):
+            profiles.append({'profile':directory.name,'integrity':'unreadable'});continue
+        missing=[name for name,item in manifest.get('outputs',{}).items()
+                 if not (directory/name).is_file() or (directory/name).stat().st_size!=item.get('bytes')]
+        keys=('event_id','source','destination','hops','path','trigger_s','source_shadow_entry_s',
+              'source_light_remaining_s','destination_light_remaining_s','light_gained_s')
+        profiles.append({'profile':manifest.get('profile',directory.name),'created_utc':manifest.get('created_utc'),
+            'installed':scenario.get('orbital',{}).get('constellation_profile')==json.loads(Path(root,'config/scenario.json').read_text(encoding='utf-8')).get('orbital',{}).get('constellation_profile'),
+            'integrity':'changed' if missing else 'sizes_match','changed_files':missing,
+            'summary':manifest.get('summary'),'statistics':manifest.get('statistics'),
+            'laser_terminals':scenario.get('fso',{}).get('laser_terminals'),
+            'rate_bps':scenario.get('fso',{}).get('useful_throughput_bps'),
+            'event_parameters':events.get('parameters'),'hops_histogram':events.get('hops_histogram'),
+            'domain':{'plane_1':domain.get('plane_1'),'plane_2':domain.get('plane_2')},
+            'selected_events':[{key:event.get(key) for key in keys} for event in events.get('selected',[])]})
+    return {'profiles':profiles}
+
+
 class Application:
     def __init__(self,root):
         self.root=Path(root).resolve();self.jobs=JobManager(self.root)
@@ -174,11 +202,11 @@ class Application:
         return sorted(rows,key=lambda row:row['created_utc'],reverse=True)
 
     def topology(self,identifier=None,tick=None):
-        from .orbit import Orbit,shortest_paths
+        from .orbit import Orbit,load_orbit,shortest_paths
         from .topology_state import presentation
         import numpy as np
         replay=tick is not None
-        if self.orbit is None:self.orbit=Orbit(self.root/'artifacts/orbit/replay.npz')
+        if self.orbit is None:self.orbit=load_orbit(self.root)
         event=None
         if identifier:
             directory=run_directory(self.root,identifier)
@@ -208,11 +236,17 @@ class Application:
             metadata=json.loads(meta_path.read_text()) if meta_path.exists() else {}
             display=presentation(directory,tick,metadata=metadata,
                 replay=replay or metadata.get('outcome') not in (None,'running'))
-        path=[];distances=shortest_paths(graph,53913)
-        if 53848 in distances:
-            node=53848;path=[node]
-            while node!=53913:
-                neighbors=[(length+distances[neighbor],neighbor) for neighbor,length in graph[node].items() if neighbor in distances]
+        source_host,target_host=53848,53913
+        service_graph=graph
+        if getattr(self.orbit,'domain',None) is not None:
+            from .fixture import service_endpoints
+            source_host,target_host=service_endpoints(json.loads((self.root/'config/fixture.json').read_text()))
+            service_graph=self.orbit.lab_graph(tick)
+        path=[];distances=shortest_paths(service_graph,target_host)
+        if source_host in distances:
+            node=source_host;path=[node]
+            while node!=target_host:
+                neighbors=[(length+distances[neighbor],neighbor) for neighbor,length in service_graph[node].items() if neighbor in distances]
                 node=min(neighbors)[1]
                 if node in path:raise ValueError('Invalid service path loop')
                 path.append(node)
@@ -220,14 +254,16 @@ class Application:
             'sat_b':event.get('sat_b') if event else None,'nodes':[{'norad':sid,'eclipsed':not self.orbit.operational(sid,tick),
                 **self.orbit.illumination_window(sid,tick),
                 'plane':selection[sid]['plane'],'phase_rank':selection[sid]['phase_rank'],'orbital_angle_rad':angles[sid],
+                'in_domain':getattr(self.orbit,'domain',None) is None or sid in self.orbit.domain,
                 'position_teme_km':self.orbit.positions[tick,self.orbit.index[sid]].tolist()} for sid in self.orbit.ids],
-            'links':[[a,b] for a in graph for b in graph[a] if a<b],'service_path':path}
+            'links':[[a,b] for a in graph for b in graph[a] if a<b],'service_path':path,
+            'domain':getattr(self.orbit,'domain',None),'link_model':'laser-3-terminals' if getattr(self.orbit,'links',None) is not None else 'range'}
 
     def initial_topology(self, initial_satellite_id=None, start_orbital_s=0):
         """A stationary initial assignment; launching must preserve both host and epoch."""
         if self.orbit is None:
-            from .orbit import Orbit
-            self.orbit=Orbit(self.root/'artifacts/orbit/replay.npz')
+            from .orbit import Orbit,load_orbit
+            self.orbit=load_orbit(self.root)
         if isinstance(start_orbital_s,bool) or not isinstance(start_orbital_s,int) or not 0 <= start_orbital_s < self.orbit.duration:
             raise ValueError('Tempo iniziale fuori dall’osservazione orbitale')
         topology=self.topology(tick=start_orbital_s)
@@ -264,8 +300,8 @@ class Application:
         orbital=inputs.get('scenario',{}).get('orbital',{})
         count=orbital.get('satellites_total')
         if count is None:return self
-        from .orbit import Orbit
-        if self.orbit is None:self.orbit=Orbit(self.root/'artifacts/orbit/replay.npz')
+        from .orbit import Orbit,load_orbit
+        if self.orbit is None:self.orbit=load_orbit(self.root)
         if len(self.orbit.ids)==count:return self
         import copy
         for selection_file in (self.root/'artifacts/constellation-profiles').glob('*/original/config/selected_constellation.json'):
@@ -318,6 +354,8 @@ class Application:
             'results/workflow.json','results/functional-gate.json','config/campaign-manifest.json','config/selected_events.json')
         paths.extend(self.root/p for p in fixed)
         paths.extend((self.root/'results/comparisons').glob('compare-*/metadata.json'))
+        for folder in (self.root/'results/event-comparisons').glob('events-*'):
+            paths.extend(p for p in folder.iterdir() if p.suffix in ('.json','.csv'))
         for folder in (self.root/'results/continuous-comparisons').glob('pair-*'):
             paths.extend(p for p in folder.iterdir() if p.suffix in ('.json','.csv','.html'))
         for folder in (self.root/'results/simulations').glob('sim-*'):
@@ -385,6 +423,10 @@ def make_server(root,port=18092):
             if path=='/api/v1/common-base':
                 from .common_base import status
                 return self.send(status(application.root))
+            if path=='/api/v1/scenario-profiles':return self.send(scenario_profiles(application.root))
+            if path=='/api/v1/event-comparisons':
+                from .event_comparison import list_comparisons
+                return self.send({'comparisons':list_comparisons(application.root)})
             if path=='/api/v1/state':return self.send(application.status())
             if path=='/api/v1/jobs':return self.send({'jobs':application.jobs.list()})
             if path.startswith('/api/v1/jobs/'):

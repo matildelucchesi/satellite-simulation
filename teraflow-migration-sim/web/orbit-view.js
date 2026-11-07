@@ -83,8 +83,8 @@ function drawOrbit(data){
   const pending=node.norad===pendingController(view);
   const active=pending||(!stale&&node.norad===view.controller_satellite),destination=!active&&node.norad===view.target_satellite;
   const role=pending?(view.mode==='preview'?'Controller iniziale':'Controller · in verifica'):active?'Controller attivo':destination?'Destinazione':node.norad===view.source_satellite?'Sorgente':'';
-  const label=`NORAD ${node.norad} · Piano ${node.plane} · ${node.eclipsed?'Ombra':'Luce'}${role?' · '+role:''} · ${candidateLabel(node)}${node.next_controller?' · Prossimo controller':''}`;
-  const group=svg('g',{class:'node'+(node.eclipsed?' shadow':'')+(active?' source':'')+(pending&&view.mode!=='preview'?' assignment-pending':'')+(destination?' destination':''),tabindex:0,role:'button','aria-label':label,'aria-pressed':String(node.norad===selectedSatellite),'data-norad':node.norad},graph);
+  const label=`NORAD ${node.norad} · Piano ${node.plane}${data.domain?(node.in_domain?' · Dominio del controller':' · Fuori dal dominio (solo modello)'):''} · ${node.eclipsed?'Ombra':'Luce'}${role?' · '+role:''} · ${candidateLabel(node)}${node.next_controller?' · Prossimo controller':''}`;
+  const group=svg('g',{class:'node'+(node.eclipsed?' shadow':'')+(data.domain&&!node.in_domain?' outside-domain':'')+(active?' source':'')+(pending&&view.mode!=='preview'?' assignment-pending':'')+(destination?' destination':''),tabindex:0,role:'button','aria-label':label,'aria-pressed':String(node.norad===selectedSatellite),'data-norad':node.norad},graph);
   svg('circle',{cx:p.x,cy:p.y,r:23,class:'selection-ring'},group);
   svg('circle',{cx:p.x,cy:p.y,r:6,class:'satellite-body'},group);
   if(node.next_controller)svg('circle',{cx:p.x,cy:p.y,r:17,class:'next-controller-ring'},group);

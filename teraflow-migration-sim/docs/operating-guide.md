@@ -6,7 +6,7 @@ La console mostra un solo avvio: imposta la durata **per modalità** e premi «A
 
 ## Confronto FSO singolo tramite CLI
 
-Dalla directory del progetto, avviare il laboratorio con `.\.venv\Scripts\python.exe tools/stack.py up` e la console con `.\.venv\Scripts\python.exe tools/serve_gui.py`. Per il confronto FSO singolo usare `.\.venv\Scripts\python.exe tools/experiment.py functional --wait`.
+Dalla directory del progetto, avviare laboratorio e console con `.\.venv\Scripts\python.exe tools/lab.py start`. Per il confronto FSO singolo usare `.\.venv\Scripts\python.exe tools/experiment.py functional --wait`.
 
 Un solo job seleziona e conserva un evento FSO diagnostico lungo, poi esegue hot e cold a 1 Gbit/s dallo stesso secondo orbitale e dalla stessa fixture. Entrambe le prove trasferiscono il bundle completo via TCP. La ricostruzione iniziale separa le due esecuzioni; non serve completare la calibrazione per questa verifica funzionale.
 
@@ -30,9 +30,10 @@ Se si usa l'ambiente locale del progetto, installare prima le dipendenze e avvia
 
 ```powershell
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt matplotlib
-.\.venv\Scripts\python.exe tools/stack.py up
-.\.venv\Scripts\python.exe tools/serve_gui.py
+.\.venv\Scripts\python.exe tools/lab.py start
 ```
+
+`lab.py start` esegue `stack.py up` (saltato se il lock del laboratorio è presente), avvia la console e apre il browser; `--no-stack` e `--no-browser` limitano l'avvio. `lab.py status` e `lab.py stop` mostrano lo stato e arrestano lo stack.
 
 Questi comandi presuppongono le immagini già costruite e gli artefatti del laboratorio presenti. `matplotlib` abilita le figure del report; NumPy e Astropy appartengono alle dipendenze dichiarate del progetto. Se è rimasto un lock di un worker morto, eseguire `tools/experiment.py recover --wait` con lo stesso interprete prima di nuove prove. Il recupero di un job ormai oltre la scadenza orbitale termina con i controller fenced: la nuova prova ricostruisce il proprio scenario.
 

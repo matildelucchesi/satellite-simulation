@@ -217,3 +217,22 @@ test('newly queued scenario opens preparation before laboratory lock refresh arr
  assert.equal(experimentLandingPage('configuration','preparation',true),'configuration');
  assert.equal(experimentLandingPage('configuration','preparation',false),'configuration');
 });
+
+test('initial network preparation precedes the calibration counter',()=>{
+ const {scenarioCreationProgress}=require('../web/experiment-state.js');
+ const label='Creazione della rete completa prima della calibrazione';
+ const events=[{id:1,phase:'scenario_creation',label}];
+ const job={operation:'calibrate',status:'running',progress:{phase:'scenario_creation',label}};
+ assert.equal(preparationView(null,job,null).title,label);
+ assert.equal(scenarioCreationProgress(job,events).calibration,false);
+ events.push({id:2,phase:'calibration',method:'cold',replica:1});
+ job.progress={phase:'calibration',method:'cold',replica:1,replicas_per_mode:1};
+ assert.equal(scenarioCreationProgress(job,events).calibration,true);
+});
+
+test('event experiment stays on the configuration page in every state',()=>{
+ for(const status of ['queued','running','completed','failed','interrupted','recovery_required']){
+  assert.equal(experimentPage(null,{operation:'compare_events',status},null,null),'configuration');
+  assert.equal(experimentPage(null,{operation:'compare_events',status,cancellation_requested:true},null,'job-1'),'configuration');
+ }
+});

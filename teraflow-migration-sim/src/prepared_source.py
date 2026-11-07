@@ -45,7 +45,10 @@ def prepare(app, metadata):
     app.checkpoint(kind='between_runs',phase='source_preparation',base_id=base_id)
     try:
         app.publish({'phase':'scenario_creation','label':'Attivazione del controller sorgente'})
-        backend.reset()
+        if getattr(app, '_calibration_network_ready', False):
+            backend.reset(reuse_inventory=True)
+        else:
+            backend.reset()
         baseline=backend.establish_baseline(base_id)
         if not baseline.get('success'):raise RuntimeError('Verifica API, autorità e sonde non riuscita')
         backend.check()
@@ -94,6 +97,7 @@ def adopt(backend, base_id, plan):
     backend.source_snapshot=snapshot
     backend.proxy_generation=record['generation']
     backend.initial_tick=plan['start_s']
-    graph=backend.orbit.graph(plan['start_s'])
+    from .orbit import lab_graph
+    graph=lab_graph(backend.orbit,plan['start_s'])
     backend.set_links(graph)
     backend.graph_signature=backend.signature(graph)

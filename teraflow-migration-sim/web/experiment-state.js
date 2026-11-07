@@ -35,6 +35,8 @@ function experimentView(pair, job, now=Date.now(), operationLabels={}) {
 if(typeof module!=='undefined')module.exports={experimentView};
 
 function experimentPage(pair,job,orbit,pending,previous){
+ // The event experiment shows its progress and results in its own panels, not in the legacy pages.
+ if(job?.operation==='compare_events')return 'configuration';
  if(['functional','calibrate','prepare_base'].includes(job?.operation))return job.cancellation_requested?(['queued','running'].includes(job.status)?'preparation':'configuration'):['queued','running','failed','recovery_required'].includes(job.status)?'preparation':'configuration';
  if(job?.cancellation_requested||pair?.outcome==='interrupted')return ['queued','running'].includes(job?.status)?'preparation':'configuration';
  if(pending||job?.operation==='recover'&&['queued','running'].includes(job.status))return 'preparation';
@@ -81,8 +83,8 @@ function preparationView(pair,job,orbit){
  const p=job?.progress||pair?.progress||{};
  if(job?.cancellation_requested&&['queued','running'].includes(job.status))return {chosen:false,ready:false,stopping:true,title:'Interruzione in corso',detail:'Richiesta ricevuta. Messa in sicurezza del laboratorio in corso; al termine tornerai alla configurazione.'};
  if(['functional','calibrate','prepare_base'].includes(job?.operation))return {chosen:false,ready:false,
-  title:['failed','recovery_required'].includes(job.status)?'Preparazione non completata':p.phase==='calibration'||job.operation==='calibrate'?`Calibrazione ${(p.method||'').toUpperCase()} · prova ${p.replica||1}/${p.replicas_per_mode||3}`:p.label||({calibration:'Calibrazione dello scenario iniziale',planning:'Scelta del controller',scenario_creation:'Creazione scenario iniziale'})[p.phase]||'Creazione scenario iniziale',
-  detail:['failed','recovery_required'].includes(job.status)?'Consulta i dettagli del laboratorio e la timeline per la causa e l’eventuale recupero.':p.phase==='calibration'||job.operation==='calibrate'?`Prove preliminari Hot/Cold per misurare i tempi di migrazione. ${p.label||'Calibrazione in corso'}. Il confronto finale non è ancora avviato.`:'Preparazione dello scenario e del controller sorgente. Al termine tornerai alla configurazione per scegliere la velocità e premere Avvia.'};
+  title:['failed','recovery_required'].includes(job.status)?'Preparazione non completata':p.phase==='calibration'||job.operation==='calibrate'&&p.phase!=='scenario_creation'?`Calibrazione ${(p.method||'').toUpperCase()} · prova ${p.replica||1}/${p.replicas_per_mode||3}`:p.label||({calibration:'Calibrazione dello scenario iniziale',planning:'Scelta del controller',scenario_creation:'Creazione scenario iniziale'})[p.phase]||'Creazione scenario iniziale',
+  detail:['failed','recovery_required'].includes(job.status)?'Consulta i dettagli del laboratorio e la timeline per la causa e l’eventuale recupero.':p.phase==='calibration'||job.operation==='calibrate'&&p.phase!=='scenario_creation'?`Prove preliminari Hot/Cold per misurare i tempi di migrazione. ${p.label||'Calibrazione in corso'}. Il confronto finale non è ancora avviato.`:'Preparazione dello scenario e del controller sorgente. Al termine tornerai alla configurazione per scegliere la velocità e premere Avvia.'};
  const selected=pair?.resolved_configuration?.initial_satellite_id;
  const chosen=selected!==undefined&&selected!==null||Object.keys(pair?.sessions||{}).length>0;
  const ready=orbit?.presentation?.initial_controller_ready===true&&orbit?.presentation?.mode!=='preview';
@@ -98,8 +100,9 @@ function scenarioCreationProgress(job,events=[]){
  const rows=[...events].sort((a,b)=>a.id-b.id),p=job?.progress||{};
  const baseStart=rows.find(row=>row.phase==='scenario_creation'&&/Preparazione della base comune|Attivazione del controller sorgente|Piano comune pronto/.test(row.label||''));
  const creation=['prepare_base','functional','calibrate'].includes(job?.operation);
- const calibration=creation&&!baseStart&&(job.operation!=='prepare_base'||!['planning','common_base_ready'].includes(p.phase));
  const trials=rows.filter(row=>row.phase==='calibration');
+ const initialNetwork=!trials.length&&rows.some(row=>row.phase==='scenario_creation'&&row.label==='Creazione della rete completa prima della calibrazione');
+ const calibration=creation&&!initialNetwork&&!baseStart&&(job.operation!=='prepare_base'||!['planning','common_base_ready'].includes(p.phase));
  const first=trials[0]?.id??Infinity;
  const successful=new Set(rows.filter(row=>row.id>first&&row.phase==='run_finished'&&['success','completed'].includes(row.outcome)).map(row=>row.run_id));
  const replicas=p.replicas_per_mode||trials.at(-1)?.replicas_per_mode||(p.calibration_total===6||p.calibration_index>2||trials.some(row=>row.replica>1)?3:1),total=2*replicas;

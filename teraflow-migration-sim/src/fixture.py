@@ -23,22 +23,42 @@ def endpoint_id(sid, port):
             "topology_id": TOPOLOGY_ID}
 
 
+def hosts(fixture):
+    """Service hosts of this fixture; fixtures older than the domain split use the fixed pair."""
+    return fixture.get("emulator", {}).get("hosts") or HOSTS
+
+
+def service_endpoints(fixture):
+    first, second = hosts(fixture)
+    return first["satellite"], second["satellite"]
+
+
 def build(root: Path):
     selection = json.loads((root / "config/selected_constellation.json").read_text())
     windows = json.loads((root / "results/direct_link_windows.json").read_text())["windows"]
     ids = sorted(row["norad_id"] for row in selection["satellites"])
-    pairs = sorted({tuple(sorted((row["sat_a"], row["sat_b"]))) for row in windows})
+    service_hosts = HOSTS
+    domain_file = root / "config/domain.json"
+    if domain_file.exists():
+        # Only the controller's domain is emulated; the rest of the constellation stays modeled.
+        domain = json.loads(domain_file.read_text())
+        ids = sorted(domain["plane_1"] + domain["plane_2"])
+        service_hosts = [{**HOSTS[index], "satellite": sid} for index, sid in enumerate(domain["service_endpoints"])]
+    members = set(ids)
+    pairs = sorted({tuple(sorted((row["sat_a"], row["sat_b"]))) for row in windows
+                    if row["sat_a"] in members and row["sat_b"] in members})
     ports = {sid: {} for sid in ids}
     devices = []
     for index, sid in enumerate(ids):
         neighbors = sorted(b if a == sid else a for a, b in pairs if sid in (a, b))
         ports[sid] = {str(neighbor): port+1 for port, neighbor in enumerate(neighbors)}
-        host = next((host for host in HOSTS if host["satellite"] == sid), None)
+        host = next((host for host in service_hosts if host["satellite"] == sid), None)
         if host: ports[sid][host["name"]] = len(neighbors)+1
         devices.append({"norad": sid, "dpid": index+1, "name": f"s{index+1}",
                         "grpc_port": 50001+index, "proxy_port": 51001+index, "ports": ports[sid]})
-    return {"schema_version": 1, "context": "migration-lab", "topology": f"starlink-{len(ids)}",
-            "service": "migration-l2", "emulator": {"devices": devices, "pairs": pairs, "hosts": HOSTS},
+    extra = {"forwarding": "service-path-only"} if domain_file.exists() else {}
+    return {"schema_version": 1, "context": "migration-lab", "topology": f"starlink-{len(ids)}", **extra,
+            "service": "migration-l2", "emulator": {"devices": devices, "pairs": pairs, "hosts": service_hosts},
             "controller_proxy": "p4-proxy", "pipeline_binary": "/experiment/deploy/p4/bmv2.json",
             "pipeline_info": "/experiment/deploy/p4/p4info.txt"}
 
@@ -82,12 +102,28 @@ def state(fixture, graph, role="sat-a"):
     from .orbit import shortest_paths
     # Compute deterministic forwarding settings only for nodes on a valid path.
     switch_info = []
+    on_path = None
+    if fixture.get("forwarding") == "service-path-only":
+        # TeraFlow programs only the switches of its connection path. Describing the others would
+        # make the intent change whenever an irrelevant tie between equal paths flips with the
+        # geometry, and every such change recreates the service.
+        source, target = service_endpoints(fixture)
+        distances = shortest_paths(graph, target) if target in graph else {}
+        on_path = set()
+        if source in distances:
+            node = source
+            on_path.add(node)
+            while node != target:
+                node = min((length + distances[n], n) for n, length in graph[node].items() if n in distances)[1]
+                on_path.add(node)
     for row in fixture["emulator"]["devices"]:
         sid = row["norad"]
+        if on_path is not None and sid not in on_path:
+            continue
         port_list = [{"port_id": port, "port_type": "host" if key in {"h1", "h2"} else "switch", "vlan_id": 4094}
                      for key, port in row["ports"].items()]
         fwd = []
-        for host in HOSTS:
+        for host in hosts(fixture):
             if host["satellite"] == sid:
                 port = row["ports"][host["name"]]
             else:
@@ -103,10 +139,30 @@ def state(fixture, graph, role="sat-a"):
                                            "port_list": port_list, "fwd_list": fwd}})
     entities["services"] = [{"service_id": {"context_id": context_id, "service_uuid": {"uuid": stable_id(CONTEXT_UUID+"/"+fixture["service"])}},
         "name": fixture["service"], "service_type": "SERVICETYPE_L2NM",
-        "service_endpoint_ids": [endpoint_id(host["satellite"], ports[host["satellite"]][host["name"]]) for host in HOSTS],
+        "service_endpoint_ids": [endpoint_id(host["satellite"], ports[host["satellite"]][host["name"]]) for host in hosts(fixture)],
         "service_constraints": [], "service_config": {"config_rules": [{"action": "CONFIGACTION_SET", "custom": {
             "resource_key": "/settings", "resource_value": json.dumps({"switch_info": switch_info}, sort_keys=True)}}]}}]
     return snapshot(entities)
+
+
+def with_endpoint_rules(document):
+    """Include the endpoint metadata that AddDevice derives from its settings.
+
+    Reconciliation must retain these rules even though the raw fixture leaves
+    their creation to discovery. Service-generated forwarding rules stay out.
+    """
+    result = copy.deepcopy(document)
+    for device in result['entities']['devices']:
+        rules = device.get('device_config', {}).get('config_rules', [])
+        keys = {row.get('custom', {}).get('resource_key') for row in rules}
+        settings = next((json.loads(row['custom']['resource_value']) for row in rules
+                         if row.get('custom', {}).get('resource_key') == '_connect/settings'), {})
+        for endpoint in settings.get('endpoints', []):
+            key = '/endpoints/endpoint[' + endpoint['uuid'] + ']'
+            if key not in keys:
+                rules.append({'action':'CONFIGACTION_SET', 'custom':{
+                    'resource_key':key, 'resource_value':json.dumps(endpoint, sort_keys=True)}})
+    return snapshot(result['entities'])
 
 
 def for_destination(document, fixture):

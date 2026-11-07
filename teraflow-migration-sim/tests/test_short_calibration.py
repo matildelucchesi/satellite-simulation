@@ -13,7 +13,7 @@ class ShortCalibrationTests(unittest.TestCase):
     def test_calibration_runs_exactly_once_per_mode_and_publishes_two_total(self):
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory);atomic_json(root/'results/functional-gate.json',{'complete':True})
-            app=SimpleNamespace(root=root,scenario={'fso':{'alignment_s':1,'useful_throughput_bps':[1000000000]}},publish=Mock(),
+            app=SimpleNamespace(root=root,prepare_calibration_network=Mock(),scenario={'fso':{'alignment_s':1,'useful_throughput_bps':[1000000000]}},publish=Mock(),
                 run=Mock(side_effect=lambda method,rate,**kw:{'run_id':method,'method':method,'success':True,'baseline':{'success':True}}),
                 calibration_manifest=Mock(return_value={}),workload=Mock())
             with patch('src.simulation.engine_fingerprint',return_value='current'),patch('tools.validate_artifact_manifest.validate',return_value=[]),patch('src.preparation.describe',return_value={}),patch('src.preparation.evaluate',return_value=SimpleNamespace(total_operation_s=10)),patch('src.preparation.asdict',side_effect=lambda row:vars(row)):
@@ -21,6 +21,7 @@ class ShortCalibrationTests(unittest.TestCase):
             self.assertEqual([call.args[0] for call in app.run.call_args_list],['cold','hot'])
             self.assertEqual(result['replicas_per_mode'],1);self.assertEqual(result['calibration_total'],2)
             self.assertTrue(result['complete'])
+            app.prepare_calibration_network.assert_called_once()
             for call in app.publish.call_args_list:self.assertEqual(call.args[0]['replicas_per_mode'],1)
     def test_short_progress_hot_is_second_of_two(self):
         progress=advance({}, {'phase':'calibration','method':'hot','replica':1,'replicas_per_mode':1,'calibration_total':2})

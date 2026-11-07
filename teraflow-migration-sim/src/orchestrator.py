@@ -74,6 +74,12 @@ class Migration:
         if method not in {"cold", "hot"}: raise ValueError("Invalid migration protocol")
         result = {"schema_version": 2, "execution_kind": "live-hybrid", "event": event,
                   "method": method, "success": False, "ack": False, "recoveries": []}
+        # Software on board: every satellite already carries the frozen controller images, so only
+        # state migrates. The verified bundle on the host stands for that installed software; its
+        # digest is computed before the trigger so the measurement does not include it.
+        on_board = bool(self.scenario.get("migration", {}).get("software_on_board"))
+        software = describe(image_bundle) if on_board else None
+        result["software_on_board"] = on_board
         self.transition("trigger", causes=event["trigger_causes"])
         self.trigger_time = self.clock.now()
         for attempt in range(1, min(3,self.scenario["fso"]["max_attempts"])+1):
@@ -94,11 +100,17 @@ class Migration:
                     self.downtime_start = self.clock.now()
                     self.backend.stop_source()
                     self.transition('source_stopped')
-                self.payload(image_bundle, event)
-                # Host inventory is accepted only from the verified receiver receipt.
-                image_receipt = self.events[-1]["receipt"]
                 destination = str(event.get('sat_b', 'sat-b'))
-                self.inventory.accept(destination, describe(image_bundle), image_receipt)
+                if on_board:
+                    image_receipt = {"mode": "software-on-board", "received_bytes": software["bytes"],
+                                     "sha256": software["sha256"], "path": None}
+                    self.transition("software_on_board", artifact=software)
+                    self.inventory.accept(destination, software, image_receipt)
+                else:
+                    self.payload(image_bundle, event)
+                    # Host inventory is accepted only from the verified receiver receipt.
+                    image_receipt = self.events[-1]["receipt"]
+                    self.inventory.accept(destination, describe(image_bundle), image_receipt)
                 additional=getattr(self.backend,'additional_payload',None)
                 if additional is not None:
                     result['additional_data_bytes']=additional.stat().st_size

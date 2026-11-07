@@ -355,3 +355,7 @@ body[data-calibration-stage=true] #preparation-page .calibration-layout>.timelin
 body[data-calibration-stage=true] #preparation-page .calibration-layout>.timeline ol{max-height:560px;overflow:auto}
 body[data-calibration-stage=true] .calibration-progress{max-width:none}
 @media(max-width:55rem){body[data-calibration-stage=true] .calibration-layout{grid-template-columns:minmax(0,1fr);gap:1.5rem}}
+.scenario-profile-info h3{font-size:1rem;margin:1.5rem 0 .5rem}.scenario-events{font-size:.8rem}.scenario-events th,.scenario-events td{overflow-wrap:normal;white-space:nowrap;padding:.4rem .35rem}.scenario-events td:nth-child(2){white-space:normal}
+.table-scroll{overflow-x:auto;max-width:100%}
+#topology .node.outside-domain{opacity:.4}
+.event-experiment{margin-top:1.5rem}.event-experiment .buttons{display:flex;flex-wrap:wrap;gap:.5rem;margin:.75rem 0}.event-card{margin:1.25rem 0 1.75rem}.event-card h3{font-size:1rem;margin-bottom:.5rem}

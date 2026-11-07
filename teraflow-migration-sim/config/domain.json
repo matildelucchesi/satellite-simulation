@@ -1,0 +1,33 @@
+{
+  "plane_1": [
+    60138,
+    60142,
+    68285,
+    58890,
+    60144,
+    68283,
+    60141,
+    60150
+  ],
+  "plane_2": [
+    62760,
+    62768,
+    62776,
+    58893,
+    58883,
+    62774,
+    62775,
+    58886
+  ],
+  "policy": "starlink-two-plane-v1",
+  "rule": "arco contiguo del piano 1 (argomento di latitudine crescente) e i satelliti del piano 2 piu vicini all arco",
+  "satellites_per_plane": 8,
+  "service_endpoints": [
+    60138,
+    60150
+  ],
+  "service_endpoints_rule": "primo satellite dell arco del piano 1 e ultimo dell arco del piano 2",
+  "statistics": {
+    "domain_internal_connected_fraction": 1.0
+  }
+}

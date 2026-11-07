@@ -8,7 +8,7 @@ from urllib.request import Request, urlopen
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from src.fixture import state, for_destination
-from src.orbit import Orbit
+from src.orbit import Orbit, load_orbit
 from src.tfs_adapter import TfsAdapter
 from src.artifacts import canonical_bytes
 from src.probes import analyze_directory
@@ -26,8 +26,8 @@ def main():
                         help="Remove only the migration fixture from both hosts before recreating it.")
     args = parser.parse_args()
     fixture = json.loads((ROOT/"config/fixture.json").read_text())
-    orbit = Orbit(ROOT/"artifacts/orbit/replay.npz")
-    graph = orbit.graph(0)
+    orbit = load_orbit(ROOT)
+    graph = orbit.lab_graph(0)
     a, b = TfsAdapter("http://127.0.0.1:18080"), TfsAdapter("http://127.0.0.1:18081")
     output = ROOT / "results/preflight"; output.mkdir(exist_ok=True)
     evidence = {"schema_version": 1, "execution_kind": "live", "success": False, "stage": "environment"}

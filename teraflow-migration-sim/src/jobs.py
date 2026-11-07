@@ -16,6 +16,7 @@ from .checkpoints import ActiveCheckpoint
 OPERATIONS = {'resource_diagnostic','simulate','functional','continuous_validation','environment','run','calibrate','select','campaign','faults','sensitivity','report','recover','diagnostic','complete'}
 OPERATIONS.update({'compare_continuous','prepare_base'})
 OPERATIONS.add('expand_constellation')
+OPERATIONS.add('compare_events')
 
 
 def process_running(pid):
@@ -77,6 +78,8 @@ class JobManager:
             from .prepared_source import readiness
             source=readiness(self.root,parameters['base_id'])
             if not source['ready']:raise ValueError(source['reason'])
+        if operation=='compare_events' and not (self.root/'config/migration_events.json').exists():
+            raise ValueError('Esperimento a eventi non disponibile: installare prima un profilo di scenario')
         if operation=='recover':
             return self.start_recovery()
         # History may have been cleared while this server remained running.

@@ -122,4 +122,33 @@ class AuthorityOrchestratorTests(unittest.TestCase):
                 self.assertLess(verified,start)
                 self.assertEqual(result['additional_data_bytes'],len(b'additional-data'))
 
+    def test_software_on_board_migrates_only_state_and_keeps_verified_inventory(self):
+        for mode in ('hot', 'cold'):
+            with self.subTest(mode=mode), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary); image = root/'images.tar'; image.write_bytes(b'image')
+                clock = ManualClock(); backend = Backend(clock); receipts = []
+                backend.start_target = lambda receipt: (receipts.append(receipt), backend.calls.append('start'))
+                scenario = {'fso': {'alignment_s': 1, 'max_attempts': 1}, 'migration': {'software_on_board': True}}
+                result = Migration(backend, clock, root/'run', scenario).run(mode, {'deadline_s': 100, 'trigger_causes': ['shadow']}, image)
+                self.assertTrue(result['success'])
+                self.assertTrue(result['software_on_board'])
+                payloads = [event.get('payload') for event in result['events'] if event['phase'] == 'transfer_verified']
+                self.assertNotIn(image.name, payloads)
+                self.assertTrue(payloads and all(name.startswith(('snapshot', 'delta')) for name in payloads))
+                self.assertEqual(receipts[0]['mode'], 'software-on-board')
+                self.assertEqual(receipts[0]['received_bytes'], len(b'image'))
+                self.assertLess(next(i for i, e in enumerate(result['events']) if e['phase'] == 'software_on_board'),
+                                next(i for i, e in enumerate(result['events']) if e['phase'] == 'target_start'))
+
+    def test_software_on_board_failures_still_never_ack(self):
+        for failure in ('copy', 'verify', 'staged'):
+            with self.subTest(failure=failure), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary); image = root/'images.tar'; image.write_bytes(b'image')
+                clock = ManualClock(); backend = Backend(clock, failure)
+                scenario = {'fso': {'alignment_s': 1, 'max_attempts': 1}, 'migration': {'software_on_board': True}}
+                result = Migration(backend, clock, root/'run', scenario).run('hot', {'deadline_s': 100, 'trigger_causes': ['shadow']}, image)
+                self.assertFalse(result['success'])
+                self.assertNotIn('ack', backend.calls)
+                self.assertNotIn('cutover', backend.calls)
+
 if __name__ == "__main__": unittest.main()

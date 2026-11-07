@@ -66,6 +66,9 @@ class TfsAdapter:
         self.allowed_device_names = {f"sat-{row['norad_id']}" for row in selection['satellites']}
         previous=selection['metadata'].get('expansion',{}).get('original_count',17)
         self.allowed_topology_names={'starlink-17',f'starlink-{previous}',f"starlink-{len(selection['satellites'])}"}
+        # With a controller domain the emulated topology is named after the fixture, not the constellation.
+        fixture=Path(__file__).parents[1]/'config/fixture.json'
+        if fixture.exists():self.allowed_topology_names.add(json.loads(fixture.read_text())['topology'])
 
     def request(self, method: str, path: str, body=None):
         started = time.monotonic()

@@ -22,6 +22,7 @@ class Preparation:
             return {'complete':False,'reason':'Baseline-valid hot and cold functional gates required before calibration'}
         from .simulation import engine_fingerprint
         fingerprint=engine_fingerprint(self.root)
+        self.prepare_calibration_network()
         runs=[]
         for method in ('cold','hot'):
             for replica in range(1):

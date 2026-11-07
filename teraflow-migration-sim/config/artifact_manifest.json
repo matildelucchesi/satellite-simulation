@@ -1,11 +1,7 @@
 {
   "calibration_run_ids": [
-    "run-7e4066e3d9314fc2a04c8b3401b991d7",
-    "run-080a3cf2956a4af7af5f3776fec8d96d",
-    "run-6bf135eb6c61480c844647df287a713e",
-    "run-2f731c668fa34851aa8f1a9c25c56435",
-    "run-db2fb450d7954236963b755b4cce965f",
-    "run-9efae2c02def4284a305986a9af76bf7"
+    "run-0d30e17909e24d51ad4d13d92e436b3a",
+    "run-a8db8fc797924b04bc6d380ef4430924"
   ],
   "controller": {
     "dependencies": [
@@ -45,8 +41,8 @@
         "image": "tfs-migration/pathcomp-frontend:7.0.0-fb870787"
       },
       "service": {
-        "digest": "sha256:5dea4352243855da7e1e2aa4a454f07c68864c1afe969471714ad395262b47fe",
-        "image": "tfs-migration/service:7.0.0-fb870787-lab2"
+        "digest": "sha256:8cf95d5fb4dfaaec1d482b47e0d9918486de369fd011f83ce37ea00cd1b9f0f1",
+        "image": "tfs-migration/service:7.0.0-fb870787-lab3"
       }
     },
     "release": "7.0.0",
@@ -56,40 +52,40 @@
   "image_bundle": {
     "bytes": 1823463936,
     "format": "docker-save-tar-uncompressed",
-    "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\artifacts\\images-l2-patched-v2\\teraflow-v7-images.tar",
-    "sha256": "9fc2920c12e4cc8867cd34ad294f1c240acc34b181dd462ce69e5abd51531c00"
+    "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\artifacts\\images-l2-patched-v3\\teraflow-v7-images.tar",
+    "sha256": "ec2e48e7ba4e5ee1956b4d68add982e23d0cfbcfeac3d3ea08498cda8acf8a4e"
   },
-  "measurement_date_utc": "2026-10-22T18:39:40.916544+00:00",
-  "measurement_method": "Three full functional runs per mode; maxima of measured phases and host resources. Shared Docker daemon layer reuse explicitly retained.",
+  "measurement_date_utc": "2026-11-04T19:44:37.226370+00:00",
+  "measurement_method": "One full functional run per mode; measured phases and maxima of sampled host resources. Shared Docker daemon layer reuse explicitly retained.",
   "notes": "Populate from the exact Release 7 images, deployment manifests, exported state fixture and repeated timing measurements. Do not infer transfer bytes from unpacked local image size.",
   "operational_state": {
-    "cold_snapshot_bytes": 85838,
+    "cold_snapshot_bytes": 1715583,
     "contexts_bytes": 439,
-    "devices_bytes": 40798,
+    "devices_bytes": 825822,
     "export_format": "versioned ordered JSON UTF-8",
-    "hot_final_delta_bytes": 15626,
-    "hot_initial_state_bytes": 85838,
-    "links_bytes": 6729,
-    "services_connections_policies_bytes": 5093,
-    "sha256": "359e9f72890bebf53c383a916aaa69dc451510db853e5af424feb495fb3484ce",
-    "topologies_bytes": 1368
+    "hot_final_delta_bytes": 216637,
+    "hot_initial_state_bytes": 1726011,
+    "links_bytes": 179975,
+    "services_connections_policies_bytes": 52429,
+    "sha256": "ab791581f3d4c50ca5eb8dadefe48982027ef2317644c51670e7985b97f02cbd",
+    "topologies_bytes": 17596
   },
   "resources": {
-    "measured_controller_cpu_cores": 1.8121,
-    "measured_controller_disk_gib": 3.5610355976969004,
-    "measured_controller_ram_gib": 2.408787109375
+    "measured_controller_cpu_cores": 1.9757,
+    "measured_controller_disk_gib": 3.6102001890540123,
+    "measured_controller_ram_gib": 2.50265625
   },
   "schema_version": 2,
   "status": "measured",
   "timing_accounting": "Maxima per phase; cold snapshot includes stop, hot freeze includes both snapshots; startup includes shared-daemon load; cutover includes queued topology reconciliation. Conservative estimates.",
   "timing_measurements_s": {
-    "ack_cutover": 47.53701150000779,
-    "api_restore": 56.04308669999955,
-    "api_verification": 2.6810569999979634,
-    "cold_snapshot": 23.56352599999809,
-    "controller_startup": 171.15309590000106,
-    "hot_delta_apply": 32.120681699998386,
-    "hot_freeze": 9.463499299999967,
-    "measured_protocol_overhead": 10.7852589000031
+    "ack_cutover": 208.54974460008088,
+    "api_restore": 594.9601205000072,
+    "api_verification": 7.217073500010883,
+    "cold_snapshot": 33.80317709999508,
+    "controller_startup": 296.43001179999555,
+    "hot_delta_apply": 58.71637079998618,
+    "hot_freeze": 16.46443729996099,
+    "measured_protocol_overhead": 66.51930680009536
   }
 }

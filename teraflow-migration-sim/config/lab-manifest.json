@@ -1,9 +1,9 @@
 {
   "bmv2_image": "p4lang/behavioral-model@sha256:53eb8d8514619a1d0033fab462dd9f002a6055c82a4676ac180322e0d589f99f",
   "fixture": {
-    "bytes": 46778,
+    "bytes": 5347,
     "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\config\\fixture.json",
-    "sha256": "088c8f847dc4264ff1b03eae3ab14a6894af7a88b36705642f0f899aa5b03527"
+    "sha256": "bc6037ccf1b5aef37bd20a7b916e4fd91ed0bf596203a0fac055c1b8f3a4fa6f"
   },
   "p4_artifacts": [
     {
