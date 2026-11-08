@@ -45,7 +45,7 @@ function renderProfile(){
  const thead=node('thead');thead.append(head);
  profile.selected_events.forEach((event,index)=>{const tr=node('tr');tr.append(node('td',String(index+1)),node('td',`${event.source} → ${event.destination}`),node('td',String(event.hops)),node('td',event.other_plane?'altro piano':'stesso piano'),node('td',clock(event.trigger_s)),node('td',Math.round(event.source_light_remaining_s/60)+' min'),node('td',Math.round(event.destination_light_remaining_s/60)+' min'));body.append(tr);});
  table.append(thead,body);const scroller=node('div',undefined,'table-scroll');scroller.append(table);box.append(scroller);
- box.append(node('p',`Ogni evento parte ${Math.round(p.trigger_lead_s/60)} min prima che la sorgente entri in ombra. Gli eventi coprono 1, 3, 5 e 7 salti laser, due verso l’altro piano; ogni salto verso i satelliti che seguono sull’orbita dà circa 3 min di luce in più alla destinazione. La destinazione deve restare al sole almeno ${Math.round(p.minimum_destination_light_s/60)} min, con un percorso stabile per almeno ${Math.round(p.minimum_path_persistence_s/60)} min.`,'small muted'));
+ box.append(node('p',`Ogni evento parte ${Math.round(p.trigger_lead_s/60)} min prima che la sorgente entri in ombra. Gli eventi coprono 1, 5 e 7 salti laser, l’ultimo verso l’altro piano; ogni salto verso i satelliti che seguono sull’orbita dà circa 3 min di luce in più alla destinazione. La destinazione deve restare al sole almeno ${Math.round(p.minimum_destination_light_s/60)} min, con un percorso stabile per almeno ${Math.round(p.minimum_path_persistence_s/60)} min.`,'small muted'));
  renderPicker();
 }
 function renderPicker(){
@@ -240,7 +240,7 @@ function renderLatest(){
  $('start-note').textContent=experiment?`Ultimo esperimento completato il ${when(experiment.created_utc)}, ${values('hot').length+values('cold').length} prove.`:'Nessun esperimento completato.';
 }
 function renderAxis(view){
- const runs=experimentRuns(profile?.selected_events?.length||5,profile?.experiment?.replicas||5,profile?.experiment?.warmup_runs??1);
+ const runs=experimentRuns(profile?.selected_events?.length||3,profile?.experiment?.replicas||3,profile?.experiment?.warmup_runs??1);
  const durations=procedureDurations(jobs,runs),scale=axisScale([durations.functional.seconds,durations.compare_events.seconds]);
  const axis=$('axis'),share=seconds=>Math.min(100,seconds/scale.maxSeconds*100).toFixed(2)+'%';
  /* Rebuild only when the durations change, so the bars' entry animation plays once. */

@@ -103,11 +103,12 @@ def main(argv=None):
     scenario['migration_events'] = {'trigger_lead_s': args.trigger_lead_s,
                                     'minimum_destination_light_s': args.minimum_destination_light_s,
                                     'minimum_path_persistence_s': args.minimum_path_persistence_s,
-                                    'event_specs': [{'hops': hops, 'other_plane': other} for hops, other in model.EVENT_SPECS],
-                                    'selection': 'un evento per combinazione di salti e piano, distribuiti nel giorno; luce sulla destinazione almeno pari alla soglia'}
+                                    'event_specs': [{'hops': hops, 'other_plane': other, 'slot': slot, 'source': source} for hops, other, slot, source in model.EVENT_SPECS],
+                                    'event_slots': model.EVENT_SLOTS,
+                                    'selection': 'combinazione 12: 1 salto stesso piano, 5 salti stesso piano, 7 salti verso l altro piano; sorgente e fascia del giorno fissate per evento; luce sulla destinazione almeno pari alla soglia'}
     # Experiment design: replicas per event and mode, one discarded warm-up run; the Hot/Cold
     # order inside each pair is drawn with a seed chosen and recorded by every experiment.
-    scenario['experiment'] = {'replicas': 5, 'warmup_runs': 1, 'seed': None}
+    scenario['experiment'] = {'replicas': 3, 'warmup_runs': 1, 'seed': None}
     # Hypotheses of the laser model, stated where the parameters live.
     scenario['fso']['alignment_hypothesis'] = ('ipotesi: prima di ogni tentativo il percorso multi-hop deve restare '
                                                'disponibile per alignment_s secondi di fila; i laser gia puntati non lo richiederebbero')
@@ -174,7 +175,7 @@ def main(argv=None):
                                     minimum_destination_light_s=args.minimum_destination_light_s,
                                     minimum_path_persistence_s=args.minimum_path_persistence_s)
     feasible = [e for e in events if e['destination'] is not None]
-    chosen = model.designed_events(index, periods, domain, plane_of, model.EVENT_SPECS,
+    chosen = model.designed_events(index, periods, domain, plane_of, model.EVENT_SPECS, slots=model.EVENT_SLOTS,
                                    trigger_lead_s=args.trigger_lead_s,
                                    minimum_destination_light_s=args.minimum_destination_light_s,
                                    minimum_path_persistence_s=args.minimum_path_persistence_s)

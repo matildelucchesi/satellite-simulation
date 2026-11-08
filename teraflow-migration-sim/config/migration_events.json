@@ -7,26 +7,25 @@
   "event_specs": [
    {
     "hops": 1,
-    "other_plane": false
-   },
-   {
-    "hops": 1,
-    "other_plane": true
-   },
-   {
-    "hops": 3,
-    "other_plane": false
+    "other_plane": false,
+    "slot": 0,
+    "source": 62760
    },
    {
     "hops": 5,
-    "other_plane": false
+    "other_plane": false,
+    "slot": 3,
+    "source": 60142
    },
    {
     "hops": 7,
-    "other_plane": true
+    "other_plane": true,
+    "slot": 4,
+    "source": 62776
    }
   ],
-  "selection": "un evento per combinazione di salti e piano, distribuiti nel giorno; luce sulla destinazione almeno pari alla soglia"
+  "event_slots": 5,
+  "selection": "combinazione 12: 1 salto stesso piano, 5 salti stesso piano, 7 salti verso l altro piano; sorgente e fascia del giorno fissate per evento; luce sulla destinazione almeno pari alla soglia"
  },
  "event_count": 240,
  "feasible_count": 240,
@@ -50,46 +49,6 @@
    "other_plane": false,
    "destination_light_remaining_s": 1081,
    "light_gained_s": 181,
-   "path_persistence_at_least_s": 900,
-   "path_end_s": 86400
-  },
-  {
-   "event_id": "60138-25371",
-   "source": 60138,
-   "trigger_s": 25371,
-   "source_shadow_entry_s": 26271,
-   "source_light_remaining_s": 900,
-   "reachable_satellites": 61,
-   "destination": 62760,
-   "hops": 1,
-   "path": [
-    60138,
-    62760
-   ],
-   "other_plane": true,
-   "destination_light_remaining_s": 911,
-   "light_gained_s": 11,
-   "path_persistence_at_least_s": 900,
-   "path_end_s": 86400
-  },
-  {
-   "event_id": "62768-42104",
-   "source": 62768,
-   "trigger_s": 42104,
-   "source_shadow_entry_s": 43004,
-   "source_light_remaining_s": 900,
-   "reachable_satellites": 61,
-   "destination": 61213,
-   "hops": 3,
-   "path": [
-    62768,
-    62760,
-    62777,
-    61213
-   ],
-   "other_plane": false,
-   "destination_light_remaining_s": 1448,
-   "light_gained_s": 548,
    "path_persistence_at_least_s": 900,
    "path_end_s": 86400
   },

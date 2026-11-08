@@ -178,3 +178,10 @@ class DesignedEventTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             model.designed_events(self.index, {**self.periods, 5: [(0, 850)], 6: [(0, 850)]}, [1], self.plane, ((1, True),),
                                   trigger_lead_s=200, minimum_destination_light_s=600, minimum_path_persistence_s=100)
+
+
+class PinnedEventTests(DesignedEventTests):
+    def test_slot_and_source_pin_an_event(self):
+        events = model.designed_events(self.index, self.periods, [1, 5], self.plane, ((1, True, 1, 5),), slots=3,
+                                       trigger_lead_s=200, minimum_destination_light_s=150, minimum_path_persistence_s=100)
+        self.assertEqual((events[0]['source'], events[0]['destination']), (5, 1))

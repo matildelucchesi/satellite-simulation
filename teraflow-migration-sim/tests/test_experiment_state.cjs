@@ -59,10 +59,10 @@ test('the verification is measured and the experiment estimated from it',()=>{
  const jobs=[
   {operation:'functional',status:'failed',started_utc:'2026-11-07T19:00:00Z',finished_utc:'2026-11-07T19:01:00Z'},
   {operation:'functional',status:'completed',application_success:true,started_utc:'2026-11-07T18:51:00Z',finished_utc:'2026-11-07T19:04:36Z'}];
- const durations=procedureDurations(jobs,experimentRuns(5));
+ const durations=procedureDurations(jobs,experimentRuns(3));
  assert.deepEqual(durations.functional,{seconds:816,measured:true});
- assert.equal(durations.compare_events.runs,51);
- assert.equal(durations.compare_events.seconds,408*51);
+ assert.equal(durations.compare_events.runs,19);
+ assert.equal(durations.compare_events.seconds,408*19);
  assert.deepEqual(procedureDurations([]).functional,{seconds:900,measured:false});
 });
 

@@ -188,7 +188,7 @@ def compare(app):
     if len(rates) != 1:
         raise ValueError('Il confronto a eventi richiede una sola velocità nello scenario installato')
     settings = app.scenario.get('experiment', {})
-    replicas, warmup_runs = int(settings.get('replicas', 5)), int(settings.get('warmup_runs', 1))
+    replicas, warmup_runs = int(settings.get('replicas', 3)), int(settings.get('warmup_runs', 1))
     seed = int(settings['seed']) if settings.get('seed') is not None else secrets.randbits(32)
     plan = schedule(selected, replicas, warmup_runs, seed)
     identifier = 'events-' + uuid.uuid4().hex

@@ -68,7 +68,7 @@ def scenario_profiles(root):
         missing = [name for name, item in manifest.get('outputs', {}).items()
                    if not (directory / name).is_file() or (directory / name).stat().st_size != item.get('bytes')]
         keys = ('event_id', 'source', 'destination', 'hops', 'path', 'trigger_s', 'source_shadow_entry_s',
-                'source_light_remaining_s', 'destination_light_remaining_s', 'light_gained_s')
+                'source_light_remaining_s', 'destination_light_remaining_s', 'light_gained_s', 'other_plane')
         profiles.append({'profile': manifest.get('profile', directory.name), 'created_utc': manifest.get('created_utc'),
             'installed': scenario.get('orbital', {}).get('constellation_profile') == installed_name,
             'integrity': 'changed' if missing else 'sizes_match', 'changed_files': missing,

@@ -9,7 +9,7 @@ Il simulatore confronta la migrazione **Hot** e **Cold** del controller TeraFlow
 | 0. Scenario | Selezione dei piani, replay orbitale, laser, percorsi, dominio, catalogo eventi | Una volta (`tools/build_scenario.py`, `tools/install_scenario.py`) | No |
 | 1. Laboratorio | Stack Compose, rete del dominio in TeraFlow, baseline | A ogni prova, nella preparazione | Sì |
 | 2. Verifica | Una migrazione Hot e una Cold sul primo evento (`functional`) | Per sessione o dopo modifiche al codice | Sì |
-| 3. Esperimento | Riscaldamento e 5 repliche di Hot e Cold su 5 eventi, ordine casuale per coppia (`compare_events`) | Per esperimento | Sì |
+| 3. Esperimento | Riscaldamento e 3 repliche di Hot e Cold su 3 eventi, ordine casuale per coppia (`compare_events`) | Per esperimento | Sì |
 | 4. Analisi | Fasi, Cold − Hot, fattibilità a posteriori, CSV | Alla fine di ogni esperimento | No |
 
 ## Moduli (`src/`)
@@ -61,8 +61,8 @@ L'orchestratore (`src/orchestrator.py`) emette una fase per ogni passo; la pagin
 - Gli estremi del servizio di prova hanno un percorso minimo unico (capi dell'arco del piano 1), così il percorso di TeraFlow e le regole di inoltro coincidono; il servizio descrive solo gli switch del percorso.
 - Software del controller a bordo: migra solo lo stato. Il database della destinazione viene svuotato prima del trigger.
 - Velocità unica di 1 Gbit/s; ritardo di propagazione per collegamento pari a distanza / velocità della luce: `tc netem` sui collegamenti di Mininet (aggiornato con la geometria) e, per il trasferimento dello stato che avviene sull'host, un modello TCP con handshake, slow start (finestra iniziale di 10 segmenti) e conferma finale sul ritardo dell'intero percorso (`src/transport.py`).
-- Eventi: uno per combinazione di salti e piano (1 stesso piano, 1 altro piano, 3, 5, 7 altro piano), distribuiti nel giorno; destinazione al sole per almeno 10 minuti e percorso stabile per 15 (`starlink_scenario.designed_events`).
-- Esperimento: riscaldamento escluso, 5 repliche replica dopo replica, ordine Hot/Cold casuale per coppia con seme registrato; statistiche in `event_comparison.event_statistics`.
+- Eventi (combinazione 12): 1 salto sullo stesso piano, 5 salti sullo stesso piano, 7 salti verso l'altro piano, ciascuno con sorgente e fascia del giorno fissate (`EVENT_SPECS`); destinazione al sole per almeno 10 minuti e percorso stabile per 15 (`starlink_scenario.designed_events`).
+- Esperimento: riscaldamento escluso, 3 repliche replica dopo replica, ordine Hot/Cold casuale per coppia con seme registrato; statistiche in `event_comparison.event_statistics`.
 - Ipotesi: prima di ogni tentativo il percorso deve restare disponibile per 60 s di fila (`fso.alignment_s`); i laser già puntati non lo richiederebbero.
 
 ## Configurazione

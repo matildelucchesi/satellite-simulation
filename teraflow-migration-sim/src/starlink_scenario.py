@@ -366,11 +366,16 @@ def migration_events(index, periods, domain, *, trigger_lead_s, minimum_destinat
     return events
 
 
-EVENT_SPECS = ((1, False), (1, True), (3, False), (5, False), (7, True))
+# Events of the experiment: (hops, destination on the other plane, slot of the day, source). The
+# day is split into EVENT_SLOTS equal slots; each event takes the candidate of that source closest
+# to its slot centre. Chosen set (combination 12 of 8 November 2026): 1 hop same plane, 5 hops
+# same plane, 7 hops towards the other plane, from three different satellites.
+EVENT_SLOTS = 5
+EVENT_SPECS = ((1, False, 0, 62760), (5, False, 3, 60142), (7, True, 4, 62776))
 
 
 def designed_events(index, periods, domain, plane_of, specs=EVENT_SPECS, *, trigger_lead_s,
-                    minimum_destination_light_s, minimum_path_persistence_s):
+                    minimum_destination_light_s, minimum_path_persistence_s, slots=None):
     """One event per (hops, other plane) specification, to compare migrations of different reach.
 
     Candidates are the shadow entries of domain satellites, triggered ``trigger_lead_s`` before
@@ -379,15 +384,22 @@ def designed_events(index, periods, domain, plane_of, specs=EVENT_SPECS, *, trig
     that lasts ``minimum_path_persistence_s``. In this shell the hop count and the destination's
     light go together (each hop towards the trailing satellites gains about one slot of light), so
     the light threshold only excludes destinations about to enter shadow. Events are spread over
-    the day: specification ``i`` takes the candidate whose trigger is closest to
-    ``duration * (i + 0.5) / len(specs)`` (ties: more light, then lower NORAD ids), never reusing a
+    the day: a specification ``(hops, other_plane, slot)`` takes the candidate whose trigger is
+    closest to ``duration * (slot + 0.5) / slots`` (without a slot, its position and len(specs));
+    an optional fourth element restricts the event to one source satellite (ties: more light, then lower NORAD ids), never reusing a
     source shadow entry and preferring sources not used yet, so the events start from different
     satellites when the geometry allows it."""
     used, sources, picks = set(), set(), []
-    for position, (hops, other_plane) in enumerate(specs):
-        target_time = index.duration * (position + 0.5) / len(specs)
+    slots = slots or len(specs)
+    for position, spec in enumerate(specs):
+        hops, other_plane = spec[0], spec[1]
+        slot = spec[2] if len(spec) > 2 else position
+        only = spec[3] if len(spec) > 3 else None
+        target_time = index.duration * (slot + 0.5) / slots
         best = None
         for source in domain:
+            if only is not None and source != only:
+                continue
             for start, end in periods[source]:
                 if end >= index.duration:
                     continue

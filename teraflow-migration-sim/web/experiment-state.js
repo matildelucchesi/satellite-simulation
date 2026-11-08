@@ -59,7 +59,7 @@ function jobView(job,comparison,now=Date.now()){
    7 November 2026. The experiment is estimated from it: a verification is two runs, the
    experiment runs `runs` of them (warm-up included). */
 const TYPICAL_VERIFICATION_S=15*60;
-function procedureDurations(jobs,runs=51){
+function procedureDurations(jobs,runs=19){
  const job=(jobs||[]).find(row=>row.operation==='functional'&&row.status==='completed'&&row.application_success!==false&&row.started_utc&&row.finished_utc);
  const measured=job?(Date.parse(job.finished_utc)-Date.parse(job.started_utc))/1000:NaN;
  const functional=Number.isFinite(measured)&&measured>0?{seconds:measured,measured:true}:{seconds:TYPICAL_VERIFICATION_S,measured:false};
@@ -67,7 +67,7 @@ function procedureDurations(jobs,runs=51){
 }
 
 /* Runs of an experiment: warm-up, then each event in Hot and Cold for every replica. */
-function experimentRuns(events,replicas=5,warmup=1){return warmup+events*replicas*2;}
+function experimentRuns(events,replicas=3,warmup=1){return warmup+events*replicas*2;}
 
 /* Time axis in minutes with at most 8 ticks: steps of 10, 30 or 60 minutes. */
 function axisScale(seconds){
