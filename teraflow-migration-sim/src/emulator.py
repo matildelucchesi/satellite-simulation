@@ -66,7 +66,8 @@ def run(fixture):
         other = next(host for host in fixture["emulator"]["hosts"] if host["name"] != row["name"])
         hosts[row["name"]].setARP(other["ip"].split("/")[0], other["mac"])
     probes = []
-    availability = {pair: True for pair in links}
+    # Per link: open or closed, and one-way propagation delay in tenths of a millisecond
+    availability = {pair: (True, 0) for pair in links}
     lock = threading.RLock()
     class Handler(BaseHTTPRequestHandler):
         def do_GET(self):
@@ -80,11 +81,13 @@ def run(fixture):
                 with lock:
                     if self.path == "/links":
                         available = {tuple(sorted(pair)) for pair in body["pairs"]}
+                        delays = body.get("delays_ms", {})
                         for pair, link in links.items():
                             enabled = pair in available
-                            if enabled != availability[pair]:
-                                set_link_availability(link, enabled)
-                                availability[pair] = enabled
+                            delay = round(float(delays.get(f"{min(pair)}-{max(pair)}", 0)) * 10)
+                            if (enabled, delay) != availability[pair]:
+                                set_link_availability(link, enabled, delay / 10)
+                                availability[pair] = (enabled, delay)
                     elif self.path == "/probes/start":
                         if probes: raise ValueError("Probes already running")
                         run_id = body["run_id"]

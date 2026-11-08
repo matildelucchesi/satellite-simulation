@@ -15,6 +15,13 @@ class ContactGatingTests(unittest.TestCase):
             for port in ports:
                 port.node.pexec.assert_called_with(['tc','qdisc','replace','dev',port.name,'root','netem','loss',loss])
 
+    def test_open_link_carries_its_propagation_delay(self):
+        ports=[SimpleNamespace(name=name,node=SimpleNamespace(pexec=Mock(return_value=('', '', 0))))
+               for name in ('s6-eth1','s1-eth1')]
+        set_link_availability(SimpleNamespace(intf1=ports[0],intf2=ports[1]),True,4.62)
+        for port in ports:
+            port.node.pexec.assert_called_with(['tc','qdisc','replace','dev',port.name,'root','netem','delay','4.62ms','loss','0%'])
+
     def test_contact_configuration_failure_is_not_silently_accepted(self):
         bad=SimpleNamespace(name='s6-eth1',node=SimpleNamespace(pexec=Mock(return_value=('', 'not permitted', 2))))
         other=Mock()

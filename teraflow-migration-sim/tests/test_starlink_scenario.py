@@ -122,15 +122,6 @@ class EventTests(unittest.TestCase):
                                         minimum_destination_light_s=100, minimum_path_persistence_s=100)
         self.assertEqual(events, [])
 
-    def test_representative_events_spread_hops(self):
-        events = [{'event_id': str(i), 'destination': 9, 'hops': hops, 'trigger_s': i, 'source': 1}
-                  for i, hops in enumerate([1, 1, 2, 3, 5, 8])]
-        events.append({'event_id': 'x', 'destination': None, 'hops': None, 'trigger_s': 0, 'source': 1})
-        picks = model.representative_events(events)
-        self.assertEqual([p['hops'] for p in picks], [1, 2, 8])
-        with self.assertRaises(ValueError):
-            model.representative_events(events[:2])
-
 
 class PlaneSelectionTests(unittest.TestCase):
     def rows(self):
@@ -161,3 +152,29 @@ class PlaneSelectionTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class DesignedEventTests(unittest.TestCase):
+    def setUp(self):
+        # Two parallel rails 1-2-3-4 (plane 0) and 5-6-7-8 (plane 1), rungs 1-5 and 3-7
+        chain = [(1, 2), (2, 3), (3, 4), (5, 6), (6, 7), (7, 8), (1, 5), (3, 7)]
+        links = [{'sat_a': a, 'sat_b': b, 'kind': 'intra', 'assigned_start_s': 0, 'start_s': 0, 'end_s': 4000}
+                 for a, b in chain]
+        self.index = model.LinkIndex(links, list(range(1, 9)), 4000)
+        # Source 1 enters shadow at 1000, 2500 and 3600: three events, triggers 800, 2300 and 3400
+        light = {1: [(0, 1000), (1500, 2500), (2700, 3600)], 5: [(0, 1000), (1200, 2600)], 2: [(0, 1300)], 3: [(0, 3800)],
+                 4: [(0, 3900)], 6: [(0, 1200)], 7: [(0, 3200)], 8: [(0, 3900)]}
+        self.periods = light
+        self.plane = {1: 0, 2: 0, 3: 0, 4: 0, 5: 1, 6: 1, 7: 1, 8: 1}
+
+    def test_one_event_per_hop_and_plane_specification(self):
+        events = model.designed_events(self.index, self.periods, [1], self.plane, ((1, False), (1, True), (2, False)),
+                                       trigger_lead_s=200, minimum_destination_light_s=150, minimum_path_persistence_s=100)
+        self.assertEqual([(e['hops'], e['other_plane'], e['destination']) for e in events], [(1, False, 2), (1, True, 5), (2, False, 3)])
+        self.assertEqual(events[0]['path'], [1, 2])
+        self.assertEqual(len({(e['source'], e['trigger_s']) for e in events}), 3)
+
+    def test_destination_about_to_enter_shadow_is_excluded(self):
+        with self.assertRaises(ValueError):
+            model.designed_events(self.index, {**self.periods, 5: [(0, 850)], 6: [(0, 850)]}, [1], self.plane, ((1, True),),
+                                  trigger_lead_s=200, minimum_destination_light_s=600, minimum_path_persistence_s=100)

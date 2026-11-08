@@ -1,56 +1,132 @@
 <!doctype html>
-<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>TeraFlow · Migrazione del controller Hot/Cold</title><link rel="stylesheet" href="/style.css"><script src="/experiment-state.js" defer></script><script src="/orbit-view.js" defer></script><script src="/app.js" defer></script></head>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>TeraFlow · Migrazione del controller Hot/Cold</title><link rel="stylesheet" href="/style.css"><script src="/stars.js" defer></script><script src="/experiment-state.js" defer></script><script src="/mission.js" defer></script><script src="/orbit-view.js" defer></script><script src="/app.js" defer></script></head>
 <body>
-<header class="top"><a class="brand" href="#scenario">Controller Migration Simulation</a><span id="health" class="health" role="status">Connessione…</span></header>
+<canvas id="stars" class="stars" aria-hidden="true"></canvas>
+<header class="top"><a class="brand" href="#lab"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="6"/><ellipse cx="16" cy="16" rx="14" ry="6" transform="rotate(-25 16 16)"/><circle cx="28.4" cy="10.2" r="2.2"/></svg>Controller Migration Simulation</a><span id="health" class="health" role="status">Connessione…</span></header>
 <main>
-<nav class="tabs" aria-label="Pagine"><a href="#scenario" data-page="scenario">Scenario</a><a href="#experiment" data-page="experiment">Esperimento</a><a href="#results" data-page="results">Risultati</a></nav>
+<nav class="tabs" aria-label="Pagine"><a href="#lab" data-page="lab">Laboratorio</a><a href="#scenario" data-page="scenario">Scenario</a><a href="#results" data-page="results">Risultati</a></nav>
 <p id="notice" class="notice" role="status" aria-live="polite"></p>
 
-<section id="page-scenario" class="page" aria-labelledby="scenario-title">
- <h1 id="scenario-title">Scenario</h1>
- <p class="lead">Due piani orbitali Starlink reali. Ogni satellite ha 3 laser: 2 verso i vicini dello stesso piano, 1 verso l’altro piano. Il controller governa un dominio di 16 satelliti; quando la sua sorgente sta per entrare in ombra migra, anche attraverso più salti, verso un satellite al sole.</p>
- <div class="grid">
-  <div id="profile" class="panel"><p class="small">Lettura del profilo…</p></div>
-  <figure class="panel orbit-panel">
-   <div id="event-picker" class="picker" role="group" aria-label="Evento mostrato"></div>
-   <svg id="orbit" role="img" aria-label="Schema dei due piani orbitali, dei collegamenti laser e del percorso della migrazione"></svg>
-   <figcaption id="orbit-caption" class="small"></figcaption>
-   <ul class="legend small"><li><span class="key domain"></span>Dominio del controller</li><li><span class="key outside"></span>Solo modello</li><li><span class="key shadow"></span>In ombra</li><li><span class="key service"></span>Percorso del servizio</li><li><span class="key migration"></span>Percorso della migrazione</li></ul>
+<section id="page-lab" class="page" aria-labelledby="lab-title">
+ <h1 id="lab-title" class="visually-hidden">Laboratorio</h1>
+ <div class="lab-top">
+  <div class="panel lab-state">
+   <div class="lab-state-head">
+    <div class="inline"><h2 id="lab-panel-title">Laboratorio</h2><button class="info" type="button" aria-expanded="false" data-pop="lab-info" aria-label="Informazioni sul laboratorio"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.25"/><path d="M10 9v5"/><circle class="dot" cx="10" cy="6.1" r="1"/></svg></button></div>
+    <p class="chip" id="lab-badge" data-state="idle" role="status"><span class="led"></span><span id="lab-state">Connessione…</span></p>
+   </div>
+   <div class="pop" id="lab-info" role="note">Il laboratorio esegue davvero TeraFlowSDN 7.0 su due controller (SAT-A e SAT-B), la rete Mininet/BMv2 del dominio e il proxy P4Runtime che assegna l’autorità. Migra solo lo stato del controller: il software è già a bordo di ogni satellite. Un job alla volta; il lavoro prosegue anche chiudendo la pagina.</div>
+   <ul id="components" class="channels" aria-label="Stato dei componenti"></ul>
+  </div>
+  <figure class="panel axis-panel">
+   <h2>Durata delle procedure <span class="unit-note">minuti</span></h2>
+   <div class="axis" id="axis" aria-label="Durata dell’ultima verifica e dell’ultimo esperimento"></div>
   </figure>
+ </div>
+
+ <div class="procs">
+  <article class="panel inst" aria-labelledby="verify-title">
+   <div class="inst-head"><svg class="glyph" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="16"/><path class="check" d="M15 22.5l5 5 9-10"/></svg><h2 id="verify-title">Verifica</h2><button class="info" type="button" aria-expanded="false" data-pop="verify-info" aria-label="Informazioni sulla verifica"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.25"/><path d="M10 9v5"/><circle class="dot" cx="10" cy="6.1" r="1"/></svg></button></div>
+   <div class="pop" id="verify-info" role="note"><p class="pop-title">Cosa fa la verifica</p><ol class="steps"><li>Prepara il laboratorio: avvia i controller, svuota il database della destinazione, configura la rete del dominio in TeraFlow e misura la baseline del servizio (API, autorità P4, 10 ping consecutivi).</li><li>Esegue una migrazione <strong>Hot</strong> sul primo evento del catalogo: la destinazione si prepara mentre la sorgente governa ancora la rete, poi freeze, delta, verifica e passaggio dell’autorità.</li><li>Prepara di nuovo il laboratorio ed esegue una migrazione <strong>Cold</strong> sullo stesso evento: salvataggio dello stato, arresto della sorgente, trasferimento e ripristino sulla destinazione.</li><li>Dopo ogni migrazione controlla equivalenza delle API, autorità sulla destinazione e ping del servizio, e registra downtime e durata.</li></ol><p>Serve a controllare il laboratorio prima di un esperimento; va ripetuta dopo modifiche al codice o allo scenario.</p><span class="pop-gap" id="verify-note"></span></div>
+   <div class="measure"><div class="digits"><div><span class="unit">Δt Hot</span><span class="value" id="verify-hot">—</span></div><div><span class="unit">Δt Cold</span><span class="value" id="verify-cold">—</span></div></div><p class="explain"><strong>Δt</strong> downtime del controller</p></div>
+   <div class="actions-row"><button id="verify" type="button" disabled>Esegui verifica</button></div>
+  </article>
+  <article class="panel inst exp" aria-labelledby="start-title">
+   <div class="inst-head"><svg class="glyph exp" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="7"/><circle cx="22" cy="22" r="17" stroke-dasharray="2 4"/><circle class="sat" cx="39" cy="22" r="3"/></svg><h2 id="start-title">Esperimento</h2><button class="info" type="button" aria-expanded="false" data-pop="start-info" aria-label="Informazioni sull’esperimento"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.25"/><path d="M10 9v5"/><circle class="dot" cx="10" cy="6.1" r="1"/></svg></button></div>
+   <div class="pop" id="start-info" role="note"><p class="pop-title">Cosa fa l’esperimento</p><ol class="steps"><li>Usa i 5 eventi del catalogo: 1 salto sullo stesso piano, 1 salto verso l’altro piano, 3, 5 e 7 salti (l’ultimo verso l’altro piano).</li><li>Esegue prima una prova di riscaldamento, che non entra nei risultati.</li><li>Poi ripete 5 volte, una replica dopo l’altra, ogni evento in Hot e in Cold: stesso percorso, stesso istante orbitale, laboratorio preparato da capo prima di ogni prova. In ogni coppia l’ordine Hot/Cold è estratto a caso, con il seme registrato.</li><li>Per ogni prova misura downtime del controller, durata, ping persi e ritardo di propagazione del percorso; per ogni evento calcola mediana, quartili e Cold − Hot con intervallo al 95 %.</li></ol><p>In tutto 51 prove. Una prova non riuscita resta mancante e l’esperimento prosegue; si ferma se serve il ripristino del laboratorio o dopo 3 prove non riuscite di fila.</p><span class="pop-gap" id="start-note"></span></div>
+   <div class="measure"><div class="digits"><div><span class="unit">Δt Hot</span><span class="value" id="start-hot">—</span></div><div><span class="unit">Δt Cold</span><span class="value" id="start-cold">—</span></div></div><p class="explain"><strong>Δt</strong> mediana di tutte le prove</p></div>
+   <div class="actions-row"><button id="start" class="primary" type="button" disabled>Avvia esperimento</button></div>
+  </article>
+ </div>
+ <p id="launch-error" class="error" role="alert" hidden></p>
+
+ <div class="panel job" id="job" data-active="false">
+  <div class="job-head">
+   <div class="job-text"><h2 id="job-heading">Job</h2><p id="job-title" class="job-title">Laboratorio libero</p></div>
+   <div class="inline"><p class="l num" id="job-clock" hidden></p><button id="stop" class="danger" type="button" hidden>Interrompi</button><button id="recover" type="button" hidden>Ripristina laboratorio</button><a id="job-results" class="button" href="#results" hidden>Vai ai risultati</a></div>
+  </div>
+  <p id="job-detail" class="small muted"></p>
+  <details class="log-box" id="job-log" hidden><summary>Registro</summary><ol id="timeline" class="timeline small"></ol></details>
  </div>
 </section>
 
-<section id="page-experiment" class="page" aria-labelledby="experiment-title" hidden>
- <h1 id="experiment-title">Esperimento</h1>
- <div class="grid">
-  <div class="panel">
-   <h2>Laboratorio</h2>
-   <ul id="components" class="components"></ul>
-   <h2>Avvio</h2>
-   <p class="small">La <strong>verifica</strong> esegue una migrazione Hot e una Cold sul primo evento. L’<strong>esperimento</strong> esegue Hot e Cold su ciascuno dei 3 eventi, alternando l’ordine fra un evento e l’altro (6 migrazioni, circa 45 minuti). Migra solo lo stato del controller: il software è già a bordo di ogni satellite. Un job alla volta; il lavoro prosegue anche chiudendo la pagina.</p>
-   <div class="buttons"><button id="verify" type="button" disabled>Esegui verifica</button><button id="start" class="primary" type="button" disabled>Avvia esperimento</button></div>
-   <p id="launch-error" class="error" role="alert" hidden></p>
-  </div>
-  <div class="panel">
-   <h2>Job</h2>
-   <h3 id="job-title">Laboratorio libero</h3>
-   <p id="job-detail" class="small"></p>
-   <div class="buttons"><button id="stop" class="danger" type="button" hidden>Interrompi</button><button id="recover" type="button" hidden>Ripristina laboratorio</button></div>
-   <h2>Avanzamento</h2>
-   <ol id="timeline" class="timeline small"></ol>
-  </div>
+<section id="page-scenario" class="page" aria-labelledby="scenario-title" hidden>
+ <div class="scene-head">
+  <div class="inline"><h1 id="scenario-title">Scenario</h1><button class="info" type="button" aria-expanded="false" data-pop="scenario-info" aria-label="Informazioni sullo scenario"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.25"/><path d="M10 9v5"/><circle class="dot" cx="10" cy="6.1" r="1"/></svg></button></div>
+  <p class="chip" id="scene-mode" data-state="idle" role="status"><span class="led"></span><span id="scene-mode-text">Anteprima</span></p>
+  <div class="pop" id="scenario-info" role="note">Due piani orbitali Starlink reali, guscio 53° a 463 km. Ogni satellite ha 3 laser: 2 verso i vicini dello stesso piano, 1 verso l’altro piano. Il controller governa un dominio di 16 satelliti; quando la sua sorgente sta per entrare in ombra migra, anche attraverso più salti, verso un satellite al sole. Durante un job la vista segue la prova in corso: l’orbita resta ferma a T−30 s mentre il laboratorio si prepara, poi avanza di un secondo orbitale al secondo. Ogni collegamento laser ha il ritardo di propagazione della sua lunghezza. Ipotesi: prima di trasferire, il percorso deve restare disponibile per 60 s di fila. Geometria modellata, non in scala.</div>
  </div>
+
+ <div class="scene">
+  <figure class="panel orbit-stage">
+   <div class="orbit-wrap">
+    <svg id="orbit" role="img" aria-label="Due piani orbitali con i satelliti in movimento, la Terra al centro e il percorso della migrazione del controller"></svg>
+    <div class="route-label" id="route-label" hidden aria-live="polite">
+     <p class="route-meta" id="route-meta"></p>
+     <p class="route-phase" id="route-phase"></p>
+     <ol class="route-ticks" id="route-ticks" aria-hidden="true"></ol>
+     <p class="route-countdown" id="route-countdown" hidden></p>
+     <p class="route-downtime" id="route-downtime" hidden></p>
+    </div>
+   </div>
+   <ul class="legend small" aria-label="Legenda">
+    <li><span class="key sun"></span>Al sole</li>
+    <li><span class="key night"></span>In ombra</li>
+    <li><span class="key host"></span>Controller</li>
+    <li><span class="key model"></span>Fuori dal dominio</li>
+    <li><span class="key route"></span>Percorso della migrazione</li>
+    <li><span class="key relay"></span>Satellite relè</li>
+    <li><span class="key service"></span>Percorso del servizio</li>
+   </ul>
+  </figure>
+
+  <aside class="panel mission" aria-labelledby="mission-title">
+   <div class="mission-head">
+    <h2 id="mission-title">Evento 1</h2>
+    <p class="mission-method" id="mission-method"></p>
+   </div>
+   <p class="mission-run" id="mission-run" hidden></p>
+   <div id="event-picker" class="picker" role="group" aria-label="Evento mostrato"></div>
+   <dl class="mission-facts">
+    <dt>Migrazione</dt><dd class="clock" id="mission-start">—</dd>
+    <dt>Rispetto al trigger</dt><dd id="mission-clock">—</dd>
+    <dt>Ora orbitale</dt><dd id="mission-time">—</dd>
+    <dt>Ombra della sorgente</dt><dd id="mission-shadow">—</dd>
+    <dt>Salti laser</dt><dd id="mission-hops">—</dd>
+   </dl>
+   <div class="hops-box">
+    <p class="small muted">Percorso della migrazione</p>
+    <ol class="hops" id="mission-path" aria-label="Satelliti attraversati dalla migrazione"></ol>
+   </div>
+   <p class="mission-status" id="mission-status"></p>
+   <ol class="steps-live" id="mission-steps" aria-label="Fasi della migrazione"></ol>
+   <div class="speed" id="preview-speed" role="group" aria-label="Velocità dell’anteprima">
+    <span class="small muted">Velocità</span>
+    <button type="button" data-speed="1" aria-pressed="false">×1</button>
+    <button type="button" data-speed="10" aria-pressed="true">×10</button>
+    <button type="button" data-speed="60" aria-pressed="false">×60</button>
+   </div>
+  </aside>
+ </div>
+
+ <div id="profile" class="panel profile"><p class="small">Lettura del profilo…</p></div>
 </section>
 
 <section id="page-results" class="page" aria-labelledby="results-title" hidden>
  <h1 id="results-title">Risultati</h1>
- <label class="select">Esperimento <select id="comparison-select"></select></label>
- <p id="results-status" class="small" role="status">Nessun esperimento registrato.</p>
- <div id="results"></div>
- <h2>Verifiche</h2>
- <div id="verifications"></div>
- <h2>File</h2>
- <ul id="downloads" class="downloads small"></ul>
+ <div class="panel">
+  <label class="select">Esperimento <select id="comparison-select"></select></label>
+  <p id="results-status" class="small" role="status">Nessun esperimento registrato.</p>
+  <div id="results"></div>
+ </div>
+ <div class="panel">
+  <h2>Verifiche</h2>
+  <div id="verifications"></div>
+ </div>
+ <div class="panel">
+  <h2>File</h2>
+  <ul id="downloads" class="downloads small"></ul>
+ </div>
 </section>
 </main>
 

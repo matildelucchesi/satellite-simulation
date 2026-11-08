@@ -40,6 +40,12 @@ class ArtifactSnapshotTransportTests(unittest.TestCase):
             self.assertFalse((destination / path.name).exists())
             self.assertFalse(list(destination.glob("*.partial")))
 
+    def test_path_delay_adds_handshake_slow_start_and_final_receipt(self):
+        from src.transport import latency_offset_s, INITIAL_WINDOW_BYTES
+        self.assertEqual(latency_offset_s(1000, 0), 0)
+        self.assertAlmostEqual(latency_offset_s(INITIAL_WINDOW_BYTES, .01), .02)
+        self.assertAlmostEqual(latency_offset_s(3 * INITIAL_WINDOW_BYTES, .01), .04)
+
     def test_deadline_terminates_paced_copy(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "payload.bin"

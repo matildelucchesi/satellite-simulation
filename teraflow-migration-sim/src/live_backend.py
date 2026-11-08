@@ -10,7 +10,7 @@ from urllib.request import Request, urlopen
 
 from .artifacts import canonical_bytes
 from .fixture import state, for_role, service_endpoints
-from .orbit import lab_graph, shortest_paths
+from .orbit import lab_graph, path_delay_s, propagation_delay_ms, shortest_paths
 from .snapshot import apply_delta
 from .storage import append_json, utc_now
 from .tfs_adapter import TfsAdapter, route, service_intent
@@ -402,7 +402,9 @@ class LiveBackend:
 
     def set_links(self, graph):
         pairs = [[a, b] for a in graph for b in graph[a] if a < b]
-        http(18090, '/links', {'pairs': pairs})
+        # Laser propagation delay of each open link, from its modeled length at this second
+        delays = {f'{a}-{b}': round(propagation_delay_ms(graph[a][b]), 2) for a, b in pairs}
+        http(18090, '/links', {'pairs': pairs, 'delays_ms': delays})
 
     def _update_controller(self, graph, role=None):
         role = role or self.active_role
@@ -569,11 +571,16 @@ class LiveBackend:
                 server.close()
             threading.Thread(target=stall, daemon=True).start()
         else: address = self.receiver.address
-        receipt = transfer(path, address, self.rate, link=link,
+        # One-way propagation delay along the multi-hop path at the start of the transfer
+        tick = int(self.clock.orbital()) if self.clock else self.event['trigger_s']
+        route_path = self.orbit.migration_path(self.event['sat_a'], self.event['sat_b'], tick)
+        one_way = path_delay_s(self.orbit.graph(tick), route_path) if route_path else 0.0
+        receipt = transfer(path, address, self.rate, link=link, one_way_delay_s=one_way,
             deadline_monotonic=time.monotonic()+self.remaining(),
             progress_timeout_s=self.scenario['fso']['progress_timeout_s'],
             corrupt_checksum=self.fault == 'checksum')
         receipt['tcp_retransmissions'] = None
+        receipt['route'] = route_path
         receipt['tcp_retransmission_measurement'] = 'unavailable on host transport'
         if Path(path).suffix == '.tar': self.received_images.append(Path(receipt['path']))
         return receipt

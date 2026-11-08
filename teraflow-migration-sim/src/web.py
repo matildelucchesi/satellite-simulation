@@ -25,8 +25,8 @@ from .storage import utc_now, read_json
 
 TERMINAL = {'completed', 'failed', 'interrupted', 'recovery_required', 'recovered'}
 ASSETS = {'/': 'web/index.html', '/experiment-state.js': 'web/experiment-state.js', '/app.js': 'web/app.js',
-          '/orbit-view.js': 'web/orbit-view.js', '/style.css': 'web/style.css', '/tokens.css': 'web/tokens.css'}
-FONTS = {'SpaceGrotesk.ttf', 'Inter.ttf'}
+          '/orbit-view.js': 'web/orbit-view.js', '/mission.js': 'web/mission.js', '/stars.js': 'web/stars.js', '/style.css': 'web/style.css', '/tokens.css': 'web/tokens.css'}
+FONTS = {'IBMPlexSans.ttf', 'STIXTwoText.ttf', 'IBMPlexMono-Regular.ttf', 'IBMPlexMono-Medium.ttf'}
 
 
 def events_after(path, after):
@@ -75,7 +75,8 @@ def scenario_profiles(root):
             'summary': manifest.get('summary'), 'statistics': manifest.get('statistics'),
             'laser_terminals': scenario.get('fso', {}).get('laser_terminals'),
             'rate_bps': scenario.get('fso', {}).get('useful_throughput_bps'),
-            'migration': scenario.get('migration'),
+            'migration': scenario.get('migration'), 'experiment': scenario.get('experiment'),
+            'alignment_hypothesis': scenario.get('fso', {}).get('alignment_hypothesis'),
             'event_parameters': events.get('parameters'), 'hops_histogram': events.get('hops_histogram'),
             'domain': {'plane_1': domain.get('plane_1'), 'plane_2': domain.get('plane_2')},
             'selected_events': [{key: event.get(key) for key in keys} for event in events.get('selected', [])]})
@@ -166,7 +167,8 @@ class Application:
                 'job': active_job, 'worker_alive': worker_alive,
                 'scenario': {'profile': scenario.get('orbital', {}).get('constellation_profile'),
                              'rate_bps': scenario.get('fso', {}).get('useful_throughput_bps'),
-                             'migration': scenario.get('migration'),
+                             'migration': scenario.get('migration'), 'experiment': scenario.get('experiment'),
+            'alignment_hypothesis': scenario.get('fso', {}).get('alignment_hypothesis'),
                              'events_ready': (self.root / 'config/migration_events.json').exists()}}
 
     def _orbit(self):
@@ -201,7 +203,10 @@ class Application:
         positions = orbit.positions[tick:min(tick + 2, orbit.duration)]
         if len(positions) < 2:
             positions = orbit.positions[tick - 1:tick + 1]
-        angles = argument_of_latitude(positions)[-1 if tick == orbit.duration - 1 else 0]
+        series = argument_of_latitude(positions)
+        angles = series[-1 if tick == orbit.duration - 1 else 0]
+        # Angular speed over the same two seconds: lets the console move satellites between samples.
+        rates = (series[1] - series[0] + 180.0) % 360.0 - 180.0
         selection = {row['norad_id']: row for row in _json(self.root / 'config/selected_constellation.json')['satellites']}
         graph = orbit.graph(tick)
         kinds = self._kinds()
@@ -222,6 +227,7 @@ class Application:
             nodes.append({'norad': sid, 'plane': selection[sid]['plane'], 'phase_rank': selection[sid]['phase_rank'],
                           'in_domain': sid in domain, 'eclipsed': not orbit.operational(sid, tick),
                           'argument_of_latitude_deg': float(angles[orbit.index[sid]]),
+                          'argument_of_latitude_rate_deg_s': float(rates[orbit.index[sid]]),
                           **orbit.illumination_window(sid, tick)})
         links = [[a, b, kinds.get((a, b))] for a in graph for b in graph[a] if a < b]
         return {'execution_kind': 'modeled-geometry', 'orbital_s': tick, 'nodes': nodes, 'links': links,

@@ -10,12 +10,12 @@
 
 ## Scopo
 
-Il laboratorio confronta due strategie di migrazione del controller ETSI TeraFlowSDN 7.0.0 fra satelliti LEO. L'orbita è modellata da TLE reali: due piani Starlink adiacenti (guscio 53°/463 km, 31 + 31 satelliti), 3 laser per satellite (2 nel piano, 1 verso l'altro piano), dominio del controller di 16 satelliti, eventi di migrazione causati dall'ingresso in ombra della sorgente, percorsi multi-hop. Il laboratorio esegue realmente API TeraFlow, trasferimento TCP dello stato, autorità P4Runtime e forwarding Mininet/BMv2.
+Il laboratorio confronta due strategie di migrazione del controller ETSI TeraFlowSDN 7.0.0 fra satelliti LEO. L'orbita è modellata da TLE reali: due piani Starlink adiacenti (guscio 53°/463 km, 31 + 31 satelliti), 3 laser per satellite (2 nel piano, 1 verso l'altro piano), dominio del controller di 16 satelliti, eventi di migrazione causati dall'ingresso in ombra della sorgente, percorsi multi-hop con ritardo di propagazione, allineamento di 60 s come ipotesi. Il laboratorio esegue realmente API TeraFlow, trasferimento TCP dello stato, autorità P4Runtime e forwarding Mininet/BMv2.
 
 - **Hot** prepara la destinazione mentre la sorgente controlla ancora la rete; dopo il freeze trasferisce e applica il delta, verifica e passa l'autorità.
 - **Cold** salva lo stato, arresta la sorgente, trasferisce e ripristina sulla destinazione; il downtime include tutto il lavoro successivo all'arresto.
 - **Verifica** (`functional`): una migrazione Hot e una Cold sul primo evento del catalogo.
-- **Esperimento** (`compare_events`): Hot e Cold su 3 eventi del catalogo, ordine alternato fra gli eventi, una replica per evento e modalità.
+- **Esperimento** (`compare_events`): 5 eventi del catalogo (1, 3, 5, 7 salti, due verso l'altro piano); un riscaldamento escluso, poi 5 repliche di Hot e Cold per evento, una replica dopo l'altra, ordine Hot/Cold casuale in ogni coppia con seme registrato; mediana, quartili e Cold − Hot appaiato con IC 95 %.
 
 Il piano e le decisioni del progetto sono in [docs/piano-riprogettazione-simulatore.md](teraflow-migration-sim/docs/piano-riprogettazione-simulatore.md); le istruzioni d'uso nel [README](README.md).
 
@@ -31,7 +31,7 @@ Il codice applicativo è in `teraflow-migration-sim/`. Salvo indicazione diversa
 | Esperimento | `src/experiment.py` (`run`, `functional`, `recover`, `environment`), `src/event_comparison.py` |
 | Migrazione live | `src/orchestrator.py`, `src/live_backend.py`, `src/tfs_adapter.py`, `src/handover.py`, `src/authority.py`, `src/p4_proxy.py`, `src/snapshot.py`, `src/transport.py`, `src/artifacts.py` |
 | Servizio e misure | `src/emulator.py`, `src/link_control.py`, `src/probes.py`, `src/measurements.py`, `src/results.py` |
-| Console | `src/web.py` (API `/api/v1/` e SSE), `web/app.js`, `web/experiment-state.js`, `web/orbit-view.js` |
+| Console | `src/web.py` (API `/api/v1/` e SSE), `web/app.js`, `web/experiment-state.js`, `web/orbit-view.js`, `web/stars.js` |
 
 ## Ambiente e verifiche locali
 

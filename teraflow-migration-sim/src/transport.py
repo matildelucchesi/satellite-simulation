@@ -13,6 +13,17 @@ from pathlib import Path
 from .artifacts import canonical_bytes, describe
 
 BLOCK = 256 * 1024
+INITIAL_WINDOW_BYTES = 10 * 1460  # TCP initial window of 10 segments (RFC 6928)
+
+
+def latency_offset_s(end_byte, one_way_delay_s):
+    """Earliest time after the start at which a byte may leave over a path with this one-way
+    delay: one round trip for the handshake, then slow start doubles the window every round
+    trip. The transfer runs on the host, so the delay of the multi-hop path is modeled here."""
+    if one_way_delay_s <= 0 or end_byte <= 0:
+        return 0.0
+    rounds = math.ceil(math.log2(end_byte / INITIAL_WINDOW_BYTES + 1)) - 1
+    return 2 * one_way_delay_s * (1 + max(0, rounds))
 
 
 def exact(sock, size):
@@ -116,9 +127,10 @@ class Receiver:
 
 
 def transfer(path: Path, address: tuple, useful_rate_bps: int, *, link=lambda: True,
-             deadline_monotonic=math.inf, progress_timeout_s=120, corrupt_checksum=False) -> dict:
-    if useful_rate_bps <= 0 or progress_timeout_s <= 0:
-        raise ValueError("Rate and timeout must be positive")
+             deadline_monotonic=math.inf, progress_timeout_s=120, corrupt_checksum=False,
+             one_way_delay_s=0.0) -> dict:
+    if useful_rate_bps <= 0 or progress_timeout_s <= 0 or one_way_delay_s < 0:
+        raise ValueError("Rate and timeout must be positive and the delay not negative")
     artifact = describe(path)
     confirmed = [0]
     last_progress = [time.monotonic()]
@@ -163,20 +175,27 @@ def transfer(path: Path, address: tuple, useful_rate_bps: int, *, link=lambda: T
         try:
             with path.open("rb") as handle:
                 for block in iter(lambda: handle.read(BLOCK), b""):
-                    target = started + (sent + len(block)) * 8 / useful_rate_bps
+                    target = started + max((sent + len(block)) * 8 / useful_rate_bps,
+                                           latency_offset_s(sent + len(block), one_way_delay_s))
                     while time.monotonic() < target:
                         if errors: raise errors[0]
                         time.sleep(max(0.0,min(0.01,target-time.monotonic())))
                     if errors: raise errors[0]
                     sock.sendall(block)
                     sent += len(block)
+            last_byte = time.monotonic()
             while not receipt:
                 if errors: raise errors[0]
                 time.sleep(0.01)
+            # The final receipt crosses the path back: one more one-way delay after the last byte
+            while time.monotonic() < last_byte + one_way_delay_s:
+                if errors: raise errors[0]
+                time.sleep(max(0.0, min(0.01, last_byte + one_way_delay_s - time.monotonic())))
             elapsed = time.monotonic() - started
             return {**receipt[0], "sent_bytes": sent, "elapsed_s": elapsed,
                     "useful_throughput_bps": sent * 8 / elapsed,
-                    "configured_rate_bps": useful_rate_bps}
+                    "configured_rate_bps": useful_rate_bps, "one_way_delay_s": one_way_delay_s,
+                    "latency_model": "handshake + slow start (finestra iniziale 10 segmenti) + conferma finale"}
         except Exception as exc:
             setattr(exc, "sent_bytes", sent)
             setattr(exc, "received_bytes", confirmed[0])

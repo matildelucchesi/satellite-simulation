@@ -1,6 +1,6 @@
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
-const {phaseLabel,clock,duration,jobView,timeline,methodLabel}=require('../web/experiment-state.js');
+const {phaseLabel,clock,duration,jobView,timeline,methodLabel,procedureDurations,experimentRuns,axisScale,hoursMinutes}=require('../web/experiment-state.js');
 
 test('free laboratory has no job actions',()=>{
  const view=jobView(null,null);
@@ -17,6 +17,8 @@ test('running event experiment shows event, mode, step and elapsed time',()=>{
  assert.match(view.detail,/Verifica di API, autorità e ping/);
  assert.match(view.detail,/00:05:07/);
  assert.equal(view.canStop,true);
+ assert.equal(view.step,'Verifica di API, autorità e ping');
+ assert.equal(view.elapsedSeconds,307);
 });
 
 test('stop is offered once and recovery when required',()=>{
@@ -51,4 +53,30 @@ test('formatting keeps missing measures explicit',()=>{
  assert.equal(duration(null),'non misurato');
  assert.equal(duration(20.56),'20,6 s');
  assert.equal(duration(123.7),'124 s');
+});
+
+test('the verification is measured and the experiment estimated from it',()=>{
+ const jobs=[
+  {operation:'functional',status:'failed',started_utc:'2026-11-07T19:00:00Z',finished_utc:'2026-11-07T19:01:00Z'},
+  {operation:'functional',status:'completed',application_success:true,started_utc:'2026-11-07T18:51:00Z',finished_utc:'2026-11-07T19:04:36Z'}];
+ const durations=procedureDurations(jobs,experimentRuns(5));
+ assert.deepEqual(durations.functional,{seconds:816,measured:true});
+ assert.equal(durations.compare_events.runs,51);
+ assert.equal(durations.compare_events.seconds,408*51);
+ assert.deepEqual(procedureDurations([]).functional,{seconds:900,measured:false});
+});
+
+test('the time axis keeps at most eight ticks',()=>{
+ assert.deepEqual(axisScale([816,2436]),{maxSeconds:3000,ticks:[0,10,20,30,40,50],step:10});
+ assert.deepEqual(axisScale([816,20808]).ticks,[0,60,120,180,240,300,360]);
+ assert.equal(hoursMinutes(20808),'5 h 47 min');
+ assert.equal(hoursMinutes(816),'14 min');
+});
+
+test('the experiment title gives run, event, replica and mode',()=>{
+ const job={operation:'compare_events',status:'running',started_utc:'2026-11-07T18:00:00Z',progress:{operation:'baseline'}};
+ const comparison={event_total:5,design:{replicas:5},current:{position:12,total:51,event:2,replica:3,method:'cold',warmup:false}};
+ assert.equal(jobView(job,comparison,Date.parse('2026-11-07T18:01:00Z')).title,'Esperimento a eventi · prova 12/51 · evento 2/5 · replica 3/5 · Cold · in corso');
+ comparison.current={position:1,total:51,event:1,replica:0,method:'hot',warmup:true};
+ assert.match(jobView(job,comparison).title,/prova 1\/51 · evento 1\/5 · riscaldamento · Hot/);
 });

@@ -26,7 +26,7 @@ from src import starlink_scenario as model  # noqa: E402
 from tools.tle_catalog import parse_tle  # noqa: E402
 
 DEFAULTS = {'profile': 'starlink-53-463-2x31', 'raan': [80.8, 82.8], 'domain_per_plane': 8,
-            'trigger_lead_s': 900, 'minimum_destination_light_s': 1800, 'minimum_path_persistence_s': 900}
+            'trigger_lead_s': 900, 'minimum_destination_light_s': 600, 'minimum_path_persistence_s': 900}
 
 
 def write_json(path, value):
@@ -103,7 +103,15 @@ def main(argv=None):
     scenario['migration_events'] = {'trigger_lead_s': args.trigger_lead_s,
                                     'minimum_destination_light_s': args.minimum_destination_light_s,
                                     'minimum_path_persistence_s': args.minimum_path_persistence_s,
-                                    'selection': 'quantili 0, 0,5 e 1 degli eventi fattibili ordinati per (salti, istante)'}
+                                    'event_specs': [{'hops': hops, 'other_plane': other} for hops, other in model.EVENT_SPECS],
+                                    'selection': 'un evento per combinazione di salti e piano, distribuiti nel giorno; luce sulla destinazione almeno pari alla soglia'}
+    # Experiment design: replicas per event and mode, one discarded warm-up run; the Hot/Cold
+    # order inside each pair is drawn with a seed chosen and recorded by every experiment.
+    scenario['experiment'] = {'replicas': 5, 'warmup_runs': 1, 'seed': None}
+    # Hypotheses of the laser model, stated where the parameters live.
+    scenario['fso']['alignment_hypothesis'] = ('ipotesi: prima di ogni tentativo il percorso multi-hop deve restare '
+                                               'disponibile per alignment_s secondi di fila; i laser gia puntati non lo richiederebbero')
+    scenario['fso']['propagation'] = {'speed_km_s': 299792.458, 'model': 'ritardo = distanza / velocita della luce, per collegamento'}
     write_json(profile / 'scenario.json', scenario)
 
     log('Propagazione SGP4 e illuminazione sulle 24 ore (replay)')
@@ -166,7 +174,10 @@ def main(argv=None):
                                     minimum_destination_light_s=args.minimum_destination_light_s,
                                     minimum_path_persistence_s=args.minimum_path_persistence_s)
     feasible = [e for e in events if e['destination'] is not None]
-    chosen = model.representative_events(events)
+    chosen = model.designed_events(index, periods, domain, plane_of, model.EVENT_SPECS,
+                                   trigger_lead_s=args.trigger_lead_s,
+                                   minimum_destination_light_s=args.minimum_destination_light_s,
+                                   minimum_path_persistence_s=args.minimum_path_persistence_s)
     hop_histogram = {}
     for event in feasible:
         hop_histogram[str(event['hops'])] = hop_histogram.get(str(event['hops']), 0) + 1

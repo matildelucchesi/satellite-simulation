@@ -83,6 +83,19 @@ def load_orbit(root: Path, scenario: dict | None = None, artifact: Path | None =
     return Orbit(artifact, links=links, domain=domain)
 
 
+SPEED_OF_LIGHT_KM_S = 299792.458
+
+
+def propagation_delay_ms(distance_km):
+    """One-way propagation delay of a laser link of the given length."""
+    return distance_km / SPEED_OF_LIGHT_KM_S * 1000.0
+
+
+def path_delay_s(graph, path):
+    """One-way propagation delay along a satellite path in a distance-weighted graph."""
+    return sum(graph[a][b] for a, b in zip(path, path[1:])) / SPEED_OF_LIGHT_KM_S
+
+
 class Orbit:
     def __init__(self, artifact: Path, links, domain=None):
         import numpy as np

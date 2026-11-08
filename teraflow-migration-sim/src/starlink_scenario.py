@@ -366,24 +366,60 @@ def migration_events(index, periods, domain, *, trigger_lead_s, minimum_destinat
     return events
 
 
-def representative_events(events, count=3):
-    """Deterministic spread over feasible events ordered by (hops, trigger time).
+EVENT_SPECS = ((1, False), (1, True), (3, False), (5, False), (7, True))
 
-    With different hop counts this yields fewest, median and most hops; when every event
-    needs the same number of hops (regular shells repeat each orbit) it yields the first,
-    median and last event of the day, i.e. replicas spread in time."""
-    feasible = sorted((e for e in events if e['destination'] is not None),
-                      key=lambda e: (e['hops'], e['trigger_s'], e['source']))
-    if len(feasible) < count:
-        raise ValueError('Not enough feasible migration events')
-    picks, chosen = [], set()
-    for quantile in [i / (count - 1) for i in range(count)] if count > 1 else [0.5]:
-        position = math.floor(quantile * (len(feasible) - 1))  # lower median for even counts
-        for candidate in feasible[position:] + feasible[:position][::-1]:
-            if candidate['event_id'] not in chosen:
-                chosen.add(candidate['event_id'])
-                picks.append(candidate)
-                break
+
+def designed_events(index, periods, domain, plane_of, specs=EVENT_SPECS, *, trigger_lead_s,
+                    minimum_destination_light_s, minimum_path_persistence_s):
+    """One event per (hops, other plane) specification, to compare migrations of different reach.
+
+    Candidates are the shadow entries of domain satellites, triggered ``trigger_lead_s`` before
+    shadow, with a destination exactly ``hops`` laser hops away (fewest-hop path), on the other
+    plane when requested, with at least ``minimum_destination_light_s`` of light left and a path
+    that lasts ``minimum_path_persistence_s``. In this shell the hop count and the destination's
+    light go together (each hop towards the trailing satellites gains about one slot of light), so
+    the light threshold only excludes destinations about to enter shadow. Events are spread over
+    the day: specification ``i`` takes the candidate whose trigger is closest to
+    ``duration * (i + 0.5) / len(specs)`` (ties: more light, then lower NORAD ids), never reusing a
+    source shadow entry and preferring sources not used yet, so the events start from different
+    satellites when the geometry allows it."""
+    used, sources, picks = set(), set(), []
+    for position, (hops, other_plane) in enumerate(specs):
+        target_time = index.duration * (position + 0.5) / len(specs)
+        best = None
+        for source in domain:
+            for start, end in periods[source]:
+                if end >= index.duration:
+                    continue
+                trigger = end - trigger_lead_s
+                if trigger < start or trigger < 0 or (source, trigger) in used:
+                    continue
+                depth, paths = index.hops(source, trigger)
+                for target, hop in depth.items():
+                    if hop != hops or (plane_of[target] != plane_of[source]) != other_plane:
+                        continue
+                    window = _containing(periods[target], trigger)
+                    if window is None or window[1] - trigger < minimum_destination_light_s:
+                        continue
+                    light = window[1] - trigger
+                    key = (source in sources, abs(trigger - target_time), -light, source, target)
+                    if best is not None and key >= best[0]:
+                        continue
+                    if index.path_end(source, target, trigger, minimum_path_persistence_s) - trigger < minimum_path_persistence_s:
+                        continue
+                    best = (key, source, trigger, end, target, light, paths[target], len(depth) - 1)
+        if best is None:
+            raise ValueError(f'Nessun evento con {hops} salti verso {"l altro" if other_plane else "lo stesso"} piano')
+        _, source, trigger, end, target, light, path, reachable = best
+        used.add((source, trigger))
+        sources.add(source)
+        picks.append({'event_id': f'{source}-{trigger}', 'source': source, 'trigger_s': trigger,
+                      'source_shadow_entry_s': end, 'source_light_remaining_s': end - trigger,
+                      'reachable_satellites': reachable, 'destination': target, 'hops': hops, 'path': path,
+                      'other_plane': other_plane, 'destination_light_remaining_s': light,
+                      'light_gained_s': light - (end - trigger),
+                      'path_persistence_at_least_s': minimum_path_persistence_s,
+                      'path_end_s': index.path_end(source, target, trigger)})
     return picks
 
 

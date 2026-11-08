@@ -153,24 +153,34 @@ class LocalWebTests(unittest.TestCase):
         self.assertEqual(sorted(tuple(link[:2]) for link in topology['links']), [(1, 2), (2, 3), (3, 4)])
         self.assertEqual([node['in_domain'] for node in topology['nodes']], [True, True, True, False])
         self.assertAlmostEqual(topology['nodes'][1]['argument_of_latitude_deg'], 10 + np.degrees(50e-3), places=3)
+        self.assertAlmostEqual(topology['nodes'][1]['argument_of_latitude_rate_deg_s'], np.degrees(1e-3), places=4)
         with self.assertRaises(HTTPError) as caught:
             urlopen(self.url + '/api/v1/topology?event=missing', timeout=5)
         self.assertEqual(caught.exception.code, 400)
 
-    def test_console_serves_the_three_pages_and_scripts(self):
+    def test_console_opens_on_the_laboratory_and_serves_its_scripts(self):
         source = Path(__file__).parents[1] / 'web'
         (self.root / 'web').mkdir()
-        for name in ('index.html', 'app.js', 'orbit-view.js', 'experiment-state.js', 'style.css', 'tokens.css'):
+        for name in ('index.html', 'app.js', 'orbit-view.js', 'mission.js', 'stars.js', 'experiment-state.js', 'style.css', 'tokens.css'):
             (self.root / 'web' / name).write_bytes((source / name).read_bytes())
         with urlopen(self.url + '/', timeout=5) as response:
             document = response.read().decode('utf-8')
-        for identifier in ('page-scenario', 'page-experiment', 'page-results', 'id="orbit"', 'id="start"', 'id="verify"', 'id="timeline"'):
+        for identifier in ('page-lab', 'page-scenario', 'page-results', 'id="orbit"', 'id="start"', 'id="verify"', 'id="timeline"', 'id="stars"'):
             self.assertIn(identifier, document)
-        for legacy in ('channel-rate', 'common-base', 'Crea scenario iniziale', 'live-progress'):
+        for legacy in ('channel-rate', 'common-base', 'Crea scenario iniziale', 'live-progress', 'page-experiment'):
             self.assertNotIn(legacy, document)
-        for asset in ('app.js', 'orbit-view.js', 'experiment-state.js', 'style.css', 'tokens.css'):
+        for asset in ('app.js', 'orbit-view.js', 'mission.js', 'stars.js', 'experiment-state.js', 'style.css', 'tokens.css'):
             with urlopen(self.url + '/' + asset, timeout=5) as response:
                 self.assertEqual(response.status, 200)
+        (self.root / 'web/fonts').mkdir()
+        for name in ('IBMPlexSans.ttf', 'IBMPlexMono-Regular.ttf'):
+            (self.root / 'web/fonts' / name).write_bytes((source / 'fonts' / name).read_bytes())
+            with urlopen(self.url + '/fonts/' + name, timeout=5) as response:
+                self.assertEqual(response.status, 200)
+        for missing in ('/fonts/Inter.ttf', '/fonts/README.md'):
+            with self.assertRaises(HTTPError) as caught:
+                urlopen(self.url + missing, timeout=5)
+            self.assertEqual(caught.exception.code, 404)
         for legacy in ('/api/v1/continuous-comparisons', '/api/v1/common-base', '/api/v1/simulations'):
             with self.assertRaises(HTTPError) as caught:
                 urlopen(self.url + legacy, timeout=5)

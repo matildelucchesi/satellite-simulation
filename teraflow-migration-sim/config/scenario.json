@@ -58,6 +58,11 @@
    "inter_plane": 1,
    "source": "https://starlink.com/it/technology (3 laser, consultata 2026-11-07)",
    "assignment": "ipotesi di progetto: 2 vicini nello stesso piano, 1 verso il piano adiacente"
+  },
+  "alignment_hypothesis": "ipotesi: prima di ogni tentativo il percorso multi-hop deve restare disponibile per alignment_s secondi di fila; i laser gia puntati non lo richiederebbero",
+  "propagation": {
+   "speed_km_s": 299792.458,
+   "model": "ritardo = distanza / velocita della luce, per collegamento"
   }
  },
  "live": {
@@ -144,13 +149,40 @@
  },
  "migration_events": {
   "trigger_lead_s": 900,
-  "minimum_destination_light_s": 1800,
+  "minimum_destination_light_s": 600,
   "minimum_path_persistence_s": 900,
-  "selection": "quantili 0, 0,5 e 1 degli eventi fattibili ordinati per (salti, istante)"
+  "event_specs": [
+   {
+    "hops": 1,
+    "other_plane": false
+   },
+   {
+    "hops": 1,
+    "other_plane": true
+   },
+   {
+    "hops": 3,
+    "other_plane": false
+   },
+   {
+    "hops": 5,
+    "other_plane": false
+   },
+   {
+    "hops": 7,
+    "other_plane": true
+   }
+  ],
+  "selection": "un evento per combinazione di salti e piano, distribuiti nel giorno; luce sulla destinazione almeno pari alla soglia"
  },
  "migration": {
   "software_on_board": true,
   "clean_target_store_before_trigger": true,
   "image_transfer": "variante opzionale (aggiornamento software), disattivata"
+ },
+ "experiment": {
+  "replicas": 5,
+  "warmup_runs": 1,
+  "seed": null
  }
 }

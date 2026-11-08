@@ -302,3 +302,11 @@ Su richiesta, rimosso tutto ciò che apparteneva al vecchio confronto continuo e
 - I file di risultati storici restano su disco in `results/`; la console non li mostra più.
 - Suite locale: 142 test Python (9 saltati) in 13 s e 8 test JavaScript.
 - Verifica live sul codice ripulito, avviata dalla console (`job-f04bd2ddf6a443a5a64c0b1ccaea6639`): riuscita in **13,6 minuti**. Hot 5,3 s di downtime e 167,9 s di durata; Cold 117,0 s e 178,6 s; Cold − Hot 111,7 s. Preparazione 224 s e 161 s, prove complete 432 s e 378 s.
+
+### Eventi diversi, repliche e ritardo di propagazione — 8 novembre 2026
+
+- **Eventi.** Nella costellazione il numero di salti e la luce della destinazione vanno insieme: ogni salto verso i satelliti che seguono sull'orbita dà circa 3 minuti di luce, e la regola «almeno 30 minuti» imponeva 5 salti a tutti gli eventi. Il catalogo ha ora 5 eventi, uno per combinazione: 1 salto sullo stesso piano, 1 salto verso l'altro piano, 3, 5 e 7 salti (l'ultimo verso l'altro piano), distribuiti nel giorno, con destinazione al sole per almeno 10 minuti e percorso stabile per 15 (`designed_events`). La vecchia scelta per quantili è stata rimossa.
+- **Esperimento.** Hot e Cold di un evento restano sullo stesso percorso e sullo stesso istante orbitale. Un riscaldamento escluso, poi 5 repliche eseguite una dopo l'altra su tutti gli eventi; in ogni coppia l'ordine Hot/Cold è estratto con un seme registrato. Per evento: mediana e quartili, Cold − Hot appaiato con intervallo bootstrap al 95 % (schema dei risultati 2). Una prova non riuscita resta mancante; l'esperimento si ferma se serve il ripristino o dopo 3 prove non riuscite di fila. 51 prove, circa 5 ore e mezza.
+- **Ritardo di propagazione.** Ogni collegamento laser ha il ritardo della sua lunghezza: `tc netem delay` sui collegamenti di Mininet, aggiornato con la geometria; per il trasferimento dello stato, che avviene sull'host, un modello TCP (handshake, slow start, conferma finale) sul ritardo dell'intero percorso multi-hop.
+- **Ipotesi dell'allineamento.** I 60 s di contatto continuo sul percorso prima di ogni tentativo restano, dichiarati come ipotesi nello scenario e nella documentazione.
+- Le misure aggiuntive proposte (sonda esterna del downtime, carico della macchina, margine rispetto all'ombra) sono state escluse.

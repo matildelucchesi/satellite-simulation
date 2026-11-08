@@ -11,7 +11,9 @@ def advance(previous, event):
         # A new migration of the verification or of the event experiment starts.
         result.update(phase=phase, subphase=None, label=event.get('label'), method=event.get('method'),
                       comparison_id=event.get('comparison_id'), event_index=event.get('event_index'),
-                      event_total=event.get('event_total'), phase_started_utc=now, deadline_utc=None, operation_status=None)
+                      event_total=event.get('event_total'), replica=event.get('replica'), replica_total=event.get('replica_total'),
+                      warmup=event.get('warmup'), position=event.get('position'), run_total=event.get('run_total'),
+                      phase_started_utc=now, deadline_utc=None, operation_status=None)
     elif phase == 'preparation_operation':
         for key in ('operation', 'label', 'phase_started_utc', 'deadline_utc', 'limit_s', 'operation_status'):
             result[key] = event.get(key)

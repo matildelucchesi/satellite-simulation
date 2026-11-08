@@ -9,7 +9,7 @@ Il simulatore confronta la migrazione **Hot** e **Cold** del controller TeraFlow
 | 0. Scenario | Selezione dei piani, replay orbitale, laser, percorsi, dominio, catalogo eventi | Una volta (`tools/build_scenario.py`, `tools/install_scenario.py`) | No |
 | 1. Laboratorio | Stack Compose, rete del dominio in TeraFlow, baseline | A ogni prova, nella preparazione | Sì |
 | 2. Verifica | Una migrazione Hot e una Cold sul primo evento (`functional`) | Per sessione o dopo modifiche al codice | Sì |
-| 3. Esperimento | Hot e Cold su 3 eventi, ordine alternato (`compare_events`) | Per esperimento | Sì |
+| 3. Esperimento | Riscaldamento e 5 repliche di Hot e Cold su 5 eventi, ordine casuale per coppia (`compare_events`) | Per esperimento | Sì |
 | 4. Analisi | Fasi, Cold − Hot, fattibilità a posteriori, CSV | Alla fine di ogni esperimento | No |
 
 ## Moduli (`src/`)
@@ -31,6 +31,28 @@ Il simulatore confronta la migrazione **Hot** e **Cold** del controller TeraFlow
 - Il laboratorio accetta un solo job alla volta; il worker sopravvive alla chiusura della console.
 - Misure assenti restano assenti; Cold − Hot si calcola solo quando entrambi i valori esistono.
 
+## Fasi della migrazione
+
+L'orchestratore (`src/orchestrator.py`) emette una fase per ogni passo; la pagina Scenario le ricava dallo stesso flusso di eventi (`web/mission.js`). Solo i due estremi si avviano o si arrestano: i satelliti intermedi del percorso multi-hop inoltrano soltanto i pacchetti del trasferimento e non hanno fasi proprie.
+
+| Fase | Hot | Cold | Dove | Nel downtime |
+| --- | --- | --- | --- | --- |
+| Trigger: la sorgente sta per entrare in ombra | sì | sì | sorgente | no |
+| Allineamento del percorso: 60 s di contatto continuo sull'intero percorso multi-hop (ipotesi) | sì | sì | percorso | no |
+| Quiete e snapshot dello stato | snapshot | quiete e snapshot | sorgente | no |
+| Arresto del controller | — | sì | sorgente | sì (inizio) |
+| Trasferimento dello stato | sì | sì | percorso | Cold |
+| Avvio del controller (software già a bordo) | sì | sì | destinazione | Cold |
+| Ripristino dello stato | sì | sì | destinazione | Cold |
+| Freeze del controller | sì | — | sorgente | sì (inizio) |
+| Trasferimento e applicazione del delta | sì | — | percorso, destinazione | sì |
+| Verifica di equivalenza delle API | sì | sì | destinazione | sì |
+| ACK e passaggio dell'autorità P4 | sì | sì | proxy P4 | sì (fine) |
+
+- Il collegamento della migrazione esiste quando nel grafo laser c'è un percorso fra sorgente e destinazione (`Orbit.migration_link`); il percorso disegnato è quello del catalogo, che coincide con il percorso modellato per almeno 15 minuti dal trigger.
+- Un tentativo fallito revoca la destinazione, restituisce il controllo alla sorgente (`rollback`) e riparte dall'allineamento, fino a 3 tentativi; con un fallimento del fencing o del ripristino i tentativi si fermano (`recovery_required`).
+- L'orbita resta ferma a T−30 s durante la preparazione del laboratorio, poi avanza di un secondo orbitale al secondo.
+
 ## Scelte del modello
 
 - Due piani adiacenti del guscio Starlink 53°/463 km (RAAN 80,8° e 82,8°, 31 + 31 satelliti). Con piani così coerenti la topologia laser resta stabile per tutto il giorno; ciò che cambia nel tempo è l'illuminazione.
@@ -38,7 +60,10 @@ Il simulatore confronta la migrazione **Hot** e **Cold** del controller TeraFlow
 - Il laboratorio emula solo il dominio del controller (16 satelliti); il resto della costellazione è modellato e fa da relè per il percorso multi-hop della migrazione.
 - Gli estremi del servizio di prova hanno un percorso minimo unico (capi dell'arco del piano 1), così il percorso di TeraFlow e le regole di inoltro coincidono; il servizio descrive solo gli switch del percorso.
 - Software del controller a bordo: migra solo lo stato. Il database della destinazione viene svuotato prima del trigger.
-- Velocità unica di 1 Gbit/s.
+- Velocità unica di 1 Gbit/s; ritardo di propagazione per collegamento pari a distanza / velocità della luce: `tc netem` sui collegamenti di Mininet (aggiornato con la geometria) e, per il trasferimento dello stato che avviene sull'host, un modello TCP con handshake, slow start (finestra iniziale di 10 segmenti) e conferma finale sul ritardo dell'intero percorso (`src/transport.py`).
+- Eventi: uno per combinazione di salti e piano (1 stesso piano, 1 altro piano, 3, 5, 7 altro piano), distribuiti nel giorno; destinazione al sole per almeno 10 minuti e percorso stabile per 15 (`starlink_scenario.designed_events`).
+- Esperimento: riscaldamento escluso, 5 repliche replica dopo replica, ordine Hot/Cold casuale per coppia con seme registrato; statistiche in `event_comparison.event_statistics`.
+- Ipotesi: prima di ogni tentativo il percorso deve restare disponibile per 60 s di fila (`fso.alignment_s`); i laser già puntati non lo richiederebbero.
 
 ## Configurazione
 
