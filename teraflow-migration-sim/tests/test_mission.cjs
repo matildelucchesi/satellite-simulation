@@ -129,3 +129,79 @@ test('the experiment position comes with the event',()=>{
  const state=missionState([{phase:'event_comparison',event_index:2,event_total:2,method:'cold',replica:3,replica_total:5,warmup:false,position:12,run_total:51,timestamp_utc:at(0)}],selected,'compare_events');
  assert.deepEqual(state.run,{position:12,total:51,replica:3,replicas:5,warmup:false});
 });
+
+/* ---------- preview ---------- */
+const preview=require('../web/mission.js');
+const finished=[...hot,
+ {phase:'restore_delta',orbital_s:1722,timestamp_utc:at(219)},{phase:'verify',orbital_s:1725,timestamp_utc:at(222)},
+ {phase:'ack',orbital_s:1726,timestamp_utc:at(223)},{phase:'completed',orbital_s:1727,timestamp_utc:at(224)},
+ {phase:'run_finished',timestamp_utc:at(260)},
+ {phase:'comparison_run',method:'cold',timestamp_utc:at(300)},{phase:'prepare',timestamp_utc:at(301)},
+ {phase:'trigger',orbital_s:1557,timestamp_utc:at(400)},{phase:'alignment',orbital_s:1557,timestamp_utc:at(401)},
+ {phase:'source_stop',orbital_s:1620,timestamp_utc:at(463)},
+ {phase:'attempt_failed',reason:'x',timestamp_utc:at(470)},{phase:'failed',timestamp_utc:at(471)}];
+
+test('measured preview times come from finished runs only',()=>{
+ const runs=preview.measuredRuns(finished);
+ assert.deepEqual(runs.map(run=>[run.method,run.eventIndex]),[['hot',1]]);
+ const offsets=runs[0].offsets;
+ assert.equal(offsets.trigger,0);assert.equal(offsets.freeze,163);assert.equal(offsets.delta,165);assert.equal(offsets.cutover,170);
+});
+
+test('experiment runs: first replica per event and method, warm-up excluded, mapped on the profile',()=>{
+ const run=(event_index,method,replica,warmup)=>[
+  {phase:'event_comparison',event_index,method,replica,warmup,timestamp_utc:at(0)},
+  {phase:'trigger',timestamp_utc:at(10)},{phase:'alignment',timestamp_utc:at(11+replica)},
+  {phase:'ack',timestamp_utc:at(100)},{phase:'completed',timestamp_utc:at(101)}];
+ const runs=preview.measuredRuns([...run(1,'hot',0,true),...run(1,'hot',2,false),...run(1,'hot',1,false),...run(2,'cold',1,false),...run(3,'cold',1,false)]);
+ assert.equal(runs.length,5);
+ /* Job event 2 is profile event 1; job event 3 is not in the profile */
+ const times=preview.previewTimes(runs,index=>({1:2,2:1})[index]??null);
+ assert.deepEqual(Object.keys(times).sort(),['1:cold','2:hot']);
+ assert.equal(times['2:hot'].replica,1);assert.equal(times['2:hot'].offsets.alignment,2);
+ const script=preview.previewScript(selected,times,10);
+ assert.deepEqual(script.segments.map(row=>row.origin.measured),[false,true,true,false]);
+ assert.equal(script.segments[2].offsets.cutover,90);assert.equal(script.segments[2].origin.replica,1);
+});
+
+test('the preview plays every event, Hot then Cold, and loops',()=>{
+ const script=preview.previewScript(selected,null,10);
+ assert.deepEqual(script.segments.map(row=>[row.eventIndex,row.method]),[[1,'hot'],[1,'cold'],[2,'hot'],[2,'cold']]);
+ /* The lead before the trigger: 30 orbital seconds in 3 s of screen time at ×10 */
+ const start=preview.previewPosition(script,1.5);
+ assert.equal(start.pieceIndex,0);
+ assert.equal(start.orbital,1557-15);
+ const mission=preview.previewMission(script,start);
+ assert.equal(mission.stage,'countdown');assert.equal(mission.controller,60150);assert.equal(mission.linkActive,false);
+ assert.equal(preview.previewPosition(script,script.wall+1.5).orbital,start.orbital);
+});
+
+test('short phases last at least the minimum screen time',()=>{
+ const script=preview.previewScript(selected,null,60),hot1=script.segments[0];
+ const transfer=hot1.pieces.find(piece=>piece.key==='transfer');
+ assert.equal(transfer.wall,preview.PREVIEW_MIN_STEP_S);
+ const alignment=preview.previewScript(selected,null,10).segments[0].pieces.find(piece=>piece.key==='alignment');
+ assert.ok(Math.abs(alignment.wall-(60.41-.34)/10)<1e-9);
+});
+
+test('the preview mission moves the controller and counts the downtime',()=>{
+ const script=preview.previewScript(selected,null,10),hot1=script.segments[0];
+ const index=key=>hot1.pieces.findIndex(piece=>piece.key===key);
+ const during=preview.previewMission(script,preview.previewPosition(script,hot1.pieces[index('transfer')].wallStart+.1));
+ assert.equal(during.current.key,'transfer');assert.equal(during.transferring,true);assert.equal(during.communicating,true);
+ assert.equal(during.steps.find(step=>step.key==='snapshot').status,'done');
+ const frozen=preview.previewMission(script,preview.previewPosition(script,hot1.pieces[index('verify')].wallStart+.5));
+ assert.equal(frozen.controllerState,'frozen');assert.equal(frozen.previewDowntime.ended,false);assert.ok(frozen.previewDowntime.seconds>4);
+ const done=preview.previewMission(script,preview.previewPosition(script,hot1.pieces[index('completed')].wallStart+.5));
+ assert.equal(done.stage,'completed');assert.equal(done.controller,selected[0].destination);
+ assert.ok(Math.abs(done.previewDowntime.seconds-(180.82-174.93))<1e-9);assert.equal(done.previewDowntime.ended,true);
+ const cold=preview.previewMission(script,preview.previewPosition(script,script.segments[1].pieces[4].wallStart+.1));
+ assert.equal(cold.method,'cold');assert.equal(cold.controllerState,'stopped');
+});
+
+test('a position survives a change of speed',()=>{
+ const slow=preview.previewScript(selected,null,10),fast=preview.previewScript(selected,null,60);
+ const position=preview.previewPosition(slow,40);
+ const again=preview.previewPosition(fast,preview.previewElapsed(fast,slow.segments.indexOf(position.segment),position.pieceIndex,position.inPiece));
+ assert.ok(Math.abs(again.orbital-position.orbital)<1e-6);
+});

@@ -274,12 +274,29 @@ def compare(app):
     return finish()
 
 
-def list_comparisons(root):
+def list_comparisons(root, running_since=None):
+    """Recorded experiments, newest first.
+
+    An unfinished experiment gets statistics over the replicas measured so far (``statistics_partial``).
+    One left without a final reason and not started by the running experiment job (``running_since``:
+    creation time of that job, None when no experiment holds the laboratory) lost its worker: it is
+    reported as ``worker_stopped`` instead of looking still in progress. The files are not changed."""
     rows = []
     for path in sorted(Path(root, 'results/event-comparisons').glob('events-*/metadata.json'),
                        key=lambda item: item.stat().st_mtime, reverse=True):
         try:
-            rows.append(json.loads(path.read_text(encoding='utf-8')))
+            row = json.loads(path.read_text(encoding='utf-8'))
         except ValueError:
             continue
+        if row.get('schema_version', 0) >= 2 and not row.get('complete'):
+            seed = (row.get('design') or {}).get('seed') or 0
+            for event in row.get('events', []):
+                if event.get('statistics') is None:
+                    event['statistics'] = event_statistics(event, seed)
+                    row['statistics_partial'] = True
+            running = running_since is not None and row.get('created_utc', '') >= running_since
+            if not row.get('reason') and not running:
+                row['reason'] = 'worker_stopped'
+                row['current'] = None
+        rows.append(row)
     return rows

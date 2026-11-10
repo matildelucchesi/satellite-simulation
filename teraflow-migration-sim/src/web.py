@@ -350,7 +350,15 @@ def make_server(root, port=18092):
                 return self.send({'verifications': verifications(root)})
             if path == '/api/v1/event-comparisons':
                 from .event_comparison import list_comparisons
-                return self.send({'comparisons': list_comparisons(root)})
+                running_since = None
+                if application.jobs.guard.exists():
+                    try:
+                        holder = application.jobs.get(read_json(application.jobs.guard)['job_id'])
+                        if holder.get('operation') == 'compare_events':
+                            running_since = holder.get('created_utc', '')
+                    except (OSError, ValueError, KeyError):
+                        running_since = ''  # lock unreadable: never call an experiment stopped
+                return self.send({'comparisons': list_comparisons(root, running_since)})
             if path == '/api/v1/topology':
                 if set(query) - {'orbital_s', 'event'}:
                     raise ValueError('Unknown topology field')

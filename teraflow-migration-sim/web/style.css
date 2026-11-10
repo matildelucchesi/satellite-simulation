@@ -166,6 +166,7 @@ tr.difference th,tr.difference td{color:var(--color-accent);font-weight:600}
 .scene-head{display:flex;justify-content:space-between;align-items:center;gap:var(--space-md);flex-wrap:wrap;position:relative}
 .scene-head .pop{top:3.5rem;left:0;right:auto;max-width:40rem}
 .scene-head .chip{margin-left:0}
+.scene-head>.inline{flex:1 1 auto;min-width:0}
 .chip[data-state="live"]{--tone:var(--color-accent)}.chip[data-state="live"] .led{animation:blink 1.6s steps(1) infinite}
 .scene{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(19rem,1fr);gap:var(--space-lg);align-items:start}
 @media(max-width:62rem){.scene{grid-template-columns:minmax(0,1fr)}}
@@ -268,6 +269,8 @@ tr.difference th,tr.difference td{color:var(--color-accent);font-weight:600}
 .hops .relay span{border-color:var(--color-accent);background:oklch(85% .13 195 / .1)}
 .hops.talking .relay span{background:oklch(85% .13 195 / .3)}
 .select{display:flex;align-items:center;gap:var(--space-md);font-size:var(--fs-s)}
+.preview-source{color:var(--color-muted);white-space:nowrap;margin-left:var(--space-md);flex:0 1 26rem;min-width:min(16rem,100%)}
+.preview-source select{width:0;flex:1;min-width:0;padding:.5rem .75rem;min-height:36px;font-size:var(--fs-s)}
 #results{display:grid;gap:var(--space-lg)}
 #results>h3{margin-top:var(--space-sm)}
 /* One collapsible block per event with its replicas */

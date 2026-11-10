@@ -112,6 +112,26 @@ class EventComparisonTests(unittest.TestCase):
         self.assertEqual(output['reason'], 'interrupted')
         self.assertEqual(self.calls, [])
 
+    def test_unfinished_experiment_has_partial_statistics_and_a_lost_worker_is_reported(self):
+        replica = {'replica': 1, 'order': ['hot', 'cold'],
+                   'runs': {'hot': {'controller_downtime_s': 6.0}, 'cold': {'controller_downtime_s': 150.0}}}
+        row = {'schema_version': 2, 'comparison_id': 'events-x', 'created_utc': '2026-11-08T17:45:47+00:00',
+               'complete': False, 'current': {'position': 10}, 'design': {'seed': 3},
+               'events': [{'index': 1, 'replicas': [replica]}]}
+        directory = self.root / 'results/event-comparisons/events-x'
+        directory.mkdir(parents=True)
+        (directory / 'metadata.json').write_text(json.dumps(row), encoding='utf-8')
+        # The experiment job that created it still holds the laboratory: still running
+        live = module.list_comparisons(self.root, running_since='2026-11-08T17:45:00+00:00')[0]
+        self.assertNotIn('reason', live)
+        self.assertTrue(live['statistics_partial'])
+        self.assertEqual(live['events'][0]['statistics']['controller_downtime_s']['cold_minus_hot']['median'], 144.0)
+        # No experiment job holds the laboratory, or a later one does: the worker was lost
+        for since in (None, '2026-11-09T10:00:00+00:00'):
+            lost = module.list_comparisons(self.root, running_since=since)[0]
+            self.assertEqual((lost['reason'], lost['current']), ('worker_stopped', None))
+        self.assertNotIn('reason', json.loads((directory / 'metadata.json').read_text(encoding='utf-8')))
+
     def test_statistics_keep_missing_values_out(self):
         self.assertEqual(module.describe_values([None, 3, 1, 2])['median'], 2)
         self.assertEqual(module.describe_values([])['n'], 0)

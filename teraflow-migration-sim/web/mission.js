@@ -131,6 +131,123 @@ function orbitalAt(state,nowMs){
 
 function orbitRunning(state){return Boolean(state&&state.anchor&&state.frozenAt===null);}
 
+/* ---------- preview ----------
+   Without a job the Scenario page plays a migration of every event, Hot then Cold, with the phase
+   times (seconds from the trigger) of a chosen verification or experiment; an event and method
+   without a finished run there uses the reference times. The orbit advances with the measured
+   times; phases shorter than PREVIEW_MIN_STEP_S of screen time are slowed down to be readable. */
+const PREVIEW_METHODS=['hot','cold'];
+const PREVIEW_OBSERVE_S=30;
+const PREVIEW_MIN_STEP_S=1.2;
+/* Reference times: verification of 8 November 2026 (job-7ae8932f…), event 1 */
+const PREVIEW_REFERENCE={
+ hot:{trigger:0,alignment:.34,snapshot:60.41,transfer:61.75,target_start:61.97,restore:134.06,freeze:174.93,delta:176.43,verify:179.67,cutover:180.82,completed:181.33},
+ cold:{trigger:0,alignment:.37,snapshot:60.44,source_stop:63.09,transfer:85.14,target_start:85.36,restore:159.17,verify:211.29,cutover:212.46,completed:212.91}};
+
+/* Finished runs in the event stream of a verification or an experiment job: for each run the
+   event index in that job, method, replica and the seconds from the trigger of each phase. Only
+   runs that reached the passage of authority and the end are kept. */
+function measuredRuns(events){
+ const runs=[];let current=null;
+ for(const event of events||[]){
+  if(event.phase==='comparison_run'||event.phase==='event_comparison'){
+   current={meta:{eventIndex:event.event_index||1,method:event.method,replica:event.replica??null,warmup:Boolean(event.warmup)},events:[]};
+   runs.push(current);
+  }
+  if(current&&(event.phase==='comparison_run'||event.phase==='event_comparison'||missionRelevant(event)))current.events.push(event);
+ }
+ return runs.flatMap(({meta,events:segment})=>{
+  const state=missionState(segment,[],'functional');
+  if(!state.method||!state.reached.has('cutover')||!state.reached.has('completed'))return [];
+  const offsets={};
+  for(const step of state.steps)if(step.offset_s!==null)offsets[step.key]=Math.max(0,step.offset_s);
+  return [{...meta,method:state.method,attempt:state.attempt,offsets}];
+ });
+}
+
+/* Times for the preview, keyed "event:method" on the events of the installed profile.
+   `profileIndex(i)` gives the profile's event number for event i of the job (null when the job's
+   event is not in the profile). Per event and method: the first replica, warm-up excluded. */
+function previewTimes(runs,profileIndex){
+ const out={};
+ const ordered=[...(runs||[])].filter(run=>!run.warmup).sort((a,b)=>(a.replica??0)-(b.replica??0));
+ for(const run of ordered){
+  const index=profileIndex(run.eventIndex);
+  if(index==null)continue;
+  const key=`${index}:${run.method}`;
+  if(!out[key])out[key]=run;
+ }
+ return out;
+}
+
+/* The preview script: one segment per event and method, each made of pieces (the lead before the
+   trigger, then one piece per phase; the last phase is the observation after the migration). */
+function previewScript(selected,times,speed){
+ const segments=[];let wall=0;
+ (selected||[]).forEach((event,index)=>{for(const method of PREVIEW_METHODS){
+  const run=times&&times[`${index+1}:${method}`];
+  const offsets=run?run.offsets:PREVIEW_REFERENCE[method];
+  const keys=MISSION_STEPS[method].map(step=>step.key).filter(key=>Number.isFinite(offsets[key]));
+  const pieces=[{key:null,start:-ORBIT_LEAD_S,orbital:ORBIT_LEAD_S}];
+  keys.forEach((key,position)=>{
+   const end=position+1<keys.length?offsets[keys[position+1]]:offsets[key]+PREVIEW_OBSERVE_S;
+   pieces.push({key,start:offsets[key],orbital:Math.max(0,end-offsets[key])});
+  });
+  const segment={eventIndex:index+1,event,method,offsets,keys,pieces,wallStart:wall,
+   origin:run?{measured:true,replica:run.replica,attempt:run.attempt}:{measured:false}};
+  for(const piece of pieces){
+   piece.wall=Math.max(piece.orbital/speed,piece.key&&piece.key!=='completed'?PREVIEW_MIN_STEP_S:0);
+   piece.wallStart=wall;wall+=piece.wall;
+  }
+  segment.wallEnd=wall;segments.push(segment);
+ }});
+ return {segments,wall};
+}
+
+/* Position in the script after `elapsed` seconds of screen time (the script loops). */
+function previewPosition(script,elapsed){
+ if(!script||!script.wall)return null;
+ const t=((elapsed%script.wall)+script.wall)%script.wall;
+ const segment=script.segments.find(row=>t<row.wallEnd)||script.segments[script.segments.length-1];
+ const pieceIndex=Math.max(0,segment.pieces.findIndex(piece=>t<piece.wallStart+piece.wall));
+ const piece=segment.pieces[pieceIndex],fraction=piece.wall?Math.min(1,(t-piece.wallStart)/piece.wall):1;
+ return {segment,pieceIndex,inPiece:piece.orbital*fraction,orbital:segment.event.trigger_s+piece.start+piece.orbital*fraction};
+}
+/* Screen time of a position, to keep it when the speed changes and to jump to an event. */
+function previewElapsed(script,segmentIndex,pieceIndex,inPiece){
+ const segment=script.segments[segmentIndex];if(!segment)return 0;
+ const piece=segment.pieces[pieceIndex]||segment.pieces[0];
+ return piece.wallStart+(piece.orbital?piece.wall*Math.min(1,inPiece/piece.orbital):0);
+}
+
+/* Mission state shown by the preview, with the same fields the live view reads. */
+function previewMission(script,position){
+ const {segment,pieceIndex,inPiece}=position,event=segment.event;
+ const currentIndex=pieceIndex-1,reached=new Set(segment.keys.slice(0,currentIndex+1));
+ const steps=MISSION_STEPS[segment.method].filter(step=>segment.keys.includes(step.key)).map((step,index)=>{
+  const piece=segment.pieces[index+1];
+  const status=index<currentIndex?'done':index===currentIndex?(step.key==='completed'?'done':'current'):'pending';
+  return {...step,status,startMs:null,offset_s:segment.offsets[step.key],duration_s:status==='done'&&step.key!=='completed'?piece.orbital:null,
+   elapsed_s:status==='current'?inPiece:null};
+ });
+ const current=currentIndex>=0?steps[currentIndex]:null,after=key=>reached.has(key);
+ const firstDown=steps.find(step=>step.downtime);
+ let downtime={seconds:null,ended:false};
+ if(firstDown&&after(firstDown.key)){
+  const start=segment.offsets[firstDown.key],now=segment.offsets[current.key]+inPiece;
+  downtime=after('cutover')?{seconds:segment.offsets.cutover-start,ended:true}:{seconds:now-start,ended:false};
+ }
+ return {preview:true,operation:'preview',event,method:segment.method,eventIndex:segment.eventIndex,eventTotal:script.segments.length/PREVIEW_METHODS.length,
+  segmentIndex:script.segments.indexOf(segment),origin:segment.origin,stage:currentIndex<0?'countdown':after('completed')?'completed':'migrating',
+  steps,current,attempt:1,failure:null,
+  controller:after('cutover')?event.destination:event.source,
+  controllerState:after('cutover')?'active':after('source_stop')?'stopped':after('freeze')?'frozen':'active',
+  linkActive:after('trigger'),
+  transferring:Boolean(current&&['transfer','delta'].includes(current.key)),
+  communicating:Boolean(current&&['alignment','transfer','delta'].includes(current.key)),
+  previewDowntime:downtime};
+}
+
 /* Signed "T±mm:ss" relative to the trigger. */
 function relativeClock(orbital,trigger){
  if(!Number.isFinite(orbital)||!Number.isFinite(trigger))return '—';
@@ -138,4 +255,5 @@ function relativeClock(orbital,trigger){
  return `T${sign}${String(Math.floor(total/60)).padStart(2,'0')}:${String(total%60).padStart(2,'0')}`;
 }
 
-if(typeof module!=='undefined')module.exports={MISSION_STEPS,ORBIT_LEAD_S,missionRelevant,missionState,orbitalAt,orbitRunning,relativeClock,stepFor};
+if(typeof module!=='undefined')module.exports={MISSION_STEPS,ORBIT_LEAD_S,PREVIEW_MIN_STEP_S,PREVIEW_REFERENCE,missionRelevant,missionState,orbitalAt,orbitRunning,relativeClock,stepFor,
+ measuredRuns,previewTimes,previewScript,previewPosition,previewElapsed,previewMission};

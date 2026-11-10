@@ -2,7 +2,7 @@
    carry the session CSRF token. Jobs keep running when the page is closed. */
 const $=id=>document.getElementById(id);
 let token='',state=null,jobs=[],profile=null,comparisons=[],verificationRows=[],artifacts=[];
-let selectedComparison='',selectedEvent='',stream=null,streamJob='',streamEvents=[],refreshTimer=null;
+let selectedComparison='',stream=null,streamJob='',streamEvents=[],refreshTimer=null;
 
 function node(tag,text,className){const element=document.createElement(tag);if(text!==undefined)element.textContent=text;if(className)element.className=className;return element;}
 function notice(message,error=false){const box=$('notice');box.textContent=message;box.dataset.state=error?'error':'ok';}
@@ -48,20 +48,21 @@ function renderProfile(){
  box.append(node('p',`Ogni evento parte ${Math.round(p.trigger_lead_s/60)} min prima che la sorgente entri in ombra. Gli eventi coprono 1, 5 e 7 salti laser, l’ultimo verso l’altro piano; ogni salto verso i satelliti che seguono sull’orbita dà circa 3 min di luce in più alla destinazione. La destinazione deve restare al sole almeno ${Math.round(p.minimum_destination_light_s/60)} min, con un percorso stabile per almeno ${Math.round(p.minimum_path_persistence_s/60)} min.`,'small muted'));
  renderPicker();
 }
+/* Event buttons: the preview goes through all the events by itself; a click jumps to one. */
 function renderPicker(){
  const box=$('event-picker');box.replaceChildren();
  if(!profile)return;
- if(!selectedEvent&&profile.selected_events.length)selectedEvent=profile.selected_events[0].event_id;
- profile.selected_events.forEach((event,index)=>{const button=node('button',`Evento ${index+1}`);button.type='button';button.setAttribute('aria-pressed',String(event.event_id===selectedEvent));button.addEventListener('click',()=>{selectedEvent=event.event_id;preview.eventId=null;renderPicker();});box.append(button);});
+ profile.selected_events.forEach((event,index)=>{const button=node('button',`Evento ${index+1}`);button.type='button';button.dataset.index=String(index+1);button.setAttribute('aria-pressed',String(index===0));button.addEventListener('click',()=>jumpToEvent(index+1));box.append(button);});
 }
 
 /* ---------- live orbit view ----------
    During a verification or an experiment the view follows the run in progress (event, orbital
-   time, migration phases). Without a job it previews the selected event, faster than real time. */
+   time, migration phases). Without a job it plays a preview: every event, Hot then Cold, with the
+   phase times of a verification or an experiment chosen in the panel, faster than real time
+   (mission.js). */
 let scene=null,missionEvents=[],missionJob='',lastFrame=0,lastPanel=0;
 let sceneSample={eventId:null,orbital:null,loading:false,error:''};
-const preview={speed:10,startMs:0,eventId:null};
-const PREVIEW_SPAN_S=1800;
+const preview={speed:10,startMs:Date.now(),script:null,times:null,source:null,chosen:'',loading:'',cache:{}};
 const twoDigits=value=>String(value).padStart(2,'0');
 const minutes=seconds=>`${twoDigits(Math.floor(Math.max(0,seconds)/60))}:${twoDigits(Math.floor(Math.max(0,seconds)%60))}`;
 
@@ -71,14 +72,86 @@ function currentMission(){
  if(!job||job.job_id!==missionJob||!profile)return null;
  return missionState(missionEvents,profile.selected_events,job.operation);
 }
+function previewNow(now){
+ if(!profile?.selected_events?.length)return null;
+ if(!preview.script)preview.script=previewScript(profile.selected_events,preview.times,preview.speed);
+ return previewPosition(preview.script,(now-preview.startMs)/1000);
+}
+/* Rebuild the script (new speed or new measured times) keeping the position on screen. */
+function rebuildPreview(change){
+ const now=Date.now(),position=previewNow(now),index=position?preview.script.segments.indexOf(position.segment):-1;
+ change();preview.script=null;
+ /* Same events and methods in the same order: the segment keeps its index */
+ if(position&&previewNow(now))preview.startMs=now-1000*previewElapsed(preview.script,index,position.pieceIndex,position.inPiece);
+}
+function jumpToEvent(index){
+ const now=Date.now();if(!previewNow(now))return;
+ const segment=preview.script.segments.findIndex(row=>row.eventIndex===index);
+ preview.startMs=now-1000*previewElapsed(preview.script,Math.max(0,segment),0,0);
+ lastPanel=0;
+}
+/* Sources of the preview times: verifications and experiments whose events belong to the
+   installed profile, newest first. `map` turns the job's event number into the profile's. */
+const shortDate=iso=>new Date(iso).toLocaleString('it-IT',{dateStyle:'short',timeStyle:'short'});
+function previewSources(){
+ if(!profile)return [];
+ const ids=profile.selected_events.map(event=>event.event_id),out=[];
+ for(const job of jobs){
+  const id=job.progress?.comparison_id;if(!id)continue;
+  if(job.operation==='functional'&&job.status==='completed'){
+   const row=verificationRows.find(entry=>entry.comparison_id===id),index=row?ids.indexOf(row.event?.catalog_event_id):-1;
+   if(index<0)continue;
+   out.push({jobId:job.job_id,kind:'verifica',created:job.created_utc,map:{1:index+1},label:`Verifica del ${shortDate(job.created_utc)} · evento ${index+1}`});
+  }else if(job.operation==='compare_events'){
+   const row=comparisons.find(entry=>entry.comparison_id===id);if(!row)continue;
+   const map={};for(const event of row.events||[]){const index=ids.indexOf(event.catalog_event_id);if(index>=0)map[event.index]=index+1;}
+   if(!Object.keys(map).length)continue;
+   out.push({jobId:job.job_id,kind:'esperimento',created:job.created_utc,map,
+    label:`Esperimento del ${shortDate(job.created_utc)} · ${row.complete?'completato':`${row.completed_runs??0} di ${row.run_total??'?'} prove`}`});
+  }
+ }
+ return out;
+}
+function renderPreviewSources(){
+ const select=$('preview-source'),sources=previewSources();
+ if(!preview.chosen&&sources.length)preview.chosen=sources[0].jobId;
+ const signature=sources.map(row=>row.jobId+row.label).join('|')+'#'+preview.chosen;
+ if(select.dataset.signature!==signature){
+  select.dataset.signature=signature;select.replaceChildren();
+  for(const row of sources){const option=node('option',row.label);option.value=row.jobId;option.selected=row.jobId===preview.chosen;select.append(option);}
+  if(!sources.length)select.append(node('option','Nessuna prova con questi eventi: tempi di riferimento'));
+  select.disabled=!sources.length;
+ }
+ const source=sources.find(row=>row.jobId===preview.chosen);
+ if(source&&preview.source?.jobId!==source.jobId)loadPreviewSource(source);
+}
+$('preview-source').addEventListener('change',event=>{preview.chosen=event.target.value;renderPreviewSources();lastPanel=0;});
+/* Phase times of one job, read once from its event stream and kept for the session. */
+function loadPreviewSource(source){
+ const use=times=>{if(preview.chosen===source.jobId)rebuildPreview(()=>{preview.times=times;preview.source=source;});lastPanel=0;};
+ if(preview.cache[source.jobId])return use(preview.cache[source.jobId]);
+ if(preview.loading===source.jobId)return;
+ preview.loading=source.jobId;lastPanel=0;
+ const events=[],stream=new EventSource('/api/v1/jobs/'+source.jobId+'/events');
+ const finish=()=>{stream.close();if(preview.loading===source.jobId)preview.loading='';
+  preview.cache[source.jobId]=previewTimes(measuredRuns(events),index=>source.map[index]??null);use(preview.cache[source.jobId]);};
+ stream.onmessage=message=>{try{const event=JSON.parse(message.data);if(event.phase==='comparison_run'||event.phase==='event_comparison'||missionRelevant(event))events.push(event);}catch{}};
+ stream.addEventListener('end',finish);
+ stream.onerror=()=>{if(stream.readyState===EventSource.CLOSED)finish();};
+}
+/* Where the times of the segment on screen come from */
+function previewOrigin(m){
+ const source=preview.source,method=methodLabel(m.method);
+ if(preview.loading)return 'Lettura dei tempi della prova scelta…';
+ if(m.origin.measured)return `Tempi: ${source.kind} del ${shortDate(source.created)} · evento ${m.eventIndex} · ${method}${m.origin.replica?` · replica ${m.origin.replica}`:''}${m.origin.attempt>1?` · tentativo ${m.origin.attempt}`:''}`;
+ return source?`Tempi di riferimento: nessuna prova riuscita dell’evento ${m.eventIndex} in ${method} in questa ${source.kind}`:'Tempi di riferimento di una verifica dell’8/11/2026';
+}
 function sceneView(now){
  const mission=currentMission();
  if(mission&&mission.event)return {mission,event:mission.event,orbital:orbitalAt(mission,now),live:true};
- const event=profile?.selected_events.find(row=>row.event_id===selectedEvent)||profile?.selected_events[0];
- if(!event)return null;
- if(preview.eventId!==event.event_id){preview.eventId=event.event_id;preview.startMs=now;}
- const elapsed=((now-preview.startMs)/1000*preview.speed)%PREVIEW_SPAN_S;
- return {mission:null,event,orbital:event.trigger_s-ORBIT_LEAD_S+elapsed,live:false};
+ const position=previewNow(now);if(!position)return null;
+ const m=previewMission(preview.script,position);
+ return {mission:m,event:m.event,orbital:position.orbital,live:false};
 }
 /* Loader of the first draw: shown until the first topology sample is on screen, never again. */
 function orbitLoader(stateName,text){
@@ -110,38 +183,42 @@ function frame(now){
  if(sceneSample.eventId!==view.event.event_id){if(sceneSample.error)orbitLoader('error','Vista orbitale non disponibile: '+sceneSample.error);return;}
  orbitLoader('done');
  const m=view.mission;
- const linkActive=m?m.linkActive:view.orbital>=view.event.trigger_s;
- const result=scene.update(view.orbital,{controller:m?m.controller:view.event.source,controllerState:m?m.controllerState:'active',
-  linkActive,transferring:Boolean(m&&m.transferring),communicating:Boolean(m&&m.communicating),source:view.event.source,destination:view.event.destination});
+ const result=scene.update(view.orbital,{controller:m.controller,controllerState:m.controllerState,
+  linkActive:m.linkActive,transferring:Boolean(m.transferring),communicating:Boolean(m.communicating),source:view.event.source,destination:view.event.destination});
  const label=$('route-label');
  label.hidden=!result?.anchor;
  if(!label.hidden){label.style.left=(result.anchor.x/result.size.width*100).toFixed(2)+'%';label.style.top=(result.anchor.y/result.size.height*100).toFixed(2)+'%';label.dataset.side=result.anchor.side;}
  if(wall-lastPanel>400){lastPanel=wall;renderMission(view,wall);}
 }
 function renderMission(view,wall){
- const m=view.mission,event=view.event,index=profile.selected_events.findIndex(row=>row.event_id===event.event_id)+1;
+ const m=view.mission,event=view.event;
  $('scene-mode-text').textContent=view.live?'In diretta':`Anteprima ×${preview.speed}`;
  $('scene-mode').dataset.state=view.live?'live':'idle';
- $('mission-title').textContent=view.live?`Evento ${m.eventIndex} di ${m.eventTotal}`:`Evento ${index}`;
- $('mission-method').textContent=view.live?(methodLabel(m.method)||''):'';
+ $('mission-title').textContent=`Evento ${m.eventIndex} di ${m.eventTotal}`;
+ $('mission-method').textContent=methodLabel(m.method)||'';
+ document.querySelectorAll('#event-picker button').forEach(button=>button.setAttribute('aria-pressed',String(Number(button.dataset.index)===m.eventIndex)));
  const run=view.live&&m.run&&m.run.position?m.run:null;
- $('mission-run').hidden=!run;
+ /* Live: which run of the job; preview: which verification or experiment the times come from */
+ $('mission-run').hidden=!run&&!m.preview;
  if(run)$('mission-run').textContent=`Prova ${run.position} di ${run.total} · ${run.warmup?'riscaldamento, esclusa dai risultati':'replica '+run.replica+' di '+run.replicas}`;
- $('event-picker').hidden=view.live;$('preview-speed').hidden=view.live;
+ else if(m.preview)$('mission-run').textContent=previewOrigin(m);
+ $('event-picker').hidden=view.live;$('preview-speed').hidden=view.live;$('preview-source-box').hidden=view.live;
  $('mission-clock').textContent=relativeClock(view.orbital,event.trigger_s);
  $('mission-start').textContent=migrationCountdown(view);$('mission-time').textContent=clock(view.orbital);
  const shadowAt=event.source_shadow_entry_s??(event.trigger_s+event.source_light_remaining_s);
  $('mission-shadow').textContent=view.orbital<shadowAt?`fra ${minutes(shadowAt-view.orbital)}`:'sorgente in ombra';
  $('mission-hops').textContent=String(event.hops);
  /* The route, satellite by satellite: who hosts the controller, who relays, who receives */
- const path=event.path||[event.source,event.destination],host=m?m.controller:event.source,hops=$('mission-path');
- hops.replaceChildren();hops.classList.toggle('talking',Boolean(m&&m.communicating));
+ const path=event.path||[event.source,event.destination],host=m.controller,hops=$('mission-path');
+ hops.replaceChildren();hops.classList.toggle('talking',Boolean(m.communicating));
  path.forEach((id,position)=>{
   const role=id===host?'host':position===path.length-1?'target':'relay',li=node('li',undefined,role);
   li.title=role==='host'?'Controller':role==='target'?'Destinazione':'Relè';li.append(node('span',String(id)));hops.append(li);
  });
  let status='';
- if(!view.live)status='Nessun job in corso: la vista mostra l’evento scelto più veloce del reale. Le fasi compaiono quando parte una verifica o un esperimento.';
+ if(m.preview){
+  status=`${m.stage==='completed'?`Migrazione completata: il controller ora è su ${event.destination}. `:''}Anteprima, nessun job in corso: ogni evento in Hot e poi in Cold, con i tempi della prova indicata sopra; la fonte si sceglie nel menu «Tempi da». Le fasi più brevi sono rallentate per renderle visibili.`;
+ }
  else if(m.stage==='waiting'||m.stage==='preparing')status=`Preparazione del laboratorio${m.preparation?': '+m.preparation.toLowerCase():''}. L’orbita resta ferma a T−30 s.`;
  else if(m.stage==='countdown')status='Laboratorio pronto: l’orbita avanza verso il trigger.';
  else if(m.stage==='completed')status=orbitRunning(m)?'Migrazione completata: il servizio resta sotto osservazione per 30 s.':'Prova conclusa.';
@@ -153,30 +230,35 @@ function renderMission(view,wall){
  if(sceneSample.error)status=`Vista orbitale non disponibile: ${sceneSample.error}`;
  $('mission-status').textContent=status;$('mission-status').hidden=!status;
  /* Phase list in the side panel */
- const list=$('mission-steps');list.replaceChildren();list.hidden=!view.live||!m.steps.length;
- if(view.live)for(const step of m.steps){
+ const list=$('mission-steps');list.replaceChildren();list.hidden=!m.steps.length;
+ for(const step of m.steps){
   const li=node('li',undefined,`step ${step.status}${step.downtime?' downtime':''}`);
-  const time=step.status==='current'&&step.startMs!==null?duration((wall-step.startMs)/1000):step.duration_s!==null?duration(step.duration_s):step.offset_s!==null&&step.key==='completed'?relativeClock(event.trigger_s+step.offset_s,event.trigger_s):'';
+  const time=step.status==='current'&&step.elapsed_s!=null?duration(step.elapsed_s):step.status==='current'&&step.startMs!==null?duration((wall-step.startMs)/1000):step.duration_s!==null?duration(step.duration_s):step.offset_s!==null&&step.key==='completed'?relativeClock(event.trigger_s+step.offset_s,event.trigger_s):'';
   const name=node('span',undefined,'name');name.append(document.createTextNode(step.label));if(step.where)name.append(node('span',step.where,'where'));
   li.append(node('span',undefined,'mark'),name,node('span',time,'time'));list.append(li);
  }
  /* Label on the route */
  const ticks=$('route-ticks');ticks.replaceChildren();
- if(view.live&&m.steps.length){
+ if(m.steps.length){
   const number=m.current?m.steps.indexOf(m.current)+1:0;
-  $('route-meta').textContent=`${methodLabel(m.method)} · fase ${number} di ${m.steps.length}${m.attempt>1?' · tentativo '+m.attempt:''}${m.stage==='failed'?' · interrotta':''}`;
+  $('route-meta').textContent=`${m.preview?'Anteprima · ':''}${methodLabel(m.method)} · fase ${number} di ${m.steps.length}${m.attempt>1?' · tentativo '+m.attempt:''}${m.stage==='failed'?' · interrotta':''}`;
   $('route-phase').textContent=m.current?m.current.label:'In attesa del trigger';
   for(const step of m.steps)ticks.append(node('li',undefined,`${step.status}${step.downtime?' downtime':''}`));
-  const down=m.downtime,box=$('route-downtime');
+  const down=m.downtime||{},box=$('route-downtime');
+  if(m.preview){
+   const d=m.previewDowntime;box.hidden=d.seconds===null;
+   if(d.seconds!==null)box.textContent=`Controller fermo ${d.ended?'per':'da'} ${duration(d.seconds)}`;
+  }else{
   box.hidden=!down.startMs;
   if(down.startMs)box.textContent=down.endMs?`Controller fermo per ${duration((down.endMs-down.startMs)/1000)}`:`Controller fermo da ${duration((wall-down.startMs)/1000)}`;
+  }
  }else{
   $('route-meta').textContent='Percorso previsto';
   $('route-phase').textContent=`${event.hops} salti laser verso ${event.destination}`;
   $('route-downtime').hidden=true;
  }
  /* Before the trigger the label also says how long until the migration starts */
- const waiting=view.live?!m.linkActive:view.orbital<event.trigger_s;
+ const waiting=!m.linkActive;
  $('route-countdown').hidden=!waiting;if(waiting)$('route-countdown').textContent=`Migrazione ${migrationCountdown(view)}`;
 }
 /* Time to the migration: the trigger fires at the event's orbital instant. During the
@@ -193,8 +275,7 @@ function migrationCountdown(view){
  return left>0?`fra ${minutes(left)}`:`avviata da ${minutes(-left)}`;
 }
 document.querySelectorAll('#preview-speed button').forEach(button=>button.addEventListener('click',()=>{
- const now=Date.now(),elapsed=((now-preview.startMs)/1000*preview.speed)%PREVIEW_SPAN_S;
- preview.speed=Number(button.dataset.speed);preview.startMs=now-elapsed/preview.speed*1000;
+ rebuildPreview(()=>{preview.speed=Number(button.dataset.speed);});
  document.querySelectorAll('#preview-speed button').forEach(other=>other.setAttribute('aria-pressed',String(other===button)));
 }));
 
@@ -327,7 +408,7 @@ $('stop-dialog').addEventListener('close',async()=>{
 function renderComparisonSelect(){
  const select=$('comparison-select'),current=selectedComparison||comparisons[0]?.comparison_id||'';
  select.replaceChildren();
- for(const row of comparisons){const option=node('option',`${new Date(row.created_utc).toLocaleString('it-IT')} · ${row.complete?'completato':row.reason?'non completato':'in corso'}`);option.value=row.comparison_id;option.selected=row.comparison_id===current;select.append(option);}
+ for(const row of comparisons){const option=node('option',`${new Date(row.created_utc).toLocaleString('it-IT')} · ${row.complete?'completato':row.reason==='worker_stopped'?'interrotto':row.reason?'non completato':'in corso'}`);option.value=row.comparison_id;option.selected=row.comparison_id===current;select.append(option);}
  select.hidden=!comparisons.length;
 }
 $('comparison-select').addEventListener('change',event=>{selectedComparison=event.target.value;renderResults();});
@@ -337,7 +418,7 @@ function phaseText(run){
   .filter(([,key])=>s[key]!==undefined).map(([label,key])=>`${label} ${duration(s[key])}`);
  return parts.join(' · ')||'fasi non disponibili';
 }
-const REASONS={interrupted:'interrotto',recovery_required:'serve il ripristino del laboratorio',too_many_failures:'3 prove non riuscite di fila',failed:'prova non riuscita',service_not_verified:'servizio non verificato'};
+const REASONS={interrupted:'interrotto',worker_stopped:'il processo dell’esperimento si è fermato prima della fine',recovery_required:'serve il ripristino del laboratorio',too_many_failures:'3 prove non riuscite di fila',failed:'prova non riuscita',service_not_verified:'servizio non verificato'};
 const spread=stat=>stat&&stat.n?`${duration(stat.median)}${stat.n>1?` · ${duration(stat.q1)}–${duration(stat.q3)}`:''}`:'—';
 const interval=stat=>stat&&stat.n?`${duration(stat.median)}${stat.ci95?` · IC ${duration(stat.ci95[0])}–${duration(stat.ci95[1])}`:''}`:'—';
 function table(headers,rows,rowClass){
@@ -355,7 +436,7 @@ function renderDesignResults(comparison,box,status){
  box.append(table(['Evento','Percorso','Salti','Destinazione','Hot · mediana e quartili','Cold · mediana e quartili','Cold − Hot · mediana e IC 95 %','Coppie'],
   comparison.events.map(row=>{const s=row.statistics?.controller_downtime_s;return [`E${row.index}`,`${row.source} → ${row.destination}`,String(row.hops),row.other_plane?'altro piano':'stesso piano',
    spread(s?.hot),spread(s?.cold),interval(s?.cold_minus_hot),String(s?.cold_minus_hot?.n??0)];})));
- box.append(node('p','IC 95 %: intervallo bootstrap della mediana delle differenze appaiate, sulle repliche con entrambe le misure. Misure mancanti escluse.','small muted'));
+ box.append(node('p',`${comparison.statistics_partial?'Statistiche parziali: solo le prove già concluse. ':''}IC 95 %: intervallo bootstrap della mediana delle differenze appaiate, sulle repliche con entrambe le misure. Misure mancanti escluse.`,'small muted'));
  if(comparison.warmup?.run){const w=comparison.warmup;box.append(node('p',`Riscaldamento (escluso): evento ${w.event}, ${methodLabel(w.method)}, downtime ${duration(w.run.controller_downtime_s)}, ${w.run.success?'riuscita':'non riuscita'}.`,'small muted'));}
  for(const row of comparison.events){
   const card=node('details',undefined,'event-detail'),summary=node('summary');
@@ -436,12 +517,12 @@ async function refresh(){
   const c=state.components||{},ready=c.mininet?.reachable&&c.p4_proxy?.reachable;
   $('health').textContent=(ready?'Laboratorio raggiungibile':'Laboratorio non raggiungibile')+(state.lock?' · job in corso':'');
   $('health').dataset.state=ready?'ok':'error';
-  renderComponents();renderLatest();renderJob();renderResults();
+  renderComponents();renderLatest();renderJob();renderResults();renderPreviewSources();
  }catch(error){$('health').textContent='Console non collegata: '+error.message;$('health').dataset.state='error';}
 }
 async function loadProfile(){
  try{const {profiles}=await api('/scenario-profiles');profile=profiles.find(row=>row.installed&&row.summary)||profiles.find(row=>row.summary)||null;}catch{profile=null;}
- renderProfile();
+ preview.script=null;renderProfile();
  if(!profile)orbitLoader('error','Nessuno scenario installato: la vista orbitale resta vuota.');
 }
 document.addEventListener('DOMContentLoaded',async()=>{

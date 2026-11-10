@@ -52,7 +52,8 @@
 
 <section id="page-scenario" class="page" aria-labelledby="scenario-title" hidden>
  <div class="scene-head">
-  <div class="inline"><h1 id="scenario-title">Scenario</h1><button class="info" type="button" aria-expanded="false" data-pop="scenario-info" aria-label="Informazioni sullo scenario"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.25"/><path d="M10 9v5"/><circle class="dot" cx="10" cy="6.1" r="1"/></svg></button></div>
+  <div class="inline"><h1 id="scenario-title">Scenario</h1><button class="info" type="button" aria-expanded="false" data-pop="scenario-info" aria-label="Informazioni sullo scenario"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.25"/><path d="M10 9v5"/><circle class="dot" cx="10" cy="6.1" r="1"/></svg></button>
+   <label class="select preview-source" id="preview-source-box">Tempi da <select id="preview-source"></select></label></div>
   <p class="chip" id="scene-mode" data-state="idle" role="status"><span class="led"></span><span id="scene-mode-text">Anteprima</span></p>
   <div class="pop" id="scenario-info" role="note">Due piani orbitali Starlink reali, guscio 53° a 463 km. Ogni satellite ha 3 laser: 2 verso i vicini dello stesso piano, 1 verso l’altro piano. Il controller governa un dominio di 16 satelliti; quando la sua sorgente sta per entrare in ombra migra, anche attraverso più salti, verso un satellite al sole. Durante un job la vista segue la prova in corso: l’orbita resta ferma a T−30 s mentre il laboratorio si prepara, poi avanza di un secondo orbitale al secondo. Ogni collegamento laser ha il ritardo di propagazione della sua lunghezza. Ipotesi: prima di trasferire, il percorso deve restare disponibile per 60 s di fila. Geometria modellata, non in scala.</div>
  </div>
