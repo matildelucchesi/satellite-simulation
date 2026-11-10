@@ -203,3 +203,48 @@ class PinnedEventTests(DesignedEventTests):
         with self.assertRaises(ValueError):
             model.designed_events(self.index, periods, [1, 2], self.plane, ((1, False, 0, 1),),
                                   trigger_lead_s=200, minimum_destination_light_s=100, minimum_path_persistence_s=100)
+
+
+class DestinationPolicyTests(DesignedEventTests):
+    """Domain = rail 1-2-3-4, links of 3000 km (≈10 ms each). From source 1 at trigger 800:
+    2 (1 hop, 300 s of stay), 3 (2 hops, 2800 s) and 4 (3 hops, 2900 s)."""
+    LIMITS = {'trigger_lead_s': 200, 'minimum_destination_light_s': 150, 'minimum_path_persistence_s': 100}
+
+    def candidates(self, domain=(1, 2, 3, 4), **weights):
+        return model.policy_candidates(self.index, self.periods, list(domain), self.plane, 1, 1000,
+                                       lambda a, b, tick: 3000.0, **self.LIMITS, **({'k': 1.0, 'downtime_s': 7.0} | weights))
+
+    def test_latency_and_stay_are_traded_with_one_parameter(self):
+        trigger, rows = self.candidates()
+        self.assertEqual(trigger, 800)
+        hop_ms = 3000.0 / model.LIGHT_SPEED_KM_S * 1000.0
+        by = {row['destination']: row for row in rows}
+        self.assertAlmostEqual(by[2]['control_latency_ms'], 4 / 3 * hop_ms)
+        self.assertAlmostEqual(by[4]['control_latency_ms'], 2 * hop_ms)
+        self.assertEqual((by[2]['stay_s'], by[3]['stay_s']), (300, 2800))
+        self.assertAlmostEqual(by[2]['cost'], 4 / 3 * hop_ms + 7.0 / 300 * 1000.0)
+        # A short stay costs more than a farther, longer-lived destination
+        self.assertEqual([row['destination'] for row in rows], [3, 4, 2])
+        # Without the downtime term the nearest of the equally central destinations wins
+        self.assertEqual(self.candidates(k=0.0)[1][0]['destination'], 2)
+
+    def test_the_controller_must_reach_the_whole_domain(self):
+        # 8 hangs off 7, outside the domain: no controller inside reaches it
+        self.assertEqual(self.candidates(domain=(1, 2, 3, 8))[1], [])
+        self.assertIsNone(model.control_latency_ms(self.index.segment(800)[2], [1, 2, 3, 8], 2, lambda a, b: 1.0))
+
+    def test_policy_events_summary_and_comparison_with_a_designed_event(self):
+        events = model.policy_events(self.index, self.periods, [1, 2, 3, 4], self.plane, lambda a, b, tick: 3000.0, **self.LIMITS)
+        first = next(event for event in events if event['event_id'] == '1-800')
+        self.assertEqual((first['destination'], first['hops'], first['candidates']), (3, 2, 3))
+        self.assertIsNotNone(first['source_control_latency_ms'])
+        summary = model.policy_summary(events)
+        self.assertEqual(summary['shadow_entries'], len(events))
+        served = [event for event in events if event['destination'] is not None]
+        self.assertEqual(summary['served'], len(served))
+        self.assertAlmostEqual(summary['downtime_share'], 7.0 * len(served) / sum(event['stay_s'] for event in served))
+        designed = [{'event_id': '1-800', 'source': 1, 'trigger_s': 800, 'source_shadow_entry_s': 1000, 'destination': 2, 'hops': 1}]
+        [row] = model.compare_with_policy(designed, self.index, self.periods, [1, 2, 3, 4], self.plane,
+                                          lambda a, b, tick: 3000.0, **self.LIMITS)
+        self.assertEqual((row['policy']['destination'], row['designed']['destination'], row['rank_of_designed']), (3, 2, 3))
+        self.assertFalse(row['same_destination'])

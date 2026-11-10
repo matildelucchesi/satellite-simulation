@@ -11,6 +11,7 @@ the other plane. A link formed during the replay is usable only after it has exi
 from __future__ import annotations
 
 import bisect
+import heapq
 import math
 from collections import deque
 
@@ -445,6 +446,144 @@ def designed_events(index, periods, domain, plane_of, specs=EVENT_SPECS, *, trig
                       'path_persistence_at_least_s': minimum_path_persistence_s,
                       'path_end_s': index.path_end(source, target, trigger)})
     return picks
+
+
+# ---------------------------------------------------------------- destination policy
+# What a real system would choose, reported next to the designed events (which fix the hop count
+# to study the reach of a migration). Of the candidate criteria only two are independent in this
+# shell: the path lifetime is the same for every destination of a shadow entry (a constraint, not
+# a weight) and the hop count follows the light gained (each hop ≈ 3 min). The policy weighs
+#   control latency: mean one-way propagation delay from the controller to the other domain
+#                    satellites over the domain's own links, in ms;
+#   stay:            time on the destination before it must migrate in turn (its remaining light
+#                    minus the trigger lead), over which one migration downtime is spread.
+# cost = latency_ms + k · (downtime_s / stay_s) · 1000: with k = 1, 1 % of time with the
+# controller down weighs as much as 10 ms of mean latency. Downtime: Hot, as measured in the
+# verifications and the experiment of 8 November 2026 (6–9 s).
+DESTINATION_POLICY = {'k': 1.0, 'downtime_s': 7.0}
+LIGHT_SPEED_KM_S = 299792.458
+
+
+def control_latency_ms(graph, domain, controller, distance_km):
+    """Mean one-way propagation delay in ms from ``controller`` to every other domain satellite,
+    over links between domain satellites only; None if one of them cannot be reached."""
+    members = set(domain)
+    best, queue = {controller: 0.0}, [(0.0, controller)]
+    while queue:
+        delay, node = heapq.heappop(queue)
+        if delay > best[node]:
+            continue
+        for neighbour in graph[node]:
+            if neighbour not in members:
+                continue
+            candidate = delay + distance_km(node, neighbour) / LIGHT_SPEED_KM_S * 1000.0
+            if candidate < best.get(neighbour, math.inf):
+                best[neighbour] = candidate
+                heapq.heappush(queue, (candidate, neighbour))
+    others = [node for node in domain if node != controller]
+    if any(node not in best for node in others):
+        return None
+    return sum(best[node] for node in others) / len(others) if others else 0.0
+
+
+def policy_candidates(index, periods, domain, plane_of, source, shadow_entry, distance_km, *, trigger_lead_s,
+                      minimum_destination_light_s, minimum_path_persistence_s, k, downtime_s):
+    """Admissible destinations for one shadow entry, cheapest first (ties: fewer hops, lower id).
+
+    Admissible as for the designed events: destination and path inside the domain, at least
+    ``minimum_destination_light_s`` of light and more than the source, a path lasting at least
+    ``minimum_path_persistence_s``; in addition the controller there must reach the whole domain.
+    ``distance_km(a, b, tick)`` gives the distance between two satellites."""
+    trigger = shadow_entry - trigger_lead_s
+    members = set(domain)
+    graph = index.segment(trigger)[2]
+    depth, paths = index.hops(source, trigger)
+    at = lambda a, b: distance_km(a, b, trigger)
+    rows = []
+    for target, hops in depth.items():
+        if target == source or not all(node in members for node in paths[target]):
+            continue
+        window = _containing(periods[target], trigger)
+        if window is None:
+            continue
+        light = window[1] - trigger
+        if light < minimum_destination_light_s or light <= shadow_entry - trigger:
+            continue
+        if index.path_end(source, target, trigger, minimum_path_persistence_s) - trigger < minimum_path_persistence_s:
+            continue
+        latency = control_latency_ms(graph, domain, target, at)
+        if latency is None:
+            continue
+        stay = light - trigger_lead_s
+        fraction = downtime_s / stay
+        rows.append({'destination': target, 'hops': hops, 'other_plane': plane_of[target] != plane_of[source],
+                     'path': paths[target], 'destination_light_remaining_s': light, 'stay_s': stay,
+                     'control_latency_ms': latency, 'downtime_fraction': fraction,
+                     'cost': latency + k * fraction * 1000.0})
+    rows.sort(key=lambda row: (row['cost'], row['hops'], row['destination']))
+    return trigger, rows
+
+
+def policy_events(index, periods, domain, plane_of, distance_km, *, trigger_lead_s, minimum_destination_light_s,
+                  minimum_path_persistence_s, k=DESTINATION_POLICY['k'], downtime_s=DESTINATION_POLICY['downtime_s']):
+    """The policy's choice at every shadow entry of a domain satellite inside the replay. Entries
+    without an admissible destination stay with ``destination`` None, as in the general catalogue."""
+    events = []
+    for source in domain:
+        for start, end in periods[source]:
+            if end >= index.duration or end - trigger_lead_s < max(start, 0):
+                continue
+            trigger, rows = policy_candidates(index, periods, domain, plane_of, source, end, distance_km,
+                                              trigger_lead_s=trigger_lead_s,
+                                              minimum_destination_light_s=minimum_destination_light_s,
+                                              minimum_path_persistence_s=minimum_path_persistence_s,
+                                              k=k, downtime_s=downtime_s)
+            event = {'event_id': f'{source}-{trigger}', 'source': source, 'trigger_s': trigger,
+                     'source_shadow_entry_s': end, 'source_light_remaining_s': end - trigger,
+                     'source_control_latency_ms': control_latency_ms(index.segment(trigger)[2], domain, source,
+                                                                     lambda a, b: distance_km(a, b, trigger)),
+                     'candidates': len(rows), 'destination': None}
+            if rows:
+                event.update(rows[0])
+            events.append(event)
+    events.sort(key=lambda e: (e['trigger_s'], e['source']))
+    return events
+
+
+def policy_summary(events):
+    """Hop histogram and means over the entries the policy could serve. The downtime share is
+    total downtime over total stay: a plain mean of the ratios would be dominated by the few
+    entries whose only destination stays a few seconds."""
+    chosen = [event for event in events if event['destination'] is not None]
+    histogram = {}
+    for event in chosen:
+        histogram[str(event['hops'])] = histogram.get(str(event['hops']), 0) + 1
+    mean = lambda field: sum(event[field] for event in chosen) / len(chosen) if chosen else None
+    stay = sum(event['stay_s'] for event in chosen)
+    return {'shadow_entries': len(events), 'served': len(chosen), 'hops_histogram': histogram,
+            'mean_stay_s': mean('stay_s'), 'mean_control_latency_ms': mean('control_latency_ms'),
+            'downtime_share': sum(event['downtime_fraction'] * event['stay_s'] for event in chosen) / stay if stay else None}
+
+
+def compare_with_policy(designed, index, periods, domain, plane_of, distance_km, *, trigger_lead_s,
+                        minimum_destination_light_s, minimum_path_persistence_s,
+                        k=DESTINATION_POLICY['k'], downtime_s=DESTINATION_POLICY['downtime_s']):
+    """For each designed event: its destination and the policy's at the same shadow entry, scored
+    alike, so the report shows what the fixed hop count costs in latency and stay."""
+    fields = ('destination', 'hops', 'other_plane', 'stay_s', 'control_latency_ms', 'downtime_fraction', 'cost')
+    out = []
+    for event in designed:
+        _, rows = policy_candidates(index, periods, domain, plane_of, event['source'], event['source_shadow_entry_s'],
+                                    distance_km, trigger_lead_s=trigger_lead_s,
+                                    minimum_destination_light_s=minimum_destination_light_s,
+                                    minimum_path_persistence_s=minimum_path_persistence_s, k=k, downtime_s=downtime_s)
+        mine = next((row for row in rows if row['destination'] == event['destination']), None)
+        out.append({'event_id': event['event_id'], 'source': event['source'], 'trigger_s': event['trigger_s'],
+                    'designed': {field: mine[field] for field in fields} if mine else {'destination': event['destination'], 'hops': event['hops']},
+                    'policy': {field: rows[0][field] for field in fields} if rows else None,
+                    'rank_of_designed': rows.index(mine) + 1 if mine else None, 'candidates': len(rows),
+                    'same_destination': bool(rows) and rows[0]['destination'] == event['destination']})
+    return out
 
 
 # ---------------------------------------------------------------- helpers

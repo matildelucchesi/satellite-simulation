@@ -48,6 +48,10 @@ def main(argv=None):
     parser.add_argument('--trigger-lead-s', type=int, default=DEFAULTS['trigger_lead_s'])
     parser.add_argument('--minimum-destination-light-s', type=int, default=DEFAULTS['minimum_destination_light_s'])
     parser.add_argument('--minimum-path-persistence-s', type=int, default=DEFAULTS['minimum_path_persistence_s'])
+    parser.add_argument('--policy-k', type=float, default=model.DESTINATION_POLICY['k'],
+                        help='Politica di destinazione: ms di latenza media equivalenti a 0,1 %% di tempo con il controller fermo')
+    parser.add_argument('--policy-downtime-s', type=float, default=model.DESTINATION_POLICY['downtime_s'],
+                        help='Politica di destinazione: downtime per migrazione (Hot misurato)')
     parser.add_argument('--force', action='store_true', help='Overwrite an existing profile directory')
     args = parser.parse_args(argv)
 
@@ -105,6 +109,9 @@ def main(argv=None):
                                     'minimum_path_persistence_s': args.minimum_path_persistence_s,
                                     'event_specs': [{'hops': hops, 'other_plane': other, 'slot': slot, 'source': source} for hops, other, slot, source in model.EVENT_SPECS],
                                     'event_slots': model.EVENT_SLOTS,
+                                    'destination_policy': {'k': args.policy_k, 'downtime_s': args.policy_downtime_s,
+                                                           'cost': 'latenza media di controllo (ms) + k * downtime / permanenza * 1000',
+                                                           'role': 'riferimento: cosa sceglierebbe un sistema reale; gli eventi dell esperimento restano quelli progettati'},
                                     'selection': 'combinazione 12: 1 salto stesso piano, 5 salti stesso piano, 7 salti verso l altro piano; sorgente e fascia del giorno fissate per evento; destinazione e percorso nel dominio; destinazione al sole piu a lungo della sorgente e almeno per la soglia'}
     # Experiment design: replicas per event and mode, one discarded warm-up run; the Hot/Cold
     # order inside each pair is drawn with a seed chosen and recorded by every experiment.
@@ -179,12 +186,22 @@ def main(argv=None):
                                    trigger_lead_s=args.trigger_lead_s,
                                    minimum_destination_light_s=args.minimum_destination_light_s,
                                    minimum_path_persistence_s=args.minimum_path_persistence_s)
+    log('Politica di destinazione (latenza di controllo e permanenza)')
+    column = {sid: position for position, sid in enumerate(ids)}
+    distance_km = lambda a, b, tick: float(np.linalg.norm(positions[int(tick), column[a]] - positions[int(tick), column[b]]))
+    limits = {'trigger_lead_s': args.trigger_lead_s, 'minimum_destination_light_s': args.minimum_destination_light_s,
+              'minimum_path_persistence_s': args.minimum_path_persistence_s, 'k': args.policy_k, 'downtime_s': args.policy_downtime_s}
+    policy = model.policy_events(index, periods, domain, plane_of, distance_km, **limits)
+    destination_policy = {'parameters': scenario['migration_events']['destination_policy'],
+                          'summary': model.policy_summary(policy),
+                          'designed_vs_policy': model.compare_with_policy(chosen, index, periods, domain, plane_of, distance_km, **limits),
+                          'events': policy}
     hop_histogram = {}
     for event in feasible:
         hop_histogram[str(event['hops'])] = hop_histogram.get(str(event['hops']), 0) + 1
     write_json(profile / 'events.json', {'policy': model.POLICY, 'parameters': scenario['migration_events'],
         'event_count': len(events), 'feasible_count': len(feasible), 'hops_histogram': hop_histogram,
-        'selected': chosen, 'events': events})
+        'selected': chosen, 'events': events, 'destination_policy': destination_policy})
 
     outputs = ['selected_constellation.json', 'scenario.json', 'replay.npz', 'replay.json',
                'laser_links.json', 'domain.json', 'events.json']
