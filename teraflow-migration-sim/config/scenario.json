@@ -156,23 +156,23 @@
     "hops": 1,
     "other_plane": false,
     "slot": 0,
-    "source": 62760
+    "source": 62768
    },
    {
     "hops": 5,
     "other_plane": false,
     "slot": 3,
-    "source": 60142
+    "source": 62774
    },
    {
     "hops": 7,
     "other_plane": true,
     "slot": 4,
-    "source": 62776
+    "source": 60150
    }
   ],
   "event_slots": 5,
-  "selection": "combinazione 12: 1 salto stesso piano, 5 salti stesso piano, 7 salti verso l altro piano; sorgente e fascia del giorno fissate per evento; luce sulla destinazione almeno pari alla soglia"
+  "selection": "combinazione 12: 1 salto stesso piano, 5 salti stesso piano, 7 salti verso l altro piano; sorgente e fascia del giorno fissate per evento; destinazione e percorso nel dominio; destinazione al sole piu a lungo della sorgente e almeno per la soglia"
  },
  "migration": {
   "software_on_board": true,

@@ -68,6 +68,17 @@
      <p class="route-countdown" id="route-countdown" hidden></p>
      <p class="route-downtime" id="route-downtime" hidden></p>
     </div>
+    <div class="orbit-loader" id="orbit-loader" role="status">
+     <svg viewBox="0 0 120 120" aria-hidden="true">
+      <circle class="planet" cx="60" cy="60" r="15"/>
+      <g transform="rotate(-25 60 60)">
+       <path class="track" d="M112 60A52 22 0 1 1 8 60A52 22 0 1 1 112 60"/>
+       <path class="tail" d="M112 60A52 22 0 1 1 8 60A52 22 0 1 1 112 60" pathLength="100" stroke-dasharray="24 76"><animate attributeName="stroke-dashoffset" values="24;-76" dur="2.4s" repeatCount="indefinite"/></path>
+       <circle class="sat" r="4.5"><animateMotion dur="2.4s" repeatCount="indefinite" path="M112 60A52 22 0 1 1 8 60A52 22 0 1 1 112 60"/></circle>
+      </g>
+     </svg>
+     <p id="orbit-loader-text">Calcolo dell’orbita…</p>
+    </div>
    </div>
    <ul class="legend small" aria-label="Legenda">
     <li><span class="key sun"></span>Al sole</li>

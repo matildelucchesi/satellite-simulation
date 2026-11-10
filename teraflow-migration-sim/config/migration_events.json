@@ -9,23 +9,23 @@
     "hops": 1,
     "other_plane": false,
     "slot": 0,
-    "source": 62760
+    "source": 62768
    },
    {
     "hops": 5,
     "other_plane": false,
     "slot": 3,
-    "source": 60142
+    "source": 62774
    },
    {
     "hops": 7,
     "other_plane": true,
     "slot": 4,
-    "source": 62776
+    "source": 60150
    }
   ],
   "event_slots": 5,
-  "selection": "combinazione 12: 1 salto stesso piano, 5 salti stesso piano, 7 salti verso l altro piano; sorgente e fascia del giorno fissate per evento; luce sulla destinazione almeno pari alla soglia"
+  "selection": "combinazione 12: 1 salto stesso piano, 5 salti stesso piano, 7 salti verso l altro piano; sorgente e fascia del giorno fissate per evento; destinazione e percorso nel dominio; destinazione al sole piu a lungo della sorgente e almeno per la soglia"
  },
  "event_count": 240,
  "feasible_count": 240,
@@ -34,69 +34,69 @@
  },
  "selected": [
   {
-   "event_id": "62760-8477",
-   "source": 62760,
-   "trigger_s": 8477,
-   "source_shadow_entry_s": 9377,
+   "event_id": "62768-8295",
+   "source": 62768,
+   "trigger_s": 8295,
+   "source_shadow_entry_s": 9195,
    "source_light_remaining_s": 900,
    "reachable_satellites": 61,
-   "destination": 62777,
+   "destination": 62760,
    "hops": 1,
    "path": [
-    62760,
-    62777
+    62768,
+    62760
    ],
    "other_plane": false,
-   "destination_light_remaining_s": 1081,
-   "light_gained_s": 181,
+   "destination_light_remaining_s": 1082,
+   "light_gained_s": 182,
    "path_persistence_at_least_s": 900,
    "path_end_s": 86400
   },
   {
-   "event_id": "60142-58996",
-   "source": 60142,
-   "trigger_s": 58996,
-   "source_shadow_entry_s": 59896,
+   "event_id": "62774-58281",
+   "source": 62774,
+   "trigger_s": 58281,
+   "source_shadow_entry_s": 59181,
    "source_light_remaining_s": 900,
    "reachable_satellites": 61,
-   "destination": 60146,
+   "destination": 62760,
    "hops": 5,
    "path": [
-    60142,
-    60138,
-    60143,
-    60154,
-    60153,
-    60146
+    62774,
+    58883,
+    58893,
+    62776,
+    62768,
+    62760
    ],
    "other_plane": false,
-   "destination_light_remaining_s": 1808,
-   "light_gained_s": 908,
+   "destination_light_remaining_s": 1809,
+   "light_gained_s": 909,
    "path_persistence_at_least_s": 900,
    "path_end_s": 86400
   },
   {
-   "event_id": "62776-75730",
-   "source": 62776,
-   "trigger_s": 75730,
-   "source_shadow_entry_s": 76630,
+   "event_id": "60150-80439",
+   "source": 60150,
+   "trigger_s": 80439,
+   "source_shadow_entry_s": 81339,
    "source_light_remaining_s": 900,
    "reachable_satellites": 61,
-   "destination": 60146,
+   "destination": 62768,
    "hops": 7,
    "path": [
+    60150,
+    58886,
+    62775,
+    62774,
+    58883,
+    58893,
     62776,
-    62768,
-    60142,
-    60138,
-    60143,
-    60154,
-    60153,
-    60146
+    62768
    ],
    "other_plane": true,
-   "destination_light_remaining_s": 1976,
-   "light_gained_s": 1076,
+   "destination_light_remaining_s": 2006,
+   "light_gained_s": 1106,
    "path_persistence_at_least_s": 900,
    "path_end_s": 86400
   }

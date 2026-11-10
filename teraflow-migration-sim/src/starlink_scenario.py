@@ -369,26 +369,34 @@ def migration_events(index, periods, domain, *, trigger_lead_s, minimum_destinat
 # Events of the experiment: (hops, destination on the other plane, slot of the day, source). The
 # day is split into EVENT_SLOTS equal slots; each event takes the candidate of that source closest
 # to its slot centre. Chosen set (combination 12 of 8 November 2026): 1 hop same plane, 5 hops
-# same plane, 7 hops towards the other plane, from three different satellites.
+# same plane, 7 hops towards the other plane, from three different satellites, with destination
+# and path inside the controller's domain.
 EVENT_SLOTS = 5
-EVENT_SPECS = ((1, False, 0, 62760), (5, False, 3, 60142), (7, True, 4, 62776))
+EVENT_SPECS = ((1, False, 0, 62768), (5, False, 3, 62774), (7, True, 4, 60150))
 
 
 def designed_events(index, periods, domain, plane_of, specs=EVENT_SPECS, *, trigger_lead_s,
-                    minimum_destination_light_s, minimum_path_persistence_s, slots=None):
-    """One event per (hops, other plane) specification, to compare migrations of different reach.
+                    minimum_destination_light_s, minimum_path_persistence_s, slots=None, within_domain=True):
+    """One event per specification, to compare migrations of different reach.
 
     Candidates are the shadow entries of domain satellites, triggered ``trigger_lead_s`` before
     shadow, with a destination exactly ``hops`` laser hops away (fewest-hop path), on the other
     plane when requested, with at least ``minimum_destination_light_s`` of light left and a path
     that lasts ``minimum_path_persistence_s``. In this shell the hop count and the destination's
     light go together (each hop towards the trailing satellites gains about one slot of light), so
-    the light threshold only excludes destinations about to enter shadow. Events are spread over
-    the day: a specification ``(hops, other_plane, slot)`` takes the candidate whose trigger is
-    closest to ``duration * (slot + 0.5) / slots`` (without a slot, its position and len(specs));
-    an optional fourth element restricts the event to one source satellite (ties: more light, then lower NORAD ids), never reusing a
-    source shadow entry and preferring sources not used yet, so the events start from different
-    satellites when the geometry allows it."""
+    the light threshold only excludes destinations about to enter shadow. The destination must
+    also stay in sunlight longer than the source, or the migration would gain nothing.
+
+    With ``within_domain`` (default) the destination and every satellite of the path belong to the
+    controller's domain: the controller stays on a satellite of the network it governs, as in SDN
+    designs for satellite constellations, and its migration does not cross another domain.
+
+    A specification is ``(hops, other_plane, slot, source)``; slot and source are optional. The day
+    is split into ``slots`` equal parts (default: one per specification) and the event takes the
+    candidate whose trigger is closest to its slot centre; a source restricts the event to one
+    satellite. Ties: more light, then lower NORAD ids. A source shadow entry is never reused and
+    sources not used yet are preferred, so events start from different satellites when possible."""
+    members = set(domain)
     used, sources, picks = set(), set(), []
     slots = slots or len(specs)
     for position, spec in enumerate(specs):
@@ -410,10 +418,14 @@ def designed_events(index, periods, domain, plane_of, specs=EVENT_SPECS, *, trig
                 for target, hop in depth.items():
                     if hop != hops or (plane_of[target] != plane_of[source]) != other_plane:
                         continue
+                    if within_domain and not all(node in members for node in paths[target]):
+                        continue
                     window = _containing(periods[target], trigger)
                     if window is None or window[1] - trigger < minimum_destination_light_s:
                         continue
                     light = window[1] - trigger
+                    if light <= end - trigger:  # the destination must outlast the source in sunlight
+                        continue
                     key = (source in sources, abs(trigger - target_time), -light, source, target)
                     if best is not None and key >= best[0]:
                         continue

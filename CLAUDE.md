@@ -15,7 +15,7 @@ Il laboratorio confronta due strategie di migrazione del controller ETSI TeraFlo
 - **Hot** prepara la destinazione mentre la sorgente controlla ancora la rete; dopo il freeze trasferisce e applica il delta, verifica e passa l'autorità.
 - **Cold** salva lo stato, arresta la sorgente, trasferisce e ripristina sulla destinazione; il downtime include tutto il lavoro successivo all'arresto.
 - **Verifica** (`functional`): una migrazione Hot e una Cold sul primo evento del catalogo.
-- **Esperimento** (`compare_events`): 3 eventi del catalogo (1 e 5 salti sullo stesso piano, 7 salti verso l'altro piano); un riscaldamento escluso, poi 3 repliche di Hot e Cold per evento, una replica dopo l'altra, ordine Hot/Cold casuale in ogni coppia con seme registrato; mediana, quartili e Cold − Hot appaiato con IC 95 %.
+- **Esperimento** (`compare_events`): 3 eventi del catalogo (1 e 5 salti sullo stesso piano, 7 salti verso l'altro piano), con destinazione e percorso dentro il dominio del controller; un riscaldamento escluso, poi 3 repliche di Hot e Cold per evento, una replica dopo l'altra, ordine Hot/Cold casuale in ogni coppia con seme registrato; mediana, quartili e Cold − Hot appaiato con IC 95 %.
 
 Il piano e le decisioni del progetto sono in [docs/piano-riprogettazione-simulatore.md](teraflow-migration-sim/docs/piano-riprogettazione-simulatore.md); le istruzioni d'uso nel [README](README.md).
 

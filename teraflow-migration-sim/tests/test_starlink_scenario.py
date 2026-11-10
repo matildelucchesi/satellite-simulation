@@ -162,14 +162,15 @@ class DesignedEventTests(unittest.TestCase):
                  for a, b in chain]
         self.index = model.LinkIndex(links, list(range(1, 9)), 4000)
         # Source 1 enters shadow at 1000, 2500 and 3600: three events, triggers 800, 2300 and 3400
-        light = {1: [(0, 1000), (1500, 2500), (2700, 3600)], 5: [(0, 1000), (1200, 2600)], 2: [(0, 1300)], 3: [(0, 3800)],
+        light = {1: [(0, 1000), (1500, 2500), (2700, 3600)], 5: [(0, 1100), (1200, 2600)], 2: [(0, 1300)], 3: [(0, 3800)],
                  4: [(0, 3900)], 6: [(0, 1200)], 7: [(0, 3200)], 8: [(0, 3900)]}
         self.periods = light
         self.plane = {1: 0, 2: 0, 3: 0, 4: 0, 5: 1, 6: 1, 7: 1, 8: 1}
 
     def test_one_event_per_hop_and_plane_specification(self):
         events = model.designed_events(self.index, self.periods, [1], self.plane, ((1, False), (1, True), (2, False)),
-                                       trigger_lead_s=200, minimum_destination_light_s=150, minimum_path_persistence_s=100)
+                                       trigger_lead_s=200, minimum_destination_light_s=150, minimum_path_persistence_s=100,
+                                       within_domain=False)
         self.assertEqual([(e['hops'], e['other_plane'], e['destination']) for e in events], [(1, False, 2), (1, True, 5), (2, False, 3)])
         self.assertEqual(events[0]['path'], [1, 2])
         self.assertEqual(len({(e['source'], e['trigger_s']) for e in events}), 3)
@@ -177,11 +178,28 @@ class DesignedEventTests(unittest.TestCase):
     def test_destination_about_to_enter_shadow_is_excluded(self):
         with self.assertRaises(ValueError):
             model.designed_events(self.index, {**self.periods, 5: [(0, 850)], 6: [(0, 850)]}, [1], self.plane, ((1, True),),
-                                  trigger_lead_s=200, minimum_destination_light_s=600, minimum_path_persistence_s=100)
+                                  trigger_lead_s=200, minimum_destination_light_s=600, minimum_path_persistence_s=100,
+                                  within_domain=False)
 
 
 class PinnedEventTests(DesignedEventTests):
     def test_slot_and_source_pin_an_event(self):
-        events = model.designed_events(self.index, self.periods, [1, 5], self.plane, ((1, True, 1, 5),), slots=3,
+        periods = {**self.periods, 1: [(0, 1500), (2000, 2500), (2700, 3600)]}
+        events = model.designed_events(self.index, periods, [1, 5], self.plane, ((1, True, 0, 5),), slots=3,
                                        trigger_lead_s=200, minimum_destination_light_s=150, minimum_path_persistence_s=100)
         self.assertEqual((events[0]['source'], events[0]['destination']), (5, 1))
+
+    def test_destination_and_path_stay_in_the_domain(self):
+        # Domain {1, 2}: 3 is reachable in 2 hops but outside, so no 2-hop event exists inside it
+        with self.assertRaises(ValueError):
+            model.designed_events(self.index, self.periods, [1, 2], self.plane, ((2, False),),
+                                  trigger_lead_s=200, minimum_destination_light_s=150, minimum_path_persistence_s=100)
+        events = model.designed_events(self.index, self.periods, [1, 2], self.plane, ((1, False),),
+                                       trigger_lead_s=200, minimum_destination_light_s=150, minimum_path_persistence_s=100)
+        self.assertEqual(events[0]['path'], [1, 2])
+
+    def test_the_destination_must_outlast_the_source(self):
+        periods = {**self.periods, 2: [(0, 950)]}
+        with self.assertRaises(ValueError):
+            model.designed_events(self.index, periods, [1, 2], self.plane, ((1, False, 0, 1),),
+                                  trigger_lead_s=200, minimum_destination_light_s=100, minimum_path_persistence_s=100)

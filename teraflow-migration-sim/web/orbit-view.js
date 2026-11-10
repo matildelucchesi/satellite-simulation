@@ -172,14 +172,15 @@ function createOrbitScene(svg){
    tag.setAttribute('x',(cx+r*Math.cos(a)).toFixed(1));tag.setAttribute('y',(cy-r*Math.sin(a)+4).toFixed(1));
    tag.setAttribute('text-anchor',c>.3?'start':c<-.3?'end':'middle');tag.textContent=text;
   }
-  /* Anchor for the phase label: over the Earth, towards the middle of the route */
+  /* Anchor for the phase label: over the Earth, on the side of the destination satellite, with the
+     leader line pointing at the satellite that receives the controller */
   let anchor=null;
   if(routePoints.length){
-   const mid=routePoints[Math.floor(routePoints.length/2)],a=Math.atan2(cy-mid.y,mid.x-cx);
-   /* The label opens away from the route, towards the far side of the Earth */
-   anchor={x:cx+earthR*.62*Math.cos(a),y:cy-earthR*.42*Math.sin(a),routeX:mid.x,routeY:mid.y,side:Math.cos(a)<0?'left':'right'};
+   const target=where.get(view.destination)||routePoints[routePoints.length-1],a=Math.atan2(cy-target.y,target.x-cx);
+   /* The label opens away from the destination, towards the far side of the Earth */
+   anchor={x:cx+earthR*.62*Math.cos(a),y:cy-earthR*.42*Math.sin(a),routeX:target.x,routeY:target.y,side:Math.cos(a)<0?'left':'right'};
    leader.setAttribute('x1',anchor.x.toFixed(1));leader.setAttribute('y1',anchor.y.toFixed(1));
-   leader.setAttribute('x2',mid.x.toFixed(1));leader.setAttribute('y2',mid.y.toFixed(1));
+   leader.setAttribute('x2',target.x.toFixed(1));leader.setAttribute('y2',target.y.toFixed(1));
   }
   return {anchor,size:ORBIT_SIZE};
  }

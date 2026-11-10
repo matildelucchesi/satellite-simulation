@@ -171,6 +171,16 @@ tr.difference th,tr.difference td{color:var(--color-accent);font-weight:600}
 @media(max-width:62rem){.scene{grid-template-columns:minmax(0,1fr)}}
 .orbit-stage{margin:0}
 .orbit-wrap{position:relative;width:100%;max-width:720px;margin:0 auto}
+/* First load only: covers the empty view while the console computes the orbit, then fades out. */
+.orbit-loader{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:var(--space-md);padding:var(--space-md);text-align:center;color:var(--color-muted);font-size:var(--fs-s);transition:opacity .5s var(--ease-out),visibility 0s .5s}
+.orbit-loader[data-state="done"]{opacity:0;visibility:hidden;pointer-events:none}
+.orbit-loader[data-state="error"]{color:var(--color-error)}
+.orbit-loader svg{width:min(9rem,40vw);overflow:visible}
+.orbit-loader .planet{fill:var(--color-earth-day)}
+.orbit-loader .track{fill:none;stroke:var(--color-orbit);stroke-dasharray:2 6}
+.orbit-loader .tail{fill:none;stroke:var(--color-accent);stroke-width:2;stroke-linecap:round}
+.orbit-loader .sat{fill:var(--color-migration)}
+.orbit-loader[data-state="error"] .tail,.orbit-loader[data-state="error"] .sat{visibility:hidden}
 #orbit{width:100%;height:auto;display:block;overflow:visible}
 #orbit .earth{fill:url(#earth-fill)}
 #orbit .earth-day{stop-color:var(--color-earth-day)}#orbit .earth-mid{stop-color:var(--color-earth-mid)}#orbit .earth-night{stop-color:var(--color-earth-night)}

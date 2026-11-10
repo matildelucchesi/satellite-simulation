@@ -105,7 +105,7 @@ def main(argv=None):
                                     'minimum_path_persistence_s': args.minimum_path_persistence_s,
                                     'event_specs': [{'hops': hops, 'other_plane': other, 'slot': slot, 'source': source} for hops, other, slot, source in model.EVENT_SPECS],
                                     'event_slots': model.EVENT_SLOTS,
-                                    'selection': 'combinazione 12: 1 salto stesso piano, 5 salti stesso piano, 7 salti verso l altro piano; sorgente e fascia del giorno fissate per evento; luce sulla destinazione almeno pari alla soglia'}
+                                    'selection': 'combinazione 12: 1 salto stesso piano, 5 salti stesso piano, 7 salti verso l altro piano; sorgente e fascia del giorno fissate per evento; destinazione e percorso nel dominio; destinazione al sole piu a lungo della sorgente e almeno per la soglia'}
     # Experiment design: replicas per event and mode, one discarded warm-up run; the Hot/Cold
     # order inside each pair is drawn with a seed chosen and recorded by every experiment.
     scenario['experiment'] = {'replicas': 3, 'warmup_runs': 1, 'seed': None}

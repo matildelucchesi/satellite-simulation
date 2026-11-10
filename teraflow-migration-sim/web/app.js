@@ -80,14 +80,24 @@ function sceneView(now){
  const elapsed=((now-preview.startMs)/1000*preview.speed)%PREVIEW_SPAN_S;
  return {mission:null,event,orbital:event.trigger_s-ORBIT_LEAD_S+elapsed,live:false};
 }
-async function ensureSample(eventId,orbital){
+/* Loader of the first draw: shown until the first topology sample is on screen, never again. */
+function orbitLoader(stateName,text){
+ const box=$('orbit-loader');if(box.dataset.state==='done')return;
+ box.dataset.state=stateName;
+ if(stateName==='done'){box.setAttribute('aria-hidden','true');box.querySelector('svg').pauseAnimations?.();return;}
+ if(text)$('orbit-loader-text').textContent=text;
+}
+async function ensureSample(event,orbital){
+ const eventId=event.event_id;
  if(sceneSample.loading)return;
  if(sceneSample.eventId===eventId&&Math.abs(orbital-sceneSample.orbital)<45)return;
  sceneSample.loading=true;
  const tick=Math.max(0,Math.min(86399,Math.floor(orbital)));
  try{
   const topology=await api(`/topology?event=${encodeURIComponent(eventId)}&orbital_s=${tick}`);
-  scene.setTopology(topology);
+  /* The route drawn is the one of the selected event in the profile: the general catalogue can
+     hold an entry with the same name (source and instant) but a different destination. */
+  scene.setTopology({...topology,migration_path:event.path||topology.migration_path});
   sceneSample={eventId,orbital:topology.orbital_s,loading:false,error:''};
  }catch(error){sceneSample={...sceneSample,loading:false,error:error.message};}
 }
@@ -96,8 +106,9 @@ function frame(now){
  if(!scene||$('page-scenario').hidden||document.hidden||now-lastFrame<33)return;
  lastFrame=now;
  const wall=Date.now(),view=sceneView(wall);if(!view)return;
- ensureSample(view.event.event_id,view.orbital);
- if(sceneSample.eventId!==view.event.event_id)return;
+ ensureSample(view.event,view.orbital);
+ if(sceneSample.eventId!==view.event.event_id){if(sceneSample.error)orbitLoader('error','Vista orbitale non disponibile: '+sceneSample.error);return;}
+ orbitLoader('done');
  const m=view.mission;
  const linkActive=m?m.linkActive:view.orbital>=view.event.trigger_s;
  const result=scene.update(view.orbital,{controller:m?m.controller:view.event.source,controllerState:m?m.controllerState:'active',
@@ -431,10 +442,11 @@ async function refresh(){
 async function loadProfile(){
  try{const {profiles}=await api('/scenario-profiles');profile=profiles.find(row=>row.installed&&row.summary)||profiles.find(row=>row.summary)||null;}catch{profile=null;}
  renderProfile();
+ if(!profile)orbitLoader('error','Nessuno scenario installato: la vista orbitale resta vuota.');
 }
 document.addEventListener('DOMContentLoaded',async()=>{
  showPage();
- if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){preview.speed=1;document.querySelectorAll('#preview-speed button').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.speed==='1')));}
+ if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){$('orbit-loader').querySelector('svg').pauseAnimations?.();preview.speed=1;document.querySelectorAll('#preview-speed button').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.speed==='1')));}
  scene=createOrbitScene($('orbit'));requestAnimationFrame(frame);
  try{token=(await api('/session')).token;}catch(error){notice('Sessione locale non disponibile: '+error.message,true);return;}
  await loadProfile();await refresh();setInterval(refresh,5000);setInterval(renderJob,1000);
