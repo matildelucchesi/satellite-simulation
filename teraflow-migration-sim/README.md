@@ -53,6 +53,34 @@ L'orchestratore (`src/orchestrator.py`) emette una fase per ogni passo; la pagin
 - Un tentativo fallito revoca la destinazione, restituisce il controllo alla sorgente (`rollback`) e riparte dall'allineamento, fino a 3 tentativi; con un fallimento del fencing o del ripristino i tentativi si fermano (`recovery_required`).
 - L'orbita resta ferma a T−30 s durante la preparazione del laboratorio, poi avanza di un secondo orbitale al secondo.
 
+## Migrazione Hot: ordine delle fasi in teoria
+
+La migrazione Hot segue lo schema *pre-copy* della migrazione a caldo delle macchine virtuali [1], applicato al controller SDN [3]. **La destinazione si avvia prima del freeze**, mentre la sorgente controlla ancora la rete. Dopo il freeze si trasferisce e si applica solo il delta, su un controller già in esecuzione.
+
+1. **Preparazione (sorgente attiva, nessun downtime).** La destinazione si avvia in ruolo di riserva e riceve una copia completa dello stato. Eventuali giri successivi copiano ciò che è cambiato nel frattempo, finché il residuo è piccolo [1]. In riserva la destinazione non scrive sugli switch: in OpenFlow ha ruolo *slave* [4]; in P4Runtime è un client non primario, con `election_id` più basso del primario [5]. Le sue regole restano in staging.
+2. **Freeze (inizio del downtime).** La sorgente non accetta più modifiche: niente richieste NBI e niente scritture sul piano dati.
+3. **Stop-and-copy del delta [1].** Si trasferiscono le sole modifiche successive all'ultima copia e la destinazione le applica.
+4. **Verifica.** La destinazione deve essere equivalente alla sorgente prima di ricevere l'autorità.
+5. **Cutover (fine del downtime).** La destinazione diventa primaria (ruolo *master* [4] o `election_id` più alto [5]); la sorgente perde l'autorità. Durante il passaggio c'è sempre un solo controller che scrive [3].
+
+Il downtime Hot è quindi circa trasferimento del delta + applicazione + verifica + passaggio dell'autorità. Se la destinazione si avviasse dopo il delta, nel downtime entrerebbero anche l'avvio dei servizi e il caricamento dello stato: la migrazione si avvicinerebbe alla Cold, dove l'avvio della destinazione è per definizione dentro il downtime.
+
+Esiste anche la variante *post-copy*: la destinazione prende il controllo con uno stato minimo e recupera il resto su richiesta [2]. Anche lì la destinazione è avviata prima del cutover. In nessuna variante a caldo l'avvio del controller cade nella finestra di downtime.
+
+Nel laboratorio l'ordine è lo stesso della tabella precedente: snapshot, trasferimento, avvio e ripristino precedono il freeze, e solo delta, verifica e passaggio dell'autorità stanno nel downtime. I due differiscono in tre punti.
+
+- C'è una sola copia completa, senza giri iterativi.
+- La riserva è realizzata dal proxy P4 (`src/p4_proxy.py`, `src/authority.py`). Il proxy inoltra agli switch solo le scritture del controller attivo; quelle della destinazione restano in staging fino al cutover. Al backend il proxy si presenta con un unico `election_id`.
+- L'ACK e il cutover arrivano solo dopo la verifica del trasferimento e l'equivalenza delle API.
+
+### Fonti
+
+1. C. Clark, K. Fraser, S. Hand, J. G. Hansen, E. Jul, C. Limpach, I. Pratt, A. Warfield, «Live Migration of Virtual Machines», *NSDI 2005*. <https://www.usenix.org/legacy/event/nsdi05/tech/full_papers/clark/clark.pdf>. Pre-copy iterativo, stop-and-copy finale, downtime come durata della sola fase di arresto.
+2. M. R. Hines, K. Gopalan, «Post-copy based live virtual machine migration using adaptive pre-paging and dynamic self-ballooning», *VEE 2009*. DOI [10.1145/1508293.1508301](https://doi.org/10.1145/1508293.1508301). Variante post-copy.
+3. A. Dixit, F. Hao, S. Mukherjee, T. V. Lakshman, R. Kompella, «Towards an Elastic Distributed SDN Controller», *HotSDN 2013*. DOI [10.1145/2491185.2491193](https://doi.org/10.1145/2491185.2491193). Protocollo di migrazione dello switch fra controller con un solo controller attivo durante il passaggio.
+4. Open Networking Foundation, *OpenFlow Switch Specification*, versione 1.3.0, 2012, sezione «Multiple Controllers». <https://opennetworking.org/wp-content/uploads/2014/10/openflow-spec-v1.3.0.pdf>. Ruoli master, slave ed equal.
+5. P4.org API Working Group, *P4Runtime Specification*, versione 1.3.0, sezione «Client Arbitration and Controller Replication». <https://p4lang.github.io/p4runtime/spec/v1.3.0/P4Runtime-Spec.html>. Client primario e di riserva, `election_id`.
+
 ## Scelte del modello
 
 - Due piani adiacenti del guscio Starlink 53°/463 km (RAAN 80,8° e 82,8°, 31 + 31 satelliti). Con piani così coerenti la topologia laser resta stabile per tutto il giorno; ciò che cambia nel tempo è l'illuminazione.

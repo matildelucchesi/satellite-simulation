@@ -6,8 +6,19 @@ let selectedComparison='',stream=null,streamJob='',streamEvents=[],refreshTimer=
 
 function node(tag,text,className){const element=document.createElement(tag);if(text!==undefined)element.textContent=text;if(className)element.className=className;return element;}
 function notice(message,error=false){const box=$('notice');box.textContent=message;box.dataset.state=error?'error':'ok';}
+/* Contact with the console server. A request that fails without an answer means the server is
+   unreachable (an HTTP error does not); from then on the orbit view stays at the last instant the
+   server answered instead of running ahead on a stale sample. */
+const link={okAt:Date.now(),lostAt:null};
+function contact(ok){
+ if(ok){link.okAt=Date.now();if(link.lostAt!==null){link.lostAt=null;lastPanel=0;}}
+ else if(link.lostAt===null){link.lostAt=link.okAt;lastPanel=0;}
+}
 async function api(path,body){
- const response=await fetch('/api/v1'+path,body===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':token},body:JSON.stringify(body)});
+ let response;
+ try{response=await fetch('/api/v1'+path,body===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':token},body:JSON.stringify(body)});}
+ catch{contact(false);throw new Error('console non raggiungibile');}
+ contact(true);
  const data=await response.json();if(!response.ok)throw new Error(data.error||`HTTP ${response.status}`);return data;
 }
 const yesNo=value=>value===true?'sì':value===false?'no':'—';
@@ -61,7 +72,10 @@ function renderPicker(){
    phase times of a verification or an experiment chosen in the panel, faster than real time
    (mission.js). */
 let scene=null,missionEvents=[],missionJob='',lastFrame=0,lastPanel=0;
-let sceneSample={eventId:null,orbital:null,loading:false,error:''};
+let sceneSample={eventId:null,orbital:null,loading:false,error:'',failedAt:0};
+/* A topology sample moves the satellites at their angular speed and flips each one's light at most
+   once: beyond this many orbital seconds from it the drawing would be wrong, so it is not drawn. */
+const SAMPLE_REACH_S=120;
 const preview={speed:10,startMs:Date.now(),script:null,times:null,source:null,chosen:'',loading:'',cache:{}};
 const twoDigits=value=>String(value).padStart(2,'0');
 const minutes=seconds=>`${twoDigits(Math.floor(Math.max(0,seconds)/60))}:${twoDigits(Math.floor(Math.max(0,seconds)%60))}`;
@@ -162,7 +176,7 @@ function orbitLoader(stateName,text){
 }
 async function ensureSample(event,orbital){
  const eventId=event.event_id;
- if(sceneSample.loading)return;
+ if(sceneSample.loading||(sceneSample.error&&Date.now()-sceneSample.failedAt<2000))return;
  if(sceneSample.eventId===eventId&&Math.abs(orbital-sceneSample.orbital)<45)return;
  sceneSample.loading=true;
  const tick=Math.max(0,Math.min(86399,Math.floor(orbital)));
@@ -171,24 +185,26 @@ async function ensureSample(event,orbital){
   /* The route drawn is the one of the selected event in the profile: the general catalogue can
      hold an entry with the same name (source and instant) but a different destination. */
   scene.setTopology({...topology,migration_path:event.path||topology.migration_path});
-  sceneSample={eventId,orbital:topology.orbital_s,loading:false,error:''};
- }catch(error){sceneSample={...sceneSample,loading:false,error:error.message};}
+  sceneSample={eventId,orbital:topology.orbital_s,loading:false,error:'',failedAt:0};
+ }catch(error){sceneSample={...sceneSample,loading:false,error:error.message,failedAt:Date.now()};}
 }
 function frame(now){
  requestAnimationFrame(frame);
  if(!scene||$('page-scenario').hidden||document.hidden||now-lastFrame<33)return;
  lastFrame=now;
- const wall=Date.now(),view=sceneView(wall);if(!view)return;
+ /* While the console is unreachable the view stays at the last instant it answered */
+ const real=Date.now(),wall=link.lostAt??real,view=sceneView(wall);if(!view)return;
  ensureSample(view.event,view.orbital);
  if(sceneSample.eventId!==view.event.event_id){if(sceneSample.error)orbitLoader('error','Vista orbitale non disponibile: '+sceneSample.error);return;}
  orbitLoader('done');
  const m=view.mission;
+ if(Math.abs(view.orbital-sceneSample.orbital)>SAMPLE_REACH_S){if(real-lastPanel>400){lastPanel=real;renderMission(view,wall);}return;}
  const result=scene.update(view.orbital,{controller:m.controller,controllerState:m.controllerState,
   linkActive:m.linkActive,transferring:Boolean(m.transferring),communicating:Boolean(m.communicating),source:view.event.source,destination:view.event.destination});
  const label=$('route-label');
  label.hidden=!result?.anchor;
  if(!label.hidden){label.style.left=(result.anchor.x/result.size.width*100).toFixed(2)+'%';label.style.top=(result.anchor.y/result.size.height*100).toFixed(2)+'%';label.dataset.side=result.anchor.side;}
- if(wall-lastPanel>400){lastPanel=wall;renderMission(view,wall);}
+ if(real-lastPanel>400){lastPanel=real;renderMission(view,wall);}
 }
 function renderMission(view,wall){
  const m=view.mission,event=view.event;
@@ -228,6 +244,10 @@ function renderMission(view,wall){
   else status=`Tentativo ${m.failure.attempt||1} non riuscito: ${reason}. ${m.rolledBack?'La sorgente ha ripreso il controllo; ':''}il percorso viene riallineato per un nuovo tentativo.`;
  }
  if(sceneSample.error)status=`Vista orbitale non disponibile: ${sceneSample.error}`;
+ if(link.lostAt!==null){
+  status=`Console non raggiungibile dalle ${new Date(link.lostAt).toLocaleTimeString('it-IT')}: la vista è ferma a quell’istante. Un job in corso prosegue sul worker; per riprendere riavviare la console (tools/lab.py start --no-stack).`;
+  $('scene-mode-text').textContent='Vista ferma';$('scene-mode').dataset.state='warn';
+ }
  $('mission-status').textContent=status;$('mission-status').hidden=!status;
  /* Phase list in the side panel */
  const list=$('mission-steps');list.replaceChildren();list.hidden=!m.steps.length;
@@ -381,7 +401,7 @@ function follow(identifier){
  if(stream)stream.close();
  streamJob=identifier;streamEvents=[];missionJob=identifier;missionEvents=[];
  stream=new EventSource('/api/v1/jobs/'+identifier+'/events');
- stream.onmessage=message=>{try{const event=JSON.parse(message.data);streamEvents.push(event);if(missionRelevant(event))missionEvents.push(event);if(streamEvents.length>800)streamEvents=streamEvents.slice(-400);renderJob();}catch{}};
+ stream.onmessage=message=>{contact(true);try{const event=JSON.parse(message.data);streamEvents.push(event);if(missionRelevant(event))missionEvents.push(event);if(streamEvents.length>800)streamEvents=streamEvents.slice(-400);renderJob();}catch{}};
  stream.addEventListener('end',()=>{stream.close();scheduleRefresh();});
  stream.onerror=()=>{};
 }
