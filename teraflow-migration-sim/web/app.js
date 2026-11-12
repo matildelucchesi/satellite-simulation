@@ -81,10 +81,12 @@ const twoDigits=value=>String(value).padStart(2,'0');
 const minutes=seconds=>`${twoDigits(Math.floor(Math.max(0,seconds)/60))}:${twoDigits(Math.floor(Math.max(0,seconds)%60))}`;
 
 function sceneJob(){const job=activeJob();return job&&['functional','compare_events'].includes(job.operation)?job:null;}
+/* Events a job runs: those of the destination policy for an experiment started with it */
+function jobEvents(job){return job?.parameters?.policy==='cost'&&profile?.policy_events?.length?profile.policy_events:profile.selected_events;}
 function currentMission(){
  const job=sceneJob();
  if(!job||job.job_id!==missionJob||!profile)return null;
- return missionState(missionEvents,profile.selected_events,job.operation);
+ return missionState(missionEvents,jobEvents(job),job.operation);
 }
 function previewNow(now){
  if(!profile?.selected_events?.length)return null;
@@ -405,9 +407,23 @@ function follow(identifier){
  stream.addEventListener('end',()=>{stream.close();scheduleRefresh();});
  stream.onerror=()=>{};
 }
+const POLICY_KEY='console.policy';
+function savedPolicy(){try{return localStorage.getItem(POLICY_KEY)||'designed';}catch{return 'designed';}}
+function renderPolicy(){
+ const select=$('policy-select'),option=select.querySelector('option[value="cost"]'),available=Boolean(profile?.policy_events?.length);
+ option.disabled=!available;
+ if(!available&&select.value==='cost')select.value='designed';
+ const note=$('policy-note');
+ if(!available){note.textContent='Politica di costo non disponibile: il catalogo installato non ha i suoi eventi (tools/destination_policy.py).';note.hidden=false;}
+ else if(select.value==='cost'){note.textContent='Eventi: '+profile.policy_events.map((event,index)=>`E${index+1} ${event.source} → ${event.destination} (${event.hops} salti)`).join(' · ');note.hidden=false;}
+ else note.hidden=true;
+}
+$('policy-select').value=savedPolicy();
+$('policy-select').addEventListener('change',()=>{try{localStorage.setItem(POLICY_KEY,$('policy-select').value);}catch{}renderPolicy();});
 async function launch(operation){
  $('verify').disabled=true;$('start').disabled=true;$('launch-error').hidden=true;
- try{const job=await api('/jobs',{operation,parameters:{}});notice({functional:'Verifica avviata',compare_events:'Esperimento avviato',recover:'Ripristino avviato'}[operation]+': '+job.job_id);follow(job.job_id);await refresh();
+ const parameters=operation==='compare_events'&&$('policy-select').value==='cost'?{policy:'cost'}:{};
+ try{const job=await api('/jobs',{operation,parameters});notice({functional:'Verifica avviata',compare_events:'Esperimento avviato',recover:'Ripristino avviato'}[operation]+': '+job.job_id);follow(job.job_id);await refresh();
   /* A verification or an experiment is followed on the orbit view */
   if(operation!=='recover')location.hash='scenario';}
  catch(error){$('launch-error').textContent='Avvio non riuscito: '+error.message;$('launch-error').hidden=false;await refresh();}
@@ -438,6 +454,7 @@ function phaseText(run){
   .filter(([,key])=>s[key]!==undefined).map(([label,key])=>`${label} ${duration(s[key])}`);
  return parts.join(' · ')||'fasi non disponibili';
 }
+const POLICY_NAMES={designed:'eventi progettati',cost:'politica di costo'};
 const REASONS={interrupted:'interrotto',worker_stopped:'il processo dell’esperimento si è fermato prima della fine',recovery_required:'serve il ripristino del laboratorio',too_many_failures:'3 prove non riuscite di fila',failed:'prova non riuscita',service_not_verified:'servizio non verificato'};
 const spread=stat=>stat&&stat.n?`${duration(stat.median)}${stat.n>1?` · ${duration(stat.q1)}–${duration(stat.q3)}`:''}`:'—';
 const interval=stat=>stat&&stat.n?`${duration(stat.median)}${stat.ci95?` · IC ${duration(stat.ci95[0])}–${duration(stat.ci95[1])}`:''}`:'—';
@@ -453,7 +470,7 @@ function table(headers,rows,rowClass){
 const openEventDetails=new Set();
 function renderDesignResults(comparison,box,status){
  const design=comparison.design||{};
- status.textContent=`${comparison.complete?'':comparison.reason?'Non completato: '+(REASONS[comparison.reason]||comparison.reason)+' · ':'In corso · '}${comparison.completed_runs} di ${comparison.run_total} prove${comparison.failed_runs?`, ${comparison.failed_runs} non ${comparison.failed_runs===1?'riuscita':'riuscite'}`:''} · ${design.replicas} repliche per evento e modalità · ${comparison.rate_bps/1e9} Gbit/s`;
+ status.textContent=`${comparison.complete?'':comparison.reason?'Non completato: '+(REASONS[comparison.reason]||comparison.reason)+' · ':'In corso · '}${comparison.completed_runs} di ${comparison.run_total} prove${comparison.failed_runs?`, ${comparison.failed_runs} non ${comparison.failed_runs===1?'riuscita':'riuscite'}`:''} · ${design.replicas} repliche per evento e modalità · ${POLICY_NAMES[design.destination_policy||'designed']} · ${comparison.rate_bps/1e9} Gbit/s`;
  box.append(table(['Evento','Percorso','Salti','Destinazione','Hot · mediana e quartili','Cold · mediana e quartili','Cold − Hot · mediana e IC 95 %','Coppie'],
   comparison.events.map(row=>{const s=row.statistics?.controller_downtime_s;return [`E${row.index}`,`${row.source} → ${row.destination}`,String(row.hops),row.other_plane?'altro piano':'stesso piano',
    spread(s?.hot),spread(s?.cold),interval(s?.cold_minus_hot),String(s?.cold_minus_hot?.n??0)];})));
@@ -462,7 +479,7 @@ function renderDesignResults(comparison,box,status){
   const card=node('details',undefined,'event-detail'),summary=node('summary');
   card.open=openEventDetails.has(key);
   card.addEventListener('toggle',()=>{if(card.open)openEventDetails.add(key);else openEventDetails.delete(key);});
-  summary.append(node('span',`E${row.index} · ${row.source} → ${row.destination}`,'event-name'),node('span',`${row.hops} salti · ${row.other_plane?'altro piano':'stesso piano'} · ${clock(row.trigger_s)}`,'small muted'));
+  summary.append(node('span',`E${row.index} · ${row.source} → ${row.destination}`,'event-name'),node('span',`${row.hops} salti · ${row.other_plane?'altro piano':'stesso piano'} · ${clock(row.trigger_s)}${row.replaces_designed_entry?` · sostituisce ${row.designed_event_id}`:''}`,'small muted'));
   card.append(summary);
   const rows=[...row.replicas].sort((a,b)=>a.replica-b.replica).map(entry=>{
    const hot=entry.runs.hot,cold=entry.runs.cold;
@@ -527,7 +544,7 @@ async function refresh(){
 }
 async function loadProfile(){
  try{const {profiles}=await api('/scenario-profiles');profile=profiles.find(row=>row.installed&&row.summary)||profiles.find(row=>row.summary)||null;}catch{profile=null;}
- preview.script=null;renderProfile();
+ preview.script=null;renderProfile();renderPolicy();
  if(!profile)orbitLoader('error','Nessuno scenario installato: la vista orbitale resta vuota.');
 }
 document.addEventListener('DOMContentLoaded',async()=>{

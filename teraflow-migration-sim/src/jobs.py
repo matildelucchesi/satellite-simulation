@@ -14,9 +14,11 @@ from .results import requires_recovery
 from .checkpoints import ActiveCheckpoint
 
 # functional: one Hot and one Cold migration on the first catalogue event.
-# compare_events: Hot and Cold on every selected catalogue event.
+# compare_events: Hot and Cold on every selected catalogue event; ``policy`` picks the events:
+# ``designed`` (the catalogue's selected events, default) or ``cost`` (the destination policy's).
 OPERATIONS = {'functional', 'compare_events', 'environment', 'recover'}
 NEEDS_SCENARIO = {'functional', 'compare_events'}
+POLICIES = ('designed', 'cost')
 
 
 def process_running(pid):
@@ -44,13 +46,21 @@ class JobManager:
 
     def validate(self, operation, parameters):
         if operation not in OPERATIONS: raise ValueError('Unknown application operation')
-        if parameters: raise ValueError('Unsupported job parameter')
+        allowed = {'policy'} if operation == 'compare_events' else set()
+        if set(parameters) - allowed: raise ValueError('Unsupported job parameter')
+        if 'policy' in parameters and parameters['policy'] not in POLICIES:
+            raise ValueError('Unknown destination policy')
 
     def start(self, operation, parameters=None):
         parameters = parameters or {}
         self.validate(operation,parameters)
         if operation in NEEDS_SCENARIO and not (self.root/'config/migration_events.json').exists():
             raise ValueError('Scenario non installato: eseguire tools/build_scenario.py e tools/install_scenario.py')
+        if parameters.get('policy') == 'cost':
+            catalogue = json.loads((self.root/'config/migration_events.json').read_text(encoding='utf-8'))
+            if not catalogue.get('policy_selected'):
+                raise ValueError('Eventi della politica di costo assenti: eseguire tools/destination_policy.py e '
+                                 'tools/install_scenario.py --refresh')
         if operation=='recover':
             return self.start_recovery()
         # History may have been cleared while this server remained running.
@@ -185,7 +195,7 @@ class JobManager:
         try:
             operation=job['operation']
             if operation=='recover':output=application.recover(job['previous_job_id'])
-            else: output=getattr(application,operation)()
+            else: output=getattr(application,operation)(**job.get('parameters',{}))
             output['recovery_required']=requires_recovery(output)
             atomic_json(directory/'result.json',output)
             recovery_required=requires_recovery(output)

@@ -1,6 +1,6 @@
 # Piano: politica di destinazione e forwarding dai percorsi di TeraFlow
 
-Branch: `forwarding-path-selection`. Stato: passi 1, 2 e 4 completati (12 novembre 2026); passo 4 da verificare nel laboratorio; passi 3, 5 e 6 da implementare.
+Branch: `forwarding-path-selection`. Stato: passi 1, 2, 4, 5 e 6 completati e verificati (12 novembre 2026); passo 3 (termine misurato della latenza) aperto; resta l'esperimento con la politica di costo.
 
 ## Obiettivo
 
@@ -67,7 +67,7 @@ Risultati sul profilo installato (downtime e durate da `events-f77d737a…`: Hot
 
 - Fonte: il tempo di risposta del controller verso gli switch nelle prove registrate (`operations.jsonl`, scritture P4Runtime tramite il proxy). Il punto esatto da cui leggerlo va verificato prima di implementarlo. Se la misura non è affidabile, il termine resta 0 e lo dichiariamo nel resoconto.
 
-### 4. Inoltro dal percorso di TeraFlow (`src/fixture.py`, `src/live_backend.py`, `tools/install_scenario.py`) — fatto, da verificare nel laboratorio
+### 4. Inoltro dal percorso di TeraFlow (`src/fixture.py`, `src/live_backend.py`, `tools/install_scenario.py`) — fatto e verificato
 
 Lo schema iniziale (creare il servizio, leggere la connessione, aggiornare `fwd_list`) è stato scartato: in Release 7 `UpdateService` ricalcola il percorso a ogni aggiornamento e, cambiando l'intento di un servizio già attivo, crea una seconda connessione (nota già presente in `TfsAdapter.reconcile`). In più avrebbe aggiunto chiamate API durante la migrazione e cambiato i tempi misurati.
 
@@ -80,22 +80,22 @@ Soluzione adottata, verificata sul codice del gestore `p4_fabric_tna_l2_simple`:
 - `install_scenario.py` rifiuta estremi senza percorso nel dominio e avvisa se in qualche istante ci sono più percorsi minimi. Per gli estremi installati gli istanti con pareggio sono 0 su 1.440 (ogni 60 s).
 - Estremi del servizio invariati: con più percorsi minimi sorgente e destinazione potrebbero scegliere connessioni diverse, e l'equivalenza API (che confronta le connessioni) fallirebbe senza ACK. Con l'invariante intatto, cambiare estremi resta possibile ma va provato nel laboratorio.
 - Fuori dal piano: ricalcolo del percorso durante la prova se un collegamento cade. Il vincolo dei 900 s di persistenza resta la protezione.
+- Verifica funzionale `compare-2baabf59…` (12 novembre 2026): Hot riuscita (downtime 5,3 s, durata 177,1 s), Cold riuscita (127,1 s, 188,8 s), ping continui, servizio verificato. TeraFlow ha calcolato per sorgente e destinazione lo stesso percorso di 7 salti lungo l'arco del piano 1.
 
-### 5. Parametro del job e worker (`src/jobs.py`, `src/event_comparison.py`, `src/experiment.py`, `tools/experiment.py`)
+### 5. Parametro del job e worker (`src/jobs.py`, `src/event_comparison.py`, `src/experiment.py`, `tools/experiment.py`) — fatto
 
-- `compare_events` accetta `parameters: {"policy": "designed" | "cost"}`, con `designed` come predefinito. `validate` rifiuta qualsiasi altro parametro o valore, come oggi.
-- `compare(app, policy)` legge `selected` o `policy_selected`. Se `policy_selected` manca, il job fallisce prima di toccare il laboratorio con un messaggio chiaro.
-- `metadata.json` registra in `design` la politica, i parametri e la provenienza dei downtime; la `schema_version` passa a 3. I risultati vecchi senza politica si leggono come `designed`.
-- CLI: `tools/experiment.py compare_events --policy cost`.
+- `compare_events` accetta `parameters: {"policy": "designed" | "cost"}`, con `designed` come predefinito. `validate` rifiuta altri parametri, altre politiche e `policy` per le altre operazioni.
+- Con `cost` e un catalogo senza `policy_selected` l'avvio fallisce prima di prendere il lock e di avviare il worker, quindi senza richiedere il ripristino.
+- `compare(app, policy)` legge `selected` o `policy_selected`. `metadata.json` passa a `schema_version` 3 e registra in `design` la politica e i suoi parametri; ogni evento della politica registra l'evento progettato corrispondente e se lo sostituisce. I risultati precedenti si leggono come `designed`.
+- CLI: `tools/experiment.py compare_events --policy cost --wait`.
 - `functional` resta sul primo evento progettato.
 
-### 6. Console (`web/index.html`, `web/app.js`, `web/style.css`, `src/web.py`)
+### 6. Console (`web/index.html`, `web/app.js`, `web/style.css`, `src/web.py`) — fatto
 
-- Nella card Esperimento, sopra «Avvia esperimento», una select «Politica»: «Eventi progettati (1, 5, 7 salti)» e «Costo (disponibilità e latenza)». La seconda è disabilitata, con il motivo, se il catalogo installato non ha `policy_selected`.
-- `launch('compare_events')` invia la politica scelta. La scelta resta in `localStorage` (con `try/catch`) solo come comodità.
-- `/api/v1/state` espone se `policy_selected` esiste e i tre eventi della politica.
-- Risultati: la politica appare nella riga di stato dell'esperimento; ogni evento mostra destinazione e salti effettivi. Il pop-up «Cosa fa l'esperimento» descrive entrambe le politiche.
-- Si mantengono sessione, controlli same-origin, replay SSE e registro dei download.
+- Nella card Esperimento, accanto a «Avvia esperimento», la select «Politica»: «Eventi progettati» e «Politica di costo». Con la seconda, sotto, l'elenco dei tre eventi; se il catalogo non li ha, l'opzione è disabilitata e una nota spiega perché. La scelta resta in `localStorage` (con `try/catch`).
+- `/api/v1/scenario-profiles` espone `policy_events` e i parametri della politica; `/api/v1/topology?event=` trova anche gli eventi della politica.
+- Pagina Scenario: un esperimento avviato con la politica segue i suoi eventi. L'anteprima e i tempi delle prove restano sugli eventi progettati.
+- Risultati: la politica è nella riga di stato; un evento sostitutivo indica quale evento progettato sostituisce.
 
 ### 7. Test
 
@@ -108,11 +108,11 @@ Soluzione adottata, verificata sul codice del gestore `p4_fabric_tna_l2_simple`:
 
 ## Ordine
 
-1. Politica rivista e analisi di sensibilità (solo modello, nessun laboratorio). Scelta della soglia.
-2. Catalogo con `policy_selected` e installazione.
-3. Inoltro dal percorso di TeraFlow (fatto), poi verifica funzionale nel laboratorio.
-4. Parametro del job, console, test.
-5. Esperimento con la politica di costo (circa 2 ore, 19 prove come oggi).
+1. Politica rivista e analisi di sensibilità — fatto.
+2. Catalogo con `policy_selected` e installazione — fatto.
+3. Inoltro dal percorso di TeraFlow e verifica funzionale — fatto.
+4. Parametro del job, console, test — fatto.
+5. Esperimento con la politica di costo (circa 2 ore, 19 prove come l'esperimento progettato) — da avviare.
 
 ## Da decidere
 

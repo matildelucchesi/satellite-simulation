@@ -179,12 +179,22 @@ def write_csv(path, output):
 MAX_CONSECUTIVE_FAILURES = 3
 
 
-def compare(app):
+POLICY_EVENTS = {'designed': 'selected', 'cost': 'policy_selected'}
+
+
+def compare(app, policy='designed'):
+    """Hot and Cold on the catalogue events of ``policy``: ``designed`` runs the selected events,
+    ``cost`` those of the destination policy (same shadow entries, the policy's destinations)."""
     root = Path(app.root)
     catalog_path = root / 'config/migration_events.json'
     if not catalog_path.exists():
         raise ValueError('Catalogo degli eventi assente: installare un profilo di scenario')
-    selected = json.loads(catalog_path.read_text(encoding='utf-8'))['selected']
+    if policy not in POLICY_EVENTS:
+        raise ValueError('Politica di destinazione sconosciuta')
+    catalogue = json.loads(catalog_path.read_text(encoding='utf-8'))
+    selected = catalogue.get(POLICY_EVENTS[policy])
+    if not selected:
+        raise ValueError('Eventi della politica di costo assenti nel catalogo installato')
     rates = app.scenario['fso']['useful_throughput_bps']
     if len(rates) != 1:
         raise ValueError('Il confronto a eventi richiede una sola velocità nello scenario installato')
@@ -195,13 +205,16 @@ def compare(app):
     identifier = 'events-' + uuid.uuid4().hex
     directory = root / 'results/event-comparisons' / identifier
     directory.mkdir(parents=True)
-    output = {'schema_version': 2, 'comparison_id': identifier, 'created_utc': utc_now(), 'purpose': 'event-comparison',
+    output = {'schema_version': 3, 'comparison_id': identifier, 'created_utc': utc_now(), 'purpose': 'event-comparison',
               'profile': app.scenario.get('orbital', {}).get('constellation_profile'), 'rate_bps': rates[0],
               'software_on_board': bool(app.scenario.get('migration', {}).get('software_on_board')),
               'inputs': {'catalog_sha256': file_digest(catalog_path),
                          'scenario_sha256': file_digest(root / 'config/scenario.json'),
                          'fixture_sha256': file_digest(root / 'config/fixture.json')},
               'design': {'replicas': replicas, 'warmup_runs': warmup_runs, 'seed': seed,
+                         'destination_policy': policy,
+                         'destination_policy_parameters': (catalogue.get('destination_policy') or {}).get('parameters')
+                                                          if policy == 'cost' else None,
                          'order_policy': 'replica per replica su tutti gli eventi; ordine Hot/Cold casuale in ogni coppia',
                          'statistics': 'mediana e quartili per evento; Cold − Hot appaiato con intervallo bootstrap al 95 % della mediana',
                          'failure_policy': f'una prova non riuscita resta mancante e l esperimento prosegue; si ferma se serve il ripristino o dopo {MAX_CONSECUTIVE_FAILURES} prove non riuscite di fila',
@@ -215,6 +228,10 @@ def compare(app):
                'destination': entry['destination'], 'hops': entry['hops'], 'other_plane': bool(entry.get('other_plane')),
                'path': entry['path'], 'trigger_s': entry['trigger_s'], 'source_light_remaining_s': entry['source_light_remaining_s'],
                'destination_light_remaining_s': entry.get('destination_light_remaining_s'), 'replicas': []}
+        if policy == 'cost':
+            row.update(designed_event_id=entry.get('designed_event_id'),
+                       replaces_designed_entry=bool(entry.get('replaces_designed_entry')),
+                       stay_s=entry.get('stay_s'), control_latency_ms=entry.get('control_latency_ms'))
         events[index] = (row, app.catalog_event(entry, f'event{index}', ['source_shadow'], 'event-comparison'))
         output['events'].append(row)
 

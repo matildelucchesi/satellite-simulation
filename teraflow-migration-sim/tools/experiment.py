@@ -7,7 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).absolute().parents[1]
 sys.path.insert(0, str(ROOT))
-from src.jobs import JobManager, OPERATIONS
+from src.jobs import JobManager, OPERATIONS, POLICIES
 
 
 def main():
@@ -16,6 +16,8 @@ def main():
     parser.add_argument('--worker', help=argparse.SUPPRESS)
     parser.add_argument('--job-id', help='Job to stop')
     parser.add_argument('--wait', action='store_true', help='Follow the job until it ends')
+    parser.add_argument('--policy', choices=POLICIES,
+                        help='compare_events: eventi progettati (designed, predefinito) o della politica di costo (cost)')
     args = parser.parse_args()
     manager = JobManager(ROOT)
     if args.worker:
@@ -31,7 +33,9 @@ def main():
         return 0
     if not args.operation:
         parser.error('Choose an operation')
-    job = manager.start(args.operation, {})
+    if args.policy and args.operation != 'compare_events':
+        parser.error('--policy vale solo per compare_events')
+    job = manager.start(args.operation, {'policy': args.policy} if args.policy else {})
     print(json.dumps(job, indent=2), flush=True)
     if args.wait:
         previous = None

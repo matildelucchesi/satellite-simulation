@@ -89,6 +89,40 @@ class EventComparisonTests(unittest.TestCase):
         self.assertEqual(rows[0]['warmup'], 'True')
         self.assertEqual(module.list_comparisons(self.root)[0]['comparison_id'], output['comparison_id'])
 
+    def test_designed_policy_is_the_default_and_is_recorded(self):
+        output = module.compare(self.app)
+        self.assertEqual(output['schema_version'], 3)
+        self.assertEqual((output['design']['destination_policy'], output['design']['destination_policy_parameters']), ('designed', None))
+        self.assertNotIn('replaces_designed_entry', output['events'][0])
+
+    def test_cost_policy_runs_the_policy_events_with_hot_and_cold(self):
+        catalogue = json.loads((self.root / 'config/migration_events.json').read_text())
+        policy = [{**entry(1, 1000), 'event_id': 'e1-cost', 'destination': 31, 'designed_event_id': 'e1',
+                   'replaces_designed_entry': False, 'stay_s': 300, 'control_latency_ms': 12.0},
+                  {**entry(2, 4800), 'event_id': 'e9-cost', 'source': 19, 'designed_event_id': 'e2',
+                   'replaces_designed_entry': True, 'stay_s': 200, 'control_latency_ms': 11.0}]
+        catalogue.update(policy_selected=policy, destination_policy={'parameters': {'availability_min': 0.95}})
+        (self.root / 'config/migration_events.json').write_text(json.dumps(catalogue))
+        output = module.compare(self.app, 'cost')
+        self.assertTrue(output['complete'])
+        self.assertEqual(output['design']['destination_policy'], 'cost')
+        self.assertEqual(output['design']['destination_policy_parameters'], {'availability_min': 0.95})
+        self.assertEqual([row['catalog_event_id'] for row in output['events']], ['e1-cost', 'e9-cost'])
+        self.assertEqual([row['destination'] for row in output['events']], [31, 22])
+        self.assertEqual([row['replaces_designed_entry'] for row in output['events']], [False, True])
+        self.assertEqual(output['events'][1]['designed_event_id'], 'e2')
+        # Every replica of every policy event has both Hot and Cold (the warm-up is extra)
+        self.assertEqual({identifier for identifier, _ in self.calls}, {'e1-cost', 'e9-cost'})
+        self.assertTrue(all(event['replicas'] and all({'hot', 'cold'} == set(r['runs']) for r in event['replicas'])
+                            for event in output['events']))
+
+    def test_cost_policy_without_its_events_fails_before_any_run(self):
+        with self.assertRaisesRegex(ValueError, 'politica di costo assenti'):
+            module.compare(self.app, 'cost')
+        with self.assertRaises(ValueError):
+            module.compare(self.app, 'random')
+        self.assertEqual(self.calls, [])
+
     def test_a_failed_run_stays_missing_and_the_experiment_continues(self):
         self.fail = {3}
         output = module.compare(self.app)

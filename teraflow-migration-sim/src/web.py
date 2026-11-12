@@ -80,7 +80,12 @@ def scenario_profiles(root):
             'alignment_hypothesis': scenario.get('fso', {}).get('alignment_hypothesis'),
             'event_parameters': events.get('parameters'), 'hops_histogram': events.get('hops_histogram'),
             'domain': {'plane_1': domain.get('plane_1'), 'plane_2': domain.get('plane_2')},
-            'selected_events': [{key: event.get(key) for key in keys} for event in events.get('selected', [])]})
+            'selected_events': [{key: event.get(key) for key in keys} for event in events.get('selected', [])],
+            # Events of the destination policy (same shadow entries, the policy's destinations), if built
+            'policy_events': [{key: event.get(key) for key in keys + ('designed_event_id', 'replaces_designed_entry', 'stay_s',
+                                                                       'control_latency_ms')}
+                              for event in events.get('policy_selected', [])],
+            'destination_policy': (events.get('destination_policy') or {}).get('parameters')})
     return {'profiles': profiles}
 
 
@@ -215,7 +220,8 @@ class Application:
         catalogue = _json(self.root / 'config/migration_events.json') if (self.root / 'config/migration_events.json').exists() else {}
         event = None
         if event_id is not None:
-            event = next((row for row in catalogue.get('events', []) if row['event_id'] == event_id), None)
+            event = next((row for row in catalogue.get('events', []) + catalogue.get('policy_selected', [])
+                          if row['event_id'] == event_id), None)
             if event is None:
                 raise ValueError('Unknown catalogue event')
             if tick is None:

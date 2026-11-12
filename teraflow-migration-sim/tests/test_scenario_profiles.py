@@ -46,6 +46,23 @@ class ScenarioProfileApiTests(unittest.TestCase):
         self.assertEqual(profile['domain'], {'plane_1': [1, 2], 'plane_2': [3, 4]})
         self.assertEqual(profile['selected_events'][0]['path'], [1, 2, 3, 4, 5])
         self.assertNotIn('reachable_satellites', profile['selected_events'][0])
+        self.assertEqual((profile['policy_events'], profile['destination_policy']), ([], None))
+
+    def test_policy_events_are_listed_when_built(self):
+        events = json.loads((self.profile / 'events.json').read_text(encoding='utf-8'))
+        pick = {**events['selected'][0], 'event_id': 'a-1-cost', 'destination': 3, 'hops': 2, 'designed_event_id': 'a-1',
+                'replaces_designed_entry': False, 'stay_s': 300, 'control_latency_ms': 12.5}
+        events.update(policy_selected=[pick], destination_policy={'parameters': {'availability_min': 0.95}, 'events': []})
+        write(self.profile / 'events.json', events)
+        manifest = json.loads((self.profile / 'manifest.json').read_text(encoding='utf-8'))
+        manifest['outputs']['events.json']['bytes'] = (self.profile / 'events.json').stat().st_size
+        write(self.profile / 'manifest.json', manifest)
+        profile = scenario_profiles(self.root)['profiles'][0]
+        self.assertEqual(profile['integrity'], 'sizes_match')
+        [row] = profile['policy_events']
+        self.assertEqual((row['event_id'], row['destination'], row['designed_event_id'], row['stay_s']), ('a-1-cost', 3, 'a-1', 300))
+        self.assertNotIn('reachable_satellites', row)
+        self.assertEqual(profile['destination_policy'], {'availability_min': 0.95})
 
     def test_changed_output_and_installed_profile_are_reported(self):
         (self.profile / 'domain.json').write_text('{"plane_1": [1], "plane_2": [3, 4, 5, 6]}', encoding='utf-8')

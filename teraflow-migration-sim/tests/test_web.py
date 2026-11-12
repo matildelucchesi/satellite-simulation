@@ -144,7 +144,10 @@ class LocalWebTests(unittest.TestCase):
         atomic_json(self.root / 'config/selected_constellation.json', {'satellites': [{'norad_id': sid, 'plane': 1, 'phase_rank': sid} for sid in ids]})
         atomic_json(self.root / 'config/fixture.json', {'emulator': {'hosts': [{'satellite': 1}, {'satellite': 3}]}})
         event = {'event_id': '1-50', 'source': 1, 'destination': 4, 'path': [1, 2, 3, 4], 'trigger_s': 50, 'hops': 3}
-        atomic_json(self.root / 'config/migration_events.json', {'selected': [event], 'events': [event]})
+        policy = {**event, 'event_id': '1-50-cost', 'destination': 3, 'path': [1, 2, 3], 'hops': 2}
+        atomic_json(self.root / 'config/migration_events.json', {'selected': [event], 'events': [event], 'policy_selected': [policy]})
+        # Events of the destination policy are found too
+        self.assertEqual(self.get('/api/v1/topology?event=1-50-cost')['migration_path'], [1, 2, 3])
         topology = self.get('/api/v1/topology?event=1-50')
         self.assertEqual(topology['orbital_s'], 50)
         self.assertEqual(topology['service_path'], [1, 2, 3])

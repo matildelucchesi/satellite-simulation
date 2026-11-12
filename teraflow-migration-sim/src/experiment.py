@@ -178,13 +178,14 @@ class Experiment:
         selected = json.loads((self.root/'config/migration_events.json').read_text())['selected'][0]
         return self.catalog_event(selected, 'functional', ['functional_diagnostic','source_shadow'], 'functional-verification')
 
-    def compare_events(self):
-        """Hot and Cold on each selected catalogue event, order alternated between events.
+    def compare_events(self, policy='designed'):
+        """Hot and Cold on each catalogue event of ``policy`` (designed events or the destination
+        policy's), order drawn in each pair.
 
-        Every run starts from the same orbital instant of its event. The comparison stops at the
-        first run that fails or needs recovery; missing measures stay missing."""
+        Every run starts from the same orbital instant of its event. A failed run stays missing and
+        the experiment goes on; it stops when recovery is needed or after repeated failures."""
         from .event_comparison import compare
-        return compare(self)
+        return compare(self, policy)
 
     def run(self, method, rate, event=None, *, purpose='diagnostic'):
         if method not in ('cold','hot') or rate not in self.scenario['fso']['useful_throughput_bps']:

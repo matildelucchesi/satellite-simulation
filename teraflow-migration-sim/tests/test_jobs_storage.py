@@ -136,3 +136,16 @@ class ScenarioAdmissionTests(unittest.TestCase):
             for operation in ('compare_continuous','calibrate','simulate','prepare_base','campaign'):
                 with self.assertRaisesRegex(ValueError,'Unknown application operation'):manager.validate(operation,{})
             with self.assertRaisesRegex(ValueError,'Unsupported job parameter'):manager.validate('compare_events',{'rate_bps':1})
+            # Only the experiment takes a destination policy, and only a known one
+            for policy in ('designed','cost'):manager.validate('compare_events',{'policy':policy})
+            with self.assertRaisesRegex(ValueError,'Unknown destination policy'):manager.validate('compare_events',{'policy':'random'})
+            with self.assertRaisesRegex(ValueError,'Unsupported job parameter'):manager.validate('functional',{'policy':'cost'})
+
+    def test_cost_policy_requires_its_events_before_lock_or_worker(self):
+        with tempfile.TemporaryDirectory() as tmp,patch('src.jobs.subprocess.Popen') as launch:
+            root=Path(tmp);(root/'config').mkdir()
+            (root/'config/migration_events.json').write_text(json.dumps({'selected':[{'event_id':'e1'}]}))
+            manager=JobManager(root)
+            with self.assertRaisesRegex(ValueError,'Eventi della politica di costo assenti'):
+                manager.start('compare_events',{'policy':'cost'})
+            launch.assert_not_called();self.assertFalse(manager.guard.exists())
