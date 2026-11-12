@@ -275,6 +275,27 @@ def compare(app):
     return finish()
 
 
+def measured_times(metadata):
+    """Median controller downtime and migration duration per mode over the accepted replicas of
+    a recorded experiment, all events pooled (the warm-up is not a replica). Each median uses the
+    replicas that have that measure; modes without accepted runs are absent."""
+    values = {}
+    for event in metadata.get('events', []):
+        for replica in event.get('replicas', []):
+            for method, run in replica.get('runs', {}).items():
+                if not (run.get('success') and run.get('baseline_valid') and run.get('service_verified')):
+                    continue
+                for field in ('controller_downtime_s', 'total_operation_s'):
+                    if run.get(field) is not None:
+                        values.setdefault(method, {}).setdefault(field, []).append(float(run[field]))
+    median = lambda rows: statistics.median(rows) if rows else None
+    return {method: {'downtime_median_s': median(fields.get('controller_downtime_s', [])),
+                     'downtime_runs': len(fields.get('controller_downtime_s', [])),
+                     'duration_median_s': median(fields.get('total_operation_s', [])),
+                     'duration_runs': len(fields.get('total_operation_s', []))}
+            for method, fields in sorted(values.items())}
+
+
 def list_comparisons(root, running_since=None):
     """Recorded experiments, newest first.
 

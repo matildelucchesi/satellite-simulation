@@ -156,3 +156,16 @@ class EventComparisonTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class MeasuredTimesTests(unittest.TestCase):
+    def test_medians_per_mode_over_accepted_replicas_only(self):
+        ok = {'success': True, 'baseline_valid': True, 'service_verified': True}
+        run = lambda downtime, duration, **flags: {**ok, **flags, 'controller_downtime_s': downtime, 'total_operation_s': duration}
+        metadata = {'warmup': {'run': run(999.0, 999.0)}, 'events': [
+            {'replicas': [{'runs': {'hot': run(6.0, 170.0), 'cold': run(130.0, 190.0)}},
+                          {'runs': {'hot': run(8.0, 180.0), 'cold': run(500.0, 500.0, service_verified=False)}}]},
+            {'replicas': [{'runs': {'hot': run(7.0, 175.0), 'cold': run(None, 200.0)}}]}]}
+        self.assertEqual(module.measured_times(metadata), {
+            'cold': {'downtime_median_s': 130.0, 'downtime_runs': 1, 'duration_median_s': 195.0, 'duration_runs': 2},
+            'hot': {'downtime_median_s': 7.0, 'downtime_runs': 3, 'duration_median_s': 175.0, 'duration_runs': 3}})

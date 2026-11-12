@@ -48,10 +48,16 @@ def main(argv=None):
     parser.add_argument('--trigger-lead-s', type=int, default=DEFAULTS['trigger_lead_s'])
     parser.add_argument('--minimum-destination-light-s', type=int, default=DEFAULTS['minimum_destination_light_s'])
     parser.add_argument('--minimum-path-persistence-s', type=int, default=DEFAULTS['minimum_path_persistence_s'])
-    parser.add_argument('--policy-k', type=float, default=model.DESTINATION_POLICY['k'],
-                        help='Politica di destinazione: ms di latenza media equivalenti a 0,1 %% di tempo con il controller fermo')
-    parser.add_argument('--policy-downtime-s', type=float, default=model.DESTINATION_POLICY['downtime_s'],
-                        help='Politica di destinazione: downtime per migrazione (Hot misurato)')
+    parser.add_argument('--policy-availability-min', type=float, default=model.DESTINATION_POLICY['availability_min'],
+                        help='Politica di destinazione: quota minima della permanenza con il controller disponibile')
+    parser.add_argument('--policy-downtime-hot-s', type=float, default=model.DESTINATION_POLICY['downtime_s']['hot'],
+                        help='Politica di destinazione: downtime Hot misurato (usato per la selezione)')
+    parser.add_argument('--policy-downtime-cold-s', type=float, default=model.DESTINATION_POLICY['downtime_s']['cold'],
+                        help='Politica di destinazione: downtime Cold misurato')
+    parser.add_argument('--policy-duration-hot-s', type=float, default=model.DESTINATION_POLICY['duration_s']['hot'],
+                        help='Politica di destinazione: durata Hot misurata della migrazione')
+    parser.add_argument('--policy-duration-cold-s', type=float, default=model.DESTINATION_POLICY['duration_s']['cold'],
+                        help='Politica di destinazione: durata Cold misurata (la permanenza parte dalla fine della piu lunga)')
     parser.add_argument('--force', action='store_true', help='Overwrite an existing profile directory')
     args = parser.parse_args(argv)
 
@@ -109,9 +115,13 @@ def main(argv=None):
                                     'minimum_path_persistence_s': args.minimum_path_persistence_s,
                                     'event_specs': [{'hops': hops, 'other_plane': other, 'slot': slot, 'source': source} for hops, other, slot, source in model.EVENT_SPECS],
                                     'event_slots': model.EVENT_SLOTS,
-                                    'destination_policy': {'k': args.policy_k, 'downtime_s': args.policy_downtime_s,
-                                                           'cost': 'latenza media di controllo (ms) + k * downtime / permanenza * 1000',
-                                                           'role': 'riferimento: cosa sceglierebbe un sistema reale; gli eventi dell esperimento restano quelli progettati'},
+                                    'destination_policy': {'availability_min': args.policy_availability_min,
+                                                           'selection_mode': model.DESTINATION_POLICY['selection_mode'],
+                                                           'downtime_s': {'hot': args.policy_downtime_hot_s, 'cold': args.policy_downtime_cold_s},
+                                                           'duration_s': {'hot': args.policy_duration_hot_s, 'cold': args.policy_duration_cold_s},
+                                                           'overhead_ms': model.DESTINATION_POLICY['overhead_ms'],
+                                                           'rule': 'ammessa se downtime (modalita selection_mode) / permanenza <= 1 - availability_min, con la permanenza dalla fine della migrazione piu lunga; fra le ammesse latenza media di controllo minima',
+                                                           'role': 'politica alternativa agli eventi progettati, scelta prima dell avvio dell esperimento'},
                                     'selection': 'combinazione 12: 1 salto stesso piano, 5 salti stesso piano, 7 salti verso l altro piano; sorgente e fascia del giorno fissate per evento; destinazione e percorso nel dominio; destinazione al sole piu a lungo della sorgente e almeno per la soglia'}
     # Experiment design: replicas per event and mode, one discarded warm-up run; the Hot/Cold
     # order inside each pair is drawn with a seed chosen and recorded by every experiment.
@@ -186,22 +196,24 @@ def main(argv=None):
                                    trigger_lead_s=args.trigger_lead_s,
                                    minimum_destination_light_s=args.minimum_destination_light_s,
                                    minimum_path_persistence_s=args.minimum_path_persistence_s)
-    log('Politica di destinazione (latenza di controllo e permanenza)')
+    log('Politica di destinazione (disponibilita e latenza di controllo)')
     column = {sid: position for position, sid in enumerate(ids)}
     distance_km = lambda a, b, tick: float(np.linalg.norm(positions[int(tick), column[a]] - positions[int(tick), column[b]]))
-    limits = {'trigger_lead_s': args.trigger_lead_s, 'minimum_destination_light_s': args.minimum_destination_light_s,
-              'minimum_path_persistence_s': args.minimum_path_persistence_s, 'k': args.policy_k, 'downtime_s': args.policy_downtime_s}
-    policy = model.policy_events(index, periods, domain, plane_of, distance_km, **limits)
-    destination_policy = {'parameters': scenario['migration_events']['destination_policy'],
-                          'summary': model.policy_summary(policy),
-                          'designed_vs_policy': model.compare_with_policy(chosen, index, periods, domain, plane_of, distance_km, **limits),
-                          'events': policy}
+    destination_policy = model.destination_policy_report(
+        chosen, index, periods, domain, plane_of, distance_km, trigger_lead_s=args.trigger_lead_s,
+        minimum_destination_light_s=args.minimum_destination_light_s,
+        minimum_path_persistence_s=args.minimum_path_persistence_s, availability_min=args.policy_availability_min,
+        downtime_s={'hot': args.policy_downtime_hot_s, 'cold': args.policy_downtime_cold_s},
+        duration_s={'hot': args.policy_duration_hot_s, 'cold': args.policy_duration_cold_s})
+    policy_selected = model.policy_selected_events(destination_policy['designed_vs_policy'], destination_policy['events'],
+                                                   index, args.minimum_path_persistence_s)
     hop_histogram = {}
     for event in feasible:
         hop_histogram[str(event['hops'])] = hop_histogram.get(str(event['hops']), 0) + 1
     write_json(profile / 'events.json', {'policy': model.POLICY, 'parameters': scenario['migration_events'],
         'event_count': len(events), 'feasible_count': len(feasible), 'hops_histogram': hop_histogram,
-        'selected': chosen, 'events': events, 'destination_policy': destination_policy})
+        'selected': chosen, 'events': events, 'destination_policy': destination_policy,
+        'policy_selected': policy_selected})
 
     outputs = ['selected_constellation.json', 'scenario.json', 'replay.npz', 'replay.json',
                'laser_links.json', 'domain.json', 'events.json']
