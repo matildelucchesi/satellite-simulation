@@ -2,8 +2,8 @@
   "bundle": {
     "bytes": 1823463936,
     "format": "docker-save-tar-uncompressed",
-    "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\artifacts\\images-l2-patched-v2\\teraflow-v7-images.tar",
-    "sha256": "9fc2920c12e4cc8867cd34ad294f1c240acc34b181dd462ce69e5abd51531c00"
+    "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\artifacts\\images-l2-patched-v3\\teraflow-v7-images.tar",
+    "sha256": "ec2e48e7ba4e5ee1956b4d68add982e23d0cfbcfeac3d3ea08498cda8acf8a4e"
   },
   "capacity_checked": true,
   "controllers": {
@@ -169,10 +169,10 @@
     "ContainerdCommit": {
       "ID": "e53c7c1516c3b2bff98eb76f1f4117477e6f4e66"
     },
-    "Containers": 61,
+    "Containers": 34,
     "ContainersPaused": 0,
-    "ContainersRunning": 20,
-    "ContainersStopped": 41,
+    "ContainersRunning": 25,
+    "ContainersStopped": 9,
     "CpuCfsPeriod": true,
     "CpuCfsQuota": true,
     "Debug": false,
@@ -200,7 +200,7 @@
     "HttpsProxy": "http.docker.internal:3128",
     "ID": "71fb6272-c4dd-4682-9256-b6d2d53925bf",
     "IPv4Forwarding": true,
-    "Images": 35,
+    "Images": 38,
     "IndexServerAddress": "https://index.docker.io/v1/",
     "InitBinary": "docker-init",
     "InitCommit": {
@@ -217,8 +217,8 @@
     "MemoryLimit": true,
     "NCPU": 16,
     "NEventsListener": 12,
-    "NFd": 223,
-    "NGoroutines": 250,
+    "NFd": 259,
+    "NGoroutines": 260,
     "Name": "docker-desktop",
     "NoProxy": "hubproxy.docker.internal",
     "OSType": "linux",
@@ -309,166 +309,204 @@
       "NodeID": "",
       "RemoteManagers": null
     },
-    "SystemTime": "2026-10-08T16:50:40.261925365Z",
+    "SystemTime": "2026-11-12T14:13:22.799575116Z",
     "Warnings": null
   },
   "execution_kind": "live",
   "host": {
-    "disk_free_bytes": 99390586880,
+    "disk_free_bytes": 95791296512,
     "platform": "Windows-11-10.0.26200-SP0",
     "python": "3.13.9"
   },
   "mininet": {
     "probes": [],
-    "switch_count": 17,
+    "switch_count": 16,
     "switches_alive": true
   },
   "proxy": {
     "ack": false,
-    "active": "sat-a",
-    "frozen": false,
-    "generation": 4,
+    "active": null,
+    "frozen": true,
+    "generation": 691,
     "ipv4": "172.25.0.3",
     "states": [
       {
         "device_id": 1,
+        "ready_by_slot": {
+          "sat-a": true,
+          "sat-b": true
+        },
         "staged_entries": 0,
-        "standby_ready": false,
+        "standby_ready": true,
         "upstream_master": true
       },
       {
         "device_id": 2,
+        "ready_by_slot": {
+          "sat-a": true,
+          "sat-b": true
+        },
         "staged_entries": 0,
-        "standby_ready": false,
+        "standby_ready": true,
         "upstream_master": true
       },
       {
         "device_id": 3,
-        "staged_entries": 0,
-        "standby_ready": false,
+        "ready_by_slot": {
+          "sat-a": true,
+          "sat-b": true
+        },
+        "staged_entries": 12,
+        "standby_ready": true,
         "upstream_master": true
       },
       {
         "device_id": 4,
+        "ready_by_slot": {
+          "sat-a": true,
+          "sat-b": true
+        },
         "staged_entries": 0,
-        "standby_ready": false,
+        "standby_ready": true,
         "upstream_master": true
       },
       {
         "device_id": 5,
-        "staged_entries": 0,
-        "standby_ready": false,
+        "ready_by_slot": {
+          "sat-a": true,
+          "sat-b": true
+        },
+        "staged_entries": 12,
+        "standby_ready": true,
         "upstream_master": true
       },
       {
         "device_id": 6,
-        "staged_entries": 0,
-        "standby_ready": false,
+        "ready_by_slot": {
+          "sat-a": true,
+          "sat-b": true
+        },
+        "staged_entries": 12,
+        "standby_ready": true,
         "upstream_master": true
       },
       {
         "device_id": 7,
-        "staged_entries": 0,
-        "standby_ready": false,
+        "ready_by_slot": {
+          "sat-a": true,
+          "sat-b": true
+        },
+        "staged_entries": 12,
+        "standby_ready": true,
         "upstream_master": true
       },
       {
         "device_id": 8,
-        "staged_entries": 0,
-        "standby_ready": false,
+        "ready_by_slot": {
+          "sat-a": true,
+          "sat-b": true
+        },
+        "staged_entries": 12,
+        "standby_ready": true,
         "upstream_master": true
       },
       {
         "device_id": 9,
-        "staged_entries": 0,
-        "standby_ready": false,
+        "ready_by_slot": {
+          "sat-a": true,
+          "sat-b": true
+        },
+        "staged_entries": 12,
+        "standby_ready": true,
         "upstream_master": true
       },
       {
         "device_id": 10,
+        "ready_by_slot": {
+          "sat-a": true,
+          "sat-b": true
+        },
         "staged_entries": 0,
-        "standby_ready": false,
+        "standby_ready": true,
         "upstream_master": true
       },
       {
         "device_id": 11,
+        "ready_by_slot": {
+          "sat-a": true,
+          "sat-b": true
+        },
         "staged_entries": 0,
-        "standby_ready": false,
+        "standby_ready": true,
         "upstream_master": true
       },
       {
         "device_id": 12,
+        "ready_by_slot": {
+          "sat-a": true,
+          "sat-b": true
+        },
         "staged_entries": 0,
-        "standby_ready": false,
+        "standby_ready": true,
         "upstream_master": true
       },
       {
         "device_id": 13,
+        "ready_by_slot": {
+          "sat-a": true,
+          "sat-b": true
+        },
         "staged_entries": 0,
-        "standby_ready": false,
+        "standby_ready": true,
         "upstream_master": true
       },
       {
         "device_id": 14,
+        "ready_by_slot": {
+          "sat-a": true,
+          "sat-b": true
+        },
         "staged_entries": 0,
-        "standby_ready": false,
+        "standby_ready": true,
         "upstream_master": true
       },
       {
         "device_id": 15,
-        "staged_entries": 0,
-        "standby_ready": false,
+        "ready_by_slot": {
+          "sat-a": true,
+          "sat-b": true
+        },
+        "staged_entries": 12,
+        "standby_ready": true,
         "upstream_master": true
       },
       {
         "device_id": 16,
-        "staged_entries": 0,
-        "standby_ready": false,
-        "upstream_master": true
-      },
-      {
-        "device_id": 17,
-        "staged_entries": 0,
-        "standby_ready": false,
+        "ready_by_slot": {
+          "sat-a": true,
+          "sat-b": true
+        },
+        "staged_entries": 12,
+        "standby_ready": true,
         "upstream_master": true
       }
     ]
   },
   "success": true,
-  "timestamp_utc": "2026-10-08T16:50:08.672866+00:00",
+  "timestamp_utc": "2026-11-12T14:13:11.892117+00:00",
   "transport_capacity": [
     {
-      "configured_rate_bps": 100000000,
-      "elapsed_s": 145.8879969001282,
-      "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\results\\capacity\\teraflow-v7-images.tar",
-      "received_bytes": 1823463936,
-      "receiver_elapsed_s": 145.86708230013028,
-      "sent_bytes": 1823463936,
-      "sha256": "9fc2920c12e4cc8867cd34ad294f1c240acc34b181dd462ce69e5abd51531c00",
-      "supported": true,
-      "useful_throughput_bps": 99992540.83930178
-    },
-    {
       "configured_rate_bps": 1000000000,
-      "elapsed_s": 14.609369999961928,
+      "elapsed_s": 14.608630200000334,
+      "latency_model": "handshake + slow start (finestra iniziale 10 segmenti) + conferma finale",
+      "one_way_delay_s": 0.0,
       "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\results\\capacity\\teraflow-v7-images.tar",
       "received_bytes": 1823463936,
-      "receiver_elapsed_s": 14.607695699902251,
+      "receiver_elapsed_s": 14.6023933999968,
       "sent_bytes": 1823463936,
-      "sha256": "9fc2920c12e4cc8867cd34ad294f1c240acc34b181dd462ce69e5abd51531c00",
+      "sha256": "ec2e48e7ba4e5ee1956b4d68add982e23d0cfbcfeac3d3ea08498cda8acf8a4e",
       "supported": true,
-      "useful_throughput_bps": 998517491.7219576
-    },
-    {
-      "configured_rate_bps": 10000000000,
-      "elapsed_s": 4.811253899941221,
-      "path": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\results\\capacity\\teraflow-v7-images.tar",
-      "received_bytes": 1823463936,
-      "receiver_elapsed_s": 4.8029466001316905,
-      "sent_bytes": 1823463936,
-      "sha256": "9fc2920c12e4cc8867cd34ad294f1c240acc34b181dd462ce69e5abd51531c00",
-      "supported": false,
-      "useful_throughput_bps": 3031997851.5742474
+      "useful_throughput_bps": 998568057.9415082
     }
   ]
 }
