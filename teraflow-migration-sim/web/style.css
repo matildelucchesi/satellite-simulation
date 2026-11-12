@@ -272,9 +272,18 @@ tr.difference th,tr.difference td{color:var(--color-accent);font-weight:600}
 .preview-source{color:var(--color-muted);white-space:nowrap;margin-left:var(--space-md);flex:0 1 26rem;min-width:min(16rem,100%)}
 .preview-source select{width:0;flex:1;min-width:0;padding:.5rem .75rem;min-height:36px;font-size:var(--fs-s)}
 #results{display:grid;gap:var(--space-lg)}
+.results-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:var(--space-sm)}
+.results-head #results-status{margin:0 0 0 auto;text-align:right;white-space:nowrap}
+.results-head .select{gap:var(--space-sm)}
+.results-head #comparison-select{padding-inline:.75rem 2.25rem}
 #results>h3{margin-top:var(--space-sm)}
 /* One collapsible block per event with its replicas */
-.event-detail{border-top:1px solid var(--color-rule);padding-top:var(--space-md)}
+.event-detail{border-top:1px solid var(--color-rule);padding-top:var(--space-md);min-width:0}
+.event-detail .table-scroll{width:100%}
+.event-detail table{width:100%;table-layout:auto}
+.event-detail th{white-space:normal;vertical-align:bottom;line-height:1.25;min-width:7rem}
+.event-detail th:first-child{min-width:0}
+.event-detail td,.event-detail th:first-child{white-space:nowrap}
 .event-detail summary{cursor:pointer;list-style:none;display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--space-sm) var(--space-md)}
 .event-detail summary::-webkit-details-marker{display:none}
 .event-detail summary::before{content:"";width:7px;height:7px;border-right:1.5px solid var(--color-accent);border-bottom:1.5px solid var(--color-accent);transform:rotate(-45deg);transition:transform .2s var(--ease-out);align-self:center}

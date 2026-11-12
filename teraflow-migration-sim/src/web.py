@@ -12,6 +12,7 @@ import mimetypes
 import secrets
 import threading
 import time
+from concurrent.futures import ThreadPoolExecutor
 from http.cookies import SimpleCookie
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -103,6 +104,9 @@ class Application:
         self.registry = {}
         self.cached_status = None
         self.cached_at = 0
+        self.probing = False
+        self.artifacts_cache = None
+        self.artifacts_cached_at = 0
         self.orbit = None
         self.link_kinds = None
 
@@ -132,24 +136,43 @@ class Application:
         return bool(session and session['expires'] > time.monotonic() and token
                     and hmac.compare_digest(session['token'], token))
 
+    @staticmethod
+    def probe_components():
+        def probe_mininet_or_p4(name, port):
+            try:
+                return name, {'reachable': True, 'data': http(port, timeout=2)}
+            except Exception as exc:
+                return name, {'reachable': False, 'error': str(exc)}
+
+        def probe_healthz(name, port):
+            try:
+                with urlopen(f'http://127.0.0.1:{port}/healthz', timeout=1) as response:
+                    return name, {'reachable': response.status == 200}
+            except Exception as exc:
+                return name, {'reachable': False, 'error': str(exc)}
+
+        jobs = [(probe_mininet_or_p4, 'mininet', 18090), (probe_mininet_or_p4, 'p4_proxy', 18091),
+                (probe_healthz, 'sat_a', 18080), (probe_healthz, 'sat_b', 18081)]
+        with ThreadPoolExecutor(max_workers=len(jobs)) as pool:
+            futures = [pool.submit(probe, name, port) for probe, name, port in jobs]
+            return dict(future.result() for future in futures)
+
     def status(self):
+        # Le probe di rete si eseguono fuori dal lock: un componente lento non blocca le altre richieste.
         with self.lock:
-            if time.monotonic() - self.cached_at > 3:
-                components = {}
-                for name, port in [('mininet', 18090), ('p4_proxy', 18091)]:
-                    try:
-                        components[name] = {'reachable': True, 'data': http(port, timeout=2)}
-                    except Exception as exc:
-                        components[name] = {'reachable': False, 'error': str(exc)}
-                for name, port in [('sat_a', 18080), ('sat_b', 18081)]:
-                    try:
-                        with urlopen(f'http://127.0.0.1:{port}/healthz', timeout=1) as response:
-                            components[name] = {'reachable': response.status == 200}
-                    except Exception as exc:
-                        components[name] = {'reachable': False, 'error': str(exc)}
-                self.cached_status = components
-                self.cached_at = time.monotonic()
-        guard = read_json(self.jobs.guard) if self.jobs.guard.exists() else None
+            stale = time.monotonic() - self.cached_at > 3 and not self.probing
+            if stale:
+                self.probing = True
+        if stale:
+            try:
+                components = self.probe_components()
+                with self.lock:
+                    self.cached_status = components
+                    self.cached_at = time.monotonic()
+            finally:
+                with self.lock:
+                    self.probing = False
+        guard =read_json(self.jobs.guard) if self.jobs.guard.exists() else None
         active_job = None
         worker_alive = None
         if guard:
@@ -236,6 +259,17 @@ class Application:
                 'selected_events': [row['event_id'] for row in catalogue.get('selected', [])]}
 
     def artifacts(self):
+        # La scansione di results/ è costosa e la console la chiede ogni pochi secondi: si riusa per breve tempo.
+        with self.lock:
+            if self.artifacts_cache and time.monotonic() - self.artifacts_cached_at < 15:
+                return self.artifacts_cache
+        rows = self.scan_artifacts()
+        with self.lock:
+            self.artifacts_cache = rows
+            self.artifacts_cached_at = time.monotonic()
+        return rows
+
+    def scan_artifacts(self):
         paths = [self.root / name for name in ('results/environment.json', 'results/functional-gate.json')]
         paths.extend((self.root / 'results/comparisons').glob('compare-*/metadata.json'))
         for folder in (self.root / 'results/event-comparisons').glob('events-*'):

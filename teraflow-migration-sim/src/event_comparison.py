@@ -74,6 +74,7 @@ def summarize_run(root, result, event, orbit):
            'total_operation_s': metrics.get('total_operation_s'),
            'ping_recovery_s': metrics.get('ping_recovery_s'),
            'observed_pings': ping.get('observed_probes'), 'lost_pings': ping.get('lost_probes'),
+           'bytes_sent': result.get('bytes_sent'), 'bytes_received': result.get('bytes_received'),
            'attempt': metrics.get('attempt'), 'software_on_board': result.get('software_on_board')}
     row['phases'] = phase_breakdown(Path(root) / 'results/runs' / str(result.get('run_id')))
     receipts = [event.get('receipt') or {} for event in result.get('events') or [] if event.get('phase') == 'transfer_verified']

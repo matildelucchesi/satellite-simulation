@@ -449,29 +449,28 @@ function table(headers,rows,rowClass){
  element.append(thead,body);const scroller=node('div',undefined,'table-scroll');scroller.append(element);return scroller;
 }
 /* Schema 2: replicas per event. Overview first, then each event with its replicas. */
+/* Dettagli per evento aperti dall'utente: restano aperti anche quando la sezione viene ricostruita al refresh. */
+const openEventDetails=new Set();
 function renderDesignResults(comparison,box,status){
  const design=comparison.design||{};
- status.textContent=`${comparison.complete?'Completato':comparison.reason?'Non completato: '+(REASONS[comparison.reason]||comparison.reason):'In corso'} · ${comparison.completed_runs} di ${comparison.run_total} prove${comparison.failed_runs?`, ${comparison.failed_runs} non ${comparison.failed_runs===1?'riuscita':'riuscite'}`:''} · ${design.replicas} repliche per evento e modalità, riscaldamento escluso · seme ${design.seed} · ${comparison.rate_bps/1e9} Gbit/s`;
- box.append(node('h3','Downtime del controller per evento'));
+ status.textContent=`${comparison.complete?'':comparison.reason?'Non completato: '+(REASONS[comparison.reason]||comparison.reason)+' · ':'In corso · '}${comparison.completed_runs} di ${comparison.run_total} prove${comparison.failed_runs?`, ${comparison.failed_runs} non ${comparison.failed_runs===1?'riuscita':'riuscite'}`:''} · ${design.replicas} repliche per evento e modalità · ${comparison.rate_bps/1e9} Gbit/s`;
  box.append(table(['Evento','Percorso','Salti','Destinazione','Hot · mediana e quartili','Cold · mediana e quartili','Cold − Hot · mediana e IC 95 %','Coppie'],
   comparison.events.map(row=>{const s=row.statistics?.controller_downtime_s;return [`E${row.index}`,`${row.source} → ${row.destination}`,String(row.hops),row.other_plane?'altro piano':'stesso piano',
    spread(s?.hot),spread(s?.cold),interval(s?.cold_minus_hot),String(s?.cold_minus_hot?.n??0)];})));
- box.append(node('p',`${comparison.statistics_partial?'Statistiche parziali: solo le prove già concluse. ':''}IC 95 %: intervallo bootstrap della mediana delle differenze appaiate, sulle repliche con entrambe le misure. Misure mancanti escluse.`,'small muted'));
- if(comparison.warmup?.run){const w=comparison.warmup;box.append(node('p',`Riscaldamento (escluso): evento ${w.event}, ${methodLabel(w.method)}, downtime ${duration(w.run.controller_downtime_s)}, ${w.run.success?'riuscita':'non riuscita'}.`,'small muted'));}
  for(const row of comparison.events){
+  const key=`${comparison.comparison_id}:${row.index}`;
   const card=node('details',undefined,'event-detail'),summary=node('summary');
+  card.open=openEventDetails.has(key);
+  card.addEventListener('toggle',()=>{if(card.open)openEventDetails.add(key);else openEventDetails.delete(key);});
   summary.append(node('span',`E${row.index} · ${row.source} → ${row.destination}`,'event-name'),node('span',`${row.hops} salti · ${row.other_plane?'altro piano':'stesso piano'} · ${clock(row.trigger_s)}`,'small muted'));
   card.append(summary);
-  const s=row.statistics||{};
-  card.append(node('p',`Durata della migrazione: Hot ${spread(s.total_operation_s?.hot)}, Cold ${spread(s.total_operation_s?.cold)}; Cold − Hot ${interval(s.total_operation_s?.cold_minus_hot)}.`,'small'));
   const rows=[...row.replicas].sort((a,b)=>a.replica-b.replica).map(entry=>{
-   const hot=entry.runs.hot,cold=entry.runs.cold,lost=run=>run?(run.lost_pings??'—'):'—';
+   const hot=entry.runs.hot,cold=entry.runs.cold;
    const outcome=[hot,cold].every(run=>run&&run.success)?'riuscite':[hot,cold].map(run=>run?(run.success?'':methodLabel(run.method)+' non riuscita'):'').filter(Boolean).join(', ')||'incompleta';
-   return [String(entry.replica),entry.order.map(methodLabel).join(' → '),duration(hot?.controller_downtime_s),duration(cold?.controller_downtime_s),
-    duration(entry.cold_minus_hot?.controller_downtime_s),duration(hot?.total_operation_s),duration(cold?.total_operation_s),`${lost(hot)} / ${lost(cold)}`,
-    hot?.transfer_one_way_delay_s!=null?`${(hot.transfer_one_way_delay_s*1000).toFixed(1).replace('.',',')} ms`:'—',outcome];
+   return [String(entry.replica),duration(hot?.controller_downtime_s),duration(cold?.controller_downtime_s),
+    duration(entry.cold_minus_hot?.controller_downtime_s),duration(hot?.total_operation_s),duration(cold?.total_operation_s),outcome];
   });
-  card.append(table(['Replica','Ordine','Hot Δt','Cold Δt','Cold − Hot','Hot durata','Cold durata','Ping persi H / C','Ritardo del percorso','Esito'],rows));
+  card.append(table(['Replica','Downtime controller Hot','Downtime controller Cold','Cold − Hot (downtime)','Durata migrazione Hot','Durata migrazione Cold','Esito'],rows));
   box.append(card);
  }
 }
@@ -481,7 +480,7 @@ function renderResults(){
  const comparison=comparisons.find(row=>row.comparison_id===selectedComparison)||comparisons[0];
  if(!comparison){status.textContent='Nessun esperimento registrato.';}
  else{
-  if(comparison.schema_version>=2){renderDesignResults(comparison,box,status);renderVerifications();renderDownloads(comparison);return;}
+  if(comparison.schema_version>=2){renderDesignResults(comparison,box,status);renderDownloads(comparison);return;}
   status.textContent=`${comparison.complete?'Completato':comparison.reason?'Non completato: '+comparison.reason:'In corso'} · ${comparison.rate_bps/1e9} Gbit/s · ${comparison.software_on_board?'migra solo lo stato':'con trasferimento delle immagini'} · una replica per evento e modalità, valori per evento.`;
   for(const row of comparison.events){
    const card=node('article',undefined,'event-card');
@@ -505,20 +504,6 @@ function renderResults(){
   }
  }
  renderVerifications();renderDownloads(comparison);
-}
-function renderVerifications(){
- const box=$('verifications');box.replaceChildren();
- if(!verificationRows.length){box.append(node('p','Nessuna verifica registrata.','small'));return;}
- const table=node('table'),thead=node('thead'),head=node('tr'),body=node('tbody');
- for(const title of ['Data','Esito','Hot: downtime','Cold: downtime','Cold − Hot'])head.append(node('th',title));
- thead.append(head);
- for(const row of verificationRows.slice(0,5)){
-  const hot=(row.runs||[]).find(run=>run.method==='hot'),cold=(row.runs||[]).find(run=>run.method==='cold'),tr=node('tr');
-  tr.append(node('td',row.created_utc?new Date(row.created_utc).toLocaleString('it-IT'):'—'),node('td',row.complete?'riuscita':row.reason||'non completata'),
-   node('td',duration(hot?.controller_downtime_s)),node('td',duration(cold?.controller_downtime_s)),node('td',duration(row.cold_minus_hot?.controller_downtime_s)));
-  body.append(tr);
- }
- table.append(thead,body);const scroller=node('div',undefined,'table-scroll');scroller.append(table);box.append(scroller);
 }
 function renderDownloads(comparison){
  const list=$('downloads');list.replaceChildren();
