@@ -281,6 +281,9 @@ tr.difference th,tr.difference td{color:var(--color-accent);font-weight:600}
 .results-head #comparison-select{padding-inline:.75rem 2.25rem}
 #results>h3{margin-top:var(--space-sm)}
 /* One collapsible block per event with its replicas */
+.policy-summary{display:grid;gap:var(--space-sm);min-width:0}
+.policy-summary h3,.policy-summary p{margin:0}
+.policy-summary .table-scroll{width:100%}
 .event-detail{border-top:1px solid var(--color-rule);padding-top:var(--space-md);min-width:0}
 .event-detail .table-scroll{width:100%}
 .event-detail table{width:100%;table-layout:auto}

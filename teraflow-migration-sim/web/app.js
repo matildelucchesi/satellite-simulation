@@ -444,7 +444,7 @@ $('stop-dialog').addEventListener('close',async()=>{
 function renderComparisonSelect(){
  const select=$('comparison-select'),current=selectedComparison||comparisons[0]?.comparison_id||'';
  select.replaceChildren();
- for(const row of comparisons){const option=node('option',`${new Date(row.created_utc).toLocaleString('it-IT')} · ${row.complete?'completato':row.reason==='worker_stopped'?'interrotto':row.reason?'non completato':'in corso'}`);option.value=row.comparison_id;option.selected=row.comparison_id===current;select.append(option);}
+ for(const row of comparisons){const option=node('option',`${new Date(row.created_utc).toLocaleString('it-IT')} · ${POLICY_NAMES[row.design?.destination_policy||'designed']} · ${row.complete?'completato':row.reason==='worker_stopped'?'interrotto':row.reason?'non completato':'in corso'}`);option.value=row.comparison_id;option.selected=row.comparison_id===current;select.append(option);}
  select.hidden=!comparisons.length;
 }
 $('comparison-select').addEventListener('change',event=>{selectedComparison=event.target.value;renderResults();});
@@ -465,12 +465,37 @@ function table(headers,rows,rowClass){
  for(const cells of rows){const tr=node('tr',undefined,rowClass?rowClass(cells):undefined);cells.forEach((cell,index)=>tr.append(node(index===0?'th':'td',cell)));body.append(tr);}
  element.append(thead,body);const scroller=node('div',undefined,'table-scroll');scroller.append(element);return scroller;
 }
+/* The destination policy the experiment ran with: its rule, its parameters and, per event, what it chose */
+const percent=value=>`${(value*100).toLocaleString('it-IT',{maximumFractionDigits:1})} %`;
+const milliseconds=value=>`${value.toLocaleString('it-IT',{maximumFractionDigits:1})} ms`;
+function policySummary(comparison){
+ const design=comparison.design||{},policy=design.destination_policy||'designed',parameters=design.destination_policy_parameters;
+ const section=node('section',undefined,'policy-summary');
+ section.append(node('h3',`Politica di destinazione: ${POLICY_NAMES[policy]||policy}`));
+ if(policy!=='cost'||!parameters){
+  section.append(node('p','Destinazioni fissate dal catalogo degli eventi progettati.','small muted'));
+  return section;
+ }
+ const mode=parameters.selection_mode||'hot',source=parameters.downtime_source||{};
+ section.append(node('p',`Ammessa una destinazione se la disponibilità in ${methodLabel(mode)} è almeno ${percent(parameters.availability_min)}: downtime ${duration(parameters.downtime_s?.[mode])} sulla permanenza contata dalla fine della migrazione più lunga (${duration(Math.max(...Object.values(parameters.duration_s||{0:0})))}). Fra le ammesse vince la latenza di controllo minima, poi meno salti, poi l’id NORAD minore.`,'small'));
+ if(source.experiment)section.append(node('p',`Tempi misurati in ${source.experiment.slice(0,15)}…: Hot ${duration(parameters.downtime_s?.hot)} di downtime e ${duration(parameters.duration_s?.hot)} di durata, Cold ${duration(parameters.downtime_s?.cold)} e ${duration(parameters.duration_s?.cold)}.`,'small muted'));
+ const designed=Object.fromEntries((profile?.selected_events||[]).map(event=>[event.event_id,event]));
+ section.append(table(['Evento','Scelta della politica','Evento progettato','Permanenza',`Disponibilità ${methodLabel(mode)} attesa`,'Latenza di controllo'],
+  comparison.events.map(row=>{
+   const original=designed[row.designed_event_id],stay=row.stay_s,downtime=parameters.downtime_s?.[mode];
+   const was=original?`${row.designed_event_id} (${original.source} → ${original.destination}, ${original.hops} ${original.hops===1?'salto':'salti'})`:row.designed_event_id||'—';
+   return [`E${row.index}`,`${row.source} → ${row.destination} · ${row.hops} salti`,row.replaces_designed_entry?`sostituisce ${was}`:`stesso ingresso in ombra di ${was}`,
+    stay?duration(stay):'—',stay&&downtime!==undefined?percent(1-downtime/stay):'—',row.control_latency_ms!==undefined?milliseconds(row.control_latency_ms):'—'];
+  })));
+ return section;
+}
 /* Schema 2: replicas per event. Overview first, then each event with its replicas. */
 /* Dettagli per evento aperti dall'utente: restano aperti anche quando la sezione viene ricostruita al refresh. */
 const openEventDetails=new Set();
 function renderDesignResults(comparison,box,status){
  const design=comparison.design||{};
  status.textContent=`${comparison.complete?'':comparison.reason?'Non completato: '+(REASONS[comparison.reason]||comparison.reason)+' · ':'In corso · '}${comparison.completed_runs} di ${comparison.run_total} prove${comparison.failed_runs?`, ${comparison.failed_runs} non ${comparison.failed_runs===1?'riuscita':'riuscite'}`:''} · ${design.replicas} repliche per evento e modalità · ${POLICY_NAMES[design.destination_policy||'designed']} · ${comparison.rate_bps/1e9} Gbit/s`;
+ box.append(policySummary(comparison));
  box.append(table(['Evento','Percorso','Salti','Destinazione','Hot · mediana e quartili','Cold · mediana e quartili','Cold − Hot · mediana e IC 95 %','Coppie'],
   comparison.events.map(row=>{const s=row.statistics?.controller_downtime_s;return [`E${row.index}`,`${row.source} → ${row.destination}`,String(row.hops),row.other_plane?'altro piano':'stesso piano',
    spread(s?.hot),spread(s?.cold),interval(s?.cold_minus_hot),String(s?.cold_minus_hot?.n??0)];})));
