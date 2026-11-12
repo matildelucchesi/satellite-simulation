@@ -1,6 +1,6 @@
 # Piano: politica di destinazione e forwarding dai percorsi di TeraFlow
 
-Branch: `forwarding-path-selection`. Stato: passi 1, 2, 4, 5 e 6 completati e verificati (12 novembre 2026); passo 3 (termine misurato della latenza) aperto; resta l'esperimento con la politica di costo.
+Branch: `forwarding-path-selection`. Stato: passi 1, 2, 4, 5 e 6 completati e verificati (12 novembre 2026); passo 3 (termine misurato della latenza) aperto. Primo esperimento con la politica completato (permanenza libera); la politica ha ora una permanenza minima di 600 s e l'esperimento va ripetuto.
 
 ## Obiettivo
 
@@ -18,7 +18,8 @@ Aggiungere all'esperimento una seconda politica di scelta della destinazione del
 | Hot e Cold | Per ogni evento entrambe le modalità, sulla stessa sorgente, destinazione e istante orbitale (come oggi). |
 | Selezione | Downtime Hot, soglia 95 %. |
 | Permanenza | Dalla fine della migrazione più lunga (Cold, 194 s di mediana) al trigger della destinazione. |
-| Ingresso non servito | Sostituito dall'ingresso servito più vicino nel tempo; gli eventi progettati restano invariati. |
+| Permanenza minima | 600 s dopo la migrazione (`minimum_stay_s`). Senza, la politica sceglie destinazioni che restano appena oltre la soglia (circa 170 s) e il controller migra ogni 6 minuti, metà del tempo in migrazione. Con 600 s migra circa ogni 15 minuti (21 % del tempo in migrazione, downtime Cold 14,5 %). |
+| Eventi della politica | Sugli ingressi in ombra degli eventi progettati; un ingresso non servito è sostituito dall'ingresso servito più vicino nel tempo. Non in catena: nel dominio fisso, con 600 s di permanenza, una catena regge una sola migrazione (vedi punto 8). L'evoluzione nel tempo del controller si studia nel modello, con il dominio che lo segue. |
 
 ## Casualità nella scelta dei percorsi di TeraFlow
 
@@ -52,14 +53,18 @@ Risultati sul profilo installato (downtime e durate da `events-f77d737a…`: Hot
 ### 2. Catalogo con gli eventi della politica — fatto
 
 - `tools/destination_policy.py --downtime-from events-…` legge il profilo senza rifare la propagazione SGP4, prende le mediane di downtime e durata dall'esperimento e scrive in `events.json` del profilo `destination_policy` (parametri, scelte, sensibilità, confronto) e `policy_selected`. Aggiorna l'hash nel manifest. `build_scenario.py` usa le stesse funzioni.
-- `policy_selected`: per ognuno dei 3 eventi progettati, la destinazione della politica sullo stesso ingresso in ombra della stessa sorgente. Un ingresso che la politica non può servire è sostituito dall'ingresso servito più vicino nel tempo, non già usato; l'evento registra `replaces_designed_entry` e il motivo.
-- Eventi installati:
+- `policy_selected` (`policy_selected_events`): per ognuno dei 3 eventi progettati, la destinazione della politica sullo stesso ingresso in ombra della stessa sorgente. Un ingresso che la politica non può servire è sostituito dall'ingresso servito più vicino nel tempo, non già usato; l'evento registra `replaces_designed_entry` e il motivo.
+- Con la permanenza minima di 600 s la politica serve 90 dei 240 ingressi in ombra del dominio, con 5–6 salti: ogni satellite più indietro sull'orbita dà circa 180 s di luce in più, quindi 600 s richiedono di andare 5 o 6 satelliti indietro.
+- Eventi installati (permanenza minima 600 s):
 
-| Evento progettato | Evento della politica | Destinazione | Salti | Permanenza |
-| --- | --- | --- | --- | --- |
-| 62768-8295 | 62776-8114 (sostituto) | 60138, altro piano | 3 | 159 s |
-| 62774-58281 | 62774-58281 | 58890, altro piano | 3 | 158 s |
-| 60150-80439 | 60150-80439 | 60144, stesso piano | 3 | 354 s |
+| Evento progettato | Evento della politica | Destinazione | Salti | Permanenza | Latenza |
+| --- | --- | --- | --- | --- | --- |
+| 62768-8295 | 62774-7568 (sostituto) | 60138, altro piano | 6 | 705 s | 17,7 ms |
+| 62774-58281 | 62774-58281 | 60138, altro piano | 6 | 702 s | 17,7 ms |
+| 60150-80439 | 60150-80439 | 68285, stesso piano | 5 | 714 s | 11,5 ms |
+
+- Primo esperimento con la politica, senza permanenza minima (62776→60138, 62774→58890, 60150→60144, tutti a 3 salti): `events-56630cf4…`, 18 prove su 18 riuscite, Cold − Hot 137, 132 e 126 s, come con gli eventi progettati.
+- Provata e scartata: gli eventi della politica in catena (la sorgente di ogni evento è la destinazione del precedente). Senza permanenza minima la catena più lunga nel dominio fisso ha 3 migrazioni; con 600 s una sola. `policy_chains` resta per il controllo del punto 8.
 
 - Installato con `tools/install_scenario.py --refresh`: cambia solo `config/migration_events.json`; fixture invariata, nessun riavvio. La verifica funzionale è stata invalidata e va ripetuta (serve comunque dopo il passo 4).
 
@@ -94,17 +99,54 @@ Soluzione adottata, verificata sul codice del gestore `p4_fabric_tna_l2_simple`:
 
 - Nella card Esperimento, accanto a «Avvia esperimento», la select «Politica»: «Eventi progettati» e «Politica di costo». Con la seconda, sotto, l'elenco dei tre eventi; se il catalogo non li ha, l'opzione è disabilitata e una nota spiega perché. La scelta resta in `localStorage` (con `try/catch`).
 - `/api/v1/scenario-profiles` espone `policy_events` e i parametri della politica; `/api/v1/topology?event=` trova anche gli eventi della politica.
-- Pagina Scenario: un esperimento avviato con la politica segue i suoi eventi. L'anteprima e i tempi delle prove restano sugli eventi progettati.
-- Risultati: la politica è nella riga di stato; un evento sostitutivo indica quale evento progettato sostituisce.
+- Pagina Scenario: un esperimento avviato con la politica segue i suoi eventi. L'anteprima segue gli eventi dell'esperimento scelto in «Tempi da» (progettati o della politica); la tabella degli eventi della politica è sotto quella degli eventi progettati.
+- Risultati: un pannello «Politica di destinazione» con regola, parametri e, per ogni evento, scelta, evento progettato, permanenza, disponibilità attesa e latenza; la politica è anche nel menu degli esperimenti.
 
 ### 7. Test
 
 - Politica: soglia rispettata, ordinamento per latenza, stessa destinazione per Hot e Cold, nessun candidato se la soglia è troppo alta.
-- Catalogo: `policy_selected` ha la stessa sorgente e lo stesso ingresso in ombra degli eventi progettati, salvo i sostituti, che registrano l'evento sostituito.
+- Catalogo: `policy_selected` ha la stessa sorgente e lo stesso ingresso in ombra degli eventi progettati, salvo i sostituti, che registrano l'evento sostituito. La permanenza minima esclude le destinazioni che resterebbero meno. Le catene della politica seguono il controller e si fermano su una sorgente senza destinazione ammessa.
 - Fixture: tutti i percorsi minimi coperti e nessuno switch in più, una porta per host su ogni percorso, percorso unico invariato, nessun percorso, lettura del percorso da una connessione.
 - Job: parametro valido e non valido, catalogo senza `policy_selected`, lettura dei metadati con `schema_version` 2.
 - JavaScript: select, select disabilitata, payload dell'avvio.
 - Laboratorio: verifica funzionale con il nuovo inoltro prima di qualsiasi esperimento con la politica.
+
+### 8. Analisi: dominio che segue il controller (solo modello) — fatto
+
+Il laboratorio emula un dominio fisso di 16 satelliti; questa analisi, solo sul replay del profilo, misura quanto il dominio fisso condiziona la politica. Il laboratorio non cambia.
+
+- `domain_around(host, …)`: dominio ricostruito attorno al satellite che ospita il controller, con la stessa regola di `choose_domain`: 8 satelliti consecutivi del suo piano, `behind` dei quali lo seguono sull'orbita, e gli 8 dell'altro piano più vicini all'arco.
+- `follow_controller(…, domain_of, …)`: la politica di costo (stessi vincoli, stessi tempi misurati, soglia 95 % Hot) decide a ogni ingresso in ombra del satellite che ospita il controller, dentro `domain_of(host, istante)`; la decisione successiva è all'ingresso in ombra della destinazione. Si ferma quando non c'è una destinazione ammessa o quando finisce il replay (una destinazione al sole fino alla fine del replay non resterebbe abbastanza). Con il dominio fisso ritrova esattamente le catene del catalogo (lo strumento lo controlla).
+- `tools/sliding_domain.py [--behind 4 6 7]` parte da ognuno dei 240 ingressi in ombra del dominio fisso e scrive `results/analysis/sliding-domain.json`. In `journeys` registra, per ogni dominio e dalla stessa partenza, la giornata del controller migrazione per migrazione (satelliti, salti, piano, permanenza, latenza, destinazioni ammesse, satelliti che entrano ed escono dal dominio).
+- Console, pagina Scenario, pannello «Il controller nel tempo» (`/api/v1/controller-journey`): sceglie il dominio e mostra in tre grafici sull'ora del giorno il piano del satellite che ospita il controller, la latenza e la permanenza di ogni migrazione, con i valori al passaggio del mouse e la tabella di tutte le migrazioni. Se il catalogo cambia dopo l'analisi, avvisa di rieseguirla.
+
+Risultati senza permanenza minima (profilo installato, 12 novembre 2026):
+
+| Dominio | Partenze servite | Migrazioni per catena (media, max) | Arresto | Una migrazione ogni | Permanenza media | Latenza scelta | Destinazioni ammesse | Altro piano | Satelliti che cambiano dominio per passo |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Fisso (laboratorio) | 180 su 240 | 2, 3 | nessuna destinazione ammessa | 370 s | 176 s | 14,1 ms | 4,8 | 31 % | 0 |
+| Segue, 2 dietro | 240 su 240 | 120, 230 | fine del replay | 363 s | 169 s | 17,7 ms | 2,0 | 40 % | 4 |
+| Segue, 4 dietro (centrato) | 240 su 240 | 120, 230 | fine del replay | 363 s | 169 s | 11,6 ms | 6,0 | 35 % | 4 |
+| Segue, 6 dietro | 240 su 240 | 86, 164 | fine del replay | 509 s | 315 s | 10,3 ms | 10,0 | 58 % | 5,6 |
+
+- Con il dominio che segue il controller la politica non si blocca più: dalla catena installata (60150, 00:25:57) il controller migra 230 volte in 23,2 ore, fino alla fine del replay. Con il dominio fisso si ferma dopo 3 migrazioni sul bordo (60138).
+- Il prezzo è il passaggio di satelliti fra domini: 4 su 16 a ogni migrazione con il dominio centrato (5,6 con 6 dietro). È un'operazione che il laboratorio non emula.
+- La latenza scelta scende da 14,1 ms (dominio fisso, il controller scivola verso il bordo) a 11,6 ms (centrato) o 10,3 ms (6 dietro).
+- Con qualsiasi dominio la politica migra molto spesso: sceglie la destinazione con la latenza minima fra quelle che restano appena oltre la soglia, quindi la permanenza è breve (circa 170 s) e la migrazione successiva arriva dopo circa 6 minuti. Il controller passa circa metà del tempo a migrare; il downtime è l'1,8 % in Hot ma sarebbe il 36 % in Cold. Mettere più satelliti dietro il controller (6 dietro) allunga la permanenza a 315 s e riduce il downtime Cold al 26 %, perché le destinazioni con più luce sono quelle che lo seguono.
+- Le misure Hot/Cold del laboratorio non cambiano: la migrazione emulata è la stessa con qualsiasi dominio.
+
+Con la permanenza minima di 600 s:
+
+| Dominio | Partenze servite | Migrazioni per catena (media, max) | Arresto | Una migrazione ogni | Permanenza media | Latenza scelta | Destinazioni ammesse | Altro piano | Satelliti che cambiano dominio per passo |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Fisso (laboratorio) | 90 su 240 | 1, 1 | nessuna destinazione ammessa | 903 s | 709 s | 14,4 ms | 4,0 | 50 % | 0 |
+| Segue, 4 dietro (centrato) | 0 su 240 | — | nessuna destinazione ammessa | — | — | — | — | — | — |
+| Segue, 6 dietro | 240 su 240 | 48, 92 | fine del replay | 908 s | 714 s | 14,0 ms | 4,0 | 39 % | 10 |
+| Segue, 7 dietro | 240 su 240 | 48, 92 | fine del replay | 908 s | 714 s | 11,5 ms | 6,0 | 44 % | 10 |
+
+- Il controller migra circa ogni 15 minuti invece che ogni 6; passa il 21 % del tempo in migrazione; il downtime è lo 0,7 % in Hot e il 14,5 % in Cold.
+- La permanenza richiede di andare 5–6 satelliti indietro, quindi il dominio deve estendersi dietro il controller: centrato (4 dietro) non ammette nessuna destinazione. Con 6–7 dietro la politica regge fino alla fine del replay, ma a ogni migrazione 10 satelliti su 16 cambiano dominio.
+- Dominio fisso più grande (arco che termina in 60150 e si estende indietro): con 600 s le catene restano di 1 migrazione fino a 10 satelliti per piano, arrivano a 2 con 12 e a 5 con 16; solo da 20 per piano (40 switch) la politica regge tutto il giorno, con latenza media 33 ms. Un piano orbitale in più non aiuta: la luce in più viene dalla posizione lungo l'orbita, non dal numero di piani.
 
 ## Ordine
 
@@ -112,7 +154,7 @@ Soluzione adottata, verificata sul codice del gestore `p4_fabric_tna_l2_simple`:
 2. Catalogo con `policy_selected` e installazione — fatto.
 3. Inoltro dal percorso di TeraFlow e verifica funzionale — fatto.
 4. Parametro del job, console, test — fatto.
-5. Esperimento con la politica di costo (circa 2 ore, 19 prove come l'esperimento progettato) — da avviare.
+5. Esperimento con la politica di costo — fatto senza permanenza minima (`events-56630cf4…`); da ripetere con la permanenza minima di 600 s (circa 2 ore, 19 prove).
 
 ## Da decidere
 

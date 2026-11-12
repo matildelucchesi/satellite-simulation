@@ -4666,6 +4666,7 @@
  "destination_policy": {
   "parameters": {
    "availability_min": 0.95,
+   "minimum_stay_s": 600.0,
    "selection_mode": "hot",
    "downtime_s": {
     "cold": 131.41048469999805,
@@ -4696,271 +4697,259 @@
    },
    "overhead_ms": 0.0,
    "stay": "dalla fine della migrazione piu lunga fra le modalita al trigger della destinazione",
-   "rule": "ammessa se downtime / permanenza <= 1 - availability_min (modalita selection_mode); fra le ammesse latenza media di controllo minima, poi meno salti, poi id NORAD minore",
+   "rule": "ammessa se downtime / permanenza <= 1 - availability_min (modalita selection_mode) e permanenza >= minimum_stay_s; fra le ammesse latenza media di controllo minima, poi meno salti, poi id NORAD minore",
    "role": "politica alternativa agli eventi progettati, scelta prima dell avvio dell esperimento"
   },
   "summary": {
    "shadow_entries": 240,
-   "served": 180,
+   "served": 90,
    "selection_mode": "hot",
    "hops_histogram": {
-    "2": 75,
-    "3": 90,
-    "4": 15
+    "5": 45,
+    "6": 45
    },
-   "other_plane": 90,
-   "mean_hops": 2.6666666666666665,
-   "mean_stay_s": 193.92507850000402,
-   "mean_control_latency_ms": 12.327125157239092,
+   "other_plane": 45,
+   "mean_hops": 5.5,
+   "mean_stay_s": 709.2584118333374,
+   "mean_control_latency_ms": 14.37060582068875,
    "downtime_share": {
-    "cold": 0.677635330698063,
-    "hot": 0.03442200746608613
+    "cold": 0.18527871154932046,
+    "hot": 0.009411647981352455
    }
   },
   "sensitivity": [
    {
     "availability_min": 0.5,
     "shadow_entries": 240,
-    "served": 180,
+    "served": 90,
     "selection_mode": "hot",
     "hops_histogram": {
-     "2": 75,
-     "3": 90,
-     "4": 15
+     "5": 45,
+     "6": 45
     },
-    "other_plane": 90,
-    "mean_hops": 2.6666666666666665,
-    "mean_stay_s": 193.92507850000402,
-    "mean_control_latency_ms": 12.327125157239092,
+    "other_plane": 45,
+    "mean_hops": 5.5,
+    "mean_stay_s": 709.2584118333374,
+    "mean_control_latency_ms": 14.37060582068875,
     "downtime_share": {
-     "cold": 0.677635330698063,
-     "hot": 0.03442200746608613
+     "cold": 0.18527871154932046,
+     "hot": 0.009411647981352455
     }
    },
    {
     "availability_min": 0.6,
     "shadow_entries": 240,
-    "served": 180,
+    "served": 90,
     "selection_mode": "hot",
     "hops_histogram": {
-     "2": 75,
-     "3": 90,
-     "4": 15
+     "5": 45,
+     "6": 45
     },
-    "other_plane": 90,
-    "mean_hops": 2.6666666666666665,
-    "mean_stay_s": 193.92507850000402,
-    "mean_control_latency_ms": 12.327125157239092,
+    "other_plane": 45,
+    "mean_hops": 5.5,
+    "mean_stay_s": 709.2584118333374,
+    "mean_control_latency_ms": 14.37060582068875,
     "downtime_share": {
-     "cold": 0.677635330698063,
-     "hot": 0.03442200746608613
+     "cold": 0.18527871154932046,
+     "hot": 0.009411647981352455
     }
    },
    {
     "availability_min": 0.7,
     "shadow_entries": 240,
-    "served": 180,
+    "served": 90,
     "selection_mode": "hot",
     "hops_histogram": {
-     "2": 75,
-     "3": 90,
-     "4": 15
+     "5": 45,
+     "6": 45
     },
-    "other_plane": 90,
-    "mean_hops": 2.6666666666666665,
-    "mean_stay_s": 193.92507850000402,
-    "mean_control_latency_ms": 12.327125157239092,
+    "other_plane": 45,
+    "mean_hops": 5.5,
+    "mean_stay_s": 709.2584118333374,
+    "mean_control_latency_ms": 14.37060582068875,
     "downtime_share": {
-     "cold": 0.677635330698063,
-     "hot": 0.03442200746608613
+     "cold": 0.18527871154932046,
+     "hot": 0.009411647981352455
     }
    },
    {
     "availability_min": 0.75,
     "shadow_entries": 240,
-    "served": 180,
+    "served": 90,
     "selection_mode": "hot",
     "hops_histogram": {
-     "2": 75,
-     "3": 90,
-     "4": 15
+     "5": 45,
+     "6": 45
     },
-    "other_plane": 90,
-    "mean_hops": 2.6666666666666665,
-    "mean_stay_s": 193.92507850000402,
-    "mean_control_latency_ms": 12.327125157239092,
+    "other_plane": 45,
+    "mean_hops": 5.5,
+    "mean_stay_s": 709.2584118333374,
+    "mean_control_latency_ms": 14.37060582068875,
     "downtime_share": {
-     "cold": 0.677635330698063,
-     "hot": 0.03442200746608613
+     "cold": 0.18527871154932046,
+     "hot": 0.009411647981352455
     }
    },
    {
     "availability_min": 0.8,
     "shadow_entries": 240,
-    "served": 180,
+    "served": 90,
     "selection_mode": "hot",
     "hops_histogram": {
-     "2": 75,
-     "3": 90,
-     "4": 15
+     "5": 45,
+     "6": 45
     },
-    "other_plane": 90,
-    "mean_hops": 2.6666666666666665,
-    "mean_stay_s": 193.92507850000402,
-    "mean_control_latency_ms": 12.327125157239092,
+    "other_plane": 45,
+    "mean_hops": 5.5,
+    "mean_stay_s": 709.2584118333374,
+    "mean_control_latency_ms": 14.37060582068875,
     "downtime_share": {
-     "cold": 0.677635330698063,
-     "hot": 0.03442200746608613
+     "cold": 0.18527871154932046,
+     "hot": 0.009411647981352455
     }
    },
    {
     "availability_min": 0.85,
     "shadow_entries": 240,
-    "served": 180,
+    "served": 90,
     "selection_mode": "hot",
     "hops_histogram": {
-     "2": 75,
-     "3": 90,
-     "4": 15
+     "5": 45,
+     "6": 45
     },
-    "other_plane": 90,
-    "mean_hops": 2.6666666666666665,
-    "mean_stay_s": 193.92507850000402,
-    "mean_control_latency_ms": 12.327125157239092,
+    "other_plane": 45,
+    "mean_hops": 5.5,
+    "mean_stay_s": 709.2584118333374,
+    "mean_control_latency_ms": 14.37060582068875,
     "downtime_share": {
-     "cold": 0.677635330698063,
-     "hot": 0.03442200746608613
+     "cold": 0.18527871154932046,
+     "hot": 0.009411647981352455
     }
    },
    {
     "availability_min": 0.88,
     "shadow_entries": 240,
-    "served": 180,
+    "served": 90,
     "selection_mode": "hot",
     "hops_histogram": {
-     "2": 75,
-     "3": 90,
-     "4": 15
+     "5": 45,
+     "6": 45
     },
-    "other_plane": 90,
-    "mean_hops": 2.6666666666666665,
-    "mean_stay_s": 193.92507850000402,
-    "mean_control_latency_ms": 12.327125157239092,
+    "other_plane": 45,
+    "mean_hops": 5.5,
+    "mean_stay_s": 709.2584118333374,
+    "mean_control_latency_ms": 14.37060582068875,
     "downtime_share": {
-     "cold": 0.677635330698063,
-     "hot": 0.03442200746608613
+     "cold": 0.18527871154932046,
+     "hot": 0.009411647981352455
     }
    },
    {
     "availability_min": 0.9,
     "shadow_entries": 240,
-    "served": 180,
+    "served": 90,
     "selection_mode": "hot",
     "hops_histogram": {
-     "2": 75,
-     "3": 90,
-     "4": 15
+     "5": 45,
+     "6": 45
     },
-    "other_plane": 90,
-    "mean_hops": 2.6666666666666665,
-    "mean_stay_s": 193.92507850000402,
-    "mean_control_latency_ms": 12.327125157239092,
+    "other_plane": 45,
+    "mean_hops": 5.5,
+    "mean_stay_s": 709.2584118333374,
+    "mean_control_latency_ms": 14.37060582068875,
     "downtime_share": {
-     "cold": 0.677635330698063,
-     "hot": 0.03442200746608613
+     "cold": 0.18527871154932046,
+     "hot": 0.009411647981352455
     }
    },
    {
     "availability_min": 0.92,
     "shadow_entries": 240,
-    "served": 180,
+    "served": 90,
     "selection_mode": "hot",
     "hops_histogram": {
-     "2": 75,
-     "3": 90,
-     "4": 15
+     "5": 45,
+     "6": 45
     },
-    "other_plane": 90,
-    "mean_hops": 2.6666666666666665,
-    "mean_stay_s": 193.92507850000402,
-    "mean_control_latency_ms": 12.327125157239092,
+    "other_plane": 45,
+    "mean_hops": 5.5,
+    "mean_stay_s": 709.2584118333374,
+    "mean_control_latency_ms": 14.37060582068875,
     "downtime_share": {
-     "cold": 0.677635330698063,
-     "hot": 0.03442200746608613
+     "cold": 0.18527871154932046,
+     "hot": 0.009411647981352455
     }
    },
    {
     "availability_min": 0.95,
     "shadow_entries": 240,
-    "served": 180,
+    "served": 90,
     "selection_mode": "hot",
     "hops_histogram": {
-     "2": 75,
-     "3": 90,
-     "4": 15
+     "5": 45,
+     "6": 45
     },
-    "other_plane": 90,
-    "mean_hops": 2.6666666666666665,
-    "mean_stay_s": 193.92507850000402,
-    "mean_control_latency_ms": 12.327125157239092,
+    "other_plane": 45,
+    "mean_hops": 5.5,
+    "mean_stay_s": 709.2584118333374,
+    "mean_control_latency_ms": 14.37060582068875,
     "downtime_share": {
-     "cold": 0.677635330698063,
-     "hot": 0.03442200746608613
+     "cold": 0.18527871154932046,
+     "hot": 0.009411647981352455
     }
    },
    {
     "availability_min": 0.96,
     "shadow_entries": 240,
-    "served": 180,
+    "served": 90,
     "selection_mode": "hot",
     "hops_histogram": {
-     "2": 146,
-     "3": 19,
-     "4": 15
+     "5": 45,
+     "6": 45
     },
-    "other_plane": 19,
-    "mean_hops": 2.272222222222222,
-    "mean_stay_s": 199.65841183333734,
-    "mean_control_latency_ms": 12.335262825635501,
+    "other_plane": 45,
+    "mean_hops": 5.5,
+    "mean_stay_s": 709.2584118333374,
+    "mean_control_latency_ms": 14.37060582068875,
     "downtime_share": {
-     "cold": 0.6581765501054446,
-     "hot": 0.03343355503378742
+     "cold": 0.18527871154932046,
+     "hot": 0.009411647981352455
     }
    },
    {
     "availability_min": 0.97,
     "shadow_entries": 240,
-    "served": 150,
+    "served": 90,
     "selection_mode": "hot",
     "hops_histogram": {
-     "3": 75,
-     "4": 75
+     "5": 45,
+     "6": 45
     },
-    "other_plane": 75,
-    "mean_hops": 3.5,
-    "mean_stay_s": 345.23841183333735,
-    "mean_control_latency_ms": 12.738679695439263,
+    "other_plane": 45,
+    "mean_hops": 5.5,
+    "mean_stay_s": 709.2584118333374,
+    "mean_control_latency_ms": 14.37060582068875,
     "downtime_share": {
-     "cold": 0.38063691697039786,
-     "hot": 0.01933530647572018
+     "cold": 0.18527871154932046,
+     "hot": 0.009411647981352455
     }
    },
    {
     "availability_min": 0.98,
     "shadow_entries": 240,
-    "served": 150,
+    "served": 90,
     "selection_mode": "hot",
     "hops_histogram": {
-     "3": 75,
-     "4": 75
+     "5": 45,
+     "6": 45
     },
-    "other_plane": 75,
-    "mean_hops": 3.5,
-    "mean_stay_s": 345.23841183333735,
-    "mean_control_latency_ms": 12.738679695439263,
+    "other_plane": 45,
+    "mean_hops": 5.5,
+    "mean_stay_s": 709.2584118333374,
+    "mean_control_latency_ms": 14.37060582068875,
     "downtime_share": {
-     "cold": 0.38063691697039786,
-     "hot": 0.01933530647572018
+     "cold": 0.18527871154932046,
+     "hot": 0.009411647981352455
     }
    },
    {
@@ -5029,26 +5018,29 @@
      "admissible": true
     },
     "policy": {
-     "destination": 58890,
-     "hops": 3,
+     "destination": 60138,
+     "hops": 6,
      "other_plane": true,
      "path": [
       62774,
       58883,
       58893,
-      58890
+      58890,
+      68285,
+      60142,
+      60138
      ],
-     "stay_s": 157.92507850000402,
-     "stay_from_trigger_s": 352,
-     "destination_light_remaining_s": 1252,
-     "control_latency_ms": 10.284158388883506,
+     "stay_s": 701.925078500004,
+     "stay_from_trigger_s": 896,
+     "destination_light_remaining_s": 1796,
+     "control_latency_ms": 17.662874899190466,
      "downtime_fraction": {
-      "cold": 0.8321065023247382,
-      "hot": 0.04226871731451004
+      "cold": 0.18721440325343397,
+      "hot": 0.009509975785810934
      }
     },
-    "rank_of_designed": 8,
-    "candidates": 8,
+    "rank_of_designed": 2,
+    "candidates": 2,
     "constrained_candidates": 8,
     "same_destination": false
    },
@@ -5083,26 +5075,28 @@
      "admissible": true
     },
     "policy": {
-     "destination": 60144,
-     "hops": 3,
+     "destination": 68285,
+     "hops": 5,
      "other_plane": false,
      "path": [
       60150,
       60141,
       68283,
-      60144
+      60144,
+      58890,
+      68285
      ],
-     "stay_s": 353.925078500004,
-     "stay_from_trigger_s": 548,
-     "destination_light_remaining_s": 1448,
-     "control_latency_ms": 10.256276979885918,
+     "stay_s": 713.925078500004,
+     "stay_from_trigger_s": 908,
+     "destination_light_remaining_s": 1808,
+     "control_latency_ms": 11.478893677049665,
      "downtime_fraction": {
-      "cold": 0.3712946402581544,
-      "hot": 0.018860744562887485
+      "cold": 0.18406761249527573,
+      "hot": 0.009350127486785632
      }
     },
-    "rank_of_designed": 10,
-    "candidates": 12,
+    "rank_of_designed": 4,
+    "candidates": 6,
     "constrained_candidates": 13,
     "same_destination": false
    }
@@ -5116,23 +5110,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 17.669720256212507,
     "constrained_candidates": 13,
-    "candidates": 12,
-    "destination": 60144,
-    "hops": 3,
+    "candidates": 6,
+    "destination": 68285,
+    "hops": 5,
     "other_plane": false,
     "path": [
      60150,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285
     ],
-    "destination_light_remaining_s": 1447,
-    "stay_s": 352.925078500004,
-    "stay_from_trigger_s": 547,
-    "control_latency_ms": 10.255759130373269,
+    "destination_light_remaining_s": 1810,
+    "stay_s": 715.925078500004,
+    "stay_from_trigger_s": 910,
+    "control_latency_ms": 11.484749057341245,
     "downtime_fraction": {
-     "cold": 0.37234668972382634,
-     "hot": 0.018914185776651746
+     "cold": 0.18355340334679632,
+     "hot": 0.009324007079029067
     }
    },
    {
@@ -5143,24 +5139,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 17.667571784983537,
     "constrained_candidates": 12,
-    "candidates": 12,
-    "destination": 60144,
-    "hops": 4,
+    "candidates": 6,
+    "destination": 68285,
+    "hops": 6,
     "other_plane": true,
     "path": [
      58886,
      60150,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285
     ],
-    "destination_light_remaining_s": 1434,
-    "stay_s": 339.925078500004,
-    "stay_from_trigger_s": 534,
-    "control_latency_ms": 10.256868479479339,
+    "destination_light_remaining_s": 1797,
+    "stay_s": 702.925078500004,
+    "stay_from_trigger_s": 897,
+    "control_latency_ms": 11.485952282712555,
     "downtime_fraction": {
-     "cold": 0.38658661279090206,
-     "hot": 0.019637534628055984
+     "cold": 0.18694806704068576,
+     "hot": 0.009496446640135688
     }
    },
    {
@@ -5171,22 +5169,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 13.990290120032721,
     "constrained_candidates": 11,
-    "candidates": 10,
-    "destination": 60144,
-    "hops": 2,
+    "candidates": 4,
+    "destination": 60142,
+    "hops": 5,
     "other_plane": false,
     "path": [
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285,
+     60142
     ],
-    "destination_light_remaining_s": 1266,
-    "stay_s": 171.92507850000402,
-    "stay_from_trigger_s": 366,
-    "control_latency_ms": 10.270512170516573,
+    "destination_light_remaining_s": 1813,
+    "stay_s": 718.925078500004,
+    "stay_from_trigger_s": 913,
+    "control_latency_ms": 13.963786633721822,
     "downtime_fraction": {
-     "cold": 0.7643473880978625,
-     "hot": 0.03882674103294547
+     "cold": 0.1827874539780675,
+     "hot": 0.009285098961794585
     }
    },
    {
@@ -5197,23 +5198,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 13.981871377745843,
     "constrained_candidates": 10,
-    "candidates": 10,
-    "destination": 60144,
-    "hops": 3,
+    "candidates": 4,
+    "destination": 60142,
+    "hops": 6,
     "other_plane": true,
     "path": [
      62775,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285,
+     60142
     ],
-    "destination_light_remaining_s": 1252,
-    "stay_s": 157.92507850000402,
-    "stay_from_trigger_s": 352,
-    "control_latency_ms": 10.27133889040449,
+    "destination_light_remaining_s": 1799,
+    "stay_s": 704.925078500004,
+    "stay_from_trigger_s": 899,
+    "control_latency_ms": 13.965156515949452,
     "downtime_fraction": {
-     "cold": 0.8321065023247382,
-     "hot": 0.04226871731451004
+     "cold": 0.1864176615472722,
+     "hot": 0.009469503502688109
     }
    },
    {
@@ -5224,22 +5228,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.540854426903216,
     "constrained_candidates": 9,
-    "candidates": 8,
-    "destination": 58890,
-    "hops": 2,
+    "candidates": 2,
+    "destination": 60138,
+    "hops": 5,
     "other_plane": false,
     "path": [
      68283,
      60144,
-     58890
+     58890,
+     68285,
+     60142,
+     60138
     ],
-    "destination_light_remaining_s": 1266,
-    "stay_s": 171.92507850000402,
-    "stay_from_trigger_s": 366,
-    "control_latency_ms": 10.288317489292659,
+    "destination_light_remaining_s": 1811,
+    "stay_s": 716.925078500004,
+    "stay_from_trigger_s": 911,
+    "control_latency_ms": 17.66332787080637,
     "downtime_fraction": {
-     "cold": 0.7643473880978625,
-     "hot": 0.03882674103294547
+     "cold": 0.18329737463633353,
+     "hot": 0.009311001526065935
     }
    },
    {
@@ -5250,23 +5257,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.52165400806628,
     "constrained_candidates": 8,
-    "candidates": 8,
-    "destination": 58890,
-    "hops": 3,
+    "candidates": 2,
+    "destination": 60138,
+    "hops": 6,
     "other_plane": true,
     "path": [
      62774,
      58883,
      58893,
-     58890
+     58890,
+     68285,
+     60142,
+     60138
     ],
-    "destination_light_remaining_s": 1255,
-    "stay_s": 160.92507850000402,
-    "stay_from_trigger_s": 355,
-    "control_latency_ms": 10.288803741327138,
+    "destination_light_remaining_s": 1800,
+    "stay_s": 705.925078500004,
+    "stay_from_trigger_s": 900,
+    "control_latency_ms": 17.66412095172515,
     "downtime_fraction": {
-     "cold": 0.8165941935519688,
-     "hot": 0.041480734775520466
+     "cold": 0.18615358584402142,
+     "hot": 0.00945608918466613
     }
    },
    {
@@ -5277,23 +5287,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.27434938657015,
     "constrained_candidates": 6,
-    "candidates": 6,
-    "destination": 68285,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     60144,
-     58890,
-     68285
-    ],
-    "destination_light_remaining_s": 1263,
-    "stay_s": 168.92507850000402,
-    "stay_from_trigger_s": 363,
-    "control_latency_ms": 11.518106351720494,
-    "downtime_fraction": {
-     "cold": 0.7779217027268981,
-     "hot": 0.0395162788098886
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58883-2117",
@@ -5303,24 +5298,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.269141374427205,
     "constrained_candidates": 6,
-    "candidates": 6,
-    "destination": 68285,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     58883,
-     58893,
-     58890,
-     68285
-    ],
-    "destination_light_remaining_s": 1250,
-    "stay_s": 155.92507850000402,
-    "stay_from_trigger_s": 350,
-    "control_latency_ms": 11.518224607604344,
-    "downtime_fraction": {
-     "cold": 0.8427796603610154,
-     "hot": 0.04281088433114565
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58890-2288",
@@ -5330,23 +5309,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.288692799201158,
     "constrained_candidates": 4,
-    "candidates": 4,
-    "destination": 60142,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     58890,
-     68285,
-     60142
-    ],
-    "destination_light_remaining_s": 1263,
-    "stay_s": 168.92507850000402,
-    "stay_from_trigger_s": 363,
-    "control_latency_ms": 13.984177589260408,
-    "downtime_fraction": {
-     "cold": 0.7779217027268981,
-     "hot": 0.0395162788098886
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58893-2298",
@@ -5356,24 +5320,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.307191244289134,
     "constrained_candidates": 4,
-    "candidates": 4,
-    "destination": 60142,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     58893,
-     58890,
-     68285,
-     60142
-    ],
-    "destination_light_remaining_s": 1253,
-    "stay_s": 158.92507850000402,
-    "stay_from_trigger_s": 353,
-    "control_latency_ms": 13.983942242326396,
-    "downtime_fraction": {
-     "cold": 0.8268706609447717,
-     "hot": 0.042002751000612584
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "68285-2467",
@@ -5383,23 +5331,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.504828476919554,
     "constrained_candidates": 2,
-    "candidates": 2,
-    "destination": 60138,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     68285,
-     60142,
-     60138
-    ],
-    "destination_light_remaining_s": 1266,
-    "stay_s": 171.92507850000402,
-    "stay_from_trigger_s": 366,
-    "control_latency_ms": 17.665432580332702,
-    "downtime_fraction": {
-     "cold": 0.7643473880978625,
-     "hot": 0.03882674103294547
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "62776-2479",
@@ -5409,24 +5342,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.52187235025093,
     "constrained_candidates": 2,
-    "candidates": 2,
-    "destination": 60138,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     62776,
-     62768,
-     60142,
-     60138
-    ],
-    "destination_light_remaining_s": 1254,
-    "stay_s": 159.92507850000402,
-    "stay_from_trigger_s": 354,
-    "control_latency_ms": 17.66474650137302,
-    "downtime_fraction": {
-     "cold": 0.8217002982430598,
-     "hot": 0.041740110823133406
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "60142-2651",
@@ -5480,23 +5397,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 17.669466553735113,
     "constrained_candidates": 13,
-    "candidates": 12,
-    "destination": 60144,
-    "hops": 3,
+    "candidates": 6,
+    "destination": 68285,
+    "hops": 5,
     "other_plane": false,
     "path": [
      60150,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285
     ],
-    "destination_light_remaining_s": 1447,
-    "stay_s": 352.925078500004,
-    "stay_from_trigger_s": 547,
-    "control_latency_ms": 10.256043198466948,
+    "destination_light_remaining_s": 1809,
+    "stay_s": 714.925078500004,
+    "stay_from_trigger_s": 909,
+    "control_latency_ms": 11.48474447831614,
     "downtime_fraction": {
-     "cold": 0.37234668972382634,
-     "hot": 0.018914185776651746
+     "cold": 0.18381014829653555,
+     "hot": 0.009337049014973727
     }
    },
    {
@@ -5507,24 +5426,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 17.667296021248376,
     "constrained_candidates": 12,
-    "candidates": 12,
-    "destination": 60144,
-    "hops": 4,
+    "candidates": 6,
+    "destination": 68285,
+    "hops": 6,
     "other_plane": true,
     "path": [
      58886,
      60150,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285
     ],
-    "destination_light_remaining_s": 1433,
-    "stay_s": 338.925078500004,
-    "stay_from_trigger_s": 533,
-    "control_latency_ms": 10.25723674306618,
+    "destination_light_remaining_s": 1795,
+    "stay_s": 700.925078500004,
+    "stay_from_trigger_s": 895,
+    "control_latency_ms": 11.48604047024112,
     "downtime_fraction": {
-     "cold": 0.3877272383666247,
-     "hot": 0.019695475264125073
+     "cold": 0.18748149942247685,
+     "hot": 0.009523543535171769
     }
    },
    {
@@ -5535,22 +5456,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 13.990191904881408,
     "constrained_candidates": 11,
-    "candidates": 10,
-    "destination": 60144,
-    "hops": 2,
+    "candidates": 4,
+    "destination": 60142,
+    "hops": 5,
     "other_plane": false,
     "path": [
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285,
+     60142
     ],
-    "destination_light_remaining_s": 1266,
-    "stay_s": 171.92507850000402,
-    "stay_from_trigger_s": 366,
-    "control_latency_ms": 10.270676259322965,
+    "destination_light_remaining_s": 1813,
+    "stay_s": 718.925078500004,
+    "stay_from_trigger_s": 913,
+    "control_latency_ms": 13.964160600186892,
     "downtime_fraction": {
-     "cold": 0.7643473880978625,
-     "hot": 0.03882674103294547
+     "cold": 0.1827874539780675,
+     "hot": 0.009285098961794585
     }
    },
    {
@@ -5561,23 +5485,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 13.982570931613369,
     "constrained_candidates": 10,
-    "candidates": 10,
-    "destination": 60144,
-    "hops": 3,
+    "candidates": 4,
+    "destination": 60142,
+    "hops": 6,
     "other_plane": true,
     "path": [
      62775,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285,
+     60142
     ],
-    "destination_light_remaining_s": 1252,
-    "stay_s": 157.92507850000402,
-    "stay_from_trigger_s": 352,
-    "control_latency_ms": 10.271359274611264,
+    "destination_light_remaining_s": 1799,
+    "stay_s": 704.925078500004,
+    "stay_from_trigger_s": 899,
+    "control_latency_ms": 13.965524891012016,
     "downtime_fraction": {
-     "cold": 0.8321065023247382,
-     "hot": 0.04226871731451004
+     "cold": 0.1864176615472722,
+     "hot": 0.009469503502688109
     }
    },
    {
@@ -5588,22 +5515,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.54100658611125,
     "constrained_candidates": 9,
-    "candidates": 8,
-    "destination": 58890,
-    "hops": 2,
+    "candidates": 2,
+    "destination": 60138,
+    "hops": 5,
     "other_plane": false,
     "path": [
      68283,
      60144,
-     58890
+     58890,
+     68285,
+     60142,
+     60138
     ],
-    "destination_light_remaining_s": 1266,
-    "stay_s": 171.92507850000402,
-    "stay_from_trigger_s": 366,
-    "control_latency_ms": 10.288286721831621,
+    "destination_light_remaining_s": 1810,
+    "stay_s": 715.925078500004,
+    "stay_from_trigger_s": 910,
+    "control_latency_ms": 17.66354799650829,
     "downtime_fraction": {
-     "cold": 0.7643473880978625,
-     "hot": 0.03882674103294547
+     "cold": 0.18355340334679632,
+     "hot": 0.009324007079029067
     }
    },
    {
@@ -5614,23 +5544,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.522029698879003,
     "constrained_candidates": 8,
-    "candidates": 8,
-    "destination": 58890,
-    "hops": 3,
+    "candidates": 2,
+    "destination": 60138,
+    "hops": 6,
     "other_plane": true,
     "path": [
      62774,
      58883,
      58893,
-     58890
+     58890,
+     68285,
+     60142,
+     60138
     ],
-    "destination_light_remaining_s": 1255,
-    "stay_s": 160.92507850000402,
-    "stay_from_trigger_s": 355,
-    "control_latency_ms": 10.288704606977465,
+    "destination_light_remaining_s": 1799,
+    "stay_s": 704.925078500004,
+    "stay_from_trigger_s": 899,
+    "control_latency_ms": 17.66427894648226,
     "downtime_fraction": {
-     "cold": 0.8165941935519688,
-     "hot": 0.041480734775520466
+     "cold": 0.1864176615472722,
+     "hot": 0.009469503502688109
     }
    },
    {
@@ -5641,23 +5574,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.273716238157558,
     "constrained_candidates": 6,
-    "candidates": 6,
-    "destination": 68285,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     60144,
-     58890,
-     68285
-    ],
-    "destination_light_remaining_s": 1262,
-    "stay_s": 167.92507850000402,
-    "stay_from_trigger_s": 362,
-    "control_latency_ms": 11.517455475609873,
-    "downtime_fraction": {
-     "cold": 0.7825542549917278,
-     "hot": 0.03975159969919751
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58883-7752",
@@ -5667,24 +5585,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.268488003604666,
     "constrained_candidates": 6,
-    "candidates": 6,
-    "destination": 68285,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     58883,
-     58893,
-     58890,
-     68285
-    ],
-    "destination_light_remaining_s": 1249,
-    "stay_s": 154.92507850000402,
-    "stay_from_trigger_s": 349,
-    "control_latency_ms": 11.517555898078932,
-    "downtime_fraction": {
-     "cold": 0.8482195779555125,
-     "hot": 0.04308721715437636
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58890-7923",
@@ -5694,23 +5596,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.287706074214789,
     "constrained_candidates": 4,
-    "candidates": 4,
-    "destination": 60142,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     58890,
-     68285,
-     60142
-    ],
-    "destination_light_remaining_s": 1263,
-    "stay_s": 168.92507850000402,
-    "stay_from_trigger_s": 363,
-    "control_latency_ms": 13.983989236090299,
-    "downtime_fraction": {
-     "cold": 0.7779217027268981,
-     "hot": 0.0395162788098886
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58893-7933",
@@ -5720,24 +5607,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.30698566069376,
     "constrained_candidates": 4,
-    "candidates": 4,
-    "destination": 60142,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     58893,
-     58890,
-     68285,
-     60142
-    ],
-    "destination_light_remaining_s": 1253,
-    "stay_s": 158.92507850000402,
-    "stay_from_trigger_s": 353,
-    "control_latency_ms": 13.983740295463582,
-    "downtime_fraction": {
-     "cold": 0.8268706609447717,
-     "hot": 0.042002751000612584
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "68285-8101",
@@ -5747,23 +5618,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.503387507015866,
     "constrained_candidates": 2,
-    "candidates": 2,
-    "destination": 60138,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     68285,
-     60142,
-     60138
-    ],
-    "destination_light_remaining_s": 1266,
-    "stay_s": 171.92507850000402,
-    "stay_from_trigger_s": 366,
-    "control_latency_ms": 17.664688057421998,
-    "downtime_fraction": {
-     "cold": 0.7643473880978625,
-     "hot": 0.03882674103294547
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "62776-8114",
@@ -5773,24 +5629,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.521264252203741,
     "constrained_candidates": 2,
-    "candidates": 2,
-    "destination": 60138,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     62776,
-     62768,
-     60142,
-     60138
-    ],
-    "destination_light_remaining_s": 1253,
-    "stay_s": 158.92507850000402,
-    "stay_from_trigger_s": 353,
-    "control_latency_ms": 17.663930147856995,
-    "downtime_fraction": {
-     "cold": 0.8268706609447717,
-     "hot": 0.042002751000612584
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "60142-8286",
@@ -5844,23 +5684,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 17.669161833607305,
     "constrained_candidates": 13,
-    "candidates": 12,
-    "destination": 60144,
-    "hops": 3,
+    "candidates": 6,
+    "destination": 68285,
+    "hops": 5,
     "other_plane": false,
     "path": [
      60150,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285
     ],
-    "destination_light_remaining_s": 1447,
-    "stay_s": 352.925078500004,
-    "stay_from_trigger_s": 547,
-    "control_latency_ms": 10.25629671559572,
+    "destination_light_remaining_s": 1809,
+    "stay_s": 714.925078500004,
+    "stay_from_trigger_s": 909,
+    "control_latency_ms": 11.484684595938615,
     "downtime_fraction": {
-     "cold": 0.37234668972382634,
-     "hot": 0.018914185776651746
+     "cold": 0.18381014829653555,
+     "hot": 0.009337049014973727
     }
    },
    {
@@ -5871,24 +5713,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 17.666910588831218,
     "constrained_candidates": 12,
-    "candidates": 12,
-    "destination": 60144,
-    "hops": 4,
+    "candidates": 6,
+    "destination": 68285,
+    "hops": 6,
     "other_plane": true,
     "path": [
      58886,
      60150,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285
     ],
-    "destination_light_remaining_s": 1433,
-    "stay_s": 338.925078500004,
-    "stay_from_trigger_s": 533,
-    "control_latency_ms": 10.257488971217274,
+    "destination_light_remaining_s": 1795,
+    "stay_s": 700.925078500004,
+    "stay_from_trigger_s": 895,
+    "control_latency_ms": 11.485980496150791,
     "downtime_fraction": {
-     "cold": 0.3877272383666247,
-     "hot": 0.019695475264125073
+     "cold": 0.18748149942247685,
+     "hot": 0.009523543535171769
     }
    },
    {
@@ -5899,22 +5743,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 13.989921463766445,
     "constrained_candidates": 11,
-    "candidates": 10,
-    "destination": 60144,
-    "hops": 2,
+    "candidates": 4,
+    "destination": 60142,
+    "hops": 5,
     "other_plane": false,
     "path": [
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285,
+     60142
     ],
-    "destination_light_remaining_s": 1266,
-    "stay_s": 171.92507850000402,
-    "stay_from_trigger_s": 366,
-    "control_latency_ms": 10.27068407814334,
+    "destination_light_remaining_s": 1813,
+    "stay_s": 718.925078500004,
+    "stay_from_trigger_s": 913,
+    "control_latency_ms": 13.964504267598828,
     "downtime_fraction": {
-     "cold": 0.7643473880978625,
-     "hot": 0.03882674103294547
+     "cold": 0.1827874539780675,
+     "hot": 0.009285098961794585
     }
    },
    {
@@ -5925,23 +5772,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 13.983235659384167,
     "constrained_candidates": 10,
-    "candidates": 10,
-    "destination": 60144,
-    "hops": 3,
+    "candidates": 4,
+    "destination": 60142,
+    "hops": 6,
     "other_plane": true,
     "path": [
      62775,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285,
+     60142
     ],
-    "destination_light_remaining_s": 1252,
-    "stay_s": 157.92507850000402,
-    "stay_from_trigger_s": 352,
-    "control_latency_ms": 10.271344019544257,
+    "destination_light_remaining_s": 1799,
+    "stay_s": 704.925078500004,
+    "stay_from_trigger_s": 899,
+    "control_latency_ms": 13.965862671078808,
     "downtime_fraction": {
-     "cold": 0.8321065023247382,
-     "hot": 0.04226871731451004
+     "cold": 0.1864176615472722,
+     "hot": 0.009469503502688109
     }
    },
    {
@@ -5952,22 +5802,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.541165417917842,
     "constrained_candidates": 9,
-    "candidates": 8,
-    "destination": 58890,
-    "hops": 2,
+    "candidates": 2,
+    "destination": 60138,
+    "hops": 5,
     "other_plane": false,
     "path": [
      68283,
      60144,
-     58890
+     58890,
+     68285,
+     60142,
+     60138
     ],
-    "destination_light_remaining_s": 1266,
-    "stay_s": 171.92507850000402,
-    "stay_from_trigger_s": 366,
-    "control_latency_ms": 10.288166581970387,
+    "destination_light_remaining_s": 1810,
+    "stay_s": 715.925078500004,
+    "stay_from_trigger_s": 910,
+    "control_latency_ms": 17.663698671335297,
     "downtime_fraction": {
-     "cold": 0.7643473880978625,
-     "hot": 0.03882674103294547
+     "cold": 0.18355340334679632,
+     "hot": 0.009324007079029067
     }
    },
    {
@@ -5978,23 +5831,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.52238620687287,
     "constrained_candidates": 8,
-    "candidates": 8,
-    "destination": 58890,
-    "hops": 3,
+    "candidates": 2,
+    "destination": 60138,
+    "hops": 6,
     "other_plane": true,
     "path": [
      62774,
      58883,
      58893,
-     58890
+     58890,
+     68285,
+     60142,
+     60138
     ],
-    "destination_light_remaining_s": 1255,
-    "stay_s": 160.92507850000402,
-    "stay_from_trigger_s": 355,
-    "control_latency_ms": 10.288570630429339,
+    "destination_light_remaining_s": 1799,
+    "stay_s": 704.925078500004,
+    "stay_from_trigger_s": 899,
+    "control_latency_ms": 17.66442194230137,
     "downtime_fraction": {
-     "cold": 0.8165941935519688,
-     "hot": 0.041480734775520466
+     "cold": 0.1864176615472722,
+     "hot": 0.009469503502688109
     }
    },
    {
@@ -6005,23 +5861,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.273050886936042,
     "constrained_candidates": 6,
-    "candidates": 6,
-    "destination": 68285,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     60144,
-     58890,
-     68285
-    ],
-    "destination_light_remaining_s": 1262,
-    "stay_s": 167.92507850000402,
-    "stay_from_trigger_s": 362,
-    "control_latency_ms": 11.516743836285432,
-    "downtime_fraction": {
-     "cold": 0.7825542549917278,
-     "hot": 0.03975159969919751
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58883-13387",
@@ -6031,24 +5872,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.267796703697709,
     "constrained_candidates": 6,
-    "candidates": 6,
-    "destination": 68285,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     58883,
-     58893,
-     58890,
-     68285
-    ],
-    "destination_light_remaining_s": 1249,
-    "stay_s": 154.92507850000402,
-    "stay_from_trigger_s": 349,
-    "control_latency_ms": 11.516746692983324,
-    "downtime_fraction": {
-     "cold": 0.8482195779555125,
-     "hot": 0.04308721715437636
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58890-13558",
@@ -6058,23 +5883,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.286676006327864,
     "constrained_candidates": 4,
-    "candidates": 4,
-    "destination": 60142,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     58890,
-     68285,
-     60142
-    ],
-    "destination_light_remaining_s": 1263,
-    "stay_s": 168.92507850000402,
-    "stay_from_trigger_s": 363,
-    "control_latency_ms": 13.983796434285042,
-    "downtime_fraction": {
-     "cold": 0.7779217027268981,
-     "hot": 0.0395162788098886
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58893-13568",
@@ -6084,24 +5894,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.306780029615608,
     "constrained_candidates": 4,
-    "candidates": 4,
-    "destination": 60142,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     58893,
-     58890,
-     68285,
-     60142
-    ],
-    "destination_light_remaining_s": 1253,
-    "stay_s": 158.92507850000402,
-    "stay_from_trigger_s": 353,
-    "control_latency_ms": 13.983533921199161,
-    "downtime_fraction": {
-     "cold": 0.8268706609447717,
-     "hot": 0.042002751000612584
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "68285-13736",
@@ -6111,23 +5905,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.501810507929068,
     "constrained_candidates": 2,
-    "candidates": 2,
-    "destination": 60138,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     68285,
-     60142,
-     60138
-    ],
-    "destination_light_remaining_s": 1266,
-    "stay_s": 171.92507850000402,
-    "stay_from_trigger_s": 366,
-    "control_latency_ms": 17.663880289264807,
-    "downtime_fraction": {
-     "cold": 0.7643473880978625,
-     "hot": 0.03882674103294547
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "62776-13749",
@@ -6137,24 +5916,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.520637676489416,
     "constrained_candidates": 2,
-    "candidates": 2,
-    "destination": 60138,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     62776,
-     62768,
-     60142,
-     60138
-    ],
-    "destination_light_remaining_s": 1253,
-    "stay_s": 158.92507850000402,
-    "stay_from_trigger_s": 353,
-    "control_latency_ms": 17.663106789876586,
-    "downtime_fraction": {
-     "cold": 0.8268706609447717,
-     "hot": 0.042002751000612584
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "60142-13921",
@@ -6208,23 +5971,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 17.668758937707594,
     "constrained_candidates": 13,
-    "candidates": 12,
-    "destination": 60144,
-    "hops": 3,
+    "candidates": 6,
+    "destination": 68285,
+    "hops": 5,
     "other_plane": false,
     "path": [
      60150,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285
     ],
-    "destination_light_remaining_s": 1448,
-    "stay_s": 353.925078500004,
-    "stay_from_trigger_s": 548,
-    "control_latency_ms": 10.256434383232367,
+    "destination_light_remaining_s": 1810,
+    "stay_s": 715.925078500004,
+    "stay_from_trigger_s": 910,
+    "control_latency_ms": 11.484476689557653,
     "downtime_fraction": {
-     "cold": 0.3712946402581544,
-     "hot": 0.018860744562887485
+     "cold": 0.18355340334679632,
+     "hot": 0.009324007079029067
     }
    },
    {
@@ -6235,24 +6000,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 17.66628356455087,
     "constrained_candidates": 12,
-    "candidates": 12,
-    "destination": 60144,
-    "hops": 4,
+    "candidates": 6,
+    "destination": 68285,
+    "hops": 6,
     "other_plane": true,
     "path": [
      58886,
      60150,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285
     ],
-    "destination_light_remaining_s": 1433,
-    "stay_s": 338.925078500004,
-    "stay_from_trigger_s": 533,
-    "control_latency_ms": 10.257710321480932,
+    "destination_light_remaining_s": 1795,
+    "stay_s": 700.925078500004,
+    "stay_from_trigger_s": 895,
+    "control_latency_ms": 11.48586480132057,
     "downtime_fraction": {
-     "cold": 0.3877272383666247,
-     "hot": 0.019695475264125073
+     "cold": 0.18748149942247685,
+     "hot": 0.009523543535171769
     }
    },
    {
@@ -6263,22 +6030,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 13.989589222884803,
     "constrained_candidates": 11,
-    "candidates": 10,
-    "destination": 60144,
-    "hops": 2,
+    "candidates": 4,
+    "destination": 60142,
+    "hops": 5,
     "other_plane": false,
     "path": [
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285,
+     60142
     ],
-    "destination_light_remaining_s": 1266,
-    "stay_s": 171.92507850000402,
-    "stay_from_trigger_s": 366,
-    "control_latency_ms": 10.270646028421362,
+    "destination_light_remaining_s": 1813,
+    "stay_s": 718.925078500004,
+    "stay_from_trigger_s": 913,
+    "control_latency_ms": 13.964817666749115,
     "downtime_fraction": {
-     "cold": 0.7643473880978625,
-     "hot": 0.03882674103294547
+     "cold": 0.1827874539780675,
+     "hot": 0.009285098961794585
     }
    },
    {
@@ -6289,23 +6059,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 13.983865580171342,
     "constrained_candidates": 10,
-    "candidates": 10,
-    "destination": 60144,
-    "hops": 3,
+    "candidates": 4,
+    "destination": 60142,
+    "hops": 6,
     "other_plane": true,
     "path": [
      62775,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285,
+     60142
     ],
-    "destination_light_remaining_s": 1252,
-    "stay_s": 157.92507850000402,
-    "stay_from_trigger_s": 352,
-    "control_latency_ms": 10.271293105836678,
+    "destination_light_remaining_s": 1799,
+    "stay_s": 704.925078500004,
+    "stay_from_trigger_s": 899,
+    "control_latency_ms": 13.96616988727947,
     "downtime_fraction": {
-     "cold": 0.8321065023247382,
-     "hot": 0.04226871731451004
+     "cold": 0.1864176615472722,
+     "hot": 0.009469503502688109
     }
    },
    {
@@ -6316,22 +6089,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.541335412969397,
     "constrained_candidates": 9,
-    "candidates": 8,
-    "destination": 58890,
-    "hops": 2,
+    "candidates": 2,
+    "destination": 60138,
+    "hops": 5,
     "other_plane": false,
     "path": [
      68283,
      60144,
-     58890
+     58890,
+     68285,
+     60142,
+     60138
     ],
-    "destination_light_remaining_s": 1266,
-    "stay_s": 171.92507850000402,
-    "stay_from_trigger_s": 366,
-    "control_latency_ms": 10.287975145688849,
+    "destination_light_remaining_s": 1811,
+    "stay_s": 716.925078500004,
+    "stay_from_trigger_s": 911,
+    "control_latency_ms": 17.663768817193198,
     "downtime_fraction": {
-     "cold": 0.7643473880978625,
-     "hot": 0.03882674103294547
+     "cold": 0.18329737463633353,
+     "hot": 0.009311001526065935
     }
    },
    {
@@ -6342,23 +6118,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.522723549465809,
     "constrained_candidates": 8,
-    "candidates": 8,
-    "destination": 58890,
-    "hops": 3,
+    "candidates": 2,
+    "destination": 60138,
+    "hops": 6,
     "other_plane": true,
     "path": [
      62774,
      58883,
      58893,
-     58890
+     58890,
+     68285,
+     60142,
+     60138
     ],
-    "destination_light_remaining_s": 1254,
-    "stay_s": 159.92507850000402,
-    "stay_from_trigger_s": 354,
-    "control_latency_ms": 10.288401754234506,
+    "destination_light_remaining_s": 1799,
+    "stay_s": 704.925078500004,
+    "stay_from_trigger_s": 899,
+    "control_latency_ms": 17.664549899707403,
     "downtime_fraction": {
-     "cold": 0.8217002982430598,
-     "hot": 0.041740110823133406
+     "cold": 0.1864176615472722,
+     "hot": 0.009469503502688109
     }
    },
    {
@@ -6369,23 +6148,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.27205496448479,
     "constrained_candidates": 6,
-    "candidates": 6,
-    "destination": 68285,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     60144,
-     58890,
-     68285
-    ],
-    "destination_light_remaining_s": 1262,
-    "stay_s": 167.92507850000402,
-    "stay_from_trigger_s": 362,
-    "control_latency_ms": 11.515673013269026,
-    "downtime_fraction": {
-     "cold": 0.7825542549917278,
-     "hot": 0.03975159969919751
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58883-19022",
@@ -6395,24 +6159,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.267067502905228,
     "constrained_candidates": 6,
-    "candidates": 6,
-    "destination": 68285,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     58883,
-     58893,
-     58890,
-     68285
-    ],
-    "destination_light_remaining_s": 1249,
-    "stay_s": 154.92507850000402,
-    "stay_from_trigger_s": 349,
-    "control_latency_ms": 11.515657093431514,
-    "downtime_fraction": {
-     "cold": 0.8482195779555125,
-     "hot": 0.04308721715437636
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58890-19192",
@@ -6422,23 +6170,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.285653249715923,
     "constrained_candidates": 4,
-    "candidates": 4,
-    "destination": 60142,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     58890,
-     68285,
-     60142
-    ],
-    "destination_light_remaining_s": 1264,
-    "stay_s": 169.92507850000402,
-    "stay_from_trigger_s": 364,
-    "control_latency_ms": 13.983625827747847,
-    "downtime_fraction": {
-     "cold": 0.7733436751067615,
-     "hot": 0.039283727622278664
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58893-19203",
@@ -6448,24 +6181,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.30657438037382,
     "constrained_candidates": 4,
-    "candidates": 4,
-    "destination": 60142,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     58893,
-     58890,
-     68285,
-     60142
-    ],
-    "destination_light_remaining_s": 1253,
-    "stay_s": 158.92507850000402,
-    "stay_from_trigger_s": 353,
-    "control_latency_ms": 13.983323157197695,
-    "downtime_fraction": {
-     "cold": 0.8268706609447717,
-     "hot": 0.042002751000612584
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "68285-19371",
@@ -6475,23 +6192,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.500167017771137,
     "constrained_candidates": 2,
-    "candidates": 2,
-    "destination": 60138,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     68285,
-     60142,
-     60138
-    ],
-    "destination_light_remaining_s": 1266,
-    "stay_s": 171.92507850000402,
-    "stay_from_trigger_s": 366,
-    "control_latency_ms": 17.66306546844285,
-    "downtime_fraction": {
-     "cold": 0.7643473880978625,
-     "hot": 0.03882674103294547
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "62776-19384",
@@ -6501,24 +6203,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.519992695847519,
     "constrained_candidates": 2,
-    "candidates": 2,
-    "destination": 60138,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     62776,
-     62768,
-     60142,
-     60138
-    ],
-    "destination_light_remaining_s": 1253,
-    "stay_s": 158.92507850000402,
-    "stay_from_trigger_s": 353,
-    "control_latency_ms": 17.662276496663104,
-    "downtime_fraction": {
-     "cold": 0.8268706609447717,
-     "hot": 0.042002751000612584
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "60142-19556",
@@ -6572,23 +6258,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 17.66835243472196,
     "constrained_candidates": 13,
-    "candidates": 12,
-    "destination": 60144,
-    "hops": 3,
+    "candidates": 6,
+    "destination": 68285,
+    "hops": 5,
     "other_plane": false,
     "path": [
      60150,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285
     ],
-    "destination_light_remaining_s": 1447,
-    "stay_s": 352.925078500004,
-    "stay_from_trigger_s": 547,
-    "control_latency_ms": 10.256626775584689,
+    "destination_light_remaining_s": 1809,
+    "stay_s": 714.925078500004,
+    "stay_from_trigger_s": 909,
+    "control_latency_ms": 11.48430596927475,
     "downtime_fraction": {
-     "cold": 0.37234668972382634,
-     "hot": 0.018914185776651746
+     "cold": 0.18381014829653555,
+     "hot": 0.009337049014973727
     }
    },
    {
@@ -6599,24 +6287,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 17.665298425085577,
     "constrained_candidates": 12,
-    "candidates": 12,
-    "destination": 60144,
-    "hops": 4,
+    "candidates": 6,
+    "destination": 68285,
+    "hops": 6,
     "other_plane": true,
     "path": [
      58886,
      60150,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285
     ],
-    "destination_light_remaining_s": 1432,
-    "stay_s": 337.925078500004,
-    "stay_from_trigger_s": 532,
-    "control_latency_ms": 10.257900752747377,
+    "destination_light_remaining_s": 1794,
+    "stay_s": 699.925078500004,
+    "stay_from_trigger_s": 894,
+    "control_latency_ms": 11.485693302753933,
     "downtime_fraction": {
-     "cold": 0.3888746147024909,
-     "hot": 0.019753758820206645
+     "cold": 0.1877493588051186,
+     "hot": 0.009537150053680266
     }
    },
    {
@@ -6627,22 +6317,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 13.98918897745471,
     "constrained_candidates": 11,
-    "candidates": 10,
-    "destination": 60144,
-    "hops": 2,
+    "candidates": 4,
+    "destination": 60142,
+    "hops": 5,
     "other_plane": false,
     "path": [
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285,
+     60142
     ],
-    "destination_light_remaining_s": 1266,
-    "stay_s": 171.92507850000402,
-    "stay_from_trigger_s": 366,
-    "control_latency_ms": 10.270526160655743,
+    "destination_light_remaining_s": 1813,
+    "stay_s": 718.925078500004,
+    "stay_from_trigger_s": 913,
+    "control_latency_ms": 13.965004046532547,
     "downtime_fraction": {
-     "cold": 0.7643473880978625,
-     "hot": 0.03882674103294547
+     "cold": 0.1827874539780675,
+     "hot": 0.009285098961794585
     }
    },
    {
@@ -6653,23 +6346,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 13.984463079213894,
     "constrained_candidates": 10,
-    "candidates": 10,
-    "destination": 60144,
-    "hops": 3,
+    "candidates": 4,
+    "destination": 60142,
+    "hops": 6,
     "other_plane": true,
     "path": [
      62775,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285,
+     60142
     ],
-    "destination_light_remaining_s": 1252,
-    "stay_s": 157.92507850000402,
-    "stay_from_trigger_s": 352,
-    "control_latency_ms": 10.271162114119429,
+    "destination_light_remaining_s": 1799,
+    "stay_s": 704.925078500004,
+    "stay_from_trigger_s": 899,
+    "control_latency_ms": 13.966351039001239,
     "downtime_fraction": {
-     "cold": 0.8321065023247382,
-     "hot": 0.04226871731451004
+     "cold": 0.1864176615472722,
+     "hot": 0.009469503502688109
     }
    },
    {
@@ -6680,22 +6376,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.541508824138809,
     "constrained_candidates": 9,
-    "candidates": 8,
-    "destination": 58890,
-    "hops": 2,
+    "candidates": 2,
+    "destination": 60138,
+    "hops": 5,
     "other_plane": false,
     "path": [
      68283,
      60144,
-     58890
+     58890,
+     68285,
+     60142,
+     60138
     ],
-    "destination_light_remaining_s": 1266,
-    "stay_s": 171.92507850000402,
-    "stay_from_trigger_s": 366,
-    "control_latency_ms": 10.287786651307188,
+    "destination_light_remaining_s": 1810,
+    "stay_s": 715.925078500004,
+    "stay_from_trigger_s": 910,
+    "control_latency_ms": 17.66389048270853,
     "downtime_fraction": {
-     "cold": 0.7643473880978625,
-     "hot": 0.03882674103294547
+     "cold": 0.18355340334679632,
+     "hot": 0.009324007079029067
     }
    },
    {
@@ -6706,23 +6405,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.5230417456596,
     "constrained_candidates": 8,
-    "candidates": 8,
-    "destination": 58890,
-    "hops": 3,
+    "candidates": 2,
+    "destination": 60138,
+    "hops": 6,
     "other_plane": true,
     "path": [
      62774,
      58883,
      58893,
-     58890
+     58890,
+     68285,
+     60142,
+     60138
     ],
-    "destination_light_remaining_s": 1254,
-    "stay_s": 159.92507850000402,
-    "stay_from_trigger_s": 354,
-    "control_latency_ms": 10.288197923374112,
+    "destination_light_remaining_s": 1798,
+    "stay_s": 703.925078500004,
+    "stay_from_trigger_s": 898,
+    "control_latency_ms": 17.664662780964434,
     "downtime_fraction": {
-     "cold": 0.8217002982430598,
-     "hot": 0.041740110823133406
+     "cold": 0.1866824875454374,
+     "hot": 0.009482955933624177
     }
    },
    {
@@ -6733,23 +6435,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.271069442588152,
     "constrained_candidates": 7,
-    "candidates": 6,
-    "destination": 68285,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     60144,
-     58890,
-     68285
-    ],
-    "destination_light_remaining_s": 1262,
-    "stay_s": 167.92507850000402,
-    "stay_from_trigger_s": 362,
-    "control_latency_ms": 11.514535686102368,
-    "downtime_fraction": {
-     "cold": 0.7825542549917278,
-     "hot": 0.03975159969919751
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58883-24657",
@@ -6759,24 +6446,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.266300430504202,
     "constrained_candidates": 6,
-    "candidates": 6,
-    "destination": 68285,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     58883,
-     58893,
-     58890,
-     68285
-    ],
-    "destination_light_remaining_s": 1248,
-    "stay_s": 153.92507850000402,
-    "stay_from_trigger_s": 348,
-    "control_latency_ms": 11.514500904277718,
-    "downtime_fraction": {
-     "cold": 0.853730178217805,
-     "hot": 0.04336714046235359
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58890-24827",
@@ -6786,23 +6457,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.284537917676623,
     "constrained_candidates": 4,
-    "candidates": 4,
-    "destination": 60142,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     58890,
-     68285,
-     60142
-    ],
-    "destination_light_remaining_s": 1263,
-    "stay_s": 168.92507850000402,
-    "stay_from_trigger_s": 363,
-    "control_latency_ms": 13.983425595244151,
-    "downtime_fraction": {
-     "cold": 0.7779217027268981,
-     "hot": 0.0395162788098886
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58893-24838",
@@ -6812,24 +6468,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.30636874505205,
     "constrained_candidates": 4,
-    "candidates": 4,
-    "destination": 60142,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     58893,
-     58890,
-     68285,
-     60142
-    ],
-    "destination_light_remaining_s": 1252,
-    "stay_s": 157.92507850000402,
-    "stay_from_trigger_s": 352,
-    "control_latency_ms": 13.983108043861282,
-    "downtime_fraction": {
-     "cold": 0.8321065023247382,
-     "hot": 0.04226871731451004
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "68285-25005",
@@ -6839,23 +6479,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.498530473580603,
     "constrained_candidates": 3,
-    "candidates": 2,
-    "destination": 60138,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     68285,
-     60142,
-     60138
-    ],
-    "destination_light_remaining_s": 1266,
-    "stay_s": 171.92507850000402,
-    "stay_from_trigger_s": 366,
-    "control_latency_ms": 17.662304452082076,
-    "downtime_fraction": {
-     "cold": 0.7643473880978625,
-     "hot": 0.03882674103294547
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "62776-25019",
@@ -6865,24 +6490,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.519329386056341,
     "constrained_candidates": 2,
-    "candidates": 2,
-    "destination": 60138,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     62776,
-     62768,
-     60142,
-     60138
-    ],
-    "destination_light_remaining_s": 1252,
-    "stay_s": 157.92507850000402,
-    "stay_from_trigger_s": 352,
-    "control_latency_ms": 17.661439340056138,
-    "downtime_fraction": {
-     "cold": 0.8321065023247382,
-     "hot": 0.04226871731451004
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "60142-25190",
@@ -6936,23 +6545,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 17.667894817379636,
     "constrained_candidates": 13,
-    "candidates": 12,
-    "destination": 60144,
-    "hops": 3,
+    "candidates": 6,
+    "destination": 68285,
+    "hops": 5,
     "other_plane": false,
     "path": [
      60150,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285
     ],
-    "destination_light_remaining_s": 1447,
-    "stay_s": 352.925078500004,
-    "stay_from_trigger_s": 547,
-    "control_latency_ms": 10.25678851336176,
+    "destination_light_remaining_s": 1809,
+    "stay_s": 714.925078500004,
+    "stay_from_trigger_s": 909,
+    "control_latency_ms": 11.484079718605305,
     "downtime_fraction": {
-     "cold": 0.37234668972382634,
-     "hot": 0.018914185776651746
+     "cold": 0.18381014829653555,
+     "hot": 0.009337049014973727
     }
    },
    {
@@ -6963,24 +6574,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 17.664203274861563,
     "constrained_candidates": 12,
-    "candidates": 12,
-    "destination": 60144,
-    "hops": 4,
+    "candidates": 6,
+    "destination": 68285,
+    "hops": 6,
     "other_plane": true,
     "path": [
      58886,
      60150,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285
     ],
-    "destination_light_remaining_s": 1432,
-    "stay_s": 337.925078500004,
-    "stay_from_trigger_s": 532,
-    "control_latency_ms": 10.258060226374726,
+    "destination_light_remaining_s": 1794,
+    "stay_s": 699.925078500004,
+    "stay_from_trigger_s": 894,
+    "control_latency_ms": 11.485465920111256,
     "downtime_fraction": {
-     "cold": 0.3888746147024909,
-     "hot": 0.019753758820206645
+     "cold": 0.1877493588051186,
+     "hot": 0.009537150053680266
     }
    },
    {
@@ -6991,22 +6604,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 13.988754952834787,
     "constrained_candidates": 11,
-    "candidates": 10,
-    "destination": 60144,
-    "hops": 2,
+    "candidates": 4,
+    "destination": 60142,
+    "hops": 5,
     "other_plane": false,
     "path": [
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285,
+     60142
     ],
-    "destination_light_remaining_s": 1266,
-    "stay_s": 171.92507850000402,
-    "stay_from_trigger_s": 366,
-    "control_latency_ms": 10.27041799465949,
+    "destination_light_remaining_s": 1813,
+    "stay_s": 718.925078500004,
+    "stay_from_trigger_s": 913,
+    "control_latency_ms": 13.965257469876793,
     "downtime_fraction": {
-     "cold": 0.7643473880978625,
-     "hot": 0.03882674103294547
+     "cold": 0.1827874539780675,
+     "hot": 0.009285098961794585
     }
    },
    {
@@ -7017,23 +6633,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 13.985024766194233,
     "constrained_candidates": 10,
-    "candidates": 10,
-    "destination": 60144,
-    "hops": 3,
+    "candidates": 4,
+    "destination": 60142,
+    "hops": 6,
     "other_plane": true,
     "path": [
      62775,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285,
+     60142
     ],
-    "destination_light_remaining_s": 1252,
-    "stay_s": 157.92507850000402,
-    "stay_from_trigger_s": 352,
-    "control_latency_ms": 10.271040784819094,
+    "destination_light_remaining_s": 1799,
+    "stay_s": 704.925078500004,
+    "stay_from_trigger_s": 899,
+    "control_latency_ms": 13.966597745455852,
     "downtime_fraction": {
-     "cold": 0.8321065023247382,
-     "hot": 0.04226871731451004
+     "cold": 0.1864176615472722,
+     "hot": 0.009469503502688109
     }
    },
    {
@@ -7044,22 +6663,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.541695691457088,
     "constrained_candidates": 9,
-    "candidates": 8,
-    "destination": 58890,
-    "hops": 2,
+    "candidates": 2,
+    "destination": 60138,
+    "hops": 5,
     "other_plane": false,
     "path": [
      68283,
      60144,
-     58890
+     58890,
+     68285,
+     60142,
+     60138
     ],
-    "destination_light_remaining_s": 1266,
-    "stay_s": 171.92507850000402,
-    "stay_from_trigger_s": 366,
-    "control_latency_ms": 10.287529131503383,
+    "destination_light_remaining_s": 1811,
+    "stay_s": 716.925078500004,
+    "stay_from_trigger_s": 911,
+    "control_latency_ms": 17.66393289630501,
     "downtime_fraction": {
-     "cold": 0.7643473880978625,
-     "hot": 0.03882674103294547
+     "cold": 0.18329737463633353,
+     "hot": 0.009311001526065935
     }
    },
    {
@@ -7070,23 +6692,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.523340816059715,
     "constrained_candidates": 8,
-    "candidates": 8,
-    "destination": 58890,
-    "hops": 3,
+    "candidates": 2,
+    "destination": 60138,
+    "hops": 6,
     "other_plane": true,
     "path": [
      62774,
      58883,
      58893,
-     58890
+     58890,
+     68285,
+     60142,
+     60138
     ],
-    "destination_light_remaining_s": 1253,
-    "stay_s": 158.92507850000402,
-    "stay_from_trigger_s": 353,
-    "control_latency_ms": 10.287959085272599,
+    "destination_light_remaining_s": 1798,
+    "stay_s": 703.925078500004,
+    "stay_from_trigger_s": 898,
+    "control_latency_ms": 17.664760550091362,
     "downtime_fraction": {
-     "cold": 0.8268706609447717,
-     "hot": 0.042002751000612584
+     "cold": 0.1866824875454374,
+     "hot": 0.009482955933624177
     }
    },
    {
@@ -7097,23 +6722,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.26999769468656,
     "constrained_candidates": 7,
-    "candidates": 6,
-    "destination": 68285,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     60144,
-     58890,
-     68285
-    ],
-    "destination_light_remaining_s": 1262,
-    "stay_s": 167.92507850000402,
-    "stay_from_trigger_s": 362,
-    "control_latency_ms": 11.513331824701925,
-    "downtime_fraction": {
-     "cold": 0.7825542549917278,
-     "hot": 0.03975159969919751
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58883-30292",
@@ -7123,24 +6733,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.265495516852607,
     "constrained_candidates": 6,
-    "candidates": 6,
-    "destination": 68285,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     58883,
-     58893,
-     58890,
-     68285
-    ],
-    "destination_light_remaining_s": 1248,
-    "stay_s": 153.92507850000402,
-    "stay_from_trigger_s": 348,
-    "control_latency_ms": 11.513278110079218,
-    "downtime_fraction": {
-     "cold": 0.853730178217805,
-     "hot": 0.04336714046235359
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58890-30461",
@@ -7150,23 +6744,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.283432438175291,
     "constrained_candidates": 4,
-    "candidates": 4,
-    "destination": 60142,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     58890,
-     68285,
-     60142
-    ],
-    "destination_light_remaining_s": 1264,
-    "stay_s": 169.92507850000402,
-    "stay_from_trigger_s": 364,
-    "control_latency_ms": 13.983250164876436,
-    "downtime_fraction": {
-     "cold": 0.7733436751067615,
-     "hot": 0.039283727622278664
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58893-30473",
@@ -7176,24 +6755,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.306163158487616,
     "constrained_candidates": 4,
-    "candidates": 4,
-    "destination": 60142,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     58893,
-     58890,
-     68285,
-     60142
-    ],
-    "destination_light_remaining_s": 1252,
-    "stay_s": 157.92507850000402,
-    "stay_from_trigger_s": 352,
-    "control_latency_ms": 13.98288862434714,
-    "downtime_fraction": {
-     "cold": 0.8321065023247382,
-     "hot": 0.04226871731451004
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "68285-30640",
@@ -7203,23 +6766,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.496755208951045,
     "constrained_candidates": 3,
-    "candidates": 2,
-    "destination": 60138,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     68285,
-     60142,
-     60138
-    ],
-    "destination_light_remaining_s": 1266,
-    "stay_s": 171.92507850000402,
-    "stay_from_trigger_s": 366,
-    "control_latency_ms": 17.66147692095783,
-    "downtime_fraction": {
-     "cold": 0.7643473880978625,
-     "hot": 0.03882674103294547
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "62776-30654",
@@ -7229,24 +6777,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.51864782592073,
     "constrained_candidates": 2,
-    "candidates": 2,
-    "destination": 60138,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     62776,
-     62768,
-     60142,
-     60138
-    ],
-    "destination_light_remaining_s": 1252,
-    "stay_s": 157.92507850000402,
-    "stay_from_trigger_s": 352,
-    "control_latency_ms": 17.66059539450935,
-    "downtime_fraction": {
-     "cold": 0.8321065023247382,
-     "hot": 0.04226871731451004
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "60142-30825",
@@ -7300,23 +6832,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 17.66734002257751,
     "constrained_candidates": 13,
-    "candidates": 12,
-    "destination": 60144,
-    "hops": 3,
+    "candidates": 6,
+    "destination": 68285,
+    "hops": 5,
     "other_plane": false,
     "path": [
      60150,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285
     ],
-    "destination_light_remaining_s": 1448,
-    "stay_s": 353.925078500004,
-    "stay_from_trigger_s": 548,
-    "control_latency_ms": 10.256834648124277,
+    "destination_light_remaining_s": 1809,
+    "stay_s": 714.925078500004,
+    "stay_from_trigger_s": 909,
+    "control_latency_ms": 11.483705347199797,
     "downtime_fraction": {
-     "cold": 0.3712946402581544,
-     "hot": 0.018860744562887485
+     "cold": 0.18381014829653555,
+     "hot": 0.009337049014973727
     }
    },
    {
@@ -7327,24 +6861,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 17.66297455309217,
     "constrained_candidates": 12,
-    "candidates": 12,
-    "destination": 60144,
-    "hops": 4,
+    "candidates": 6,
+    "destination": 68285,
+    "hops": 6,
     "other_plane": true,
     "path": [
      58886,
      60150,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285
     ],
-    "destination_light_remaining_s": 1433,
-    "stay_s": 338.925078500004,
-    "stay_from_trigger_s": 533,
-    "control_latency_ms": 10.258104377945076,
+    "destination_light_remaining_s": 1794,
+    "stay_s": 699.925078500004,
+    "stay_from_trigger_s": 894,
+    "control_latency_ms": 11.485090452817408,
     "downtime_fraction": {
-     "cold": 0.3877272383666247,
-     "hot": 0.019695475264125073
+     "cold": 0.1877493588051186,
+     "hot": 0.009537150053680266
     }
    },
    {
@@ -7355,22 +6891,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 13.9881497811073,
     "constrained_candidates": 11,
-    "candidates": 10,
-    "destination": 60144,
-    "hops": 2,
+    "candidates": 4,
+    "destination": 60142,
+    "hops": 5,
     "other_plane": false,
     "path": [
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285,
+     60142
     ],
-    "destination_light_remaining_s": 1267,
-    "stay_s": 172.92507850000402,
-    "stay_from_trigger_s": 367,
-    "control_latency_ms": 10.270229717191118,
+    "destination_light_remaining_s": 1813,
+    "stay_s": 718.925078500004,
+    "stay_from_trigger_s": 913,
+    "control_latency_ms": 13.96538481026952,
     "downtime_fraction": {
-     "cold": 0.7599272808772789,
-     "hot": 0.03860221176645771
+     "cold": 0.1827874539780675,
+     "hot": 0.009285098961794585
     }
    },
    {
@@ -7381,23 +6920,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 13.985551720812575,
     "constrained_candidates": 10,
-    "candidates": 10,
-    "destination": 60144,
-    "hops": 3,
+    "candidates": 4,
+    "destination": 60142,
+    "hops": 6,
     "other_plane": true,
     "path": [
      62775,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285,
+     60142
     ],
-    "destination_light_remaining_s": 1252,
-    "stay_s": 157.92507850000402,
-    "stay_from_trigger_s": 352,
-    "control_latency_ms": 10.270883757702371,
+    "destination_light_remaining_s": 1798,
+    "stay_s": 703.925078500004,
+    "stay_from_trigger_s": 898,
+    "control_latency_ms": 13.966814024641026,
     "downtime_fraction": {
-     "cold": 0.8321065023247382,
-     "hot": 0.04226871731451004
+     "cold": 0.1866824875454374,
+     "hot": 0.009482955933624177
     }
    },
    {
@@ -7408,22 +6950,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.54188372740024,
     "constrained_candidates": 9,
-    "candidates": 8,
-    "destination": 58890,
-    "hops": 2,
+    "candidates": 2,
+    "destination": 60138,
+    "hops": 5,
     "other_plane": false,
     "path": [
      68283,
      60144,
-     58890
+     58890,
+     68285,
+     60142,
+     60138
     ],
-    "destination_light_remaining_s": 1266,
-    "stay_s": 171.92507850000402,
-    "stay_from_trigger_s": 366,
-    "control_latency_ms": 10.287272100920028,
+    "destination_light_remaining_s": 1810,
+    "stay_s": 715.925078500004,
+    "stay_from_trigger_s": 910,
+    "control_latency_ms": 17.664025470367214,
     "downtime_fraction": {
-     "cold": 0.7643473880978625,
-     "hot": 0.03882674103294547
+     "cold": 0.18355340334679632,
+     "hot": 0.009324007079029067
     }
    },
    {
@@ -7434,23 +6979,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.523620782903414,
     "constrained_candidates": 8,
-    "candidates": 8,
-    "destination": 58890,
-    "hops": 3,
+    "candidates": 2,
+    "destination": 60138,
+    "hops": 6,
     "other_plane": true,
     "path": [
      62774,
      58883,
      58893,
-     58890
+     58890,
+     68285,
+     60142,
+     60138
     ],
-    "destination_light_remaining_s": 1253,
-    "stay_s": 158.92507850000402,
-    "stay_from_trigger_s": 353,
-    "control_latency_ms": 10.287610034549465,
+    "destination_light_remaining_s": 1797,
+    "stay_s": 702.925078500004,
+    "stay_from_trigger_s": 897,
+    "control_latency_ms": 17.664768017617803,
     "downtime_fraction": {
-     "cold": 0.8268706609447717,
-     "hot": 0.042002751000612584
+     "cold": 0.18694806704068576,
+     "hot": 0.009496446640135688
     }
    },
    {
@@ -7461,23 +7009,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.268888120897147,
     "constrained_candidates": 7,
-    "candidates": 6,
-    "destination": 68285,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     60144,
-     58890,
-     68285
-    ],
-    "destination_light_remaining_s": 1261,
-    "stay_s": 166.92507850000402,
-    "stay_from_trigger_s": 361,
-    "control_latency_ms": 11.512061387521182,
-    "downtime_fraction": {
-     "cold": 0.7872423118255109,
-     "hot": 0.03998974006765746
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58883-35927",
@@ -7487,24 +7020,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.264652793393008,
     "constrained_candidates": 6,
-    "candidates": 6,
-    "destination": 68285,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     58883,
-     58893,
-     58890,
-     68285
-    ],
-    "destination_light_remaining_s": 1247,
-    "stay_s": 152.92507850000402,
-    "stay_from_trigger_s": 347,
-    "control_latency_ms": 11.511988698287746,
-    "downtime_fraction": {
-     "cold": 0.8593128477615566,
-     "hot": 0.043650724691230436
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58890-36096",
@@ -7514,23 +7031,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.282231954512998,
     "constrained_candidates": 4,
-    "candidates": 4,
-    "destination": 60142,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     58890,
-     68285,
-     60142
-    ],
-    "destination_light_remaining_s": 1263,
-    "stay_s": 168.92507850000402,
-    "stay_from_trigger_s": 363,
-    "control_latency_ms": 13.983042657998146,
-    "downtime_fraction": {
-     "cold": 0.7779217027268981,
-     "hot": 0.0395162788098886
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58893-36108",
@@ -7540,24 +7042,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.305957658268905,
     "constrained_candidates": 4,
-    "candidates": 4,
-    "destination": 60142,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     58893,
-     58890,
-     68285,
-     60142
-    ],
-    "destination_light_remaining_s": 1251,
-    "stay_s": 156.92507850000402,
-    "stay_from_trigger_s": 351,
-    "control_latency_ms": 13.982664944587984,
-    "downtime_fraction": {
-     "cold": 0.8374090741652532,
-     "hot": 0.04253807335191683
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "68285-36274",
@@ -7567,23 +7053,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.494988852544015,
     "constrained_candidates": 3,
-    "candidates": 2,
-    "destination": 60138,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     68285,
-     60142,
-     60138
-    ],
-    "destination_light_remaining_s": 1266,
-    "stay_s": 171.92507850000402,
-    "stay_from_trigger_s": 366,
-    "control_latency_ms": 17.66070553744398,
-    "downtime_fraction": {
-     "cold": 0.7643473880978625,
-     "hot": 0.03882674103294547
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "62776-36288",
@@ -7593,24 +7064,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.518019651921692,
     "constrained_candidates": 2,
-    "candidates": 2,
-    "destination": 60138,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     62776,
-     62768,
-     60142,
-     60138
-    ],
-    "destination_light_remaining_s": 1252,
-    "stay_s": 157.92507850000402,
-    "stay_from_trigger_s": 352,
-    "control_latency_ms": 17.659809843133754,
-    "downtime_fraction": {
-     "cold": 0.8321065023247382,
-     "hot": 0.04226871731451004
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "60142-36459",
@@ -7664,23 +7119,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 17.66678049414858,
     "constrained_candidates": 13,
-    "candidates": 12,
-    "destination": 60144,
-    "hops": 3,
+    "candidates": 6,
+    "destination": 68285,
+    "hops": 5,
     "other_plane": false,
     "path": [
      60150,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285
     ],
-    "destination_light_remaining_s": 1447,
-    "stay_s": 352.925078500004,
-    "stay_from_trigger_s": 547,
-    "control_latency_ms": 10.256935133344875,
+    "destination_light_remaining_s": 1808,
+    "stay_s": 713.925078500004,
+    "stay_from_trigger_s": 908,
+    "control_latency_ms": 11.483367895153231,
     "downtime_fraction": {
-     "cold": 0.37234668972382634,
-     "hot": 0.018914185776651746
+     "cold": 0.18406761249527573,
+     "hot": 0.009350127486785632
     }
    },
    {
@@ -7691,24 +7148,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 17.661660647406176,
     "constrained_candidates": 12,
-    "candidates": 12,
-    "destination": 60144,
-    "hops": 4,
+    "candidates": 6,
+    "destination": 68285,
+    "hops": 6,
     "other_plane": true,
     "path": [
      58886,
      60150,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285
     ],
-    "destination_light_remaining_s": 1432,
-    "stay_s": 337.925078500004,
-    "stay_from_trigger_s": 532,
-    "control_latency_ms": 10.25820204659276,
+    "destination_light_remaining_s": 1793,
+    "stay_s": 698.925078500004,
+    "stay_from_trigger_s": 893,
+    "control_latency_ms": 11.484751221571292,
     "downtime_fraction": {
-     "cold": 0.3888746147024909,
-     "hot": 0.019753758820206645
+     "cold": 0.18801798467730516,
+     "hot": 0.009550795507745454
     }
    },
    {
@@ -7719,22 +7178,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 13.987363297212886,
     "constrained_candidates": 11,
-    "candidates": 10,
-    "destination": 60144,
-    "hops": 2,
+    "candidates": 4,
+    "destination": 60142,
+    "hops": 5,
     "other_plane": false,
     "path": [
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285,
+     60142
     ],
-    "destination_light_remaining_s": 1266,
-    "stay_s": 171.92507850000402,
-    "stay_from_trigger_s": 366,
-    "control_latency_ms": 10.270051414849064,
+    "destination_light_remaining_s": 1812,
+    "stay_s": 717.925078500004,
+    "stay_from_trigger_s": 912,
+    "control_latency_ms": 13.965578507234857,
     "downtime_fraction": {
-     "cold": 0.7643473880978625,
-     "hot": 0.03882674103294547
+     "cold": 0.18304205917219163,
+     "hot": 0.009298032204050441
     }
    },
    {
@@ -7745,23 +7207,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 13.986043970516482,
     "constrained_candidates": 10,
-    "candidates": 10,
-    "destination": 60144,
-    "hops": 3,
+    "candidates": 4,
+    "destination": 60142,
+    "hops": 6,
     "other_plane": true,
     "path": [
      62775,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285,
+     60142
     ],
-    "destination_light_remaining_s": 1251,
-    "stay_s": 156.92507850000402,
-    "stay_from_trigger_s": 351,
-    "control_latency_ms": 10.27069101841097,
+    "destination_light_remaining_s": 1797,
+    "stay_s": 702.925078500004,
+    "stay_from_trigger_s": 897,
+    "control_latency_ms": 13.966999922857724,
     "downtime_fraction": {
-     "cold": 0.8374090741652532,
-     "hot": 0.04253807335191683
+     "cold": 0.18694806704068576,
+     "hot": 0.009496446640135688
     }
    },
    {
@@ -7772,22 +7237,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.542087532724072,
     "constrained_candidates": 9,
-    "candidates": 8,
-    "destination": 58890,
-    "hops": 2,
+    "candidates": 2,
+    "destination": 60138,
+    "hops": 5,
     "other_plane": false,
     "path": [
      68283,
      60144,
-     58890
+     58890,
+     68285,
+     60142,
+     60138
     ],
-    "destination_light_remaining_s": 1266,
-    "stay_s": 171.92507850000402,
-    "stay_from_trigger_s": 366,
-    "control_latency_ms": 10.286649252154836,
+    "destination_light_remaining_s": 1811,
+    "stay_s": 716.925078500004,
+    "stay_from_trigger_s": 911,
+    "control_latency_ms": 17.66374102745183,
     "downtime_fraction": {
-     "cold": 0.7643473880978625,
-     "hot": 0.03882674103294547
+     "cold": 0.18329737463633353,
+     "hot": 0.009311001526065935
     }
    },
    {
@@ -7798,23 +7266,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.523881670077179,
     "constrained_candidates": 8,
-    "candidates": 8,
-    "destination": 58890,
-    "hops": 3,
+    "candidates": 2,
+    "destination": 60138,
+    "hops": 6,
     "other_plane": true,
     "path": [
      62774,
      58883,
      58893,
-     58890
+     58890,
+     68285,
+     60142,
+     60138
     ],
-    "destination_light_remaining_s": 1252,
-    "stay_s": 157.92507850000402,
-    "stay_from_trigger_s": 352,
-    "control_latency_ms": 10.286975496331275,
+    "destination_light_remaining_s": 1797,
+    "stay_s": 702.925078500004,
+    "stay_from_trigger_s": 897,
+    "control_latency_ms": 17.664509923902596,
     "downtime_fraction": {
-     "cold": 0.8321065023247382,
-     "hot": 0.04226871731451004
+     "cold": 0.18694806704068576,
+     "hot": 0.009496446640135688
     }
    },
    {
@@ -7825,23 +7296,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.267793721248829,
     "constrained_candidates": 7,
-    "candidates": 6,
-    "destination": 68285,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     60144,
-     58890,
-     68285
-    ],
-    "destination_light_remaining_s": 1261,
-    "stay_s": 166.92507850000402,
-    "stay_from_trigger_s": 361,
-    "control_latency_ms": 11.510729568304289,
-    "downtime_fraction": {
-     "cold": 0.7872423118255109,
-     "hot": 0.03998974006765746
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58883-41562",
@@ -7851,24 +7307,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.263772292651755,
     "constrained_candidates": 6,
-    "candidates": 6,
-    "destination": 68285,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     58883,
-     58893,
-     58890,
-     68285
-    ],
-    "destination_light_remaining_s": 1246,
-    "stay_s": 151.92507850000402,
-    "stay_from_trigger_s": 346,
-    "control_latency_ms": 11.51053177388003,
-    "downtime_fraction": {
-     "cold": 0.8649690097082594,
-     "hot": 0.04393804213165703
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58890-41730",
@@ -7878,23 +7318,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.281043850175132,
     "constrained_candidates": 4,
-    "candidates": 4,
-    "destination": 60142,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     58890,
-     68285,
-     60142
-    ],
-    "destination_light_remaining_s": 1263,
-    "stay_s": 168.92507850000402,
-    "stay_from_trigger_s": 363,
-    "control_latency_ms": 13.982862563034127,
-    "downtime_fraction": {
-     "cold": 0.7779217027268981,
-     "hot": 0.0395162788098886
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58893-41743",
@@ -7904,24 +7329,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.3057522847221,
     "constrained_candidates": 4,
-    "candidates": 4,
-    "destination": 60142,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     58893,
-     58890,
-     68285,
-     60142
-    ],
-    "destination_light_remaining_s": 1250,
-    "stay_s": 155.92507850000402,
-    "stay_from_trigger_s": 350,
-    "control_latency_ms": 13.982437053305208,
-    "downtime_fraction": {
-     "cold": 0.8427796603610154,
-     "hot": 0.04281088433114565
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "68285-41908",
@@ -7931,23 +7340,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.493158094165944,
     "constrained_candidates": 3,
-    "candidates": 2,
-    "destination": 60138,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     68285,
-     60142,
-     60138
-    ],
-    "destination_light_remaining_s": 1267,
-    "stay_s": 172.92507850000402,
-    "stay_from_trigger_s": 367,
-    "control_latency_ms": 17.659929568113068,
-    "downtime_fraction": {
-     "cold": 0.7599272808772789,
-     "hot": 0.03860221176645771
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "62776-41923",
@@ -7957,24 +7351,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.5173027179088,
     "constrained_candidates": 2,
-    "candidates": 2,
-    "destination": 60138,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     62776,
-     62768,
-     60142,
-     60138
-    ],
-    "destination_light_remaining_s": 1252,
-    "stay_s": 157.92507850000402,
-    "stay_from_trigger_s": 352,
-    "control_latency_ms": 17.658953695017733,
-    "downtime_fraction": {
-     "cold": 0.8321065023247382,
-     "hot": 0.04226871731451004
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "60142-42093",
@@ -8028,23 +7406,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 17.666124513962963,
     "constrained_candidates": 13,
-    "candidates": 12,
-    "destination": 60144,
-    "hops": 3,
+    "candidates": 6,
+    "destination": 68285,
+    "hops": 5,
     "other_plane": false,
     "path": [
      60150,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285
     ],
-    "destination_light_remaining_s": 1448,
-    "stay_s": 353.925078500004,
-    "stay_from_trigger_s": 548,
-    "control_latency_ms": 10.256920274984436,
+    "destination_light_remaining_s": 1809,
+    "stay_s": 714.925078500004,
+    "stay_from_trigger_s": 909,
+    "control_latency_ms": 11.482882374747483,
     "downtime_fraction": {
-     "cold": 0.3712946402581544,
-     "hot": 0.018860744562887485
+     "cold": 0.18381014829653555,
+     "hot": 0.009337049014973727
     }
    },
    {
@@ -8055,24 +7435,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 17.660236809139487,
     "constrained_candidates": 12,
-    "candidates": 12,
-    "destination": 60144,
-    "hops": 4,
+    "candidates": 6,
+    "destination": 68285,
+    "hops": 6,
     "other_plane": true,
     "path": [
      58886,
      60150,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285
     ],
-    "destination_light_remaining_s": 1432,
-    "stay_s": 337.925078500004,
-    "stay_from_trigger_s": 532,
-    "control_latency_ms": 10.258268677272435,
+    "destination_light_remaining_s": 1793,
+    "stay_s": 698.925078500004,
+    "stay_from_trigger_s": 893,
+    "control_latency_ms": 11.484355905357313,
     "downtime_fraction": {
-     "cold": 0.3888746147024909,
-     "hot": 0.019753758820206645
+     "cold": 0.18801798467730516,
+     "hot": 0.009550795507745454
     }
    },
    {
@@ -8083,22 +7465,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 13.98649782618811,
     "constrained_candidates": 11,
-    "candidates": 10,
-    "destination": 60144,
-    "hops": 2,
+    "candidates": 4,
+    "destination": 60142,
+    "hops": 5,
     "other_plane": false,
     "path": [
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285,
+     60142
     ],
-    "destination_light_remaining_s": 1267,
-    "stay_s": 172.92507850000402,
-    "stay_from_trigger_s": 367,
-    "control_latency_ms": 10.269794752041696,
+    "destination_light_remaining_s": 1813,
+    "stay_s": 718.925078500004,
+    "stay_from_trigger_s": 913,
+    "control_latency_ms": 13.96564714281687,
     "downtime_fraction": {
-     "cold": 0.7599272808772789,
-     "hot": 0.03860221176645771
+     "cold": 0.1827874539780675,
+     "hot": 0.009285098961794585
     }
    },
    {
@@ -8109,23 +7494,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 13.986509016387314,
     "constrained_candidates": 10,
-    "candidates": 10,
-    "destination": 60144,
-    "hops": 3,
+    "candidates": 4,
+    "destination": 60142,
+    "hops": 6,
     "other_plane": true,
     "path": [
      62775,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285,
+     60142
     ],
-    "destination_light_remaining_s": 1252,
-    "stay_s": 157.92507850000402,
-    "stay_from_trigger_s": 352,
-    "control_latency_ms": 10.270421895310998,
+    "destination_light_remaining_s": 1798,
+    "stay_s": 703.925078500004,
+    "stay_from_trigger_s": 898,
+    "control_latency_ms": 13.967062011559838,
     "downtime_fraction": {
-     "cold": 0.8321065023247382,
-     "hot": 0.04226871731451004
+     "cold": 0.1866824875454374,
+     "hot": 0.009482955933624177
     }
    },
    {
@@ -8136,22 +7524,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.542133303959279,
     "constrained_candidates": 9,
-    "candidates": 8,
-    "destination": 58890,
-    "hops": 2,
+    "candidates": 2,
+    "destination": 60138,
+    "hops": 5,
     "other_plane": false,
     "path": [
      68283,
      60144,
-     58890
+     58890,
+     68285,
+     60142,
+     60138
     ],
-    "destination_light_remaining_s": 1266,
-    "stay_s": 171.92507850000402,
-    "stay_from_trigger_s": 366,
-    "control_latency_ms": 10.285890264190728,
+    "destination_light_remaining_s": 1811,
+    "stay_s": 716.925078500004,
+    "stay_from_trigger_s": 911,
+    "control_latency_ms": 17.663339492005516,
     "downtime_fraction": {
-     "cold": 0.7643473880978625,
-     "hot": 0.03882674103294547
+     "cold": 0.18329737463633353,
+     "hot": 0.009311001526065935
     }
    },
    {
@@ -8162,23 +7553,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.524157693076189,
     "constrained_candidates": 8,
-    "candidates": 8,
-    "destination": 58890,
-    "hops": 3,
+    "candidates": 2,
+    "destination": 60138,
+    "hops": 6,
     "other_plane": true,
     "path": [
      62774,
      58883,
      58893,
-     58890
+     58890,
+     68285,
+     60142,
+     60138
     ],
-    "destination_light_remaining_s": 1252,
-    "stay_s": 157.92507850000402,
-    "stay_from_trigger_s": 352,
-    "control_latency_ms": 10.286232873948494,
+    "destination_light_remaining_s": 1797,
+    "stay_s": 702.925078500004,
+    "stay_from_trigger_s": 897,
+    "control_latency_ms": 17.66413117414854,
     "downtime_fraction": {
-     "cold": 0.8321065023247382,
-     "hot": 0.04226871731451004
+     "cold": 0.18694806704068576,
+     "hot": 0.009496446640135688
     }
    },
    {
@@ -8189,23 +7583,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.26660977048354,
     "constrained_candidates": 7,
-    "candidates": 6,
-    "destination": 68285,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     60144,
-     58890,
-     68285
-    ],
-    "destination_light_remaining_s": 1261,
-    "stay_s": 166.92507850000402,
-    "stay_from_trigger_s": 361,
-    "control_latency_ms": 11.509298452699095,
-    "downtime_fraction": {
-     "cold": 0.7872423118255109,
-     "hot": 0.03998974006765746
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58883-47196",
@@ -8215,24 +7594,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.262910533307815,
     "constrained_candidates": 6,
-    "candidates": 6,
-    "destination": 68285,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     58883,
-     58893,
-     58890,
-     68285
-    ],
-    "destination_light_remaining_s": 1247,
-    "stay_s": 152.92507850000402,
-    "stay_from_trigger_s": 347,
-    "control_latency_ms": 11.509011663337803,
-    "downtime_fraction": {
-     "cold": 0.8593128477615566,
-     "hot": 0.043650724691230436
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58890-47364",
@@ -8242,23 +7605,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.279815043213393,
     "constrained_candidates": 4,
-    "candidates": 4,
-    "destination": 60142,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     58890,
-     68285,
-     60142
-    ],
-    "destination_light_remaining_s": 1264,
-    "stay_s": 169.92507850000402,
-    "stay_from_trigger_s": 364,
-    "control_latency_ms": 13.9826807859297,
-    "downtime_fraction": {
-     "cold": 0.7733436751067615,
-     "hot": 0.039283727622278664
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58893-47377",
@@ -8268,24 +7616,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.305601916379972,
     "constrained_candidates": 4,
-    "candidates": 4,
-    "destination": 60142,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     58893,
-     58890,
-     68285,
-     60142
-    ],
-    "destination_light_remaining_s": 1251,
-    "stay_s": 156.92507850000402,
-    "stay_from_trigger_s": 351,
-    "control_latency_ms": 13.982240140350344,
-    "downtime_fraction": {
-     "cold": 0.8374090741652532,
-     "hot": 0.04253807335191683
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "68285-47543",
@@ -8295,23 +7627,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.491036101968847,
     "constrained_candidates": 3,
-    "candidates": 2,
-    "destination": 60138,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     68285,
-     60142,
-     60138
-    ],
-    "destination_light_remaining_s": 1266,
-    "stay_s": 171.92507850000402,
-    "stay_from_trigger_s": 366,
-    "control_latency_ms": 17.65893399003692,
-    "downtime_fraction": {
-     "cold": 0.7643473880978625,
-     "hot": 0.03882674103294547
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "62776-47558",
@@ -8321,24 +7638,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.516567774072236,
     "constrained_candidates": 2,
-    "candidates": 2,
-    "destination": 60138,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     62776,
-     62768,
-     60142,
-     60138
-    ],
-    "destination_light_remaining_s": 1251,
-    "stay_s": 156.92507850000402,
-    "stay_from_trigger_s": 351,
-    "control_latency_ms": 17.65789724453641,
-    "downtime_fraction": {
-     "cold": 0.8374090741652532,
-     "hot": 0.04253807335191683
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "60142-47728",
@@ -8392,23 +7693,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 17.66541812561577,
     "constrained_candidates": 13,
-    "candidates": 12,
-    "destination": 60144,
-    "hops": 3,
+    "candidates": 6,
+    "destination": 68285,
+    "hops": 5,
     "other_plane": false,
     "path": [
      60150,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285
     ],
-    "destination_light_remaining_s": 1448,
-    "stay_s": 353.925078500004,
-    "stay_from_trigger_s": 548,
-    "control_latency_ms": 10.256875007281215,
+    "destination_light_remaining_s": 1809,
+    "stay_s": 714.925078500004,
+    "stay_from_trigger_s": 909,
+    "control_latency_ms": 11.482341287644438,
     "downtime_fraction": {
-     "cold": 0.3712946402581544,
-     "hot": 0.018860744562887485
+     "cold": 0.18381014829653555,
+     "hot": 0.009337049014973727
     }
    },
    {
@@ -8419,24 +7722,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 17.65868294820476,
     "constrained_candidates": 12,
-    "candidates": 12,
-    "destination": 60144,
-    "hops": 4,
+    "candidates": 6,
+    "destination": 68285,
+    "hops": 6,
     "other_plane": true,
     "path": [
      58886,
      60150,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285
     ],
-    "destination_light_remaining_s": 1432,
-    "stay_s": 337.925078500004,
-    "stay_from_trigger_s": 532,
-    "control_latency_ms": 10.258220569106664,
+    "destination_light_remaining_s": 1793,
+    "stay_s": 698.925078500004,
+    "stay_from_trigger_s": 893,
+    "control_latency_ms": 11.48381278973658,
     "downtime_fraction": {
-     "cold": 0.3888746147024909,
-     "hot": 0.019753758820206645
+     "cold": 0.18801798467730516,
+     "hot": 0.009550795507745454
     }
    },
    {
@@ -8447,22 +7752,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 13.985586813367876,
     "constrained_candidates": 11,
-    "candidates": 10,
-    "destination": 60144,
-    "hops": 2,
+    "candidates": 4,
+    "destination": 60142,
+    "hops": 5,
     "other_plane": false,
     "path": [
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285,
+     60142
     ],
-    "destination_light_remaining_s": 1266,
-    "stay_s": 171.92507850000402,
-    "stay_from_trigger_s": 366,
-    "control_latency_ms": 10.26954630338559,
+    "destination_light_remaining_s": 1812,
+    "stay_s": 717.925078500004,
+    "stay_from_trigger_s": 912,
+    "control_latency_ms": 13.965781395143578,
     "downtime_fraction": {
-     "cold": 0.7643473880978625,
-     "hot": 0.03882674103294547
+     "cold": 0.18304205917219163,
+     "hot": 0.009298032204050441
     }
    },
    {
@@ -8473,23 +7781,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 13.986933281925568,
     "constrained_candidates": 10,
-    "candidates": 10,
-    "destination": 60144,
-    "hops": 3,
+    "candidates": 4,
+    "destination": 60142,
+    "hops": 6,
     "other_plane": true,
     "path": [
      62775,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285,
+     60142
     ],
-    "destination_light_remaining_s": 1251,
-    "stay_s": 156.92507850000402,
-    "stay_from_trigger_s": 351,
-    "control_latency_ms": 10.270158692414975,
+    "destination_light_remaining_s": 1797,
+    "stay_s": 702.925078500004,
+    "stay_from_trigger_s": 897,
+    "control_latency_ms": 13.967187892686379,
     "downtime_fraction": {
-     "cold": 0.8374090741652532,
-     "hot": 0.04253807335191683
+     "cold": 0.18694806704068576,
+     "hot": 0.009496446640135688
     }
    },
    {
@@ -8500,22 +7811,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.541940385459158,
     "constrained_candidates": 9,
-    "candidates": 8,
-    "destination": 58890,
-    "hops": 2,
+    "candidates": 2,
+    "destination": 60138,
+    "hops": 5,
     "other_plane": false,
     "path": [
      68283,
      60144,
-     58890
+     58890,
+     68285,
+     60142,
+     60138
     ],
-    "destination_light_remaining_s": 1267,
-    "stay_s": 172.92507850000402,
-    "stay_from_trigger_s": 367,
-    "control_latency_ms": 10.284884764555565,
+    "destination_light_remaining_s": 1811,
+    "stay_s": 716.925078500004,
+    "stay_from_trigger_s": 911,
+    "control_latency_ms": 17.662710525854372,
     "downtime_fraction": {
-     "cold": 0.7599272808772789,
-     "hot": 0.03860221176645771
+     "cold": 0.18329737463633353,
+     "hot": 0.009311001526065935
     }
    },
    {
@@ -8526,23 +7840,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.524381863780286,
     "constrained_candidates": 8,
-    "candidates": 8,
-    "destination": 58890,
-    "hops": 3,
+    "candidates": 2,
+    "destination": 60138,
+    "hops": 6,
     "other_plane": true,
     "path": [
      62774,
      58883,
      58893,
-     58890
+     58890,
+     68285,
+     60142,
+     60138
     ],
-    "destination_light_remaining_s": 1252,
-    "stay_s": 157.92507850000402,
-    "stay_from_trigger_s": 352,
-    "control_latency_ms": 10.285232276601695,
+    "destination_light_remaining_s": 1796,
+    "stay_s": 701.925078500004,
+    "stay_from_trigger_s": 896,
+    "control_latency_ms": 17.663546418000028,
     "downtime_fraction": {
-     "cold": 0.8321065023247382,
-     "hot": 0.04226871731451004
+     "cold": 0.18721440325343397,
+     "hot": 0.009509975785810934
     }
    },
    {
@@ -8553,23 +7870,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.26535946835056,
     "constrained_candidates": 7,
-    "candidates": 6,
-    "destination": 68285,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     60144,
-     58890,
-     68285
-    ],
-    "destination_light_remaining_s": 1261,
-    "stay_s": 166.92507850000402,
-    "stay_from_trigger_s": 361,
-    "control_latency_ms": 11.50764614691342,
-    "downtime_fraction": {
-     "cold": 0.7872423118255109,
-     "hot": 0.03998974006765746
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58883-52831",
@@ -8579,24 +7881,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.26195573029949,
     "constrained_candidates": 6,
-    "candidates": 6,
-    "destination": 68285,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     58883,
-     58893,
-     58890,
-     68285
-    ],
-    "destination_light_remaining_s": 1246,
-    "stay_s": 151.92507850000402,
-    "stay_from_trigger_s": 346,
-    "control_latency_ms": 11.507328165589808,
-    "downtime_fraction": {
-     "cold": 0.8649690097082594,
-     "hot": 0.04393804213165703
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58890-52999",
@@ -8606,23 +7892,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.278366994849403,
     "constrained_candidates": 4,
-    "candidates": 4,
-    "destination": 60142,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     58890,
-     68285,
-     60142
-    ],
-    "destination_light_remaining_s": 1263,
-    "stay_s": 168.92507850000402,
-    "stay_from_trigger_s": 363,
-    "control_latency_ms": 13.982342639834776,
-    "downtime_fraction": {
-     "cold": 0.7779217027268981,
-     "hot": 0.0395162788098886
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58893-53012",
@@ -8632,24 +7903,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.305398148600746,
     "constrained_candidates": 4,
-    "candidates": 4,
-    "destination": 60142,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     58893,
-     58890,
-     68285,
-     60142
-    ],
-    "destination_light_remaining_s": 1250,
-    "stay_s": 155.92507850000402,
-    "stay_from_trigger_s": 350,
-    "control_latency_ms": 13.981868896333234,
-    "downtime_fraction": {
-     "cold": 0.8427796603610154,
-     "hot": 0.04281088433114565
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "68285-53177",
@@ -8659,23 +7914,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.488739898726202,
     "constrained_candidates": 3,
-    "candidates": 2,
-    "destination": 60138,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     68285,
-     60142,
-     60138
-    ],
-    "destination_light_remaining_s": 1266,
-    "stay_s": 171.92507850000402,
-    "stay_from_trigger_s": 366,
-    "control_latency_ms": 17.65781202727736,
-    "downtime_fraction": {
-     "cold": 0.7643473880978625,
-     "hot": 0.03882674103294547
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "62776-53192",
@@ -8685,24 +7925,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.515888953017148,
     "constrained_candidates": 2,
-    "candidates": 2,
-    "destination": 60138,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     62776,
-     62768,
-     60142,
-     60138
-    ],
-    "destination_light_remaining_s": 1251,
-    "stay_s": 156.92507850000402,
-    "stay_from_trigger_s": 351,
-    "control_latency_ms": 17.656758982354024,
-    "downtime_fraction": {
-     "cold": 0.8374090741652532,
-     "hot": 0.04253807335191683
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "60142-53362",
@@ -8756,23 +7980,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 17.66470586726175,
     "constrained_candidates": 13,
-    "candidates": 12,
-    "destination": 60144,
-    "hops": 3,
+    "candidates": 6,
+    "destination": 68285,
+    "hops": 5,
     "other_plane": false,
     "path": [
      60150,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285
     ],
-    "destination_light_remaining_s": 1447,
-    "stay_s": 352.925078500004,
-    "stay_from_trigger_s": 547,
-    "control_latency_ms": 10.25688364039239,
+    "destination_light_remaining_s": 1808,
+    "stay_s": 713.925078500004,
+    "stay_from_trigger_s": 908,
+    "control_latency_ms": 11.481836741644413,
     "downtime_fraction": {
-     "cold": 0.37234668972382634,
-     "hot": 0.018914185776651746
+     "cold": 0.18406761249527573,
+     "hot": 0.009350127486785632
     }
    },
    {
@@ -8783,24 +8009,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 17.657040561459212,
     "constrained_candidates": 12,
-    "candidates": 12,
-    "destination": 60144,
-    "hops": 4,
+    "candidates": 6,
+    "destination": 68285,
+    "hops": 6,
     "other_plane": true,
     "path": [
      58886,
      60150,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285
     ],
-    "destination_light_remaining_s": 1431,
-    "stay_s": 336.925078500004,
-    "stay_from_trigger_s": 531,
-    "control_latency_ms": 10.258225315153105,
+    "destination_light_remaining_s": 1792,
+    "stay_s": 697.925078500004,
+    "stay_from_trigger_s": 892,
+    "control_latency_ms": 11.483305315457594,
     "downtime_fraction": {
-     "cold": 0.39002880190765166,
-     "hot": 0.019812388349679938
+     "cold": 0.18828738033375783,
+     "hot": 0.009564480064730098
     }
    },
    {
@@ -8811,22 +8039,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 13.984598978585359,
     "constrained_candidates": 11,
-    "candidates": 10,
-    "destination": 60144,
-    "hops": 2,
+    "candidates": 4,
+    "destination": 60142,
+    "hops": 5,
     "other_plane": false,
     "path": [
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285,
+     60142
     ],
-    "destination_light_remaining_s": 1266,
-    "stay_s": 171.92507850000402,
-    "stay_from_trigger_s": 366,
-    "control_latency_ms": 10.269221289797038,
+    "destination_light_remaining_s": 1812,
+    "stay_s": 717.925078500004,
+    "stay_from_trigger_s": 912,
+    "control_latency_ms": 13.965791693878938,
     "downtime_fraction": {
-     "cold": 0.7643473880978625,
-     "hot": 0.03882674103294547
+     "cold": 0.18304205917219163,
+     "hot": 0.009298032204050441
     }
    },
    {
@@ -8837,23 +8068,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 13.987139724461413,
     "constrained_candidates": 10,
-    "candidates": 10,
-    "destination": 60144,
-    "hops": 3,
+    "candidates": 4,
+    "destination": 60142,
+    "hops": 6,
     "other_plane": true,
     "path": [
      62775,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285,
+     60142
     ],
-    "destination_light_remaining_s": 1251,
-    "stay_s": 156.92507850000402,
-    "stay_from_trigger_s": 351,
-    "control_latency_ms": 10.26974368204606,
+    "destination_light_remaining_s": 1797,
+    "stay_s": 702.925078500004,
+    "stay_from_trigger_s": 897,
+    "control_latency_ms": 13.967113910156032,
     "downtime_fraction": {
-     "cold": 0.8374090741652532,
-     "hot": 0.04253807335191683
+     "cold": 0.18694806704068576,
+     "hot": 0.009496446640135688
     }
    },
    {
@@ -8864,22 +8098,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.54171347715091,
     "constrained_candidates": 9,
-    "candidates": 8,
-    "destination": 58890,
-    "hops": 2,
+    "candidates": 2,
+    "destination": 60138,
+    "hops": 5,
     "other_plane": false,
     "path": [
      68283,
      60144,
-     58890
+     58890,
+     68285,
+     60142,
+     60138
     ],
-    "destination_light_remaining_s": 1266,
-    "stay_s": 171.92507850000402,
-    "stay_from_trigger_s": 366,
-    "control_latency_ms": 10.283852446878926,
+    "destination_light_remaining_s": 1810,
+    "stay_s": 715.925078500004,
+    "stay_from_trigger_s": 910,
+    "control_latency_ms": 17.66210646975396,
     "downtime_fraction": {
-     "cold": 0.7643473880978625,
-     "hot": 0.03882674103294547
+     "cold": 0.18355340334679632,
+     "hot": 0.009324007079029067
     }
    },
    {
@@ -8890,23 +8127,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.52462377187875,
     "constrained_candidates": 8,
-    "candidates": 8,
-    "destination": 58890,
-    "hops": 3,
+    "candidates": 2,
+    "destination": 60138,
+    "hops": 6,
     "other_plane": true,
     "path": [
      62774,
      58883,
      58893,
-     58890
+     58890,
+     68285,
+     60142,
+     60138
     ],
-    "destination_light_remaining_s": 1252,
-    "stay_s": 157.92507850000402,
-    "stay_from_trigger_s": 352,
-    "control_latency_ms": 10.284158388883506,
+    "destination_light_remaining_s": 1796,
+    "stay_s": 701.925078500004,
+    "stay_from_trigger_s": 896,
+    "control_latency_ms": 17.662874899190466,
     "downtime_fraction": {
-     "cold": 0.8321065023247382,
-     "hot": 0.04226871731451004
+     "cold": 0.18721440325343397,
+     "hot": 0.009509975785810934
     }
    },
    {
@@ -8917,23 +8157,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.263844383422606,
     "constrained_candidates": 7,
-    "candidates": 6,
-    "destination": 68285,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     60144,
-     58890,
-     68285
-    ],
-    "destination_light_remaining_s": 1261,
-    "stay_s": 166.92507850000402,
-    "stay_from_trigger_s": 361,
-    "control_latency_ms": 11.505698570637183,
-    "downtime_fraction": {
-     "cold": 0.7872423118255109,
-     "hot": 0.03998974006765746
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58883-58466",
@@ -8943,24 +8168,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.260963249191708,
     "constrained_candidates": 6,
-    "candidates": 6,
-    "destination": 68285,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     58883,
-     58893,
-     58890,
-     68285
-    ],
-    "destination_light_remaining_s": 1245,
-    "stay_s": 150.92507850000402,
-    "stay_from_trigger_s": 345,
-    "control_latency_ms": 11.505336273655535,
-    "downtime_fraction": {
-     "cold": 0.870700124896702,
-     "hot": 0.04422916699021826
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58890-58633",
@@ -8970,23 +8179,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.276725026538893,
     "constrained_candidates": 4,
-    "candidates": 4,
-    "destination": 60142,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     58890,
-     68285,
-     60142
-    ],
-    "destination_light_remaining_s": 1263,
-    "stay_s": 168.92507850000402,
-    "stay_from_trigger_s": 363,
-    "control_latency_ms": 13.981825761922234,
-    "downtime_fraction": {
-     "cold": 0.7779217027268981,
-     "hot": 0.0395162788098886
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58893-58646",
@@ -8996,24 +8190,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.305251750071582,
     "constrained_candidates": 4,
-    "candidates": 4,
-    "destination": 60142,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     58893,
-     58890,
-     68285,
-     60142
-    ],
-    "destination_light_remaining_s": 1250,
-    "stay_s": 155.92507850000402,
-    "stay_from_trigger_s": 350,
-    "control_latency_ms": 13.981335613125564,
-    "downtime_fraction": {
-     "cold": 0.8427796603610154,
-     "hot": 0.04281088433114565
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "68285-58811",
@@ -9023,23 +8201,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.486366677765051,
     "constrained_candidates": 3,
-    "candidates": 2,
-    "destination": 60138,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     68285,
-     60142,
-     60138
-    ],
-    "destination_light_remaining_s": 1266,
-    "stay_s": 171.92507850000402,
-    "stay_from_trigger_s": 366,
-    "control_latency_ms": 17.656672872141126,
-    "downtime_fraction": {
-     "cold": 0.7643473880978625,
-     "hot": 0.03882674103294547
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "62776-58827",
@@ -9049,24 +8212,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.515119102127,
     "constrained_candidates": 2,
-    "candidates": 2,
-    "destination": 60138,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     62776,
-     62768,
-     60142,
-     60138
-    ],
-    "destination_light_remaining_s": 1250,
-    "stay_s": 155.92507850000402,
-    "stay_from_trigger_s": 350,
-    "control_latency_ms": 17.655531103142337,
-    "downtime_fraction": {
-     "cold": 0.8427796603610154,
-     "hot": 0.04281088433114565
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "60142-58996",
@@ -9120,23 +8267,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 17.663898325519128,
     "constrained_candidates": 13,
-    "candidates": 12,
-    "destination": 60144,
-    "hops": 3,
+    "candidates": 6,
+    "destination": 68285,
+    "hops": 5,
     "other_plane": false,
     "path": [
      60150,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285
     ],
-    "destination_light_remaining_s": 1448,
-    "stay_s": 353.925078500004,
-    "stay_from_trigger_s": 548,
-    "control_latency_ms": 10.256777449836596,
+    "destination_light_remaining_s": 1808,
+    "stay_s": 713.925078500004,
+    "stay_from_trigger_s": 908,
+    "control_latency_ms": 11.481184367459992,
     "downtime_fraction": {
-     "cold": 0.3712946402581544,
-     "hot": 0.018860744562887485
+     "cold": 0.18406761249527573,
+     "hot": 0.009350127486785632
     }
    },
    {
@@ -9147,24 +8296,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 17.655270518779385,
     "constrained_candidates": 12,
-    "candidates": 12,
-    "destination": 60144,
-    "hops": 4,
+    "candidates": 6,
+    "destination": 68285,
+    "hops": 6,
     "other_plane": true,
     "path": [
      58886,
      60150,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285
     ],
-    "destination_light_remaining_s": 1432,
-    "stay_s": 337.925078500004,
-    "stay_from_trigger_s": 532,
-    "control_latency_ms": 10.258115801048707,
+    "destination_light_remaining_s": 1792,
+    "stay_s": 697.925078500004,
+    "stay_from_trigger_s": 892,
+    "control_latency_ms": 11.482650342593946,
     "downtime_fraction": {
-     "cold": 0.3888746147024909,
-     "hot": 0.019753758820206645
+     "cold": 0.18828738033375783,
+     "hot": 0.009564480064730098
     }
    },
    {
@@ -9175,22 +8326,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 13.983550530801043,
     "constrained_candidates": 11,
-    "candidates": 10,
-    "destination": 60144,
-    "hops": 2,
+    "candidates": 4,
+    "destination": 60142,
+    "hops": 5,
     "other_plane": false,
     "path": [
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285,
+     60142
     ],
-    "destination_light_remaining_s": 1267,
-    "stay_s": 172.92507850000402,
-    "stay_from_trigger_s": 367,
-    "control_latency_ms": 10.268335403017751,
+    "destination_light_remaining_s": 1812,
+    "stay_s": 717.925078500004,
+    "stay_from_trigger_s": 912,
+    "control_latency_ms": 13.965246064851451,
     "downtime_fraction": {
-     "cold": 0.7599272808772789,
-     "hot": 0.03860221176645771
+     "cold": 0.18304205917219163,
+     "hot": 0.009298032204050441
     }
    },
    {
@@ -9201,23 +8355,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 13.985816567176077,
     "constrained_candidates": 10,
-    "candidates": 10,
-    "destination": 60144,
-    "hops": 3,
+    "candidates": 4,
+    "destination": 60142,
+    "hops": 6,
     "other_plane": true,
     "path": [
      62775,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285,
+     60142
     ],
-    "destination_light_remaining_s": 1252,
-    "stay_s": 157.92507850000402,
-    "stay_from_trigger_s": 352,
-    "control_latency_ms": 10.268695800025446,
+    "destination_light_remaining_s": 1797,
+    "stay_s": 702.925078500004,
+    "stay_from_trigger_s": 897,
+    "control_latency_ms": 13.9664119152552,
     "downtime_fraction": {
-     "cold": 0.8321065023247382,
-     "hot": 0.04226871731451004
+     "cold": 0.18694806704068576,
+     "hot": 0.009496446640135688
     }
    },
    {
@@ -9228,22 +8385,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.541512125844854,
     "constrained_candidates": 9,
-    "candidates": 8,
-    "destination": 58890,
-    "hops": 2,
+    "candidates": 2,
+    "destination": 60138,
+    "hops": 5,
     "other_plane": false,
     "path": [
      68283,
      60144,
-     58890
+     58890,
+     68285,
+     60142,
+     60138
     ],
-    "destination_light_remaining_s": 1266,
-    "stay_s": 171.92507850000402,
-    "stay_from_trigger_s": 366,
-    "control_latency_ms": 10.282745568610467,
+    "destination_light_remaining_s": 1810,
+    "stay_s": 715.925078500004,
+    "stay_from_trigger_s": 910,
+    "control_latency_ms": 17.661414841767947,
     "downtime_fraction": {
-     "cold": 0.7643473880978625,
-     "hot": 0.03882674103294547
+     "cold": 0.18355340334679632,
+     "hot": 0.009324007079029067
     }
    },
    {
@@ -9254,23 +8414,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.524849257017882,
     "constrained_candidates": 8,
-    "candidates": 8,
-    "destination": 58890,
-    "hops": 3,
+    "candidates": 2,
+    "destination": 60138,
+    "hops": 6,
     "other_plane": true,
     "path": [
      62774,
      58883,
      58893,
-     58890
+     58890,
+     68285,
+     60142,
+     60138
     ],
-    "destination_light_remaining_s": 1252,
-    "stay_s": 157.92507850000402,
-    "stay_from_trigger_s": 352,
-    "control_latency_ms": 10.283034285030846,
+    "destination_light_remaining_s": 1796,
+    "stay_s": 701.925078500004,
+    "stay_from_trigger_s": 896,
+    "control_latency_ms": 17.662172237044533,
     "downtime_fraction": {
-     "cold": 0.8321065023247382,
-     "hot": 0.04226871731451004
+     "cold": 0.18721440325343397,
+     "hot": 0.009509975785810934
     }
    },
    {
@@ -9281,23 +8444,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.262225018674588,
     "constrained_candidates": 7,
-    "candidates": 6,
-    "destination": 68285,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     60144,
-     58890,
-     68285
-    ],
-    "destination_light_remaining_s": 1260,
-    "stay_s": 165.92507850000402,
-    "stay_from_trigger_s": 360,
-    "control_latency_ms": 11.503650354260733,
-    "downtime_fraction": {
-     "cold": 0.7919868767758026,
-     "hot": 0.040230750892718825
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58883-64100",
@@ -9307,24 +8455,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.259992902822187,
     "constrained_candidates": 6,
-    "candidates": 6,
-    "destination": 68285,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     58883,
-     58893,
-     58890,
-     68285
-    ],
-    "destination_light_remaining_s": 1245,
-    "stay_s": 150.92507850000402,
-    "stay_from_trigger_s": 345,
-    "control_latency_ms": 11.503288991922865,
-    "downtime_fraction": {
-     "cold": 0.870700124896702,
-     "hot": 0.04422916699021826
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58890-64267",
@@ -9334,23 +8466,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.27502993356549,
     "constrained_candidates": 4,
-    "candidates": 4,
-    "destination": 60142,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     58890,
-     68285,
-     60142
-    ],
-    "destination_light_remaining_s": 1263,
-    "stay_s": 168.92507850000402,
-    "stay_from_trigger_s": 363,
-    "control_latency_ms": 13.981294837803455,
-    "downtime_fraction": {
-     "cold": 0.7779217027268981,
-     "hot": 0.0395162788098886
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58893-64281",
@@ -9360,24 +8477,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.305049749970886,
     "constrained_candidates": 4,
-    "candidates": 4,
-    "destination": 60142,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     58893,
-     58890,
-     68285,
-     60142
-    ],
-    "destination_light_remaining_s": 1249,
-    "stay_s": 154.92507850000402,
-    "stay_from_trigger_s": 349,
-    "control_latency_ms": 13.980748017580279,
-    "downtime_fraction": {
-     "cold": 0.8482195779555125,
-     "hot": 0.04308721715437636
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "68285-64445",
@@ -9387,23 +8488,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.483916482389278,
     "constrained_candidates": 3,
-    "candidates": 2,
-    "destination": 60138,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     68285,
-     60142,
-     60138
-    ],
-    "destination_light_remaining_s": 1266,
-    "stay_s": 171.92507850000402,
-    "stay_from_trigger_s": 366,
-    "control_latency_ms": 17.655516572575536,
-    "downtime_fraction": {
-     "cold": 0.7643473880978625,
-     "hot": 0.03882674103294547
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "62776-64461",
@@ -9413,24 +8499,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.514407109547538,
     "constrained_candidates": 2,
-    "candidates": 2,
-    "destination": 60138,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     62776,
-     62768,
-     60142,
-     60138
-    ],
-    "destination_light_remaining_s": 1250,
-    "stay_s": 155.92507850000402,
-    "stay_from_trigger_s": 350,
-    "control_latency_ms": 17.654357607945972,
-    "downtime_fraction": {
-     "cold": 0.8427796603610154,
-     "hot": 0.04281088433114565
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "60142-64630",
@@ -9484,23 +8554,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 17.66304041932301,
     "constrained_candidates": 13,
-    "candidates": 12,
-    "destination": 60144,
-    "hops": 3,
+    "candidates": 6,
+    "destination": 68285,
+    "hops": 5,
     "other_plane": false,
     "path": [
      60150,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285
     ],
-    "destination_light_remaining_s": 1448,
-    "stay_s": 353.925078500004,
-    "stay_from_trigger_s": 548,
-    "control_latency_ms": 10.256640919836801,
+    "destination_light_remaining_s": 1808,
+    "stay_s": 713.925078500004,
+    "stay_from_trigger_s": 908,
+    "control_latency_ms": 11.48047639694152,
     "downtime_fraction": {
-     "cold": 0.3712946402581544,
-     "hot": 0.018860744562887485
+     "cold": 0.18406761249527573,
+     "hot": 0.009350127486785632
     }
    },
    {
@@ -9511,24 +8583,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 17.653409755676897,
     "constrained_candidates": 12,
-    "candidates": 12,
-    "destination": 60144,
-    "hops": 4,
+    "candidates": 6,
+    "destination": 68285,
+    "hops": 6,
     "other_plane": true,
     "path": [
      58886,
      60150,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285
     ],
-    "destination_light_remaining_s": 1431,
-    "stay_s": 336.925078500004,
-    "stay_from_trigger_s": 531,
-    "control_latency_ms": 10.258058649715025,
+    "destination_light_remaining_s": 1791,
+    "stay_s": 696.925078500004,
+    "stay_from_trigger_s": 891,
+    "control_latency_ms": 11.482030548340344,
     "downtime_fraction": {
-     "cold": 0.39002880190765166,
-     "hot": 0.019812388349679938
+     "cold": 0.18855754908810804,
+     "hot": 0.00957820389295754
     }
    },
    {
@@ -9539,22 +8613,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 13.982441534121895,
     "constrained_candidates": 11,
-    "candidates": 10,
-    "destination": 60144,
-    "hops": 2,
+    "candidates": 4,
+    "destination": 60142,
+    "hops": 5,
     "other_plane": false,
     "path": [
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285,
+     60142
     ],
-    "destination_light_remaining_s": 1267,
-    "stay_s": 172.92507850000402,
-    "stay_from_trigger_s": 367,
-    "control_latency_ms": 10.267256299469453,
+    "destination_light_remaining_s": 1812,
+    "stay_s": 717.925078500004,
+    "stay_from_trigger_s": 912,
+    "control_latency_ms": 13.964512263458028,
     "downtime_fraction": {
-     "cold": 0.7599272808772789,
-     "hot": 0.03860221176645771
+     "cold": 0.18304205917219163,
+     "hot": 0.009298032204050441
     }
    },
    {
@@ -9565,23 +8642,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 13.984382972359848,
     "constrained_candidates": 10,
-    "candidates": 10,
-    "destination": 60144,
-    "hops": 3,
+    "candidates": 4,
+    "destination": 60142,
+    "hops": 6,
     "other_plane": true,
     "path": [
      62775,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285,
+     60142
     ],
-    "destination_light_remaining_s": 1251,
-    "stay_s": 156.92507850000402,
-    "stay_from_trigger_s": 351,
-    "control_latency_ms": 10.267624679370783,
+    "destination_light_remaining_s": 1796,
+    "stay_s": 701.925078500004,
+    "stay_from_trigger_s": 896,
+    "control_latency_ms": 13.965745950926346,
     "downtime_fraction": {
-     "cold": 0.8374090741652532,
-     "hot": 0.04253807335191683
+     "cold": 0.18721440325343397,
+     "hot": 0.009509975785810934
     }
    },
    {
@@ -9592,22 +8672,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.541307239113632,
     "constrained_candidates": 9,
-    "candidates": 8,
-    "destination": 58890,
-    "hops": 2,
+    "candidates": 2,
+    "destination": 60138,
+    "hops": 5,
     "other_plane": false,
     "path": [
      68283,
      60144,
-     58890
+     58890,
+     68285,
+     60142,
+     60138
     ],
-    "destination_light_remaining_s": 1266,
-    "stay_s": 171.92507850000402,
-    "stay_from_trigger_s": 366,
-    "control_latency_ms": 10.281588597215285,
+    "destination_light_remaining_s": 1810,
+    "stay_s": 715.925078500004,
+    "stay_from_trigger_s": 910,
+    "control_latency_ms": 17.66067352464194,
     "downtime_fraction": {
-     "cold": 0.7643473880978625,
-     "hot": 0.03882674103294547
+     "cold": 0.18355340334679632,
+     "hot": 0.009324007079029067
     }
    },
    {
@@ -9618,23 +8701,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.525019250827814,
     "constrained_candidates": 8,
-    "candidates": 8,
-    "destination": 58890,
-    "hops": 3,
+    "candidates": 2,
+    "destination": 60138,
+    "hops": 6,
     "other_plane": true,
     "path": [
      62774,
      58883,
      58893,
-     58890
+     58890,
+     68285,
+     60142,
+     60138
     ],
-    "destination_light_remaining_s": 1251,
-    "stay_s": 156.92507850000402,
-    "stay_from_trigger_s": 351,
-    "control_latency_ms": 10.28187792249982,
+    "destination_light_remaining_s": 1795,
+    "stay_s": 700.925078500004,
+    "stay_from_trigger_s": 895,
+    "control_latency_ms": 17.66140190421337,
     "downtime_fraction": {
-     "cold": 0.8374090741652532,
-     "hot": 0.04253807335191683
+     "cold": 0.18748149942247685,
+     "hot": 0.009523543535171769
     }
    },
    {
@@ -9645,23 +8731,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.260613649494557,
     "constrained_candidates": 7,
-    "candidates": 6,
-    "destination": 68285,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     60144,
-     58890,
-     68285
-    ],
-    "destination_light_remaining_s": 1260,
-    "stay_s": 165.92507850000402,
-    "stay_from_trigger_s": 360,
-    "control_latency_ms": 11.501545187984977,
-    "downtime_fraction": {
-     "cold": 0.7919868767758026,
-     "hot": 0.040230750892718825
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58883-69735",
@@ -9671,24 +8742,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.258926313991312,
     "constrained_candidates": 6,
-    "candidates": 6,
-    "destination": 68285,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     58883,
-     58893,
-     58890,
-     68285
-    ],
-    "destination_light_remaining_s": 1244,
-    "stay_s": 149.92507850000402,
-    "stay_from_trigger_s": 344,
-    "control_latency_ms": 11.501136548100565,
-    "downtime_fraction": {
-     "cold": 0.8765076931408412,
-     "hot": 0.04452417545333017
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58890-69901",
@@ -9698,23 +8753,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.273281734404891,
     "constrained_candidates": 5,
-    "candidates": 4,
-    "destination": 60142,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     58890,
-     68285,
-     60142
-    ],
-    "destination_light_remaining_s": 1263,
-    "stay_s": 168.92507850000402,
-    "stay_from_trigger_s": 363,
-    "control_latency_ms": 13.980749907596785,
-    "downtime_fraction": {
-     "cold": 0.7779217027268981,
-     "hot": 0.0395162788098886
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58893-69915",
@@ -9724,24 +8764,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.304907465243359,
     "constrained_candidates": 4,
-    "candidates": 4,
-    "destination": 60142,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     58893,
-     58890,
-     68285,
-     60142
-    ],
-    "destination_light_remaining_s": 1249,
-    "stay_s": 154.92507850000402,
-    "stay_from_trigger_s": 349,
-    "control_latency_ms": 13.980185422691338,
-    "downtime_fraction": {
-     "cold": 0.8482195779555125,
-     "hot": 0.04308721715437636
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "68285-70079",
@@ -9751,23 +8775,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.481389358031375,
     "constrained_candidates": 3,
-    "candidates": 2,
-    "destination": 60138,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     68285,
-     60142,
-     60138
-    ],
-    "destination_light_remaining_s": 1266,
-    "stay_s": 171.92507850000402,
-    "stay_from_trigger_s": 366,
-    "control_latency_ms": 17.65434317889419,
-    "downtime_fraction": {
-     "cold": 0.7643473880978625,
-     "hot": 0.03882674103294547
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "62776-70096",
@@ -9777,24 +8786,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.513602680217286,
     "constrained_candidates": 2,
-    "candidates": 2,
-    "destination": 60138,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     62776,
-     62768,
-     60142,
-     60138
-    ],
-    "destination_light_remaining_s": 1249,
-    "stay_s": 154.92507850000402,
-    "stay_from_trigger_s": 349,
-    "control_latency_ms": 17.653092337551445,
-    "downtime_fraction": {
-     "cold": 0.8482195779555125,
-     "hot": 0.04308721715437636
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "60142-70264",
@@ -9848,23 +8841,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 17.662132171942805,
     "constrained_candidates": 13,
-    "candidates": 12,
-    "destination": 60144,
-    "hops": 3,
+    "candidates": 6,
+    "destination": 68285,
+    "hops": 5,
     "other_plane": false,
     "path": [
      60150,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285
     ],
-    "destination_light_remaining_s": 1448,
-    "stay_s": 353.925078500004,
-    "stay_from_trigger_s": 548,
-    "control_latency_ms": 10.25647408420467,
+    "destination_light_remaining_s": 1808,
+    "stay_s": 713.925078500004,
+    "stay_from_trigger_s": 908,
+    "control_latency_ms": 11.47971283181487,
     "downtime_fraction": {
-     "cold": 0.3712946402581544,
-     "hot": 0.018860744562887485
+     "cold": 0.18406761249527573,
+     "hot": 0.009350127486785632
     }
    },
    {
@@ -9875,24 +8870,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 17.65142374747155,
     "constrained_candidates": 12,
-    "candidates": 12,
-    "destination": 60144,
-    "hops": 4,
+    "candidates": 6,
+    "destination": 68285,
+    "hops": 6,
     "other_plane": true,
     "path": [
      58886,
      60150,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285
     ],
-    "destination_light_remaining_s": 1431,
-    "stay_s": 336.925078500004,
-    "stay_from_trigger_s": 531,
-    "control_latency_ms": 10.257887795479858,
+    "destination_light_remaining_s": 1791,
+    "stay_s": 696.925078500004,
+    "stay_from_trigger_s": 891,
+    "control_latency_ms": 11.48126364698093,
     "downtime_fraction": {
-     "cold": 0.39002880190765166,
-     "hot": 0.019812388349679938
+     "cold": 0.18855754908810804,
+     "hot": 0.00957820389295754
     }
    },
    {
@@ -9903,22 +8900,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 13.98127205636478,
     "constrained_candidates": 11,
-    "candidates": 10,
-    "destination": 60144,
-    "hops": 2,
+    "candidates": 4,
+    "destination": 60142,
+    "hops": 5,
     "other_plane": false,
     "path": [
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285,
+     60142
     ],
-    "destination_light_remaining_s": 1267,
-    "stay_s": 172.92507850000402,
-    "stay_from_trigger_s": 367,
-    "control_latency_ms": 10.266132259825746,
+    "destination_light_remaining_s": 1812,
+    "stay_s": 717.925078500004,
+    "stay_from_trigger_s": 912,
+    "control_latency_ms": 13.963738672768862,
     "downtime_fraction": {
-     "cold": 0.7599272808772789,
-     "hot": 0.03860221176645771
+     "cold": 0.18304205917219163,
+     "hot": 0.009298032204050441
     }
    },
    {
@@ -9929,23 +8929,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 13.982938194374166,
     "constrained_candidates": 10,
-    "candidates": 10,
-    "destination": 60144,
-    "hops": 3,
+    "candidates": 4,
+    "destination": 60142,
+    "hops": 6,
     "other_plane": true,
     "path": [
      62775,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285,
+     60142
     ],
-    "destination_light_remaining_s": 1251,
-    "stay_s": 156.92507850000402,
-    "stay_from_trigger_s": 351,
-    "control_latency_ms": 10.26648566807138,
+    "destination_light_remaining_s": 1796,
+    "stay_s": 701.925078500004,
+    "stay_from_trigger_s": 896,
+    "control_latency_ms": 13.964963193110556,
     "downtime_fraction": {
-     "cold": 0.8374090741652532,
-     "hot": 0.04253807335191683
+     "cold": 0.18721440325343397,
+     "hot": 0.009509975785810934
     }
    },
    {
@@ -9956,22 +8959,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.541133051773704,
     "constrained_candidates": 9,
-    "candidates": 8,
-    "destination": 58890,
-    "hops": 2,
+    "candidates": 2,
+    "destination": 60138,
+    "hops": 5,
     "other_plane": false,
     "path": [
      68283,
      60144,
-     58890
+     58890,
+     68285,
+     60142,
+     60138
     ],
-    "destination_light_remaining_s": 1267,
-    "stay_s": 172.92507850000402,
-    "stay_from_trigger_s": 367,
-    "control_latency_ms": 10.28036197173882,
+    "destination_light_remaining_s": 1811,
+    "stay_s": 716.925078500004,
+    "stay_from_trigger_s": 911,
+    "control_latency_ms": 17.65929839948472,
     "downtime_fraction": {
-     "cold": 0.7599272808772789,
-     "hot": 0.03860221176645771
+     "cold": 0.18329737463633353,
+     "hot": 0.009311001526065935
     }
    },
    {
@@ -9982,23 +8988,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.525210803435536,
     "constrained_candidates": 8,
-    "candidates": 8,
-    "destination": 58890,
-    "hops": 3,
+    "candidates": 2,
+    "destination": 60138,
+    "hops": 6,
     "other_plane": true,
     "path": [
      62774,
      58883,
      58893,
-     58890
+     58890,
+     68285,
+     60142,
+     60138
     ],
-    "destination_light_remaining_s": 1251,
-    "stay_s": 156.92507850000402,
-    "stay_from_trigger_s": 351,
-    "control_latency_ms": 10.280652127180572,
+    "destination_light_remaining_s": 1795,
+    "stay_s": 700.925078500004,
+    "stay_from_trigger_s": 895,
+    "control_latency_ms": 17.660059663514307,
     "downtime_fraction": {
-     "cold": 0.8374090741652532,
-     "hot": 0.04253807335191683
+     "cold": 0.18748149942247685,
+     "hot": 0.009523543535171769
     }
    },
    {
@@ -10009,23 +9018,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.258954725850952,
     "constrained_candidates": 7,
-    "candidates": 6,
-    "destination": 68285,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     60144,
-     58890,
-     68285
-    ],
-    "destination_light_remaining_s": 1260,
-    "stay_s": 165.92507850000402,
-    "stay_from_trigger_s": 360,
-    "control_latency_ms": 11.499361896015358,
-    "downtime_fraction": {
-     "cold": 0.7919868767758026,
-     "hot": 0.040230750892718825
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58883-75369",
@@ -10035,24 +9029,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.257884057661185,
     "constrained_candidates": 6,
-    "candidates": 6,
-    "destination": 68285,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     58883,
-     58893,
-     58890,
-     68285
-    ],
-    "destination_light_remaining_s": 1244,
-    "stay_s": 149.92507850000402,
-    "stay_from_trigger_s": 344,
-    "control_latency_ms": 11.498931593282125,
-    "downtime_fraction": {
-     "cold": 0.8765076931408412,
-     "hot": 0.04452417545333017
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58890-75535",
@@ -10062,23 +9040,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.271480449597387,
     "constrained_candidates": 5,
-    "candidates": 4,
-    "destination": 60142,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     58890,
-     68285,
-     60142
-    ],
-    "destination_light_remaining_s": 1263,
-    "stay_s": 168.92507850000402,
-    "stay_from_trigger_s": 363,
-    "control_latency_ms": 13.98000894868803,
-    "downtime_fraction": {
-     "cold": 0.7779217027268981,
-     "hot": 0.0395162788098886
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58893-75550",
@@ -10088,24 +9051,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.304707413615612,
     "constrained_candidates": 4,
-    "candidates": 4,
-    "destination": 60142,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     58893,
-     58890,
-     68285,
-     60142
-    ],
-    "destination_light_remaining_s": 1248,
-    "stay_s": 153.92507850000402,
-    "stay_from_trigger_s": 348,
-    "control_latency_ms": 13.979565903359115,
-    "downtime_fraction": {
-     "cold": 0.853730178217805,
-     "hot": 0.04336714046235359
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "68285-75713",
@@ -10115,23 +9062,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.478785352238567,
     "constrained_candidates": 3,
-    "candidates": 2,
-    "destination": 60138,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     68285,
-     60142,
-     60138
-    ],
-    "destination_light_remaining_s": 1266,
-    "stay_s": 171.92507850000402,
-    "stay_from_trigger_s": 366,
-    "control_latency_ms": 17.653152743807034,
-    "downtime_fraction": {
-     "cold": 0.7643473880978625,
-     "hot": 0.03882674103294547
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "62776-75730",
@@ -10141,24 +9073,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.512857804907851,
     "constrained_candidates": 2,
-    "candidates": 2,
-    "destination": 60138,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     62776,
-     62768,
-     60142,
-     60138
-    ],
-    "destination_light_remaining_s": 1249,
-    "stay_s": 154.92507850000402,
-    "stay_from_trigger_s": 349,
-    "control_latency_ms": 17.651883841395087,
-    "downtime_fraction": {
-     "cold": 0.8482195779555125,
-     "hot": 0.04308721715437636
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "60142-75898",
@@ -10212,23 +9128,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 17.661173609493126,
     "constrained_candidates": 13,
-    "candidates": 12,
-    "destination": 60144,
-    "hops": 3,
+    "candidates": 6,
+    "destination": 68285,
+    "hops": 5,
     "other_plane": false,
     "path": [
      60150,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285
     ],
-    "destination_light_remaining_s": 1448,
-    "stay_s": 353.925078500004,
-    "stay_from_trigger_s": 548,
-    "control_latency_ms": 10.256276979885918,
+    "destination_light_remaining_s": 1808,
+    "stay_s": 713.925078500004,
+    "stay_from_trigger_s": 908,
+    "control_latency_ms": 11.478893677049665,
     "downtime_fraction": {
-     "cold": 0.3712946402581544,
-     "hot": 0.018860744562887485
+     "cold": 0.18406761249527573,
+     "hot": 0.009350127486785632
     }
    },
    {
@@ -10239,24 +9157,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 17.6488552956781,
     "constrained_candidates": 12,
-    "candidates": 12,
-    "destination": 60144,
-    "hops": 4,
+    "candidates": 6,
+    "destination": 68285,
+    "hops": 6,
     "other_plane": true,
     "path": [
      58886,
      60150,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285
     ],
-    "destination_light_remaining_s": 1431,
-    "stay_s": 336.925078500004,
-    "stay_from_trigger_s": 531,
-    "control_latency_ms": 10.257496404782165,
+    "destination_light_remaining_s": 1791,
+    "stay_s": 696.925078500004,
+    "stay_from_trigger_s": 891,
+    "control_latency_ms": 11.480250846365148,
     "downtime_fraction": {
-     "cold": 0.39002880190765166,
-     "hot": 0.019812388349679938
+     "cold": 0.18855754908810804,
+     "hot": 0.00957820389295754
     }
    },
    {
@@ -10267,22 +9187,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 13.980042169215004,
     "constrained_candidates": 11,
-    "candidates": 10,
-    "destination": 60144,
-    "hops": 2,
+    "candidates": 4,
+    "destination": 60142,
+    "hops": 5,
     "other_plane": false,
     "path": [
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285,
+     60142
     ],
-    "destination_light_remaining_s": 1267,
-    "stay_s": 172.92507850000402,
-    "stay_from_trigger_s": 367,
-    "control_latency_ms": 10.264963340512484,
+    "destination_light_remaining_s": 1812,
+    "stay_s": 717.925078500004,
+    "stay_from_trigger_s": 912,
+    "control_latency_ms": 13.962925455148628,
     "downtime_fraction": {
-     "cold": 0.7599272808772789,
-     "hot": 0.03860221176645771
+     "cold": 0.18304205917219163,
+     "hot": 0.009298032204050441
     }
    },
    {
@@ -10293,23 +9216,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 13.98143346271241,
     "constrained_candidates": 10,
-    "candidates": 10,
-    "destination": 60144,
-    "hops": 3,
+    "candidates": 4,
+    "destination": 60142,
+    "hops": 6,
     "other_plane": true,
     "path": [
      62775,
      60141,
      68283,
-     60144
+     60144,
+     58890,
+     68285,
+     60142
     ],
-    "destination_light_remaining_s": 1251,
-    "stay_s": 156.92507850000402,
-    "stay_from_trigger_s": 351,
-    "control_latency_ms": 10.265301637483303,
+    "destination_light_remaining_s": 1796,
+    "stay_s": 701.925078500004,
+    "stay_from_trigger_s": 896,
+    "control_latency_ms": 13.964140574975705,
     "downtime_fraction": {
-     "cold": 0.8374090741652532,
-     "hot": 0.04253807335191683
+     "cold": 0.18721440325343397,
+     "hot": 0.009509975785810934
     }
    },
    {
@@ -10320,22 +9246,25 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.540922479422791,
     "constrained_candidates": 9,
-    "candidates": 8,
-    "destination": 58890,
-    "hops": 2,
+    "candidates": 2,
+    "destination": 60138,
+    "hops": 5,
     "other_plane": false,
     "path": [
      68283,
      60144,
-     58890
+     58890,
+     68285,
+     60142,
+     60138
     ],
-    "destination_light_remaining_s": 1267,
-    "stay_s": 172.92507850000402,
-    "stay_from_trigger_s": 367,
-    "control_latency_ms": 10.279106067168158,
+    "destination_light_remaining_s": 1811,
+    "stay_s": 716.925078500004,
+    "stay_from_trigger_s": 911,
+    "control_latency_ms": 17.65792777742853,
     "downtime_fraction": {
-     "cold": 0.7599272808772789,
-     "hot": 0.03860221176645771
+     "cold": 0.18329737463633353,
+     "hot": 0.009311001526065935
     }
    },
    {
@@ -10346,23 +9275,26 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.52538603164297,
     "constrained_candidates": 8,
-    "candidates": 8,
-    "destination": 58890,
-    "hops": 3,
+    "candidates": 2,
+    "destination": 60138,
+    "hops": 6,
     "other_plane": true,
     "path": [
      62774,
      58883,
      58893,
-     58890
+     58890,
+     68285,
+     60142,
+     60138
     ],
-    "destination_light_remaining_s": 1251,
-    "stay_s": 156.92507850000402,
-    "stay_from_trigger_s": 351,
-    "control_latency_ms": 10.279376108985526,
+    "destination_light_remaining_s": 1795,
+    "stay_s": 700.925078500004,
+    "stay_from_trigger_s": 895,
+    "control_latency_ms": 17.658671682088787,
     "downtime_fraction": {
-     "cold": 0.8374090741652532,
-     "hot": 0.04253807335191683
+     "cold": 0.18748149942247685,
+     "hot": 0.009523543535171769
     }
    },
    {
@@ -10373,23 +9305,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.257248272062617,
     "constrained_candidates": 7,
-    "candidates": 6,
-    "destination": 68285,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     60144,
-     58890,
-     68285
-    ],
-    "destination_light_remaining_s": 1260,
-    "stay_s": 165.92507850000402,
-    "stay_from_trigger_s": 360,
-    "control_latency_ms": 11.497100478667855,
-    "downtime_fraction": {
-     "cold": 0.7919868767758026,
-     "hot": 0.040230750892718825
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58883-81003",
@@ -10399,24 +9316,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.256806386895727,
     "constrained_candidates": 6,
-    "candidates": 6,
-    "destination": 68285,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     58883,
-     58893,
-     58890,
-     68285
-    ],
-    "destination_light_remaining_s": 1244,
-    "stay_s": 149.92507850000402,
-    "stay_from_trigger_s": 344,
-    "control_latency_ms": 11.49664847662411,
-    "downtime_fraction": {
-     "cold": 0.8765076931408412,
-     "hot": 0.04452417545333017
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58890-81169",
@@ -10426,23 +9327,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.26962610175028,
     "constrained_candidates": 5,
-    "candidates": 4,
-    "destination": 60142,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     58890,
-     68285,
-     60142
-    ],
-    "destination_light_remaining_s": 1263,
-    "stay_s": 168.92507850000402,
-    "stay_from_trigger_s": 363,
-    "control_latency_ms": 13.978577465913464,
-    "downtime_fraction": {
-     "cold": 0.7779217027268981,
-     "hot": 0.0395162788098886
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "58893-81184",
@@ -10452,24 +9338,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 10.303739268452123,
     "constrained_candidates": 4,
-    "candidates": 4,
-    "destination": 60142,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     58893,
-     58890,
-     68285,
-     60142
-    ],
-    "destination_light_remaining_s": 1248,
-    "stay_s": 153.92507850000402,
-    "stay_from_trigger_s": 348,
-    "control_latency_ms": 13.978144035697147,
-    "downtime_fraction": {
-     "cold": 0.853730178217805,
-     "hot": 0.04336714046235359
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "68285-81347",
@@ -10479,23 +9349,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.47610451464929,
     "constrained_candidates": 3,
-    "candidates": 2,
-    "destination": 60138,
-    "hops": 2,
-    "other_plane": false,
-    "path": [
-     68285,
-     60142,
-     60138
-    ],
-    "destination_light_remaining_s": 1266,
-    "stay_s": 171.92507850000402,
-    "stay_from_trigger_s": 366,
-    "control_latency_ms": 17.651945322431857,
-    "downtime_fraction": {
-     "cold": 0.7643473880978625,
-     "hot": 0.03882674103294547
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "62776-81364",
@@ -10505,24 +9360,8 @@
     "source_light_remaining_s": 900,
     "source_control_latency_ms": 11.512057776851716,
     "constrained_candidates": 2,
-    "candidates": 2,
-    "destination": 60138,
-    "hops": 3,
-    "other_plane": true,
-    "path": [
-     62776,
-     62768,
-     60142,
-     60138
-    ],
-    "destination_light_remaining_s": 1249,
-    "stay_s": 154.92507850000402,
-    "stay_from_trigger_s": 349,
-    "control_latency_ms": 17.65065845832004,
-    "downtime_fraction": {
-     "cold": 0.8482195779555125,
-     "hot": 0.04308721715437636
-    }
+    "candidates": 0,
+    "destination": null
    },
    {
     "event_id": "60142-81532",
@@ -10574,102 +9413,110 @@
    "laser_links.json": "c877cda66cbb719f447d7e7ba9b8831b0729a4d49a9751730c59b1e2c1fcf2f0",
    "domain.json": "7537c051b53f52e5be1217255cacd19fa40c04eb869508f1a761b8968cfc8533",
    "selected_constellation.json": "51960ca5d38b5cc146b20c005aa3e57c2a1b16a5b5ffe94dd0d06cf7abeb96bb",
-   "model_sha256": "10449a104717fa4e5f03ffb24d216b67e4cc8b4442ffb20576346ad33ea121d4",
-   "created_utc": "2026-11-12T13:50:01.737453+00:00"
+   "model_sha256": "0d482df25a3a1b23d1962782d26730a1b1137486c85c4033510ffdfe7d7b930f",
+   "created_utc": "2026-11-12T18:34:28.758980+00:00"
   }
  },
  "policy_selected": [
   {
-   "event_id": "62776-8114-cost",
-   "designed_event_id": "62768-8295",
-   "source": 62776,
-   "trigger_s": 8114,
-   "source_shadow_entry_s": 9014,
+   "event_id": "62774-7568-cost",
+   "source": 62774,
+   "trigger_s": 7568,
+   "source_shadow_entry_s": 8468,
    "source_light_remaining_s": 900,
    "reachable_satellites": 61,
    "destination": 60138,
-   "hops": 3,
+   "hops": 6,
    "path": [
-    62776,
-    62768,
+    62774,
+    58883,
+    58893,
+    58890,
+    68285,
     60142,
     60138
    ],
    "other_plane": true,
-   "destination_light_remaining_s": 1253,
-   "light_gained_s": 353,
+   "destination_light_remaining_s": 1799,
+   "light_gained_s": 899,
    "path_persistence_at_least_s": 900,
    "path_end_s": 86400,
-   "stay_s": 158.92507850000402,
-   "stay_from_trigger_s": 353,
-   "control_latency_ms": 17.663930147856995,
+   "stay_s": 704.925078500004,
+   "stay_from_trigger_s": 899,
+   "control_latency_ms": 17.66427894648226,
    "downtime_fraction": {
-    "cold": 0.8268706609447717,
-    "hot": 0.042002751000612584
+    "cold": 0.1864176615472722,
+    "hot": 0.009469503502688109
    },
+   "designed_event_id": "62768-8295",
    "same_destination": false,
    "replaces_designed_entry": true,
    "replacement_reason": "nessuna destinazione ammessa sull ingresso in ombra progettato: ingresso servito piu vicino nel tempo"
   },
   {
    "event_id": "62774-58281-cost",
-   "designed_event_id": "62774-58281",
    "source": 62774,
    "trigger_s": 58281,
    "source_shadow_entry_s": 59181,
    "source_light_remaining_s": 900,
    "reachable_satellites": 61,
-   "destination": 58890,
-   "hops": 3,
+   "destination": 60138,
+   "hops": 6,
    "path": [
     62774,
     58883,
     58893,
-    58890
+    58890,
+    68285,
+    60142,
+    60138
    ],
    "other_plane": true,
-   "destination_light_remaining_s": 1252,
-   "light_gained_s": 352,
+   "destination_light_remaining_s": 1796,
+   "light_gained_s": 896,
    "path_persistence_at_least_s": 900,
    "path_end_s": 86400,
-   "stay_s": 157.92507850000402,
-   "stay_from_trigger_s": 352,
-   "control_latency_ms": 10.284158388883506,
+   "stay_s": 701.925078500004,
+   "stay_from_trigger_s": 896,
+   "control_latency_ms": 17.662874899190466,
    "downtime_fraction": {
-    "cold": 0.8321065023247382,
-    "hot": 0.04226871731451004
+    "cold": 0.18721440325343397,
+    "hot": 0.009509975785810934
    },
+   "designed_event_id": "62774-58281",
    "same_destination": false,
    "replaces_designed_entry": false
   },
   {
    "event_id": "60150-80439-cost",
-   "designed_event_id": "60150-80439",
    "source": 60150,
    "trigger_s": 80439,
    "source_shadow_entry_s": 81339,
    "source_light_remaining_s": 900,
    "reachable_satellites": 61,
-   "destination": 60144,
-   "hops": 3,
+   "destination": 68285,
+   "hops": 5,
    "path": [
     60150,
     60141,
     68283,
-    60144
+    60144,
+    58890,
+    68285
    ],
    "other_plane": false,
-   "destination_light_remaining_s": 1448,
-   "light_gained_s": 548,
+   "destination_light_remaining_s": 1808,
+   "light_gained_s": 908,
    "path_persistence_at_least_s": 900,
    "path_end_s": 86400,
-   "stay_s": 353.925078500004,
-   "stay_from_trigger_s": 548,
-   "control_latency_ms": 10.256276979885918,
+   "stay_s": 713.925078500004,
+   "stay_from_trigger_s": 908,
+   "control_latency_ms": 11.478893677049665,
    "downtime_fraction": {
-    "cold": 0.3712946402581544,
-    "hot": 0.018860744562887485
+    "cold": 0.18406761249527573,
+    "hot": 0.009350127486785632
    },
+   "designed_event_id": "60150-80439",
    "same_destination": false,
    "replaces_designed_entry": false
   }

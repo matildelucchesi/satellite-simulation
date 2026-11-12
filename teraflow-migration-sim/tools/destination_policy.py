@@ -71,6 +71,8 @@ def main(argv=None):
     parser.add_argument('--profile', default='starlink-53-463-2x31')
     parser.add_argument('--downtime-from', required=True, metavar='EXPERIMENT', help='Esperimento completato (events-...)')
     parser.add_argument('--availability-min', type=float, default=model.DESTINATION_POLICY['availability_min'])
+    parser.add_argument('--minimum-stay-s', type=float, default=model.DESTINATION_POLICY['minimum_stay_s'],
+                        help='Permanenza minima sulla destinazione dopo la migrazione')
     parser.add_argument('--overhead-ms', type=float, default=model.DESTINATION_POLICY['overhead_ms'],
                         help='Termine costante misurato aggiunto alla latenza di controllo')
     parser.add_argument('--selection-mode', choices=('hot', 'cold'), default=model.DESTINATION_POLICY['selection_mode'],
@@ -88,7 +90,8 @@ def main(argv=None):
     limits = {name: events['parameters'][name] for name in
               ('trigger_lead_s', 'minimum_destination_light_s', 'minimum_path_persistence_s')}
     report = model.destination_policy_report(events['selected'], index, periods, domain, plane_of, distance_km, **limits,
-                                             availability_min=args.availability_min, downtime_s=downtime_s,
+                                             availability_min=args.availability_min, minimum_stay_s=args.minimum_stay_s,
+                                             downtime_s=downtime_s,
                                              duration_s=duration_s,
                                              overhead_ms=args.overhead_ms, downtime_source=source,
                                              selection_mode=args.selection_mode)

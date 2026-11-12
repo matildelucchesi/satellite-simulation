@@ -126,6 +126,24 @@ class LocalWebTests(unittest.TestCase):
                 urlopen(self.url + path, timeout=5)
             self.assertEqual(caught.exception.code, 404)
 
+    def test_controller_journey_from_the_analysis(self):
+        self.assertEqual(self.get('/api/v1/controller-journey'), {'available': False})
+        profile = self.root / 'artifacts/constellation-profiles/p'
+        profile.mkdir(parents=True)
+        (profile / 'events.json').write_text('{"selected": []}', encoding='utf-8')
+        from src.artifacts import file_digest
+        journeys = {'start': {'source': 1, 'trigger_s': 100},
+                    'variants': [{'key': 'fixed', 'summary': {'migrations': 1}, 'steps': [{'source': 1, 'destination': 2}]}]}
+        atomic_json(self.root / 'results/analysis/sliding-domain.json',
+                    {'profile': 'p', 'created_utc': 'x', 'policy': {'minimum_stay_s': 600},
+                     'inputs': {'events.json': file_digest(profile / 'events.json')}, 'journeys': journeys, 'fixed': {}})
+        row = self.get('/api/v1/controller-journey')
+        self.assertEqual((row['available'], row['stale'], row['journeys'], row['policy']), (True, False, journeys, {'minimum_stay_s': 600}))
+        self.assertNotIn('fixed', row)
+        # A catalogue rebuilt after the analysis makes it stale
+        (profile / 'events.json').write_text('{"selected": [1]}', encoding='utf-8')
+        self.assertTrue(self.get('/api/v1/controller-journey')['stale'])
+
     def test_topology_for_a_catalogue_event(self):
         ids = [1, 2, 3, 4]
         ticks = 120

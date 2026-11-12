@@ -30,6 +30,8 @@ function showPage(){
  const requested=location.hash.slice(1),page=PAGES.includes(requested)?requested:'lab';
  for(const name of PAGES)$('page-'+name).hidden=name!==page;
  document.querySelectorAll('.tabs a').forEach(link=>link.setAttribute('aria-current',link.dataset.page===page?'page':'false'));
+ /* The journey charts are sized on their panel: draw them again once it is visible */
+ if(page==='scenario'&&typeof journey!=='undefined'&&journey)renderJourney();
 }
 window.addEventListener('hashchange',showPage);
 
@@ -56,6 +58,16 @@ function renderProfile(){
  const thead=node('thead');thead.append(head);
  profile.selected_events.forEach((event,index)=>{const tr=node('tr');tr.append(node('td',String(index+1)),node('td',`${event.source} → ${event.destination}`),node('td',String(event.hops)),node('td',event.other_plane?'altro piano':'stesso piano'),node('td',clock(event.trigger_s)),node('td',Math.round(event.source_light_remaining_s/60)+' min'),node('td',Math.round(event.destination_light_remaining_s/60)+' min'));body.append(tr);});
  table.append(thead,body);const scroller=node('div',undefined,'table-scroll');scroller.append(table);box.append(scroller);
+ if(profile.policy_events?.length){
+  box.append(node('h2','Eventi della politica di costo'));
+  const policy=node('table'),policyHead=node('tr'),policyBody=node('tbody');
+  for(const title of ['N.','Migrazione','Salti','Destinazione','Ora','Permanenza','Latenza di controllo','Evento progettato'])policyHead.append(node('th',title));
+  const policyThead=node('thead');policyThead.append(policyHead);
+  profile.policy_events.forEach((event,index)=>{const tr=node('tr');tr.append(node('td',String(index+1)),node('td',`${event.source} → ${event.destination}`),node('td',String(event.hops)),node('td',event.other_plane?'altro piano':'stesso piano'),node('td',clock(event.trigger_s)),node('td',event.stay_s!=null?Math.round(event.stay_s)+' s':'—'),node('td',event.control_latency_ms!=null?milliseconds(event.control_latency_ms):'—'),node('td',`${event.replaces_designed_entry?'sostituisce':'stesso ingresso di'} ${event.designed_event_id}`));policyBody.append(tr);});
+  policy.append(policyThead,policyBody);const policyScroller=node('div',undefined,'table-scroll');policyScroller.append(policy);box.append(policyScroller);
+  const minimum=profile.destination_policy?.minimum_stay_s;
+  box.append(node('p',`La politica sceglie, fra le destinazioni su cui il controller resta disponibile almeno il ${percent(profile.destination_policy?.availability_min??0.95)} del tempo${minimum?` e resta almeno ${Math.round(minimum/60)} min dopo la migrazione`:''}, quella con la latenza di controllo minima.`,'small muted'));
+ }
  box.append(node('p',`Ogni evento parte ${Math.round(p.trigger_lead_s/60)} min prima che la sorgente entri in ombra. Gli eventi coprono 1, 5 e 7 salti laser, l’ultimo verso l’altro piano; ogni salto verso i satelliti che seguono sull’orbita dà circa 3 min di luce in più alla destinazione. La destinazione deve restare al sole almeno ${Math.round(p.minimum_destination_light_s/60)} min, con un percorso stabile per almeno ${Math.round(p.minimum_path_persistence_s/60)} min.`,'small muted'));
  renderPicker();
 }
@@ -63,7 +75,7 @@ function renderProfile(){
 function renderPicker(){
  const box=$('event-picker');box.replaceChildren();
  if(!profile)return;
- profile.selected_events.forEach((event,index)=>{const button=node('button',`Evento ${index+1}`);button.type='button';button.dataset.index=String(index+1);button.setAttribute('aria-pressed',String(index===0));button.addEventListener('click',()=>jumpToEvent(index+1));box.append(button);});
+ previewEvents().forEach((event,index)=>{const button=node('button',`Evento ${index+1}`);button.type='button';button.dataset.index=String(index+1);button.setAttribute('aria-pressed',String(index===0));button.addEventListener('click',()=>jumpToEvent(index+1));box.append(button);});
 }
 
 /* ---------- live orbit view ----------
@@ -88,9 +100,12 @@ function currentMission(){
  if(!job||job.job_id!==missionJob||!profile)return null;
  return missionState(missionEvents,jobEvents(job),job.operation);
 }
+/* Events the preview plays: those of the destination policy when its times come from an experiment
+   run with it, otherwise the designed events */
+function previewEvents(){return preview.source?.policy==='cost'&&profile?.policy_events?.length?profile.policy_events:profile?.selected_events||[];}
 function previewNow(now){
- if(!profile?.selected_events?.length)return null;
- if(!preview.script)preview.script=previewScript(profile.selected_events,preview.times,preview.speed);
+ if(!previewEvents().length)return null;
+ if(!preview.script)preview.script=previewScript(previewEvents(),preview.times,preview.speed);
  return previewPosition(preview.script,(now-preview.startMs)/1000);
 }
 /* Rebuild the script (new speed or new measured times) keeping the position on screen. */
@@ -111,19 +126,21 @@ function jumpToEvent(index){
 const shortDate=iso=>new Date(iso).toLocaleString('it-IT',{dateStyle:'short',timeStyle:'short'});
 function previewSources(){
  if(!profile)return [];
- const ids=profile.selected_events.map(event=>event.event_id),out=[];
+ const out=[];
  for(const job of jobs){
   const id=job.progress?.comparison_id;if(!id)continue;
+  const policy=job.operation==='compare_events'&&job.parameters?.policy==='cost'?'cost':'designed';
+  const ids=jobEvents(job).map(event=>event.event_id);
   if(job.operation==='functional'&&job.status==='completed'){
    const row=verificationRows.find(entry=>entry.comparison_id===id),index=row?ids.indexOf(row.event?.catalog_event_id):-1;
    if(index<0)continue;
-   out.push({jobId:job.job_id,kind:'verifica',created:job.created_utc,map:{1:index+1},label:`Verifica del ${shortDate(job.created_utc)} · evento ${index+1}`});
+   out.push({jobId:job.job_id,kind:'verifica',policy,created:job.created_utc,map:{1:index+1},label:`Verifica del ${shortDate(job.created_utc)} · evento ${index+1}`});
   }else if(job.operation==='compare_events'){
    const row=comparisons.find(entry=>entry.comparison_id===id);if(!row)continue;
    const map={};for(const event of row.events||[]){const index=ids.indexOf(event.catalog_event_id);if(index>=0)map[event.index]=index+1;}
    if(!Object.keys(map).length)continue;
-   out.push({jobId:job.job_id,kind:'esperimento',created:job.created_utc,map,
-    label:`Esperimento del ${shortDate(job.created_utc)} · ${row.complete?'completato':`${row.completed_runs??0} di ${row.run_total??'?'} prove`}`});
+   out.push({jobId:job.job_id,kind:'esperimento',policy,created:job.created_utc,map,
+    label:`Esperimento del ${shortDate(job.created_utc)} · ${POLICY_NAMES[policy]} · ${row.complete?'completato':`${row.completed_runs??0} di ${row.run_total??'?'} prove`}`});
   }
  }
  return out;
@@ -144,7 +161,14 @@ function renderPreviewSources(){
 $('preview-source').addEventListener('change',event=>{preview.chosen=event.target.value;renderPreviewSources();lastPanel=0;});
 /* Phase times of one job, read once from its event stream and kept for the session. */
 function loadPreviewSource(source){
- const use=times=>{if(preview.chosen===source.jobId)rebuildPreview(()=>{preview.times=times;preview.source=source;});lastPanel=0;};
+ const use=times=>{
+  if(preview.chosen===source.jobId){
+   /* Another set of events (designed or policy): the preview starts again from the first one */
+   const changes=(preview.source?.policy||'designed')!==source.policy;
+   if(changes){preview.times=times;preview.source=source;preview.script=null;preview.startMs=Date.now();sceneSample.eventId=null;renderPicker();}
+   else rebuildPreview(()=>{preview.times=times;preview.source=source;});
+  }
+  lastPanel=0;};
  if(preview.cache[source.jobId])return use(preview.cache[source.jobId]);
  if(preview.loading===source.jobId)return;
  preview.loading=source.jobId;lastPanel=0;
@@ -235,7 +259,7 @@ function renderMission(view,wall){
  });
  let status='';
  if(m.preview){
-  status=`${m.stage==='completed'?`Migrazione completata: il controller ora è su ${event.destination}. `:''}Anteprima, nessun job in corso: ogni evento in Hot e poi in Cold, con i tempi della prova indicata sopra; la fonte si sceglie nel menu «Tempi da». Le fasi più brevi sono rallentate per renderle visibili.`;
+  status=`${m.stage==='completed'?`Migrazione completata: il controller ora è su ${event.destination}. `:''}Anteprima, nessun job in corso: ${preview.source?.policy==='cost'?'eventi scelti dalla politica di costo, ':''}ogni evento in Hot e poi in Cold, con i tempi della prova indicata sopra; la fonte si sceglie nel menu «Tempi da». Le fasi più brevi sono rallentate per renderle visibili.`;
  }
  else if(m.stage==='waiting'||m.stage==='preparing')status=`Preparazione del laboratorio${m.preparation?': '+m.preparation.toLowerCase():''}. L’orbita resta ferma a T−30 s.`;
  else if(m.stage==='countdown')status='Laboratorio pronto: l’orbita avanza verso il trigger.';
@@ -477,7 +501,7 @@ function policySummary(comparison){
   return section;
  }
  const mode=parameters.selection_mode||'hot',source=parameters.downtime_source||{};
- section.append(node('p',`Ammessa una destinazione se la disponibilità in ${methodLabel(mode)} è almeno ${percent(parameters.availability_min)}: downtime ${duration(parameters.downtime_s?.[mode])} sulla permanenza contata dalla fine della migrazione più lunga (${duration(Math.max(...Object.values(parameters.duration_s||{0:0})))}). Fra le ammesse vince la latenza di controllo minima, poi meno salti, poi l’id NORAD minore.`,'small'));
+ section.append(node('p',`Ammessa una destinazione se la disponibilità in ${methodLabel(mode)} è almeno ${percent(parameters.availability_min)}: downtime ${duration(parameters.downtime_s?.[mode])} sulla permanenza contata dalla fine della migrazione più lunga (${duration(Math.max(...Object.values(parameters.duration_s||{0:0})))})${parameters.minimum_stay_s?`, e permanenza di almeno ${duration(parameters.minimum_stay_s)}`:''}. Fra le ammesse vince la latenza di controllo minima, poi meno salti, poi l’id NORAD minore.`,'small'));
  if(source.experiment)section.append(node('p',`Tempi misurati in ${source.experiment.slice(0,15)}…: Hot ${duration(parameters.downtime_s?.hot)} di downtime e ${duration(parameters.duration_s?.hot)} di durata, Cold ${duration(parameters.downtime_s?.cold)} e ${duration(parameters.duration_s?.cold)}.`,'small muted'));
  const designed=Object.fromEntries((profile?.selected_events||[]).map(event=>[event.event_id,event]));
  section.append(table(['Evento','Scelta della politica','Evento progettato','Permanenza',`Disponibilità ${methodLabel(mode)} attesa`,'Latenza di controllo'],
@@ -567,9 +591,114 @@ async function refresh(){
   renderComponents();renderLatest();renderJob();renderResults();renderPreviewSources();
  }catch(error){$('health').textContent='Console non collegata: '+error.message;$('health').dataset.state='error';}
 }
+/* ---------- the controller over the day (model) ----------
+   From tools/sliding_domain.py: the cost policy follows the controller from one shadow entry to
+   the next, in the laboratory's fixed domain or in a domain rebuilt around it. Three charts share
+   the time of day: which satellite hosts the controller, the control latency and the stay at each
+   migration. Every mark has a tooltip; the table lists the same migrations. */
+const JOURNEY_KEY='console.journey',SVG='http://www.w3.org/2000/svg';
+const STOPS={replay_end:'fine del replay',no_admissible_destination:'nessuna destinazione ammessa'};
+let journey=null,journeyChoice='';
+try{journeyChoice=localStorage.getItem(JOURNEY_KEY)||'';}catch{}
+function svgNode(tag,attributes,text){const element=document.createElementNS(SVG,tag);for(const [key,value] of Object.entries(attributes||{}))element.setAttribute(key,value);if(text!==undefined)element.textContent=text;return element;}
+const hourLabel=seconds=>`${String(Math.floor(seconds/3600)).padStart(2,'0')}:00`;
+async function loadJourney(){
+ try{journey=await api('/controller-journey');}catch{journey={available:false,error:true};}
+ renderJourney();
+}
+function journeyVariant(){
+ const variants=journey?.journeys?.variants||[];
+ return variants.find(row=>row.key===journeyChoice)||variants.find(row=>row.key==='following-7')||variants[0]||null;
+}
+function stepText(step){
+ return `${clock(step.trigger_s)} · ${step.source} → ${step.destination} · ${step.hops} salti, ${step.other_plane?'altro piano':'stesso piano'}\n`+
+  `Permanenza ${duration(step.stay_s)} · latenza ${milliseconds(step.control_latency_ms)} · ${step.admissible_destinations} destinazioni ammesse`+
+  (step.switches_changed?`\n${step.switches_changed} satelliti cambiano dominio (entrano ${step.joined.join(', ')})`:'');
+}
+/* One chart: time of day on x, a measure on y, a dot per migration (filled: same plane; ring:
+   other plane). `lanes` draws the hosting satellite as a band per plane instead of dots. */
+function journeyChart(box,title,steps,{value,unit,lanes,end,stopAt,format},tip){
+ const figure=node('figure',undefined,'journey-chart');figure.append(node('figcaption',unit?`${title} (${unit})`:title));box.append(figure);
+ const width=Math.max(320,figure.clientWidth||box.clientWidth||720),height=lanes?92:150,left=56,right=12,top=10,bottom=26;
+ const plotW=width-left-right,plotH=height-top-bottom,x=seconds=>left+seconds/86400*plotW;
+ const svg=svgNode('svg',{viewBox:`0 0 ${width} ${height}`,width:'100%',height,role:'img','aria-label':title});
+ for(let hour=0;hour<=24;hour+=3){
+  svg.append(svgNode('line',{x1:x(hour*3600),x2:x(hour*3600),y1:top,y2:top+plotH,class:'grid'}));
+  svg.append(svgNode('text',{x:x(hour*3600),y:height-6,'text-anchor':hour===0?'start':hour===24?'end':'middle',class:'tick'},hourLabel(hour*3600)));
+ }
+ let y;
+ if(lanes){
+  y=plane=>top+(plane===0?plotH*.25:plotH*.75);
+  ['Piano 1','Piano 2'].forEach((label,plane)=>svg.append(svgNode('text',{x:left-8,y:y(plane)+4,'text-anchor':'end',class:'tick'},label)));
+ }else{
+  const values=steps.map(value),max=Math.max(...values,1),grain=max>100?200:10,nice=Math.ceil(max/grain)*grain;
+  y=v=>top+plotH-v/nice*plotH;
+  for(const v of [0,nice/2,nice]){svg.append(svgNode('line',{x1:left,x2:left+plotW,y1:y(v),y2:y(v),class:v===0?'baseline':'grid'}));svg.append(svgNode('text',{x:left-8,y:y(v)+4,'text-anchor':'end',class:'tick'},format(v)));}
+   }
+ steps.forEach((step,index)=>{
+  const cx=x(step.trigger_s);let mark;
+  if(lanes){
+   /* The controller sits on the destination from this migration to the next one */
+   const until=index+1<steps.length?steps[index+1].trigger_s:end;
+   const plane=step.destination_plane??0;
+   mark=svgNode('rect',{x:cx,y:y(plane)-7,width:Math.max(2,x(until)-cx-2),height:14,rx:2,class:'lane'});
+  }else{
+   mark=svgNode('circle',{cx,cy:y(value(step)),r:4,class:step.other_plane?'dot ring':'dot'});
+  }
+  const hit=lanes?mark:svgNode('circle',{cx,cy:mark.getAttribute('cy'),r:10,class:'hit'});
+  hit.addEventListener('pointerenter',event=>tip(event,stepText(step)));hit.addEventListener('pointermove',event=>tip(event,stepText(step)));
+  hit.addEventListener('pointerleave',()=>tip(null));
+  svg.append(mark);if(hit!==mark)svg.append(hit);
+ });
+ if(stopAt!==null){svg.append(svgNode('line',{x1:x(stopAt),x2:x(stopAt),y1:top,y2:top+plotH,class:'stop'}));}
+ figure.append(svg);
+}
+function renderJourney(){
+ const box=$('journey');if(!box)return;box.replaceChildren();
+ box.append(node('h2','Il controller nel tempo'));
+ box.append(node('p','Analisi del modello orbitale, non del laboratorio: la politica di costo decide a ogni ingresso in ombra del satellite che ospita il controller e lo segue per tutto il giorno. Con il dominio fisso del laboratorio, o con un dominio ricostruito attorno al controller a ogni migrazione.','small muted'));
+ if(!journey?.available||!journey.journeys){box.append(node('p',journey?.error?'Analisi non leggibile.':'Analisi non ancora eseguita: tools/sliding_domain.py.','small'));return;}
+ if(journey.stale)box.append(node('p','Il catalogo è cambiato dopo l’analisi: rieseguire tools/sliding_domain.py.','small error'));
+ const variant=journeyVariant(),head=node('div',undefined,'journey-head'),label=node('label',undefined,'select'),select=node('select');
+ label.append('Dominio ',select);
+ for(const row of journey.journeys.variants){const option=node('option',`${row.label} · ${row.summary.migrations} migrazioni`);option.value=row.key;option.selected=row.key===variant?.key;select.append(option);}
+ select.addEventListener('change',()=>{journeyChoice=select.value;try{localStorage.setItem(JOURNEY_KEY,journeyChoice);}catch{}renderJourney();});
+ const start=journey.journeys.start,policy=journey.policy||{};
+ head.append(label,node('p',`Partenza: ${start.source} alle ${clock(start.trigger_s)} · disponibilità Hot ≥ ${percent(policy.availability_min??0.95)}${policy.minimum_stay_s?` · permanenza ≥ ${duration(policy.minimum_stay_s)}`:''}`,'small muted'));
+ box.append(head);
+ const s=variant.summary,steps=variant.steps;
+ const tiles=node('dl',undefined,'journey-tiles');
+ const tile=(term,value)=>{const item=node('div');item.append(node('dt',term),node('dd',value));tiles.append(item);};
+ tile('Migrazioni',String(s.migrations));
+ tile('Fine',s.migrations?`${clock(s.first_trigger_s+s.span_s)} · ${STOPS[s.stop]||s.stop}`:STOPS[s.stop]||s.stop);
+ tile('Una migrazione ogni',s.migrations>1?`${Math.round(s.mean_interval_s/60)} min`:'—');
+ tile('Permanenza media',s.migrations?duration(s.mean_stay_s):'—');
+ tile('Latenza media',s.migrations?milliseconds(s.mean_control_latency_ms):'—');
+ tile('Satelliti che cambiano dominio',s.mean_switches_changed!=null?`${Math.round(s.mean_switches_changed)} su ${variant.domain?.length??16} a migrazione`:'nessuno (dominio fisso)');
+ box.append(tiles);
+ if(!steps.length){box.append(node('p','La politica non trova nessuna destinazione ammessa già alla partenza: con questo dominio il controller non può migrare.','small'));return;}
+ const charts=node('div',undefined,'journey-charts'),tipBox=node('div',undefined,'chart-tip');tipBox.hidden=true;charts.append(tipBox);box.append(charts);
+ const tip=(event,text)=>{if(!event){tipBox.hidden=true;return;}const area=charts.getBoundingClientRect();tipBox.textContent=text;tipBox.hidden=false;
+  const x=Math.min(event.clientX-area.left+12,area.width-tipBox.offsetWidth-4);tipBox.style.left=Math.max(0,x)+'px';tipBox.style.top=(event.clientY-area.top+14)+'px';};
+ const placed=steps;
+ const end=s.first_trigger_s+s.span_s,stopAt=s.stop==='no_admissible_destination'?end:null;
+ journeyChart(charts,'Satellite che ospita il controller',placed,{lanes:true,end,stopAt},tip);
+ journeyChart(charts,'Latenza di controllo della destinazione',placed,{value:step=>step.control_latency_ms,unit:'ms',format:v=>String(Math.round(v)),stopAt},tip);
+ journeyChart(charts,'Permanenza dopo la migrazione',placed,{value:step=>step.stay_s,unit:'s',format:v=>String(Math.round(v)),stopAt},tip);
+ const legend=node('p',undefined,'small muted journey-legend');
+ legend.append(node('span','●','key'),'destinazione sullo stesso piano',node('span','○','key'),'sull’altro piano',node('span','▬','key'),'periodo in cui il controller resta su un satellite del piano'+(stopAt!==null?' · la linea tratteggiata segna dove la politica si ferma':''));
+ box.append(legend);
+ const details=node('details',undefined,'event-detail'),summary=node('summary');summary.append(node('span','Tutte le migrazioni','event-name'));details.append(summary);
+ details.append(table(['Ora','Migrazione','Salti','Piano','Permanenza','Latenza','Ammesse','Cambiano dominio'],
+  steps.map(step=>[clock(step.trigger_s),`${step.source} → ${step.destination}`,String(step.hops),step.other_plane?'altro':'stesso',duration(step.stay_s),milliseconds(step.control_latency_ms),String(step.admissible_destinations),step.switches_changed==null?'—':String(step.switches_changed)])));
+ box.append(details);
+}
+let journeyWidth=0;
+new ResizeObserver(entries=>{const width=Math.round(entries[0].contentRect.width);if(journey&&Math.abs(width-journeyWidth)>40){journeyWidth=width;renderJourney();}}).observe(document.documentElement);
+
 async function loadProfile(){
  try{const {profiles}=await api('/scenario-profiles');profile=profiles.find(row=>row.installed&&row.summary)||profiles.find(row=>row.summary)||null;}catch{profile=null;}
- preview.script=null;renderProfile();renderPolicy();
+ preview.script=null;renderProfile();renderPolicy();loadJourney();
  if(!profile)orbitLoader('error','Nessuno scenario installato: la vista orbitale resta vuota.');
 }
 document.addEventListener('DOMContentLoaded',async()=>{

@@ -468,7 +468,7 @@ def designed_events(index, periods, domain, plane_of, specs=EVENT_SPECS, *, trig
 # 1290 s) to keep the controller available for 90 % of the stay, and the first designed source
 # has only stays of about 180 s. Hot at 95 % serves 180 of 240 shadow entries (12 November 2026):
 # the four satellites at the front of the domain never have a destination that stays long enough.
-DESTINATION_POLICY = {'availability_min': 0.95, 'selection_mode': 'hot',
+DESTINATION_POLICY = {'availability_min': 0.95, 'minimum_stay_s': 600.0, 'selection_mode': 'hot',
                       'downtime_s': {'hot': 6.7, 'cold': 131.4}, 'duration_s': {'hot': 179.0, 'cold': 194.0},
                       'overhead_ms': 0.0,
                       'downtime_source': 'mediane di downtime e durata dell esperimento events-f77d737a04914dc6b964f8dcd3fd8751 (8 novembre 2026)'}
@@ -545,14 +545,16 @@ def destination_candidates(index, periods, domain, plane_of, source, shadow_entr
     return trigger, rows
 
 
-def admissible(row, availability_min, selection_mode):
-    """Whether the controller stays available for at least ``availability_min`` of the stay."""
-    return row['downtime_fraction'][selection_mode] <= 1.0 - availability_min + 1e-12
+def admissible(row, availability_min, selection_mode, minimum_stay_s=0.0):
+    """Whether the controller stays available for at least ``availability_min`` of the stay and
+    stays at least ``minimum_stay_s``, so it does not migrate again soon after arriving."""
+    return (row['downtime_fraction'][selection_mode] <= 1.0 - availability_min + 1e-12
+            and row['stay_s'] >= minimum_stay_s)
 
 
 def policy_candidates(index, periods, domain, plane_of, source, shadow_entry, distance_km, *, trigger_lead_s,
                       minimum_destination_light_s, minimum_path_persistence_s,
-                      availability_min=DESTINATION_POLICY['availability_min'],
+                      availability_min=DESTINATION_POLICY['availability_min'], minimum_stay_s=DESTINATION_POLICY['minimum_stay_s'],
                       selection_mode=DESTINATION_POLICY['selection_mode'],
                       downtime_s=DESTINATION_POLICY['downtime_s'], duration_s=DESTINATION_POLICY['duration_s'],
                       overhead_ms=DESTINATION_POLICY['overhead_ms']):
@@ -562,7 +564,7 @@ def policy_candidates(index, periods, domain, plane_of, source, shadow_entry, di
                                            minimum_destination_light_s=minimum_destination_light_s,
                                            minimum_path_persistence_s=minimum_path_persistence_s,
                                            downtime_s=downtime_s, duration_s=duration_s, overhead_ms=overhead_ms)
-    return trigger, [row for row in rows if admissible(row, availability_min, selection_mode)]
+    return trigger, [row for row in rows if admissible(row, availability_min, selection_mode, minimum_stay_s)]
 
 
 def _shadow_entries(index, periods, domain, trigger_lead_s):
@@ -590,7 +592,7 @@ def _limits(trigger_lead_s, minimum_destination_light_s, minimum_path_persistenc
 
 
 def policy_events(index, periods, domain, plane_of, distance_km, *, trigger_lead_s, minimum_destination_light_s,
-                  minimum_path_persistence_s, availability_min=DESTINATION_POLICY['availability_min'],
+                  minimum_path_persistence_s, availability_min=DESTINATION_POLICY['availability_min'], minimum_stay_s=DESTINATION_POLICY['minimum_stay_s'],
                   selection_mode=DESTINATION_POLICY['selection_mode'], downtime_s=DESTINATION_POLICY['downtime_s'],
                   duration_s=DESTINATION_POLICY['duration_s'], overhead_ms=DESTINATION_POLICY['overhead_ms'],
                   _candidates=None):
@@ -600,7 +602,7 @@ def policy_events(index, periods, domain, plane_of, distance_km, *, trigger_lead
     entries = _candidates if _candidates is not None else _all_candidates(index, periods, domain, plane_of, distance_km, limits)
     events = []
     for source, end, trigger, rows in entries:
-        chosen = [row for row in rows if admissible(row, availability_min, selection_mode)]
+        chosen = [row for row in rows if admissible(row, availability_min, selection_mode, minimum_stay_s)]
         event = {'event_id': f'{source}-{trigger}', 'source': source, 'trigger_s': trigger,
                  'source_shadow_entry_s': end, 'source_light_remaining_s': end - trigger,
                  'source_control_latency_ms': control_latency_ms(index.segment(trigger)[2], domain, source,
@@ -634,6 +636,7 @@ def policy_summary(events, selection_mode=DESTINATION_POLICY['selection_mode']):
 
 def policy_sensitivity(index, periods, domain, plane_of, distance_km, *, trigger_lead_s, minimum_destination_light_s,
                        minimum_path_persistence_s, selection_mode=DESTINATION_POLICY['selection_mode'],
+                       minimum_stay_s=DESTINATION_POLICY['minimum_stay_s'],
                        downtime_s=DESTINATION_POLICY['downtime_s'], duration_s=DESTINATION_POLICY['duration_s'],
                        overhead_ms=DESTINATION_POLICY['overhead_ms'], thresholds=SENSITIVITY_THRESHOLDS, _candidates=None):
     """For each availability threshold: how many shadow entries the policy serves and with which
@@ -643,14 +646,14 @@ def policy_sensitivity(index, periods, domain, plane_of, distance_km, *, trigger
     rows = []
     for threshold in thresholds:
         events = policy_events(index, periods, domain, plane_of, distance_km, **limits, availability_min=threshold,
-                               selection_mode=selection_mode, _candidates=entries)
+                               minimum_stay_s=minimum_stay_s, selection_mode=selection_mode, _candidates=entries)
         rows.append({'availability_min': threshold, **policy_summary(events, selection_mode)})
     return rows
 
 
 def compare_with_policy(designed, index, periods, domain, plane_of, distance_km, *, trigger_lead_s,
                         minimum_destination_light_s, minimum_path_persistence_s,
-                        availability_min=DESTINATION_POLICY['availability_min'],
+                        availability_min=DESTINATION_POLICY['availability_min'], minimum_stay_s=DESTINATION_POLICY['minimum_stay_s'],
                         selection_mode=DESTINATION_POLICY['selection_mode'], downtime_s=DESTINATION_POLICY['downtime_s'],
                         duration_s=DESTINATION_POLICY['duration_s'], overhead_ms=DESTINATION_POLICY['overhead_ms']):
     """For each designed event: its destination and the policy's at the same shadow entry of the
@@ -665,14 +668,14 @@ def compare_with_policy(designed, index, periods, domain, plane_of, distance_km,
                                          minimum_destination_light_s=minimum_destination_light_s,
                                          minimum_path_persistence_s=minimum_path_persistence_s,
                                          downtime_s=downtime_s, duration_s=duration_s, overhead_ms=overhead_ms)
-        chosen = [row for row in rows if admissible(row, availability_min, selection_mode)]
+        chosen = [row for row in rows if admissible(row, availability_min, selection_mode, minimum_stay_s)]
         mine = next((row for row in rows if row['destination'] == event['destination']), None)
         out.append({'event_id': event['event_id'], 'source': event['source'], 'trigger_s': event['trigger_s'],
                     'source_shadow_entry_s': event['source_shadow_entry_s'],
                     # A designed destination absent from the candidates fails a constraint: with the
                     # stay counted from the end of the migration, its own trigger comes too early
                     'designed': ({field: mine[field] for field in fields}
-                                 | {'feasible': True, 'admissible': admissible(mine, availability_min, selection_mode)})
+                                 | {'feasible': True, 'admissible': admissible(mine, availability_min, selection_mode, minimum_stay_s)})
                                 if mine else {'destination': event['destination'], 'hops': event['hops'],
                                               'feasible': False, 'admissible': False},
                     'policy': {field: chosen[0][field] for field in fields} if chosen else None,
@@ -680,6 +683,43 @@ def compare_with_policy(designed, index, periods, domain, plane_of, distance_km,
                     'candidates': len(chosen), 'constrained_candidates': len(rows),
                     'same_destination': bool(chosen) and chosen[0]['destination'] == event['destination']})
     return out
+
+
+def _catalogue_entry(event, index, minimum_path_persistence_s):
+    """A policy choice as a catalogue entry: the fields of a designed event plus the policy's figures."""
+    source, trigger, shadow = event['source'], event['trigger_s'], event['source_shadow_entry_s']
+    source_light = shadow - trigger
+    return {'event_id': f'{source}-{trigger}-cost', 'source': source, 'trigger_s': trigger, 'source_shadow_entry_s': shadow,
+            'source_light_remaining_s': source_light, 'reachable_satellites': len(index.hops(source, trigger)[0]) - 1,
+            'destination': event['destination'], 'hops': event['hops'], 'path': event['path'],
+            'other_plane': event['other_plane'], 'destination_light_remaining_s': event['destination_light_remaining_s'],
+            'light_gained_s': event['destination_light_remaining_s'] - source_light,
+            'path_persistence_at_least_s': minimum_path_persistence_s,
+            'path_end_s': index.path_end(source, event['destination'], trigger),
+            'stay_s': event['stay_s'], 'stay_from_trigger_s': event['stay_from_trigger_s'],
+            'control_latency_ms': event['control_latency_ms'], 'downtime_fraction': event['downtime_fraction']}
+
+
+def policy_chains(events):
+    """Every chain of the policy's choices that follows the controller: the next migration is the
+    one the policy makes at the next shadow entry of the satellite now hosting the controller. A
+    chain starts at a served shadow entry and stops at a host without an admissible destination or
+    whose shadow entry falls outside the replay. Returned as lists of events."""
+    by_entry = {(event['source'], event['source_shadow_entry_s']): event for event in events}
+    chains = []
+    for first in events:
+        if first['destination'] is None:
+            continue
+        chain, event = [first], first
+        while True:
+            # The destination is in light at the trigger: its shadow entry ends that light period
+            following = by_entry.get((event['destination'], event['trigger_s'] + event['destination_light_remaining_s']))
+            if following is None or following['destination'] is None:
+                break
+            chain.append(following)
+            event = following
+        chains.append(chain)
+    return chains
 
 
 def policy_selected_events(comparison, events, index, minimum_path_persistence_s):
@@ -702,21 +742,12 @@ def policy_selected_events(comparison, events, index, minimum_path_persistence_s
                 raise ValueError('Nessun ingresso in ombra servito dalla politica per sostituire ' + row['event_id'])
             event = min(options, key=lambda event: (abs(event['trigger_s'] - row['trigger_s']), event['source']))
             used.add((event['source'], event['trigger_s']))
-            chosen, source, trigger, shadow = event, event['source'], event['trigger_s'], event['source_shadow_entry_s']
         else:
-            chosen, source, trigger, shadow = row['policy'], row['source'], row['trigger_s'], row['source_shadow_entry_s']
-        source_light = shadow - trigger
-        pick = {'event_id': f'{source}-{trigger}-cost', 'designed_event_id': row['event_id'],
-                'source': source, 'trigger_s': trigger, 'source_shadow_entry_s': shadow,
-                'source_light_remaining_s': source_light, 'reachable_satellites': len(index.hops(source, trigger)[0]) - 1,
-                'destination': chosen['destination'], 'hops': chosen['hops'], 'path': chosen['path'],
-                'other_plane': chosen['other_plane'], 'destination_light_remaining_s': chosen['destination_light_remaining_s'],
-                'light_gained_s': chosen['destination_light_remaining_s'] - source_light,
-                'path_persistence_at_least_s': minimum_path_persistence_s,
-                'path_end_s': index.path_end(source, chosen['destination'], trigger),
-                'stay_s': chosen['stay_s'], 'stay_from_trigger_s': chosen['stay_from_trigger_s'],
-                'control_latency_ms': chosen['control_latency_ms'], 'downtime_fraction': chosen['downtime_fraction'],
-                'same_destination': row['same_destination'], 'replaces_designed_entry': replaced}
+            event = {**row['policy'], 'source': row['source'], 'trigger_s': row['trigger_s'],
+                     'source_shadow_entry_s': row['source_shadow_entry_s']}
+        pick = _catalogue_entry(event, index, minimum_path_persistence_s)
+        pick.update(designed_event_id=row['event_id'], same_destination=row['same_destination'],
+                    replaces_designed_entry=replaced)
         if replaced:
             pick['replacement_reason'] = ('nessuna destinazione ammessa sull ingresso in ombra progettato: '
                                           'ingresso servito piu vicino nel tempo')
@@ -724,9 +755,113 @@ def policy_selected_events(comparison, events, index, minimum_path_persistence_s
     return picks
 
 
+# ---------------------------------------------------------------- domain that follows the controller
+# Analysis only: the laboratory keeps the fixed domain of ``choose_domain``.
+
+def domain_around(host, plane_of, latitude_deg, size_per_plane, behind=None):
+    """Domain centred on ``host``: ``size_per_plane`` consecutive satellites of its plane ring,
+    ordered by argument of latitude, with ``behind`` of them trailing the host (default half),
+    and the satellites of the other plane closest to that arc, as in ``choose_domain``.
+
+    ``latitude_deg`` maps every satellite to its argument of latitude at the instant considered."""
+    behind = size_per_plane // 2 if behind is None else behind
+    plane = plane_of[host]
+    ring = sorted((sid for sid in latitude_deg if plane_of[sid] == plane), key=lambda sid: (latitude_deg[sid], sid))
+    others = [sid for sid in latitude_deg if plane_of[sid] != plane]
+    if len(ring) < size_per_plane or len(others) < size_per_plane or not 0 <= behind < size_per_plane:
+        raise ValueError('Plane too small for the requested domain')
+    position = ring.index(host)
+    arc = [ring[(position - behind + step) % len(ring)] for step in range(size_per_plane)]
+    centre = _mean_angle([latitude_deg[sid] for sid in arc])
+    near = sorted(others, key=lambda sid: (_angle_gap(latitude_deg[sid], centre), sid))[:size_per_plane]
+    return sorted(arc) + sorted(near)
+
+
+def follow_controller(index, periods, plane_of, distance_km, domain_of, source, shadow_entry, *, trigger_lead_s,
+                      minimum_destination_light_s, minimum_path_persistence_s,
+                      availability_min=DESTINATION_POLICY['availability_min'], minimum_stay_s=DESTINATION_POLICY['minimum_stay_s'],
+                      selection_mode=DESTINATION_POLICY['selection_mode'], downtime_s=DESTINATION_POLICY['downtime_s'],
+                      duration_s=DESTINATION_POLICY['duration_s'], overhead_ms=DESTINATION_POLICY['overhead_ms'],
+                      memo=None):
+    """Migrations of the cost policy from one shadow entry until it cannot go on.
+
+    At every shadow entry of the satellite hosting the controller the policy chooses inside
+    ``domain_of(host, trigger)`` (a fixed list, or a domain that follows the controller); the next
+    decision is at the shadow entry of the chosen destination. Returns ``(steps, stop)`` with
+    ``stop`` 'no_admissible_destination' or 'replay_end'. ``memo`` caches decisions by (host,
+    shadow entry), so chains that meet share the work."""
+    memo = {} if memo is None else memo
+    steps, previous = [], None
+    while True:
+        trigger = shadow_entry - trigger_lead_s
+        window = _containing(periods[source], trigger) if 0 <= trigger else None
+        # Near the end of the replay no path can show its minimum persistence: that is the replay
+        # ending, not the policy failing
+        if shadow_entry >= index.duration or window is None or trigger + minimum_path_persistence_s > index.duration:
+            return steps, 'replay_end'
+        key = (source, shadow_entry)
+        if key not in memo:
+            domain = domain_of(source, trigger)
+            _, rows = policy_candidates(index, periods, domain, plane_of, source, shadow_entry, distance_km,
+                                        trigger_lead_s=trigger_lead_s,
+                                        minimum_destination_light_s=minimum_destination_light_s,
+                                        minimum_path_persistence_s=minimum_path_persistence_s,
+                                        availability_min=availability_min, minimum_stay_s=minimum_stay_s,
+                                        selection_mode=selection_mode,
+                                        downtime_s=downtime_s, duration_s=duration_s, overhead_ms=overhead_ms)
+            latency = control_latency_ms(index.segment(trigger)[2], domain, source,
+                                         lambda a, b: distance_km(a, b, trigger), overhead_ms)
+            memo[key] = (domain, rows[0] if rows else None, len(rows), latency)
+        domain, chosen, admitted, latency = memo[key]
+        if chosen is None:
+            # Light is cut at the end of the replay: if even a destination lit until then could not
+            # stay long enough to be admitted, the replay ended, not the policy
+            shortest = max(downtime_s[selection_mode] / (1.0 - availability_min), minimum_stay_s)
+            late = trigger + trigger_lead_s + max((duration_s or {}).values(), default=0.0) + shortest > index.duration
+            return steps, 'replay_end' if late else 'no_admissible_destination'
+        steps.append({'source': source, 'trigger_s': trigger, 'source_shadow_entry_s': shadow_entry,
+                      'destination': chosen['destination'], 'hops': chosen['hops'], 'other_plane': chosen['other_plane'],
+                      'stay_s': chosen['stay_s'], 'control_latency_ms': chosen['control_latency_ms'],
+                      # The destination's own trigger: the next decision
+                      'next_trigger_s': trigger + chosen['stay_from_trigger_s'],
+                      'source_control_latency_ms': latency, 'admissible_destinations': admitted,
+                      'domain': domain,
+                      'switches_changed': None if previous is None else len(set(domain) - set(previous))})
+        previous = domain
+        source, shadow_entry = chosen['destination'], trigger + chosen['destination_light_remaining_s']
+
+
+def chain_summary(steps, stop, downtime_s, duration_s=None):
+    """Length, span and means of one chain of ``follow_controller``. The span runs from the first
+    trigger to the trigger of the last destination. Per mode: the downtime of every migration over
+    that span and, with ``duration_s``, the share of it spent migrating."""
+    if not steps:
+        return {'migrations': 0, 'stop': stop}
+    histogram = {}
+    for step in steps:
+        histogram[str(step['hops'])] = histogram.get(str(step['hops']), 0) + 1
+    mean = lambda values: sum(values) / len(values) if values else None
+    changed = [step['switches_changed'] for step in steps if step['switches_changed'] is not None]
+    span = steps[-1]['next_trigger_s'] - steps[0]['trigger_s']
+    return {'migrations': len(steps), 'stop': stop, 'first_trigger_s': steps[0]['trigger_s'],
+            'last_trigger_s': steps[-1]['trigger_s'], 'span_s': span,
+            'hops_histogram': dict(sorted(histogram.items(), key=lambda item: int(item[0]))),
+            'other_plane_share': sum(step['other_plane'] for step in steps) / len(steps),
+            'mean_stay_s': mean([step['stay_s'] for step in steps]),
+            'min_stay_s': min(step['stay_s'] for step in steps),
+            'mean_control_latency_ms': mean([step['control_latency_ms'] for step in steps]),
+            'mean_source_control_latency_ms': mean([step['source_control_latency_ms'] for step in steps
+                                                    if step['source_control_latency_ms'] is not None]),
+            'mean_admissible_destinations': mean([step['admissible_destinations'] for step in steps]),
+            'mean_switches_changed': mean(changed), 'max_switches_changed': max(changed, default=None),
+            'mean_interval_s': span / len(steps),
+            'downtime_share': {mode: len(steps) * value / span for mode, value in sorted(downtime_s.items())},
+            'migrating_share': {mode: len(steps) * value / span for mode, value in sorted((duration_s or {}).items())}}
+
+
 def destination_policy_report(designed, index, periods, domain, plane_of, distance_km, *, trigger_lead_s,
                               minimum_destination_light_s, minimum_path_persistence_s,
-                              availability_min=DESTINATION_POLICY['availability_min'],
+                              availability_min=DESTINATION_POLICY['availability_min'], minimum_stay_s=DESTINATION_POLICY['minimum_stay_s'],
                               selection_mode=DESTINATION_POLICY['selection_mode'],
                               downtime_s=DESTINATION_POLICY['downtime_s'], duration_s=DESTINATION_POLICY['duration_s'],
                               overhead_ms=DESTINATION_POLICY['overhead_ms'],
@@ -740,19 +875,23 @@ def destination_policy_report(designed, index, periods, domain, plane_of, distan
     limits = _limits(trigger_lead_s, minimum_destination_light_s, minimum_path_persistence_s, downtime_s, duration_s, overhead_ms)
     entries = _all_candidates(index, periods, domain, plane_of, distance_km, limits)
     events = policy_events(index, periods, domain, plane_of, distance_km, **limits, availability_min=availability_min,
-                           selection_mode=selection_mode, _candidates=entries)
-    return {'parameters': {'availability_min': availability_min, 'selection_mode': selection_mode,
+                           minimum_stay_s=minimum_stay_s, selection_mode=selection_mode, _candidates=entries)
+    return {'parameters': {'availability_min': availability_min, 'minimum_stay_s': minimum_stay_s,
+                           'selection_mode': selection_mode,
                            'downtime_s': dict(downtime_s), 'duration_s': dict(duration_s), 'downtime_source': downtime_source,
                            'overhead_ms': overhead_ms,
                            'stay': 'dalla fine della migrazione piu lunga fra le modalita al trigger della destinazione',
-                           'rule': 'ammessa se downtime / permanenza <= 1 - availability_min (modalita selection_mode); '
+                           'rule': 'ammessa se downtime / permanenza <= 1 - availability_min (modalita selection_mode) '
+                                   'e permanenza >= minimum_stay_s; '
                                    'fra le ammesse latenza media di controllo minima, poi meno salti, poi id NORAD minore',
                            'role': 'politica alternativa agli eventi progettati, scelta prima dell avvio dell esperimento'},
             'summary': policy_summary(events, selection_mode),
             'sensitivity': policy_sensitivity(index, periods, domain, plane_of, distance_km, **limits,
-                                              selection_mode=selection_mode, thresholds=thresholds, _candidates=entries),
+                                              selection_mode=selection_mode, minimum_stay_s=minimum_stay_s,
+                                              thresholds=thresholds, _candidates=entries),
             'designed_vs_policy': compare_with_policy(designed, index, periods, domain, plane_of, distance_km, **limits,
-                                                      availability_min=availability_min, selection_mode=selection_mode),
+                                                      availability_min=availability_min, minimum_stay_s=minimum_stay_s,
+                                                      selection_mode=selection_mode),
             'events': events}
 
 

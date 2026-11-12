@@ -212,7 +212,7 @@ class DestinationPolicyTests(DesignedEventTests):
     LIMITS = {'trigger_lead_s': 200, 'minimum_destination_light_s': 150, 'minimum_path_persistence_s': 100}
     DOWNTIME = {'hot': 7.0, 'cold': 100.0}
     DURATION = {'hot': 50.0, 'cold': 100.0}
-    SELECTION = {'availability_min': 0.9, 'selection_mode': 'cold'}
+    SELECTION = {'availability_min': 0.9, 'selection_mode': 'cold', 'minimum_stay_s': 0.0}
 
     def candidates(self, domain=(1, 2, 3, 4), **options):
         return model.policy_candidates(self.index, self.periods, list(domain), self.plane, 1, 1000,
@@ -240,6 +240,10 @@ class DestinationPolicyTests(DesignedEventTests):
         self.assertEqual(self.candidates(availability_min=0.97)[1], [])
         # With a loose threshold the tie on latency goes to fewer hops
         self.assertEqual(self.candidates(availability_min=0.5)[1][0]['destination'], 2)
+        # A minimum stay excludes the destinations the controller would leave too soon
+        self.assertEqual([row['destination'] for row in self.candidates(availability_min=0.5, minimum_stay_s=2700)[1]], [3, 4])
+        self.assertEqual([row['destination'] for row in self.candidates(availability_min=0.5, minimum_stay_s=2750)[1]], [4])
+        self.assertEqual(model.DESTINATION_POLICY['minimum_stay_s'], 600.0)
 
     def test_the_stay_starts_at_the_end_of_the_longest_migration(self):
         # With a 350 s migration the trigger of 2 (300 s after this one) comes before its end
@@ -333,3 +337,65 @@ class DestinationPolicyTests(DesignedEventTests):
         self.assertNotEqual((picks[1]['source'], picks[1]['trigger_s']), (nearest['source'], nearest['trigger_s']))
         with self.assertRaises(ValueError):
             model.policy_selected_events([unserved], [], self.index, 100)
+
+    def test_following_the_controller_until_the_policy_or_the_replay_stops(self):
+        distance = lambda a, b, tick: 3000.0
+        options = {**self.options(), **self.SELECTION}
+        memo = {}
+        # Domain 1-2-3-4: from 1 the policy picks 3 (2700 s of stay, lower latency than 4); at 3's
+        # shadow entry (trigger 3600) even a destination lit until 4000 could not be admitted
+        steps, stop = model.follow_controller(self.index, self.periods, self.plane, distance, lambda host, tick: [1, 2, 3, 4],
+                                              1, 1000, **options, memo=memo)
+        self.assertEqual(stop, 'replay_end')
+        [step] = steps
+        self.assertEqual((step['source'], step['trigger_s'], step['destination'], step['hops']), (1, 800, 3, 2))
+        self.assertEqual((step['stay_s'], step['next_trigger_s'], step['admissible_destinations']), (2700, 3600, 2))
+        self.assertIsNone(step['switches_changed'])
+        self.assertAlmostEqual(step['source_control_latency_ms'], 20.0, places=0)
+        self.assertIn((1, 1000), memo)
+        # Domain 1-2: 2 stays no time after the migration, long before the replay ends
+        steps, stop = model.follow_controller(self.index, self.periods, self.plane, distance, lambda host, tick: [1, 2],
+                                              1, 1000, **options)
+        self.assertEqual((steps, stop), ([], 'no_admissible_destination'))
+
+    def test_chain_summary(self):
+        step = lambda trigger, hops, other, stay, changed, latency: {
+            'trigger_s': trigger, 'next_trigger_s': trigger + 400, 'hops': hops, 'other_plane': other, 'stay_s': stay,
+            'switches_changed': changed, 'control_latency_ms': latency, 'source_control_latency_ms': latency + 1,
+            'admissible_destinations': 3}
+        summary = model.chain_summary([step(0, 2, False, 100, None, 10.0), step(400, 3, True, 200, 4, 12.0)], 'replay_end',
+                                      {'hot': 8.0, 'cold': 80.0}, {'hot': 100.0, 'cold': 200.0})
+        self.assertEqual((summary['migrations'], summary['span_s'], summary['mean_interval_s']), (2, 800, 400))
+        self.assertEqual(summary['hops_histogram'], {'2': 1, '3': 1})
+        self.assertEqual((summary['other_plane_share'], summary['mean_stay_s'], summary['min_stay_s']), (0.5, 150, 100))
+        self.assertEqual((summary['mean_switches_changed'], summary['max_switches_changed']), (4, 4))
+        self.assertEqual(summary['downtime_share'], {'cold': 0.2, 'hot': 0.02})
+        self.assertEqual(summary['migrating_share'], {'cold': 0.5, 'hot': 0.25})
+        self.assertEqual(model.chain_summary([], 'no_admissible_destination', {}), {'migrations': 0, 'stop': 'no_admissible_destination'})
+
+    def test_domain_around_the_host(self):
+        plane = {sid: 0 for sid in range(1, 7)} | {sid: 1 for sid in range(11, 17)}
+        latitude = {sid: 60.0 * (sid - 1) for sid in range(1, 7)} | {sid: 60.0 * (sid - 11) + 5 for sid in range(11, 17)}
+        # Ring of plane 0 by latitude: 1 (0°) … 6 (300°); host 1 with 2 trailing satellites: 5, 6, 1, 2
+        self.assertEqual(model.domain_around(1, plane, latitude, 4, behind=2), [1, 2, 5, 6, 11, 12, 15, 16])
+        self.assertEqual(model.domain_around(1, plane, latitude, 4), model.domain_around(1, plane, latitude, 4, behind=2))
+        # The host is always inside; the other plane gives the satellites closest to the arc
+        domain = model.domain_around(13, plane, latitude, 3, behind=0)
+        self.assertEqual(domain, [13, 14, 15, 3, 4, 5])
+        with self.assertRaises(ValueError):
+            model.domain_around(1, plane, latitude, 7)
+
+    def test_chains_of_the_policy_follow_the_controller(self):
+        def entry(source, trigger, destination, light=None):
+            event = {'event_id': f'{source}-{trigger}', 'source': source, 'trigger_s': trigger,
+                     'source_shadow_entry_s': trigger + 900, 'destination': destination}
+            if destination is not None:
+                event.update(hops=2, path=[source, destination], other_plane=False, destination_light_remaining_s=light,
+                             stay_s=light - 1100, stay_from_trigger_s=light - 900, control_latency_ms=10.0,
+                             downtime_fraction={'hot': 0.01})
+            return event
+        # 1 -> 2 -> 3 -> 4 (4 has no destination); 5 -> 6 is a chain of one; 9 -> 1 starts a longer one later
+        events = [entry(1, 100, 2, 1400), entry(2, 600, 3, 1300), entry(3, 1000, 4, 1500), entry(4, 1600, None),
+                  entry(5, 50, 6, 1500), entry(9, 2000, 1, 1200)]
+        chains = model.policy_chains(events)
+        self.assertEqual([[event['source'] for event in chain] for chain in chains], [[1, 2, 3], [2, 3], [3], [5], [9]])

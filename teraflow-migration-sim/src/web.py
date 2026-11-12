@@ -89,6 +89,26 @@ def scenario_profiles(root):
     return {'profiles': profiles}
 
 
+def controller_journey(root):
+    """The controller's day under the cost policy, from tools/sliding_domain.py (model only).
+
+    ``stale`` is true when the installed profile's catalogue changed after the analysis, so the
+    console can ask to run it again; without the analysis ``available`` is false."""
+    path = Path(root, 'results/analysis/sliding-domain.json')
+    try:
+        report = _json(path)
+    except (OSError, ValueError):
+        return {'available': False}
+    from .artifacts import file_digest
+    catalogue = Path(root, 'artifacts/constellation-profiles', report.get('profile', ''), 'events.json')
+    try:
+        stale = file_digest(catalogue) != report.get('inputs', {}).get('events.json')
+    except OSError:
+        stale = True
+    return {'available': True, 'stale': stale, 'created_utc': report.get('created_utc'), 'profile': report.get('profile'),
+            'policy': report.get('policy'), 'journeys': report.get('journeys')}
+
+
 def verifications(root):
     """Functional verifications (one Hot and one Cold on the first catalogue event), newest first."""
     rows = []
@@ -386,6 +406,8 @@ def make_server(root, port=18092):
                 return self.send(application.status())
             if path == '/api/v1/scenario-profiles':
                 return self.send(scenario_profiles(root))
+            if path == '/api/v1/controller-journey':
+                return self.send(controller_journey(root))
             if path == '/api/v1/verifications':
                 return self.send({'verifications': verifications(root)})
             if path == '/api/v1/event-comparisons':

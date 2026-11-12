@@ -50,6 +50,8 @@ def main(argv=None):
     parser.add_argument('--minimum-path-persistence-s', type=int, default=DEFAULTS['minimum_path_persistence_s'])
     parser.add_argument('--policy-availability-min', type=float, default=model.DESTINATION_POLICY['availability_min'],
                         help='Politica di destinazione: quota minima della permanenza con il controller disponibile')
+    parser.add_argument('--policy-minimum-stay-s', type=float, default=model.DESTINATION_POLICY['minimum_stay_s'],
+                        help='Politica di destinazione: permanenza minima sulla destinazione dopo la migrazione')
     parser.add_argument('--policy-downtime-hot-s', type=float, default=model.DESTINATION_POLICY['downtime_s']['hot'],
                         help='Politica di destinazione: downtime Hot misurato (usato per la selezione)')
     parser.add_argument('--policy-downtime-cold-s', type=float, default=model.DESTINATION_POLICY['downtime_s']['cold'],
@@ -116,6 +118,7 @@ def main(argv=None):
                                     'event_specs': [{'hops': hops, 'other_plane': other, 'slot': slot, 'source': source} for hops, other, slot, source in model.EVENT_SPECS],
                                     'event_slots': model.EVENT_SLOTS,
                                     'destination_policy': {'availability_min': args.policy_availability_min,
+                                                           'minimum_stay_s': args.policy_minimum_stay_s,
                                                            'selection_mode': model.DESTINATION_POLICY['selection_mode'],
                                                            'downtime_s': {'hot': args.policy_downtime_hot_s, 'cold': args.policy_downtime_cold_s},
                                                            'duration_s': {'hot': args.policy_duration_hot_s, 'cold': args.policy_duration_cold_s},
@@ -203,6 +206,7 @@ def main(argv=None):
         chosen, index, periods, domain, plane_of, distance_km, trigger_lead_s=args.trigger_lead_s,
         minimum_destination_light_s=args.minimum_destination_light_s,
         minimum_path_persistence_s=args.minimum_path_persistence_s, availability_min=args.policy_availability_min,
+        minimum_stay_s=args.policy_minimum_stay_s,
         downtime_s={'hot': args.policy_downtime_hot_s, 'cold': args.policy_downtime_cold_s},
         duration_s={'hot': args.policy_duration_hot_s, 'cold': args.policy_duration_cold_s})
     policy_selected = model.policy_selected_events(destination_policy['designed_vs_policy'], destination_policy['events'],
