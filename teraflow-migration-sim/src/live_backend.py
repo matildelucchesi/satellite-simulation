@@ -9,7 +9,7 @@ from pathlib import Path
 from urllib.request import Request, urlopen
 
 from .artifacts import canonical_bytes
-from .fixture import state, for_role, service_endpoints
+from .fixture import connection_path, state, for_role, service_endpoints
 from .orbit import lab_graph, path_delay_s, propagation_delay_ms, shortest_paths
 from .snapshot import apply_delta
 from .storage import append_json, utc_now
@@ -263,6 +263,7 @@ class LiveBackend:
                 self.a.notify = None
             from .storage import atomic_json
             atomic_json(self.directory/'prepared-snapshot.json', self.source_snapshot)
+            self.record_service_path('prepared', 'sat-a', self.source_snapshot)
         # Explicit reconciliation also restores authority after a proxy restart.
         with stage('restore_authority'):
             self.admin('/recover')
@@ -379,6 +380,12 @@ class LiveBackend:
             if path.resolve().is_relative_to(self.directory.resolve()): path.unlink(missing_ok=True)
         self.received_images.clear()
 
+    def record_service_path(self, phase, role, document):
+        """Path of each connection TeraFlow computed for the service, as satellites in order."""
+        paths = [connection_path(document, row) for row in document['entities'].get('connections', [])]
+        append_json(self.directory/'service-paths.jsonl', {'phase': phase, 'role': role, 'paths': paths,
+                                                           'timestamp_utc': utc_now()})
+
     def signature(self, graph):
         return canonical_bytes(state(self.fixture, graph)['entities']['services']) + canonical_bytes(
             [(a,b) for a in graph for b in graph[a] if a < b])
@@ -431,7 +438,9 @@ class LiveBackend:
             patch['entities']['devices'] = []
             patch['entities']['links'] = []
             adapter.restore(patch)
-        actual = adapter.export()['entities']
+        exported = adapter.export()
+        actual = exported['entities']
+        if path and changed: self.record_service_path('topology_update', role, exported)
         wanted_services = [service_intent(row) for row in desired['entities']['services']] if path else []
         if sorted(canonical_bytes(service_intent(row)) for row in actual['services']) != sorted(map(canonical_bytes,wanted_services)):
             raise RuntimeError('Queued service intent did not reconcile')
@@ -621,7 +630,9 @@ class LiveBackend:
     def verify_target(self, expected):
         self.check()
         target = for_role(expected, self.fixture, self.target_slot)
-        return self.measure('api_verification', lambda: self.target.verify(target))
+        result = self.measure('api_verification', lambda: self.target.verify(target))
+        if result.get('actual'): self.record_service_path('target_verification', self.target_slot, result['actual'])
+        return result
 
     def staged_ready(self):
         with self.lock:

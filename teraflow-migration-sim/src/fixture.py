@@ -34,6 +34,34 @@ def service_endpoints(fixture):
     return first["satellite"], second["satellite"]
 
 
+def hop_distances(graph, origin):
+    """Fewest hops from ``origin`` to every reachable node, as TeraFlow's PathComp counts them."""
+    if origin not in graph:
+        return {}
+    distance, frontier = {origin: 0}, [origin]
+    while frontier:
+        following = []
+        for node in frontier:
+            for neighbor in graph[node]:
+                if neighbor not in distance:
+                    distance[neighbor] = distance[node] + 1
+                    following.append(neighbor)
+        frontier = following
+    return distance
+
+
+def connection_path(document, connection):
+    """Satellite NORAD ids crossed by a TeraFlow connection, in order (``sat-<id>`` device names)."""
+    names = {row["device_id"]["device_uuid"]["uuid"]: row["name"] for row in document["entities"]["devices"]}
+    path = []
+    for hop in connection.get("path_hops_endpoint_ids", []):
+        name = names.get(hop["device_id"]["device_uuid"]["uuid"])
+        satellite = int(name.split("-", 1)[1]) if name and name.startswith("sat-") else name
+        if not path or path[-1] != satellite:
+            path.append(satellite)
+    return path
+
+
 def build(root: Path):
     """Emulated network: only the controller's domain; the rest of the constellation stays modeled."""
     windows = json.loads((root / "results/direct_link_windows.json").read_text())["windows"]
@@ -94,20 +122,21 @@ def state(fixture, graph, role="sat-a"):
     entities["topologies"] = [{"topology_id": topology_id, "name": fixture["topology"],
         "device_ids": [row["device_id"] for row in entities["devices"]],
         "link_ids": [row["link_id"] for row in entities["links"]]}]
-    from .orbit import shortest_paths
-    # Forwarding settings only for the switches of the service path: TeraFlow programs only the
-    # switches of its connection path, and describing others would change the intent whenever an
-    # irrelevant tie between equal paths flips with the geometry (each change recreates the service).
+    # Forwarding follows the path TeraFlow chooses. PathComp gives every link cost 1 and picks one
+    # of the fewest-hop paths with an internal tie-break, and the service handler programs only
+    # the ports of that connection, each with the host MACs that fwd_list sends through it. So the
+    # intent describes every switch on some fewest-hop path between the hosts and, for each host,
+    # every port one hop closer to it: whichever of those paths TeraFlow takes, its ports carry the
+    # right entries, and no switch of it is missing. With a unique fewest-hop path this is exactly
+    # that path. Switches off every such path stay out: describing them would change the intent
+    # whenever an irrelevant link changes with the geometry (each change recreates the service).
     switch_info = []
     source, target = service_endpoints(fixture)
-    distances = shortest_paths(graph, target) if target in graph else {}
-    on_path = set()
-    if source in distances:
-        node = source
-        on_path.add(node)
-        while node != target:
-            node = min((length + distances[n], n) for n, length in graph[node].items() if n in distances)[1]
-            on_path.add(node)
+    to_source, to_target = hop_distances(graph, source), hop_distances(graph, target)
+    length = to_target.get(source)
+    on_path = {sid for sid in graph if length is not None and sid in to_source and sid in to_target
+               and to_source[sid] + to_target[sid] == length}
+    toward = {host["name"]: hop_distances(graph, host["satellite"]) for host in hosts(fixture)}
     for row in fixture["emulator"]["devices"]:
         sid = row["norad"]
         if sid not in on_path:
@@ -117,14 +146,12 @@ def state(fixture, graph, role="sat-a"):
         fwd = []
         for host in hosts(fixture):
             if host["satellite"] == sid:
-                port = row["ports"][host["name"]]
+                ports_to_host = [row["ports"][host["name"]]]
             else:
-                distances = shortest_paths(graph, host["satellite"])
-                reachable = [(graph[sid][neighbor] + distances[neighbor], neighbor)
-                             for neighbor in graph[sid] if neighbor in distances]
-                if not reachable: continue
-                port = row["ports"][str(min(reachable)[1])]
-            fwd.append({"port_id": port, "host_mac": host["mac"]})
+                distance = toward[host["name"]]
+                ports_to_host = sorted(row["ports"][str(neighbor)] for neighbor in graph[sid]
+                                       if neighbor in on_path and distance.get(neighbor) == distance[sid] - 1)
+            fwd.extend({"port_id": port, "host_mac": host["mac"]} for port in ports_to_host)
         if not port_list or not fwd:
             continue
         switch_info.append({f"sat-{sid}": {"arch": "v1model", "dpid": row["dpid"],

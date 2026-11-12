@@ -56,10 +56,10 @@ def windows_from_links(document):
 def service_endpoints(domain):
     """Both ends of the plane-1 arc.
 
-    TeraFlow's path computation and the fixture's forwarding rules must choose the same path.
-    Between the two planes the domain is a ladder with many equal-hop paths and TeraFlow's
-    tie-break is internal, so the endpoints lie on one rail, where the shortest path is unique
-    (any detour through the other plane costs at least two extra hops)."""
+    The forwarding rules cover every fewest-hop path, so any endpoints would forward. On one rail
+    the fewest-hop path is unique (any detour through the other plane costs at least two extra
+    hops): source and destination controllers, each with its own TeraFlow tie-break, then compute
+    the same connection, and the API equivalence of the migration compares connections too."""
     return [domain['plane_1'][0], domain['plane_1'][-1]]
 
 
@@ -145,22 +145,24 @@ def copy_outputs(profile):
 
 
 def check_service_path(domain, step_s=600):
-    """Refuse endpoints whose fewest-hop path is ambiguous or differs from the distance-based one."""
-    from src.orbit import load_orbit, shortest_paths
+    """Refuse endpoints without a path inside the domain; report the instants with several
+    fewest-hop paths, where source and destination controllers may compute different connections
+    (the forwarding rules cover all of them, the API equivalence of a migration may then fail)."""
+    from src.fixture import hop_distances
+    from src.orbit import load_orbit
     orbit = load_orbit(ROOT)
     source, target = domain['service_endpoints']
+    ties = 0
     for tick in range(0, orbit.duration, step_s):
         graph = orbit.lab_graph(tick)
-        unique = unique_shortest_path(graph, source, target)
-        if unique is None:
-            raise SystemExit(f'Estremi del servizio {source}-{target}: percorso minimo assente o non unico al secondo {tick}')
-        distances = shortest_paths(graph, target)
-        node, by_distance = source, [source]
-        while node != target:
-            node = min((length + distances[n], n) for n, length in graph[node].items() if n in distances)[1]
-            by_distance.append(node)
-        if by_distance != unique:
-            raise SystemExit(f'Estremi del servizio {source}-{target}: percorso per distanza diverso da quello minimo al secondo {tick}')
+        if target not in hop_distances(graph, source):
+            raise SystemExit(f'Estremi del servizio {source}-{target}: nessun percorso nel dominio al secondo {tick}')
+        ties += unique_shortest_path(graph, source, target) is None
+    if ties:
+        print(f'Avviso: estremi del servizio {source}-{target} con piu percorsi minimi in {ties} istanti su '
+              f'{len(range(0, orbit.duration, step_s))}; le regole li coprono tutti, ma sorgente e destinazione '
+              'potrebbero calcolare connessioni diverse e la verifica API della migrazione fallirebbe')
+    return ties
 
 
 def write_if_changed(path, value):

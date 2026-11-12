@@ -1,6 +1,6 @@
 # Piano: politica di destinazione e forwarding dai percorsi di TeraFlow
 
-Branch: `forwarding-path-selection`. Stato: passi 1 e 2 completati (12 novembre 2026); dal passo 3 da implementare.
+Branch: `forwarding-path-selection`. Stato: passi 1, 2 e 4 completati (12 novembre 2026); passo 4 da verificare nel laboratorio; passi 3, 5 e 6 da implementare.
 
 ## Obiettivo
 
@@ -67,17 +67,18 @@ Risultati sul profilo installato (downtime e durate da `events-f77d737a…`: Hot
 
 - Fonte: il tempo di risposta del controller verso gli switch nelle prove registrate (`operations.jsonl`, scritture P4Runtime tramite il proxy). Il punto esatto da cui leggerlo va verificato prima di implementarlo. Se la misura non è affidabile, il termine resta 0 e lo dichiariamo nel resoconto.
 
-### 4. Inoltro dal percorso di TeraFlow (`src/fixture.py`, `src/tfs_adapter.py`, `src/live_backend.py`, `tools/install_scenario.py`)
+### 4. Inoltro dal percorso di TeraFlow (`src/fixture.py`, `src/live_backend.py`, `tools/install_scenario.py`) — fatto, da verificare nel laboratorio
 
-1. Si crea il servizio con `port_list` per gli switch del dominio e `fwd_list` vuota.
-2. Si legge la connessione calcolata (`GET …/service/{id}/connections`, già usato dall'adattatore) e se ne ricavano gli switch e le porte in ordine.
-3. Si calcola `fwd_list` lungo quel percorso: per ogni switch, MAC di h1 verso la porta del vicino precedente, MAC di h2 verso quella del successivo, porta host negli estremi.
-4. Si aggiorna il servizio con le sole voci degli switch del percorso e si rilegge la connessione: deve coincidere con quella del passo 2. Se cambia, l'installazione fallisce invece di proseguire con regole incoerenti.
-5. Verifica dell'inoltro con almeno dieci ping freschi consecutivi, come oggi.
+Lo schema iniziale (creare il servizio, leggere la connessione, aggiornare `fwd_list`) è stato scartato: in Release 7 `UpdateService` ricalcola il percorso a ogni aggiornamento e, cambiando l'intento di un servizio già attivo, crea una seconda connessione (nota già presente in `TfsAdapter.reconcile`). In più avrebbe aggiunto chiamate API durante la migrazione e cambiato i tempi misurati.
 
-- Sorgente e destinazione: la destinazione ripristina lo stato dalla sorgente; l'equivalenza API confronta già le connessioni nell'ordine dei salti. Se la destinazione calcolasse un percorso diverso, la verifica fallisce e non c'è ACK né cutover: l'invariante resta. La prova registra il percorso di entrambi.
-- Il controllo di `install_scenario.py` sul percorso minimo unico diventa un avviso invece di un rifiuto, perché la coerenza ora la garantisce il passo 4.
-- Estremi del servizio: restano quelli attuali (capi dell'arco del piano 1). Cambiarli è un passo successivo, possibile solo dopo che il passo 4 funziona.
+Soluzione adottata, verificata sul codice del gestore `p4_fabric_tna_l2_simple`: il gestore programma solo le porte della connessione scelta da TeraFlow e, su ciascuna, solo i MAC che `fwd_list` associa a quella porta; `fwd_list` può associare lo stesso MAC a più porte.
+
+- `state()` descrive gli switch di **tutti** i percorsi minimi in salti fra gli host (`hop_distances`, come PathComp, che dà costo 1 a ogni collegamento) e, per ogni host, **tutte** le porte un salto più vicine. Qualunque percorso minimo TeraFlow scelga, le sue porte hanno le voci giuste e nessuno dei suoi switch manca dalle impostazioni. Su un percorso semplice ogni switch usa una sola porta per host, quindi non nascono voci in conflitto.
+- Con percorso minimo unico l'intento è identico a prima: verificato su tutti i 2.880 istanti (ogni 30 s) del replay installato. Fixture invariata, nessun riavvio.
+- Prima le regole seguivano la distanza in km: con un pareggio in salti potevano indicare un percorso diverso da quello di TeraFlow. Ora seguono i salti, come TeraFlow.
+- Ogni prova scrive in `service-paths.jsonl` il percorso di ogni connessione calcolata da TeraFlow: sorgente preparata, eventuali ricreazioni per cambio di topologia, destinazione dopo la verifica API. La scrittura è fuori dalle fasi misurate.
+- `install_scenario.py` rifiuta estremi senza percorso nel dominio e avvisa se in qualche istante ci sono più percorsi minimi. Per gli estremi installati gli istanti con pareggio sono 0 su 1.440 (ogni 60 s).
+- Estremi del servizio invariati: con più percorsi minimi sorgente e destinazione potrebbero scegliere connessioni diverse, e l'equivalenza API (che confronta le connessioni) fallirebbe senza ACK. Con l'invariante intatto, cambiare estremi resta possibile ma va provato nel laboratorio.
 - Fuori dal piano: ricalcolo del percorso durante la prova se un collegamento cade. Il vincolo dei 900 s di persistenza resta la protezione.
 
 ### 5. Parametro del job e worker (`src/jobs.py`, `src/event_comparison.py`, `src/experiment.py`, `tools/experiment.py`)
@@ -100,7 +101,7 @@ Risultati sul profilo installato (downtime e durate da `events-f77d737a…`: Hot
 
 - Politica: soglia rispettata, ordinamento per latenza, stessa destinazione per Hot e Cold, nessun candidato se la soglia è troppo alta.
 - Catalogo: `policy_selected` ha la stessa sorgente e lo stesso ingresso in ombra degli eventi progettati, salvo i sostituti, che registrano l'evento sostituito.
-- Fixture: `fwd_list` ricavata da una connessione data, inclusi i casi a 1 salto e con percorso fra i piani.
+- Fixture: tutti i percorsi minimi coperti e nessuno switch in più, una porta per host su ogni percorso, percorso unico invariato, nessun percorso, lettura del percorso da una connessione.
 - Job: parametro valido e non valido, catalogo senza `policy_selected`, lettura dei metadati con `schema_version` 2.
 - JavaScript: select, select disabilitata, payload dell'avvio.
 - Laboratorio: verifica funzionale con il nuovo inoltro prima di qualsiasi esperimento con la politica.
@@ -109,7 +110,7 @@ Risultati sul profilo installato (downtime e durate da `events-f77d737a…`: Hot
 
 1. Politica rivista e analisi di sensibilità (solo modello, nessun laboratorio). Scelta della soglia.
 2. Catalogo con `policy_selected` e installazione.
-3. Inoltro dal percorso di TeraFlow, poi verifica funzionale nel laboratorio.
+3. Inoltro dal percorso di TeraFlow (fatto), poi verifica funzionale nel laboratorio.
 4. Parametro del job, console, test.
 5. Esperimento con la politica di costo (circa 2 ore, 19 prove come oggi).
 

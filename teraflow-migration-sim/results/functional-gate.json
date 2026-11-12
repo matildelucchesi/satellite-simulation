@@ -1,5 +1,84 @@
 {
-  "complete": false,
-  "previous_evidence": "C:\\UNIFI-workspaces\\satellite-simulation\\teraflow-migration-sim\\artifacts\\constellation-profiles\\starlink-53-463-2x31\\original\\results\\functional-gate.json",
-  "reason": "Scenario installato: nuova verifica funzionale richiesta"
+  "acceptance": "api_equivalence+target_authority+10_fresh_consecutive_pings",
+  "cold_minus_hot": {
+    "attempt": 0,
+    "controller_downtime_s": 121.76546320000125,
+    "ping_recovery_s": null,
+    "total_operation_s": 11.645192799998767
+  },
+  "comparison_id": "compare-2baabf59cd0143fb8e2e26a0e49536e2",
+  "complete": true,
+  "configured_rate_bps": 1000000000,
+  "created_utc": "2026-11-12T14:13:54.737998+00:00",
+  "current_method": null,
+  "event": {
+    "catalog_event_id": "62768-8295",
+    "contact_end_s": 86400,
+    "contact_window_s": 78105,
+    "deadline_s": 9195,
+    "deadline_window_s": 900,
+    "event_id": "functional-62768-62760-8295",
+    "execution_purpose": "functional-verification",
+    "hops": 1,
+    "path": [
+      62768,
+      62760
+    ],
+    "sat_a": 62768,
+    "sat_b": 62760,
+    "trigger_causes": [
+      "functional_diagnostic",
+      "source_shadow"
+    ],
+    "trigger_s": 8295
+  },
+  "order": [
+    "hot",
+    "cold"
+  ],
+  "purpose": "functional-validation",
+  "recovery_required": false,
+  "runs": [
+    {
+      "attempt": 1,
+      "baseline_valid": true,
+      "controller_downtime_s": 5.344127000000299,
+      "failure_reason": null,
+      "image_throughput_bps": null,
+      "method": "hot",
+      "observation_s": 39.42104729999846,
+      "outcome": "success",
+      "ping_continuous": true,
+      "ping_recovery_s": null,
+      "recovery_required": false,
+      "restarted_payload_bytes": 0,
+      "retries": 0,
+      "run_id": "run-e875f83f7c4a4e879f84a8cea254e069",
+      "service_verification_s": 1.1857428000002983,
+      "service_verified": true,
+      "success": true,
+      "total_operation_s": 177.1302065000018
+    },
+    {
+      "attempt": 1,
+      "baseline_valid": true,
+      "controller_downtime_s": 127.10959020000155,
+      "failure_reason": null,
+      "image_throughput_bps": null,
+      "method": "cold",
+      "observation_s": 40.50092070000028,
+      "outcome": "success",
+      "ping_continuous": true,
+      "ping_recovery_s": null,
+      "recovery_required": false,
+      "restarted_payload_bytes": 0,
+      "retries": 0,
+      "run_id": "run-84320248688640029cefdba9d08fc06a",
+      "service_verification_s": 1.2829495999976643,
+      "service_verified": true,
+      "success": true,
+      "total_operation_s": 188.77539930000057
+    }
+  ],
+  "schema_version": 3
 }

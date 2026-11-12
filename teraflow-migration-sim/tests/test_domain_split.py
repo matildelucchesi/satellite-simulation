@@ -5,7 +5,7 @@ from pathlib import Path
 
 import numpy as np
 
-from src.fixture import build, hosts, service_endpoints, state
+from src.fixture import build, connection_path, endpoint_id, hop_distances, hosts, service_endpoints, state
 from src.orbit import Orbit, load_orbit
 from tools.install_scenario import service_endpoints as choose_endpoints, unique_shortest_path, windows_from_links
 
@@ -121,6 +121,82 @@ class DomainFixtureTests(unittest.TestCase):
         (self.root / 'config/scenario.json').write_text(json.dumps({'fso': {}}))
         with self.assertRaises(ValueError):
             load_orbit(self.root)
+
+
+def ladder_fixture():
+    """Square 1-2-4 / 1-3-4 with a spur 4-5: two fewest-hop paths between the hosts on 1 and 4."""
+    pairs = [(1, 2), (1, 3), (2, 4), (3, 4), (4, 5)]
+    devices = []
+    for index, sid in enumerate([1, 2, 3, 4, 5]):
+        neighbors = sorted(b if a == sid else a for a, b in pairs if sid in (a, b))
+        ports = {str(neighbor): port + 1 for port, neighbor in enumerate(neighbors)}
+        if sid == 1: ports['h1'] = len(neighbors) + 1
+        if sid == 4: ports['h2'] = len(neighbors) + 1
+        devices.append({'norad': sid, 'dpid': index + 1, 'name': f's{index + 1}', 'grpc_port': 50001 + index,
+                        'proxy_port': 51001 + index, 'ports': ports})
+    hosts_ = [{'name': 'h1', 'ip': '10.0.0.1/24', 'mac': '00:00:00:00:00:01', 'satellite': 1},
+              {'name': 'h2', 'ip': '10.0.0.2/24', 'mac': '00:00:00:00:00:02', 'satellite': 4}]
+    fixture = {'schema_version': 1, 'context': 'migration-lab', 'topology': 'starlink-5', 'forwarding': 'service-path-only',
+               'service': 'migration-l2', 'emulator': {'devices': devices, 'pairs': pairs, 'hosts': hosts_},
+               'controller_proxy': 'p4-proxy', 'pipeline_binary': 'b', 'pipeline_info': 'i'}
+    graph = {sid: {} for sid in range(1, 6)}
+    for a, b in pairs:
+        graph[a][b] = graph[b][a] = 100.0
+    return fixture, graph
+
+
+class TeraFlowPathForwardingTests(unittest.TestCase):
+    def settings(self, fixture, graph):
+        document = state(fixture, graph)
+        rules = document['entities']['services'][0]['service_config']['config_rules']
+        return {name: info for row in json.loads(rules[0]['custom']['resource_value'])['switch_info'] for name, info in row.items()}
+
+    def test_every_fewest_hop_path_is_covered_and_nothing_else(self):
+        fixture, graph = ladder_fixture()
+        settings = self.settings(fixture, graph)
+        # 5 hangs off the destination switch, on no fewest-hop path
+        self.assertEqual(sorted(settings), ['sat-1', 'sat-2', 'sat-3', 'sat-4'])
+        ports = {row['norad']: row['ports'] for row in fixture['emulator']['devices']}
+        h1, h2 = '00:00:00:00:00:01', '00:00:00:00:00:02'
+        entries = lambda sid: sorted((row['host_mac'], row['port_id']) for row in settings[f'sat-{sid}']['fwd_list'])
+        # The source switch sends h2 to both of its next hops, whichever TeraFlow takes
+        self.assertEqual(entries(1), sorted([(h1, ports[1]['h1']), (h2, ports[1]['2']), (h2, ports[1]['3'])]))
+        self.assertEqual(entries(2), sorted([(h1, ports[2]['1']), (h2, ports[2]['4'])]))
+        self.assertEqual(entries(4), sorted([(h1, ports[4]['2']), (h1, ports[4]['3']), (h2, ports[4]['h2'])]))
+        # On any one of the two paths every switch has exactly one port per host on that path
+        for path in ([1, 2, 4], [1, 3, 4]):
+            for position, sid in enumerate(path):
+                used = {ports[sid]['h1'] if sid == 1 else ports[sid][str(path[position - 1])],
+                        ports[sid]['h2'] if sid == 4 else ports[sid][str(path[position + 1])]}
+                macs = {}
+                for mac, port in entries(sid):
+                    if port in used: macs.setdefault(mac, []).append(port)
+                self.assertEqual({mac: len(found) for mac, found in macs.items()}, {h1: 1, h2: 1})
+
+    def test_a_unique_path_gives_one_port_per_host(self):
+        fixture, graph = ladder_fixture()
+        del graph[1][3], graph[3][1]
+        settings = self.settings(fixture, graph)
+        self.assertEqual(sorted(settings), ['sat-1', 'sat-2', 'sat-4'])
+        self.assertTrue(all(len(info['fwd_list']) == 2 for info in settings.values()))
+
+    def test_without_a_path_no_switch_is_described(self):
+        fixture, graph = ladder_fixture()
+        for a, b in ((2, 4), (3, 4)):
+            del graph[a][b], graph[b][a]
+        self.assertEqual(self.settings(fixture, graph), {})
+
+    def test_hop_distances_ignore_link_length(self):
+        graph = {1: {2: 1.0, 3: 900.0}, 2: {1: 1.0, 3: 1.0}, 3: {1: 900.0, 2: 1.0}}
+        self.assertEqual(hop_distances(graph, 1), {1: 0, 2: 1, 3: 1})
+        self.assertEqual(hop_distances(graph, 9), {})
+
+    def test_connection_path_reads_satellites_in_order(self):
+        fixture, graph = ladder_fixture()
+        document = state(fixture, graph)
+        hop = lambda sid, port: endpoint_id(sid, port)
+        connection = {'path_hops_endpoint_ids': [hop(1, 3), hop(1, 2), hop(3, 1), hop(3, 2), hop(4, 2), hop(4, 4)]}
+        self.assertEqual(connection_path(document, connection), [1, 3, 4])
 
 
 if __name__ == '__main__':
