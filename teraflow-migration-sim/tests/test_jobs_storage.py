@@ -126,7 +126,7 @@ class ScenarioAdmissionTests(unittest.TestCase):
         for operation in ('functional','compare_events'):
             with self.subTest(operation=operation),tempfile.TemporaryDirectory() as tmp,patch('src.jobs.subprocess.Popen') as launch:
                 manager=JobManager(Path(tmp))
-                with self.assertRaisesRegex(ValueError,'Scenario non installato'):manager.start(operation,{})
+                with self.assertRaisesRegex(ValueError,'Scenario not installed'):manager.start(operation,{})
                 launch.assert_not_called();self.assertFalse(manager.guard.exists())
                 self.assertEqual(list(manager.directory.glob('job-*')),[])
 
@@ -146,6 +146,6 @@ class ScenarioAdmissionTests(unittest.TestCase):
             root=Path(tmp);(root/'config').mkdir()
             (root/'config/migration_events.json').write_text(json.dumps({'selected':[{'event_id':'e1'}]}))
             manager=JobManager(root)
-            with self.assertRaisesRegex(ValueError,'Eventi della politica di costo assenti'):
+            with self.assertRaisesRegex(ValueError,'Cost-policy events missing'):
                 manager.start('compare_events',{'policy':'cost'})
             launch.assert_not_called();self.assertFalse(manager.guard.exists())

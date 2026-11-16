@@ -43,11 +43,11 @@ class SourceStartupTests(unittest.TestCase):
         progress=advance({}, {'phase':'preparation_operation','operation':'start_source',
             'label':'Avvio sorgente','operation_status':'running','deadline_utc':'deadline'})
         progress=advance(progress,{'phase':'source_startup','startup_stage':'api',
-            'label':'Attivazione API del controller sorgente','operation_status':'running'})
+            'label':'Enabling the source controller API','operation_status':'running'})
         self.assertEqual(progress['deadline_utc'],'deadline')
         self.assertEqual(progress['subphase'],'start_source')
         self.assertEqual(progress['startup_stage'],'api')
-        self.assertEqual(progress['label'],'Attivazione API del controller sorgente')
+        self.assertEqual(progress['label'],'Enabling the source controller API')
 
     def test_reset_stops_destination_without_calling_its_api(self):
         with tempfile.TemporaryDirectory() as directory:

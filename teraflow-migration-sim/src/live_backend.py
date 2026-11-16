@@ -25,12 +25,12 @@ WORKLOAD = ('nbiservice', 'serviceservice', 'deviceservice', 'pathcompservice',
             'pathcomp-backend', 'contextservice')
 
 SOURCE_STARTUP = (
-    ('dependencies', 'Avvio dipendenze del controller sorgente', ('cockroachdb', 'nats', 'kafka')),
-    ('context', 'Avvio servizio di contesto sorgente', ('contextservice',)),
-    ('devices', 'Avvio gestione dispositivi sorgente', ('deviceservice',)),
-    ('paths', 'Avvio calcolo percorsi sorgente', ('pathcomp-backend', 'pathcompservice')),
-    ('services', 'Avvio gestione servizi sorgente', ('serviceservice',)),
-    ('api', 'Attivazione API del controller sorgente', ('nbiservice',)),
+    ('dependencies', 'Starting the source controller dependencies', ('cockroachdb', 'nats', 'kafka')),
+    ('context', 'Starting the source context service', ('contextservice',)),
+    ('devices', 'Starting the source device service', ('deviceservice',)),
+    ('paths', 'Starting the source path computation', ('pathcomp-backend', 'pathcompservice')),
+    ('services', 'Starting the source service management', ('serviceservice',)),
+    ('api', 'Enabling the source controller API', ('nbiservice',)),
 )
 
 
@@ -177,8 +177,8 @@ class LiveBackend:
         last={}
         previous=None
         def expired():
-            detail='; '.join(name+': '+row['detail'] for name,row in last.items()) or 'nessuna risposta disponibile'
-            error=TimeoutError('Infrastruttura non pronta entro il limite. '+detail)
+            detail='; '.join(name+': '+row['detail'] for name,row in last.items()) or 'no answer available'
+            error=TimeoutError('Infrastructure not ready within the limit. '+detail)
             error.infrastructure_status=last
             return error
         def check():
@@ -195,13 +195,13 @@ class LiveBackend:
                     if name=='Mininet':
                         count=data['switch_count']
                         ready=count==expected and data['switches_alive'] is True
-                        detail=f'{count}/{expected} switch; '+('attivi' if data['switches_alive'] else 'non tutti attivi')
+                        detail=f'{count}/{expected} switch; '+('active' if data['switches_alive'] else 'not all active')
                     else:
                         states=data['states']
                         masters=sum(row.get('upstream_master') is True for row in states)
                         ready=len(states)==expected and masters==expected and isinstance(data.get('ipv4'),str) and bool(data['ipv4'])
-                        detail=f'{masters}/{expected} connessioni agli switch confermate'
-                        if not data.get('ipv4'):detail+='; indirizzo del proxy non disponibile'
+                        detail=f'{masters}/{expected} switch connections confirmed'
+                        if not data.get('ipv4'):detail+='; proxy address unavailable'
                         proxy=data
                     last[name]={'ready':ready,'detail':detail}
                 except (OSError,ValueError,KeyError,TypeError,AttributeError) as exc:
@@ -210,7 +210,7 @@ class LiveBackend:
             check()
             ready=all(row['ready'] for row in last.values())
             if last!=previous:
-                self.notify({'phase':'infrastructure_wait','label':'Attesa disponibilità Mininet e proxy P4',
+                self.notify({'phase':'infrastructure_wait','label':'Waiting for Mininet and the P4 proxy',
                     'operation_status':'completed' if ready else 'running',
                     'detail':'; '.join(name+': '+row['detail'] for name,row in last.items()),
                     'infrastructure_status':copy.deepcopy(last)})
@@ -325,7 +325,7 @@ class LiveBackend:
         except Exception as exc:
             from .storage import atomic_json
             atomic_json(self.directory/'baseline.json', {'success':False,'probe_id':probe_id,
-                'started_unix_s':started,'failure_reason':'Baseline API/P4/ping non valida: '+str(exc),'verified_unix_s':None,
+                'started_unix_s':started,'failure_reason':'Invalid API/P4/ping baseline: '+str(exc),'verified_unix_s':None,
                 'last_ping':locals().get('summary'),'udp_received':len(locals().get('udp',[])),
                 'last_authority':locals().get('status')})
             raise
@@ -690,7 +690,7 @@ class LiveBackend:
         finally: self.recovery_mode = False
 
     def shutdown(self):
-        try: self.notify({'phase':'cleanup','label':'Messa in sicurezza del laboratorio'})
+        try: self.notify({'phase':'cleanup','label':'Making the laboratory safe'})
         except OSError: pass
         self.recovery_mode = True
         self.preparation_deadline = None
@@ -714,7 +714,7 @@ class LiveBackend:
                     errors.append('Controller workload still running: '+slot)
         except Exception as exc: errors.append('Cleanup verification: '+str(exc))
         if errors: raise RuntimeError('; '.join(errors))
-        try: self.notify({'phase':'cleanup_verified','label':'Autorità revocata e controller arrestati: verifica conclusa'})
+        try: self.notify({'phase':'cleanup_verified','label':'Authority revoked and controllers stopped: check complete'})
         except OSError: pass
 
     def close(self):

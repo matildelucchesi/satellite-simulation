@@ -117,7 +117,7 @@ class EventComparisonTests(unittest.TestCase):
                             for event in output['events']))
 
     def test_cost_policy_without_its_events_fails_before_any_run(self):
-        with self.assertRaisesRegex(ValueError, 'politica di costo assenti'):
+        with self.assertRaisesRegex(ValueError, 'Cost-policy events missing'):
             module.compare(self.app, 'cost')
         with self.assertRaises(ValueError):
             module.compare(self.app, 'random')

@@ -338,7 +338,7 @@ class Experiment:
             output['current_method']=method
             save()
             self.publish({'phase':'comparison_run','comparison_id':output['comparison_id'],'method':method,
-                          'label':f'Verifica · {method.upper()}'})
+                          'label':f'Verification · {method.upper()}'})
             result=self.run(method,rate,copy.deepcopy(event),purpose='functional-gate')
             if result.get('error'): output['error'] = result['error']
             runs.append({**summary_metrics(result), **{key:result.get(key) for key in ('run_id','method','outcome','failure_reason')},

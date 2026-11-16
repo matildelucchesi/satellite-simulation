@@ -1,17 +1,17 @@
 /* Pure presentation helpers shared by the console and the Node regression tests. */
 const PHASE_LABELS={
- infrastructure:'Attesa di Mininet e proxy P4',stop_target:'Arresto della destinazione',clean_target:'Pulizia del database della destinazione',
- start_source:'Avvio del controller sorgente',clean_source:'Pulizia dello scenario sorgente',restore_scenario:'Configurazione e verifica della rete',
- restore_authority:'Ripristino dell’autorità P4',baseline:'Verifica di API, autorità e ping',baseline_check:'Controllo della baseline',trigger:'Trigger della migrazione',
- alignment:'Allineamento del percorso laser',quiescence:'Quiete della sorgente',snapshot_initial:'Snapshot dello stato',source_stop:'Arresto della sorgente',
- source_stopped:'Sorgente arrestata',software_on_board:'Software già a bordo della destinazione',transfer:'Trasferimento dello stato',
- transfer_verified:'Trasferimento verificato',target_start:'Avvio del controller destinazione',restore_initial:'Ripristino dello stato sulla destinazione',
- freeze:'Freeze della sorgente',source_frozen:'Sorgente in freeze',restore_delta:'Applicazione del delta',verify:'Verifica di equivalenza API',
- ack:'ACK della destinazione',cutover:'Passaggio dell’autorità',completed:'Migrazione completata',service_verified:'Servizio verificato',
- run_finished:'Prova conclusa',cleanup:'Messa in sicurezza del laboratorio',cleanup_verified:'Laboratorio in sicurezza',job_finished:'Job concluso',
- event_comparison:'Nuova prova',comparison_run:'Nuova prova',prepare:'Preparazione della prova'};
-const OPERATION_LABELS={functional:'Verifica',compare_events:'Esperimento a eventi',recover:'Ripristino del laboratorio',environment:'Controllo dell’ambiente'};
-const STATUS_LABELS={queued:'in coda',running:'in corso',completed:'concluso',failed:'non riuscito',interrupted:'interrotto',recovery_required:'ripristino necessario',recovered:'ripristinato'};
+ infrastructure:'Waiting for Mininet and the P4 proxy',stop_target:'Stopping the destination',clean_target:'Cleaning the destination database',
+ start_source:'Starting the source controller',clean_source:'Cleaning the source scenario',restore_scenario:'Configuring and checking the network',
+ restore_authority:'Restoring the P4 authority',baseline:'Checking API, authority and pings',baseline_check:'Baseline check',trigger:'Migration trigger',
+ alignment:'Laser path alignment',quiescence:'Source quiescence',snapshot_initial:'State snapshot',source_stop:'Stopping the source',
+ source_stopped:'Source stopped',software_on_board:'Software already on board the destination',transfer:'State transfer',
+ transfer_verified:'Transfer verified',target_start:'Starting the destination controller',restore_initial:'Restoring the state on the destination',
+ freeze:'Source freeze',source_frozen:'Source frozen',restore_delta:'Applying the delta',verify:'API equivalence check',
+ ack:'Destination ACK',cutover:'Authority handover',completed:'Migration complete',service_verified:'Service verified',
+ run_finished:'Run finished',cleanup:'Making the laboratory safe',cleanup_verified:'Laboratory safe',job_finished:'Job finished',
+ event_comparison:'New run',comparison_run:'New run',prepare:'Preparing the run'};
+const OPERATION_LABELS={functional:'Verification',compare_events:'Event experiment',recover:'Laboratory recovery',environment:'Environment check'};
+const STATUS_LABELS={queued:'queued',running:'running',completed:'finished',failed:'failed',interrupted:'stopped',recovery_required:'recovery required',recovered:'recovered'};
 
 function methodLabel(method){return method==='hot'?'Hot':method==='cold'?'Cold':method||'';}
 
@@ -29,30 +29,30 @@ function clock(seconds){
 }
 
 function duration(seconds){
- if(seconds===null||seconds===undefined||!Number.isFinite(seconds))return 'non misurato';
- return seconds<100?`${seconds.toFixed(1).replace('.',',')} s`:`${Math.round(seconds)} s`;
+ if(seconds===null||seconds===undefined||!Number.isFinite(seconds))return 'not measured';
+ return seconds<100?`${seconds.toFixed(1)} s`:`${Math.round(seconds)} s`;
 }
 
 /* Headline for the laboratory job shown on the experiment page. */
 function jobView(job,comparison,now=Date.now()){
- if(!job)return {title:'Laboratorio libero',detail:'Nessun job in corso.',active:false,canStop:false,needsRecovery:false};
+ if(!job)return {title:'Laboratory free',detail:'No job running.',active:false,canStop:false,needsRecovery:false};
  const active=['queued','running'].includes(job.status);
  const operation=OPERATION_LABELS[job.operation]||job.operation;
  const progress=job.progress||{};
  const current=comparison&&comparison.current;
  /* Experiment position: run n of N, event, replica (or warm-up), mode. Schema 1 had no replicas. */
- const where=job.operation==='compare_events'&&current?(current.position?` · prova ${current.position}/${current.total} · evento ${current.event}/${comparison.event_total} · ${current.warmup?'riscaldamento':'replica '+current.replica+'/'+comparison.design.replicas} · ${methodLabel(current.method)}`:` · evento ${current.event}/${comparison.event_total} · ${methodLabel(current.method)}`):'';
+ const where=job.operation==='compare_events'&&current?(current.position?` · run ${current.position}/${current.total} · event ${current.event}/${comparison.event_total} · ${current.warmup?'warm-up':'replica '+current.replica+'/'+comparison.design.replicas} · ${methodLabel(current.method)}`:` · event ${current.event}/${comparison.event_total} · ${methodLabel(current.method)}`):'';
  const step=phaseLabel(progress);
  const started=Date.parse(job.started_utc||job.created_utc||'');
  const elapsed=Number.isFinite(started)?clock((now-started)/1000):'—';
  const needsRecovery=job.status==='recovery_required'||(job.application_success===false&&job.result&&job.result.recovery_required===true);
  let detail;
- if(active)detail=(job.cancellation_requested?'Interruzione richiesta: messa in sicurezza in corso. ':'')+(step||'Avvio')+` · tempo trascorso ${elapsed}`;
- else if(needsRecovery)detail='Il laboratorio va ripristinato prima di un nuovo job.';
- else detail=job.error?`Esito: ${job.error}`:job.application_success===false?'Il job non ha completato la prova: vedi i risultati per la causa.':'Il job si è concluso.';
+ if(active)detail=(job.cancellation_requested?'Stop requested: making the laboratory safe. ':'')+(step||'Starting')+` · elapsed ${elapsed}`;
+ else if(needsRecovery)detail='The laboratory must be recovered before a new job.';
+ else detail=job.error?`Outcome: ${job.error}`:job.application_success===false?'The job did not complete the run: see the results for the cause.':'The job finished.';
  const elapsedSeconds=Number.isFinite(started)?Math.max(0,(now-started)/1000):null;
  return {title:`${operation}${where} · ${STATUS_LABELS[job.status]||job.status}`,detail,active,canStop:active&&!job.cancellation_requested,needsRecovery,
-  operation:job.operation,step:step||'Avvio',elapsed,elapsedSeconds};
+  operation:job.operation,step:step||'Starting',elapsed,elapsedSeconds};
 }
 
 /* Duration of the verification: the latest successful one, else the typical 15 min measured on

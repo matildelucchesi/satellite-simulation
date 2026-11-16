@@ -8,7 +8,7 @@ const at=seconds=>new Date(Date.UTC(2026,10,7,18,54,0)+seconds*1000).toISOString
 const hot=[
  {phase:'comparison_run',method:'hot',timestamp_utc:at(-180)},
  {phase:'prepare',timestamp_utc:at(-176)},
- {phase:'preparation_operation',operation:'start_source',operation_status:'running',label:'Avvio controller sorgente',timestamp_utc:at(-120)},
+ {phase:'preparation_operation',operation:'start_source',operation_status:'running',label:'Starting the source controller',timestamp_utc:at(-120)},
  {phase:'restore_request',timestamp_utc:at(-100)},
  {phase:'preparation_operation',operation:'baseline',operation_status:'completed',timestamp_utc:at(23)},
  {phase:'trigger',orbital_s:1557,timestamp_utc:at(53)},
@@ -28,7 +28,7 @@ test('noise is dropped as events arrive',()=>{
 test('preparation holds the orbit thirty seconds before the trigger',()=>{
  const state=missionState(hot.slice(0,4),selected,'functional');
  assert.equal(state.stage,'preparing');
- assert.equal(state.preparation,'Avvio controller sorgente');
+ assert.equal(state.preparation,'Starting the source controller');
  assert.equal(state.event.event_id,'60150-1557');
  assert.equal(orbitalAt(state,Date.parse(at(0))),1527);
  assert.equal(orbitRunning(state),false);
@@ -89,14 +89,14 @@ test('relative clock is signed around the trigger',()=>{
 
 test('an interrupted run stops the phase timer and closes the downtime at the failure',()=>{
  const events=[...hot,{phase:'attempt_failed',attempt:1,reason:'Job interrupted by user',orbital_s:1730,timestamp_utc:at(226)},
-  {phase:'rollback',timestamp_utc:at(240)},{phase:'failed',timestamp_utc:at(300)},{phase:'cleanup',label:'Messa in sicurezza del laboratorio',timestamp_utc:at(305)}];
+  {phase:'rollback',timestamp_utc:at(240)},{phase:'failed',timestamp_utc:at(300)},{phase:'cleanup',label:'Making the laboratory safe',timestamp_utc:at(305)}];
  const state=missionState(events,selected,'functional');
  assert.equal(state.stage,'failed');
  assert.equal(state.current.key,'delta');
  assert.equal(state.current.status,'failed');
  assert.equal(state.current.duration_s,8);
  assert.equal(state.downtime.endMs,Date.parse(at(226)));
- assert.equal(state.cleanup,'Messa in sicurezza del laboratorio');
+ assert.equal(state.cleanup,'Making the laboratory safe');
  assert.equal(orbitRunning(state),false);
 });
 

@@ -55,11 +55,11 @@ class JobManager:
         parameters = parameters or {}
         self.validate(operation,parameters)
         if operation in NEEDS_SCENARIO and not (self.root/'config/migration_events.json').exists():
-            raise ValueError('Scenario non installato: eseguire tools/build_scenario.py e tools/install_scenario.py')
+            raise ValueError('Scenario not installed: run tools/build_scenario.py and tools/install_scenario.py')
         if parameters.get('policy') == 'cost':
             catalogue = json.loads((self.root/'config/migration_events.json').read_text(encoding='utf-8'))
             if not catalogue.get('policy_selected'):
-                raise ValueError('Eventi della politica di costo assenti: eseguire tools/destination_policy.py e '
+                raise ValueError('Cost-policy events missing: run tools/destination_policy.py and '
                                  'tools/install_scenario.py --refresh')
         if operation=='recover':
             return self.start_recovery()

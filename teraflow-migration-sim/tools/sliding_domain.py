@@ -148,12 +148,12 @@ def main(argv=None):
 
     report['journeys'] = {'start': {'source': start[0], 'source_shadow_entry_s': start[1],
                                     'trigger_s': start[1] - limits['trigger_lead_s']},
-                          'variants': [journey('fixed', 'Dominio fisso (laboratorio)', None, fixed_chains)]}
+                          'variants': [journey('fixed', 'Fixed domain (laboratory)', None, fixed_chains)]}
     for behind in args.behind:
         summaries, chains = run(lambda host, tick, behind=behind: model.domain_around(host, plane_of, latitude_at(tick), size, behind))
         report['following'][str(behind)] = aggregate(summaries)
         report['journeys']['variants'].append(
-            journey(f'following-{behind}', f'Dominio che segue il controller, {behind} satelliti dietro', behind, chains))
+            journey(f'following-{behind}', f'Domain following the controller, {behind} satellites behind', behind, chains))
 
     output = ROOT / args.output
     output.parent.mkdir(parents=True, exist_ok=True)

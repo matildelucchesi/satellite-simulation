@@ -10,12 +10,12 @@ from .storage import append_json, atomic_json, utc_now
 DEFAULTS = {'infrastructure': 120, 'start_source': 180, 'start_target': 180,
             'clean_target': 120, 'clean_source': 120, 'restore_scenario': 120,
             'restore_authority': 60, 'stop_target': 45, 'baseline': 60, 'reset_service': 120}
-LABELS = {'reset_service': 'Ripristino del servizio sulla rete esistente',
-          'infrastructure': 'Attesa disponibilità Mininet e proxy P4',
-          'start_source': 'Avvio controller sorgente', 'start_target': 'Avvio controller destinazione',
-          'clean_target': 'Pulizia scenario destinazione', 'clean_source': 'Pulizia scenario sorgente',
-          'restore_scenario': 'Configurazione e verifica della rete', 'restore_authority': 'Ripristino autorità P4',
-          'stop_target': 'Arresto previsto della destinazione', 'baseline': 'Verifica API, autorità e sonde'}
+LABELS = {'reset_service': 'Restoring the service on the existing network',
+          'infrastructure': 'Waiting for Mininet and the P4 proxy',
+          'start_source': 'Starting the source controller', 'start_target': 'Starting the destination controller',
+          'clean_target': 'Cleaning the destination scenario', 'clean_source': 'Cleaning the source scenario',
+          'restore_scenario': 'Configuring and checking the network', 'restore_authority': 'Restoring the P4 authority',
+          'stop_target': 'Planned stop of the destination', 'baseline': 'Checking API, authority and probes'}
 
 
 RESTORE_COEFFICIENTS = {'base':120, 'devices':10, 'links':2, 'additional_rules':1, 'services':30}
@@ -101,20 +101,20 @@ class PreparationBudget:
                     if unhealthy and code != 'interrupted':
                         self.error.update(code='dependency_unhealthy', unhealthy_services=unhealthy)
                 except Exception as diagnostic_error: self.error['diagnostics_error'] = str(diagnostic_error)
-            messages = {'interrupted':'Esecuzione interrotta su richiesta.',
-                        'dependency_unhealthy':'Una dipendenza del controller non supera il controllo di salute.',
-                        'startup_timeout':'Il controller non è diventato disponibile entro il limite di avvio.',
-                        'startup_failed':'Il controller non è riuscito ad avviarsi.',
-                        'preparation_timeout':'Il passaggio di preparazione ha raggiunto il limite di tempo.',
-                        'p4_not_ready':'Mininet o l’autorità P4 non sono pronti.',
-                        'invalid_baseline':'Il servizio iniziale non supera la verifica API, autorità e sonde.'}
-            messages.update(nbi_timeout='Una chiamata NBI ha superato il proprio limite di tempo.',
-                            nbi_http_error='Una chiamata NBI è stata rifiutata dal controller.')
-            self.error['message'] = messages.get(self.error['code'],'Preparazione del laboratorio non riuscita.')
+            messages = {'interrupted':'Run stopped on request.',
+                        'dependency_unhealthy':'A controller dependency fails its health check.',
+                        'startup_timeout':'The controller did not become available within the startup limit.',
+                        'startup_failed':'The controller failed to start.',
+                        'preparation_timeout':'The preparation step reached its time limit.',
+                        'p4_not_ready':'Mininet or the P4 authority is not ready.',
+                        'invalid_baseline':'The initial service fails the API, authority and probe check.'}
+            messages.update(nbi_timeout='An NBI call exceeded its time limit.',
+                            nbi_http_error='An NBI call was rejected by the controller.')
+            self.error['message'] = messages.get(self.error['code'],'Laboratory preparation failed.')
             if name=='infrastructure' and self.error['code']=='p4_not_ready' and self.error.get('infrastructure_status'):
                 unavailable=[component for component,status in self.error['infrastructure_status'].items() if not status['ready']]
-                if unavailable:self.error['message']='Infrastruttura non pronta entro il limite: '+', '.join(unavailable)+'.'
-            self.error['recovery_hint'] = 'Consultare stato e log dei servizi indicati; risolvere la causa prima di riprovare.'
+                if unavailable:self.error['message']='Infrastructure not ready within the limit: '+', '.join(unavailable)+'.'
+            self.error['recovery_hint'] = 'Check the status and logs of the services listed; fix the cause before trying again.'
             atomic_json(self.directory/'preparation-error.json', self.error)
             self.notify({**row, 'operation_status': 'failed', 'error': self.error})
             raise

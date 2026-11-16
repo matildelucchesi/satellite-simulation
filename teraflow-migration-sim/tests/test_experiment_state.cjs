@@ -4,7 +4,7 @@ const {phaseLabel,clock,duration,jobView,timeline,methodLabel,procedureDurations
 
 test('free laboratory has no job actions',()=>{
  const view=jobView(null,null);
- assert.equal(view.title,'Laboratorio libero');
+ assert.equal(view.title,'Laboratory free');
  assert.equal(view.canStop,false);
  assert.equal(view.needsRecovery,false);
 });
@@ -13,11 +13,11 @@ test('running event experiment shows event, mode, step and elapsed time',()=>{
  const job={operation:'compare_events',status:'running',started_utc:'2026-11-07T18:00:00Z',progress:{operation:'baseline'}};
  const comparison={event_total:3,current:{event:2,method:'cold'}};
  const view=jobView(job,comparison,Date.parse('2026-11-07T18:05:07Z'));
- assert.equal(view.title,'Esperimento a eventi · evento 2/3 · Cold · in corso');
- assert.match(view.detail,/Verifica di API, autorità e ping/);
+ assert.equal(view.title,'Event experiment · event 2/3 · Cold · running');
+ assert.match(view.detail,/Checking API, authority and pings/);
  assert.match(view.detail,/00:05:07/);
  assert.equal(view.canStop,true);
- assert.equal(view.step,'Verifica di API, autorità e ping');
+ assert.equal(view.step,'Checking API, authority and pings');
  assert.equal(view.elapsedSeconds,307);
 });
 
@@ -30,9 +30,9 @@ test('stop is offered once and recovery when required',()=>{
 });
 
 test('labels prefer explicit text and fall back to known phases',()=>{
- assert.equal(phaseLabel({phase:'event_comparison',label:'Evento 1/3 · HOT'}),'Evento 1/3 · HOT');
- assert.equal(phaseLabel({phase:'preparation_operation',operation:'clean_target'}),'Pulizia del database della destinazione');
- assert.equal(phaseLabel({phase:'cutover'}),'Passaggio dell’autorità');
+ assert.equal(phaseLabel({phase:'event_comparison',label:'Event 1/3 · HOT'}),'Event 1/3 · HOT');
+ assert.equal(phaseLabel({phase:'preparation_operation',operation:'clean_target'}),'Cleaning the destination database');
+ assert.equal(phaseLabel({phase:'cutover'}),'Authority handover');
  assert.equal(methodLabel('hot'),'Hot');
 });
 
@@ -42,7 +42,7 @@ test('timeline skips noisy events and consecutive duplicates',()=>{
   {id:2,phase:'restore_request',timestamp_utc:'2026-11-07T18:00:02Z'},
   {id:3,phase:'trigger',timestamp_utc:'2026-11-07T18:00:03Z'},
   {id:4,phase:'preparation_operation',operation:'baseline',operation_status:'failed',timestamp_utc:'2026-11-07T18:00:04Z'}]);
- assert.deepEqual(rows.map(row=>row.text),['Trigger della migrazione','Verifica di API, autorità e ping']);
+ assert.deepEqual(rows.map(row=>row.text),['Migration trigger','Checking API, authority and pings']);
  assert.equal(rows[1].failed,true);
  assert.equal(rows[0].time,'18:00:01');
 });
@@ -50,8 +50,8 @@ test('timeline skips noisy events and consecutive duplicates',()=>{
 test('formatting keeps missing measures explicit',()=>{
  assert.equal(clock(3725),'01:02:05');
  assert.equal(clock(undefined),'—');
- assert.equal(duration(null),'non misurato');
- assert.equal(duration(20.56),'20,6 s');
+ assert.equal(duration(null),'not measured');
+ assert.equal(duration(20.56),'20.6 s');
  assert.equal(duration(123.7),'124 s');
 });
 
@@ -76,7 +76,7 @@ test('the time axis keeps at most eight ticks',()=>{
 test('the experiment title gives run, event, replica and mode',()=>{
  const job={operation:'compare_events',status:'running',started_utc:'2026-11-07T18:00:00Z',progress:{operation:'baseline'}};
  const comparison={event_total:5,design:{replicas:5},current:{position:12,total:51,event:2,replica:3,method:'cold',warmup:false}};
- assert.equal(jobView(job,comparison,Date.parse('2026-11-07T18:01:00Z')).title,'Esperimento a eventi · prova 12/51 · evento 2/5 · replica 3/5 · Cold · in corso');
+ assert.equal(jobView(job,comparison,Date.parse('2026-11-07T18:01:00Z')).title,'Event experiment · run 12/51 · event 2/5 · replica 3/5 · Cold · running');
  comparison.current={position:1,total:51,event:1,replica:0,method:'hot',warmup:true};
- assert.match(jobView(job,comparison).title,/prova 1\/51 · evento 1\/5 · riscaldamento · Hot/);
+ assert.match(jobView(job,comparison).title,/run 1\/51 · event 1\/5 · warm-up · Hot/);
 });

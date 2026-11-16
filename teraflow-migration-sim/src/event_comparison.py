@@ -188,16 +188,16 @@ def compare(app, policy='designed'):
     root = Path(app.root)
     catalog_path = root / 'config/migration_events.json'
     if not catalog_path.exists():
-        raise ValueError('Catalogo degli eventi assente: installare un profilo di scenario')
+        raise ValueError('Event catalogue missing: install a scenario profile')
     if policy not in POLICY_EVENTS:
-        raise ValueError('Politica di destinazione sconosciuta')
+        raise ValueError('Unknown destination policy')
     catalogue = json.loads(catalog_path.read_text(encoding='utf-8'))
     selected = catalogue.get(POLICY_EVENTS[policy])
     if not selected:
-        raise ValueError('Eventi della politica di costo assenti nel catalogo installato')
+        raise ValueError('Cost-policy events missing from the installed catalogue')
     rates = app.scenario['fso']['useful_throughput_bps']
     if len(rates) != 1:
-        raise ValueError('Il confronto a eventi richiede una sola velocità nello scenario installato')
+        raise ValueError('The event comparison requires a single rate in the installed scenario')
     settings = app.scenario.get('experiment', {})
     replicas, warmup_runs = int(settings.get('replicas', 3)), int(settings.get('warmup_runs', 1))
     seed = int(settings['seed']) if settings.get('seed') is not None else secrets.randbits(32)
@@ -259,11 +259,11 @@ def compare(app, policy='designed'):
         row, event = events[item['event']]
         output['current'] = {**item, 'total': len(plan)}
         save()
-        label = 'Riscaldamento' if item['warmup'] else f'Replica {item["replica"]}/{replicas}'
+        label = 'Warm-up' if item['warmup'] else f'Replica {item["replica"]}/{replicas}'
         app.publish({'phase': 'event_comparison', 'comparison_id': identifier, 'event_index': item['event'],
                      'event_total': len(selected), 'method': item['method'], 'replica': item['replica'],
                      'replica_total': replicas, 'warmup': item['warmup'], 'position': item['position'], 'run_total': len(plan),
-                     'label': f'Prova {item["position"]}/{len(plan)} · Evento {item["event"]}/{len(selected)} · {label} · {item["method"].upper()}'})
+                     'label': f'Run {item["position"]}/{len(plan)} · Event {item["event"]}/{len(selected)} · {label} · {item["method"].upper()}'})
         result = app.run(item['method'], rates[0], copy.deepcopy(event), purpose='event-comparison')
         run = summarize_run(root, result, event, app.orbit)
         if item['warmup']:

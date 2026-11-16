@@ -113,7 +113,7 @@ function createOrbitScene(svg){
    const lit=!state.eclipsed;
    if(item.lit!==lit){
     item.lit=lit;(lit?litLayer:shadowLayer).append(item.circle);
-    item.title.textContent=`NORAD ${norad} · piano ${node.plane} · ${node.in_domain?'dominio del controller':'solo modello'} · ${lit?'al sole':'in ombra'}`;
+    item.title.textContent=`NORAD ${norad} · plane ${node.plane} · ${node.in_domain?'controller domain':'model only'} · ${lit?'in sunlight':'in shadow'}`;
    }
   }
   for(const link of links){
@@ -163,7 +163,7 @@ function createOrbitScene(svg){
   if(host){for(const element of [halo2,core]){element.setAttribute('cx',host.x.toFixed(2));element.setAttribute('cy',host.y.toFixed(2));}}
   controllerLayer.dataset.state=view.controllerState||'active';
   /* The host is named after what it carries: the controller; the destination keeps its role until the cutover */
-  for(const [tag,id,text] of [[hostTag,view.controller,'controller'],[targetTag,view.destination!==view.controller?view.destination:null,'destinazione']]){
+  for(const [tag,id,text] of [[hostTag,view.controller,'controller'],[targetTag,view.destination!==view.controller?view.destination:null,'destination']]){
    const p=where.get(id);tag.style.display=p?'':'none';if(!p)continue;
    /* Inner ring: label towards the Earth; outer ring: label towards space. Either way it never
       lands next to a satellite of the other ring. */

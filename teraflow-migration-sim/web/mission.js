@@ -6,28 +6,28 @@
    fires at the event's instant and the orchestrator reports each phase with its orbital time. */
 const MISSION_STEPS={
  hot:[
-  {key:'trigger',label:'Trigger',hint:'la sorgente sta per entrare in ombra',where:'sorgente'},
-  {key:'alignment',label:'Allineamento del percorso',hint:'60 s di contatto continuo su tutti i salti',where:'percorso'},
-  {key:'snapshot',label:'Snapshot dello stato',where:'sorgente'},
-  {key:'transfer',label:'Trasferimento dello stato',where:'percorso'},
-  {key:'target_start',label:'Avvio del controller',where:'destinazione'},
-  {key:'restore',label:'Ripristino dello stato',where:'destinazione'},
-  {key:'freeze',label:'Freeze del controller',downtime:true,where:'sorgente'},
-  {key:'delta',label:'Trasferimento del delta',downtime:true,where:'percorso, destinazione'},
-  {key:'verify',label:'Verifica di equivalenza',downtime:true,where:'destinazione'},
-  {key:'cutover',label:'Passaggio dell’autorità',downtime:true,where:'proxy P4'},
-  {key:'completed',label:'Migrazione completata',where:''}],
+  {key:'trigger',label:'Trigger',hint:'the source is about to enter shadow',where:'source'},
+  {key:'alignment',label:'Path alignment',hint:'60 s of continuous contact on every hop',where:'path'},
+  {key:'snapshot',label:'State snapshot',where:'source'},
+  {key:'transfer',label:'State transfer',where:'path'},
+  {key:'target_start',label:'Controller start',where:'destination'},
+  {key:'restore',label:'State restore',where:'destination'},
+  {key:'freeze',label:'Controller freeze',downtime:true,where:'source'},
+  {key:'delta',label:'Delta transfer',downtime:true,where:'path, destination'},
+  {key:'verify',label:'Equivalence check',downtime:true,where:'destination'},
+  {key:'cutover',label:'Authority handover',downtime:true,where:'P4 proxy'},
+  {key:'completed',label:'Migration complete',where:''}],
  cold:[
-  {key:'trigger',label:'Trigger',hint:'la sorgente sta per entrare in ombra',where:'sorgente'},
-  {key:'alignment',label:'Allineamento del percorso',hint:'60 s di contatto continuo su tutti i salti',where:'percorso'},
-  {key:'snapshot',label:'Quiete e snapshot',where:'sorgente'},
-  {key:'source_stop',label:'Arresto del controller',downtime:true,where:'sorgente'},
-  {key:'transfer',label:'Trasferimento dello stato',downtime:true,where:'percorso'},
-  {key:'target_start',label:'Avvio del controller',downtime:true,where:'destinazione'},
-  {key:'restore',label:'Ripristino dello stato',downtime:true,where:'destinazione'},
-  {key:'verify',label:'Verifica di equivalenza',downtime:true,where:'destinazione'},
-  {key:'cutover',label:'Passaggio dell’autorità',downtime:true,where:'proxy P4'},
-  {key:'completed',label:'Migrazione completata',where:''}]};
+  {key:'trigger',label:'Trigger',hint:'the source is about to enter shadow',where:'source'},
+  {key:'alignment',label:'Path alignment',hint:'60 s of continuous contact on every hop',where:'path'},
+  {key:'snapshot',label:'Quiescence and snapshot',where:'source'},
+  {key:'source_stop',label:'Controller stop',downtime:true,where:'source'},
+  {key:'transfer',label:'State transfer',downtime:true,where:'path'},
+  {key:'target_start',label:'Controller start',downtime:true,where:'destination'},
+  {key:'restore',label:'State restore',downtime:true,where:'destination'},
+  {key:'verify',label:'Equivalence check',downtime:true,where:'destination'},
+  {key:'cutover',label:'Authority handover',downtime:true,where:'P4 proxy'},
+  {key:'completed',label:'Migration complete',where:''}]};
 
 const ORBIT_LEAD_S=30;
 const NOISE=new Set(['restore_request','restore_progress','heartbeat','infrastructure_wait','source_startup']);
