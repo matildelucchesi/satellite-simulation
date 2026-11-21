@@ -26,6 +26,25 @@ def latency_offset_s(end_byte, one_way_delay_s):
     return 2 * one_way_delay_s * (1 + max(0, rounds))
 
 
+def modelled_transfer(size_bytes, one_way_delay_s, useful_rate_bps):
+    """Time ``transfer`` takes on an ideal host for this payload: each block leaves when both the
+    rate and the path's latency (handshake and slow start) allow it, then the receipt crosses the
+    path back. ``crossings`` is how many times the transfer crosses the path when the latency
+    bounds it: every link of the path then adds ``crossings`` times its own delay."""
+    target = 0.0
+    for end in range(min(BLOCK, size_bytes), size_bytes + BLOCK, BLOCK):
+        end = min(end, size_bytes)
+        target = max(end * 8 / useful_rate_bps, latency_offset_s(end, one_way_delay_s))
+        if end == size_bytes:
+            break
+    latency_bound = latency_offset_s(size_bytes, one_way_delay_s) + one_way_delay_s
+    rate_bound = size_bytes * 8 / useful_rate_bps + one_way_delay_s
+    rounds = max(0, math.ceil(math.log2(size_bytes / INITIAL_WINDOW_BYTES + 1)) - 1) if size_bytes > 0 else 0
+    return {'modelled_s': target + one_way_delay_s, 'serialization_s': size_bytes * 8 / useful_rate_bps,
+            'bound': 'latency' if latency_bound >= rate_bound else 'rate',
+            'crossings': 2 * (1 + rounds) + 1, 'slow_start_rounds': rounds}
+
+
 def exact(sock, size):
     result = bytearray()
     while len(result) < size:

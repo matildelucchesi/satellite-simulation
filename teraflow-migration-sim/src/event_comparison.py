@@ -19,6 +19,7 @@ import uuid
 from pathlib import Path
 
 from .artifacts import file_digest
+from .transport import modelled_transfer
 from .results import requires_recovery, summary_metrics
 from .storage import atomic_json, utc_now
 
@@ -62,6 +63,60 @@ def feasibility(event, total_operation_s, orbit):
     return out
 
 
+def _link_breakdown(route, delay, model, orbital_s, orbit):
+    """Links of a transfer route with their length, delay and share, or None if the orbit at the
+    start of the transfer does not give back the delay the transfer used."""
+    graph = getattr(orbit, 'graph', None)
+    if graph is None or orbital_s is None or model is None:
+        return None
+    from .orbit import SPEED_OF_LIGHT_KM_S
+    for tick in (int(orbital_s), int(orbital_s) - 1, int(orbital_s) + 1):
+        try:
+            edges = graph(tick)
+            lengths = [edges[a][b] for a, b in zip(route, route[1:])]
+        except (KeyError, ValueError, IndexError):
+            continue
+        if abs(sum(lengths) / SPEED_OF_LIGHT_KM_S - delay) <= 1e-9 + 1e-6 * delay:
+            times = model['crossings'] if model['bound'] == 'latency' else 1
+            return [{'from': a, 'to': b, 'distance_km': km, 'delay_s': km / SPEED_OF_LIGHT_KM_S,
+                     'share_s': times * km / SPEED_OF_LIGHT_KM_S}
+                    for (a, b), km in zip(zip(route, route[1:]), lengths)]
+    return None
+
+
+def transfer_breakdown(result, orbit):
+    """The state transfers of the accepted attempt, in order, each link by link (Cold: the
+    snapshot; Hot: the snapshot before the freeze and the delta during it).
+
+    The route is the one the transfer used (fewest km at its start; it can differ from the event's
+    planned path, fewest hops). The laboratory moves the state with one TCP connection on the host
+    and emulates the whole path's delay, so a link has no time of its own: its share is its
+    propagation delay times the times the transfer crosses the path (handshake, slow-start rounds,
+    final receipt) when the latency bounds the transfer, once otherwise. The rest of the measured
+    time is the host's. Link lengths come from the orbit at the start of the transfer and must add
+    up to the delay the transfer used, otherwise ``links`` is None."""
+    transfers, started = [], {}
+    for event in result.get('events') or []:
+        phase = event.get('phase')
+        if phase == 'attempt_failed':
+            transfers, started = [], {}
+        elif phase == 'transfer':
+            started[event.get('payload')] = event.get('orbital_s')
+        elif phase == 'transfer_verified':
+            receipt = event.get('receipt') or {}
+            if not receipt.get('route') or receipt.get('elapsed_s') is None:
+                continue
+            route, delay = receipt['route'], receipt.get('one_way_delay_s') or 0.0
+            size = receipt.get('received_bytes') or receipt.get('sent_bytes') or 0
+            rate = receipt.get('configured_rate_bps')
+            model = modelled_transfer(size, delay, rate) if size and rate else None
+            transfers.append({'payload': event.get('payload'), 'route': route, 'bytes': size,
+                              'measured_s': receipt['elapsed_s'], 'one_way_delay_s': delay, 'model': model,
+                              'host_s': receipt['elapsed_s'] - model['modelled_s'] if model else None,
+                              'links': _link_breakdown(route, delay, model, started.get(event.get('payload')), orbit)})
+    return transfers
+
+
 def summarize_run(root, result, event, orbit):
     ping = ((result.get('probes') or {}).get('ping')) or {}
     metrics = summary_metrics(result)
@@ -79,6 +134,7 @@ def summarize_run(root, result, event, orbit):
     row['phases'] = phase_breakdown(Path(root) / 'results/runs' / str(result.get('run_id')))
     receipts = [event.get('receipt') or {} for event in result.get('events') or [] if event.get('phase') == 'transfer_verified']
     row['transfer_one_way_delay_s'] = next((r['one_way_delay_s'] for r in receipts if r.get('one_way_delay_s') is not None), None)
+    row['transfers'] = transfer_breakdown(result, orbit)
     row['feasibility'] = feasibility(event, row['total_operation_s'], orbit)
     return row
 
@@ -231,7 +287,10 @@ def compare(app, policy='designed'):
         if policy == 'cost':
             row.update(designed_event_id=entry.get('designed_event_id'),
                        replaces_designed_entry=bool(entry.get('replaces_designed_entry')),
-                       stay_s=entry.get('stay_s'), control_latency_ms=entry.get('control_latency_ms'))
+                       stay_s=entry.get('stay_s'), control_latency_ms=entry.get('control_latency_ms'),
+                       # Every satellite the policy weighed at this shadow entry, so the results
+                       # explain the choice that was run even after the catalogue changes
+                       candidates=entry.get('candidates'))
         events[index] = (row, app.catalog_event(entry, f'event{index}', ['source_shadow'], 'event-comparison'))
         output['events'].append(row)
 

@@ -20,6 +20,8 @@
  --color-atmosphere:oklch(78% .09 220);--color-orbit:oklch(45% .04 245);
  /* Orbit view: satellites in sunlight, in shadow, and the one hosting the controller */
  --color-sun:oklch(89% .16 95);--color-night:oklch(66% .13 252);--color-host:oklch(72% .19 305);
+ /* Results: the two migration modes. Hot red, Cold light blue, apart in lightness too. */
+ --color-hot:oklch(66% .2 25);--color-cold:oklch(83% .1 230);
  --font-display:'STIX Two Text',Cambria,Georgia,serif;
  --font-body:'IBM Plex Sans','Segoe UI',system-ui,sans-serif;
  --font-mono:'IBM Plex Mono','Cascadia Mono',Consolas,monospace;

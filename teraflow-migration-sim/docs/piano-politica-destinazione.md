@@ -19,7 +19,7 @@ Aggiungere all'esperimento una seconda politica di scelta della destinazione del
 | Selezione | Downtime Hot, soglia 95 %. |
 | Permanenza | Dalla fine della migrazione più lunga (Cold, 194 s di mediana) al trigger della destinazione. |
 | Permanenza minima | 600 s dopo la migrazione (`minimum_stay_s`). Senza, la politica sceglie destinazioni che restano appena oltre la soglia (circa 170 s) e il controller migra ogni 6 minuti, metà del tempo in migrazione. Con 600 s migra circa ogni 15 minuti (21 % del tempo in migrazione, downtime Cold 14,5 %). |
-| Eventi della politica | Sugli ingressi in ombra degli eventi progettati; un ingresso non servito è sostituito dall'ingresso servito più vicino nel tempo. Non in catena: nel dominio fisso, con 600 s di permanenza, una catena regge una sola migrazione (vedi punto 8). L'evoluzione nel tempo del controller si studia nel modello, con il dominio che lo segue. |
+| Eventi della politica | Sugli ingressi in ombra degli eventi progettati; un ingresso non servito è sostituito dall'ingresso servito più vicino nel tempo con sorgente e destinazione non usate dagli altri eventi, così le tre migrazioni sono distinte. Non in catena: nel dominio fisso, con 600 s di permanenza, una catena regge una sola migrazione (vedi punto 8). L'evoluzione nel tempo del controller si studia nel modello, con il dominio che lo segue. |
 
 ## Casualità nella scelta dei percorsi di TeraFlow
 
@@ -53,13 +53,14 @@ Risultati sul profilo installato (downtime e durate da `events-f77d737a…`: Hot
 ### 2. Catalogo con gli eventi della politica — fatto
 
 - `tools/destination_policy.py --downtime-from events-…` legge il profilo senza rifare la propagazione SGP4, prende le mediane di downtime e durata dall'esperimento e scrive in `events.json` del profilo `destination_policy` (parametri, scelte, sensibilità, confronto) e `policy_selected`. Aggiorna l'hash nel manifest. `build_scenario.py` usa le stesse funzioni.
-- `policy_selected` (`policy_selected_events`): per ognuno dei 3 eventi progettati, la destinazione della politica sullo stesso ingresso in ombra della stessa sorgente. Un ingresso che la politica non può servire è sostituito dall'ingresso servito più vicino nel tempo, non già usato; l'evento registra `replaces_designed_entry` e il motivo.
+- `policy_selected` (`policy_selected_events`): per ognuno dei 3 eventi progettati, la destinazione della politica sullo stesso ingresso in ombra della stessa sorgente. Un ingresso che la politica non può servire è sostituito dall'ingresso servito più vicino nel tempo, non già usato, la cui sorgente e destinazione non compaiono (né come sorgente né come destinazione) negli altri eventi; l'evento registra `replaces_designed_entry` e il motivo. Prima della regola il sostituto di 62768-8295 era 62774 → 60138 alle 02:06:08, la stessa migrazione dell'evento 2 (esperimento `job-98035e08…`, 18 novembre 2026).
+- Ogni evento della politica porta `candidates` (`candidate_map`): tutti i satelliti del dominio all'ingresso in ombra, con latenza di controllo, permanenza e disponibilità di quelli che rispettano i vincoli e, per gli esclusi, il primo vincolo che non rispettano (`REJECTION_REASONS`). La console lo disegna nella tabella degli eventi della politica.
 - Con la permanenza minima di 600 s la politica serve 90 dei 240 ingressi in ombra del dominio, con 5–6 salti: ogni satellite più indietro sull'orbita dà circa 180 s di luce in più, quindi 600 s richiedono di andare 5 o 6 satelliti indietro.
 - Eventi installati (permanenza minima 600 s):
 
 | Evento progettato | Evento della politica | Destinazione | Salti | Permanenza | Latenza |
 | --- | --- | --- | --- | --- | --- |
-| 62768-8295 | 62774-7568 (sostituto) | 60138, altro piano | 6 | 705 s | 17,7 ms |
+| 62768-8295 | 62775-7387 (sostituto) | 60142, altro piano | 6 | 705 s | 14,0 ms |
 | 62774-58281 | 62774-58281 | 60138, altro piano | 6 | 702 s | 17,7 ms |
 | 60150-80439 | 60150-80439 | 68285, stesso piano | 5 | 714 s | 11,5 ms |
 

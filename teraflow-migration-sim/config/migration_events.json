@@ -9413,28 +9413,28 @@
    "laser_links.json": "c877cda66cbb719f447d7e7ba9b8831b0729a4d49a9751730c59b1e2c1fcf2f0",
    "domain.json": "7537c051b53f52e5be1217255cacd19fa40c04eb869508f1a761b8968cfc8533",
    "selected_constellation.json": "51960ca5d38b5cc146b20c005aa3e57c2a1b16a5b5ffe94dd0d06cf7abeb96bb",
-   "model_sha256": "0d482df25a3a1b23d1962782d26730a1b1137486c85c4033510ffdfe7d7b930f",
-   "created_utc": "2026-11-12T18:34:28.758980+00:00"
+   "model_sha256": "bdb890e6c7437ee2c6f360dfe04fd1c86bf69e3ab6183669875cbf695c2b996a",
+   "created_utc": "2026-11-18T13:04:10.091820+00:00"
   }
  },
  "policy_selected": [
   {
-   "event_id": "62774-7568-cost",
-   "source": 62774,
-   "trigger_s": 7568,
-   "source_shadow_entry_s": 8468,
+   "event_id": "62775-7387-cost",
+   "source": 62775,
+   "trigger_s": 7387,
+   "source_shadow_entry_s": 8287,
    "source_light_remaining_s": 900,
    "reachable_satellites": 61,
-   "destination": 60138,
+   "destination": 60142,
    "hops": 6,
    "path": [
-    62774,
-    58883,
-    58893,
+    62775,
+    60141,
+    68283,
+    60144,
     58890,
     68285,
-    60142,
-    60138
+    60142
    ],
    "other_plane": true,
    "destination_light_remaining_s": 1799,
@@ -9443,7 +9443,7 @@
    "path_end_s": 86400,
    "stay_s": 704.925078500004,
    "stay_from_trigger_s": 899,
-   "control_latency_ms": 17.66427894648226,
+   "control_latency_ms": 13.965524891012016,
    "downtime_fraction": {
     "cold": 0.1864176615472722,
     "hot": 0.009469503502688109
@@ -9451,7 +9451,124 @@
    "designed_event_id": "62768-8295",
    "same_destination": false,
    "replaces_designed_entry": true,
-   "replacement_reason": "nessuna destinazione ammessa sull ingresso in ombra progettato: ingresso servito piu vicino nel tempo"
+   "replacement_reason": "nessuna destinazione ammessa sull ingresso in ombra progettato: ingresso servito piu vicino nel tempo, con sorgente e destinazione non usate dagli altri eventi",
+   "candidates": [
+    {
+     "satellite": 60138,
+     "hops": 7,
+     "stay_s": 885.925078500004,
+     "control_latency_ms": 17.649308081000903,
+     "availability": 0.992465174920558,
+     "status": "admissible"
+    },
+    {
+     "satellite": 60142,
+     "hops": 6,
+     "stay_s": 704.925078500004,
+     "control_latency_ms": 13.965524891012016,
+     "availability": 0.9905304964973118,
+     "status": "chosen"
+    },
+    {
+     "satellite": 68285,
+     "hops": 5,
+     "stay_s": 519.925078500004,
+     "control_latency_ms": 11.502062214789005,
+     "availability": 0.9871610530516304,
+     "status": "excluded",
+     "reason": "short_stay"
+    },
+    {
+     "satellite": 58890,
+     "hops": 4,
+     "stay_s": 341.925078500004,
+     "control_latency_ms": 10.277633669231552,
+     "availability": 0.9804773299189623,
+     "status": "excluded",
+     "reason": "short_stay"
+    },
+    {
+     "satellite": 60144,
+     "hops": 3,
+     "stay_s": 157.92507850000402,
+     "control_latency_ms": 10.271359274611264,
+     "availability": 0.95773128268549,
+     "status": "excluded",
+     "reason": "short_stay"
+    },
+    {
+     "satellite": 68283,
+     "status": "excluded",
+     "reason": "shadow_before_migration_ends"
+    },
+    {
+     "satellite": 60141,
+     "status": "excluded",
+     "reason": "little_light"
+    },
+    {
+     "satellite": 60150,
+     "status": "excluded",
+     "reason": "little_light"
+    },
+    {
+     "satellite": 62760,
+     "hops": 6,
+     "stay_s": 895.925078500004,
+     "control_latency_ms": 17.66353577161398,
+     "availability": 0.9925492759828036,
+     "status": "admissible"
+    },
+    {
+     "satellite": 62768,
+     "hops": 5,
+     "stay_s": 713.925078500004,
+     "control_latency_ms": 13.986659706532627,
+     "availability": 0.9906498725132143,
+     "status": "admissible"
+    },
+    {
+     "satellite": 62776,
+     "hops": 4,
+     "stay_s": 532.925078500004,
+     "control_latency_ms": 11.524538798641867,
+     "availability": 0.9874742421227819,
+     "status": "excluded",
+     "reason": "short_stay"
+    },
+    {
+     "satellite": 58893,
+     "hops": 3,
+     "stay_s": 351.925078500004,
+     "control_latency_ms": 10.30193151088097,
+     "availability": 0.9810320693016812,
+     "status": "excluded",
+     "reason": "short_stay"
+    },
+    {
+     "satellite": 58883,
+     "hops": 2,
+     "stay_s": 170.92507850000402,
+     "control_latency_ms": 10.27433984300131,
+     "availability": 0.9609461024761892,
+     "status": "excluded",
+     "reason": "short_stay"
+    },
+    {
+     "satellite": 62774,
+     "status": "excluded",
+     "reason": "shadow_before_migration_ends"
+    },
+    {
+     "satellite": 62775,
+     "status": "source"
+    },
+    {
+     "satellite": 58886,
+     "status": "excluded",
+     "reason": "little_light"
+    }
+   ]
   },
   {
    "event_id": "62774-58281-cost",
@@ -9485,7 +9602,118 @@
    },
    "designed_event_id": "62774-58281",
    "same_destination": false,
-   "replaces_designed_entry": false
+   "replaces_designed_entry": false,
+   "candidates": [
+    {
+     "satellite": 60138,
+     "hops": 6,
+     "stay_s": 701.925078500004,
+     "control_latency_ms": 17.662874899190466,
+     "availability": 0.9904900242141891,
+     "status": "chosen"
+    },
+    {
+     "satellite": 60142,
+     "hops": 5,
+     "stay_s": 520.925078500004,
+     "control_latency_ms": 13.978859968974223,
+     "availability": 0.9871856994882836,
+     "status": "excluded",
+     "reason": "short_stay"
+    },
+    {
+     "satellite": 68285,
+     "hops": 4,
+     "stay_s": 335.925078500004,
+     "control_latency_ms": 11.504659681030754,
+     "availability": 0.9801286330577179,
+     "status": "excluded",
+     "reason": "short_stay"
+    },
+    {
+     "satellite": 58890,
+     "hops": 3,
+     "stay_s": 157.92507850000402,
+     "control_latency_ms": 10.284158388883506,
+     "availability": 0.95773128268549,
+     "status": "excluded",
+     "reason": "short_stay"
+    },
+    {
+     "satellite": 60144,
+     "status": "excluded",
+     "reason": "shadow_before_migration_ends"
+    },
+    {
+     "satellite": 68283,
+     "status": "excluded",
+     "reason": "little_light"
+    },
+    {
+     "satellite": 60141,
+     "status": "excluded",
+     "reason": "little_light"
+    },
+    {
+     "satellite": 60150,
+     "status": "excluded",
+     "reason": "little_light"
+    },
+    {
+     "satellite": 62760,
+     "hops": 5,
+     "stay_s": 714.925078500004,
+     "control_latency_ms": 17.689061392639875,
+     "availability": 0.9906629509850263,
+     "status": "admissible"
+    },
+    {
+     "satellite": 62768,
+     "hops": 4,
+     "stay_s": 532.925078500004,
+     "control_latency_ms": 13.988768472477307,
+     "availability": 0.9874742421227819,
+     "status": "excluded",
+     "reason": "short_stay"
+    },
+    {
+     "satellite": 62776,
+     "hops": 3,
+     "stay_s": 351.925078500004,
+     "control_latency_ms": 11.530270980701866,
+     "availability": 0.9810320693016812,
+     "status": "excluded",
+     "reason": "short_stay"
+    },
+    {
+     "satellite": 58893,
+     "hops": 2,
+     "stay_s": 170.92507850000402,
+     "control_latency_ms": 10.310398712811432,
+     "availability": 0.9609461024761892,
+     "status": "excluded",
+     "reason": "short_stay"
+    },
+    {
+     "satellite": 58883,
+     "status": "excluded",
+     "reason": "shadow_before_migration_ends"
+    },
+    {
+     "satellite": 62774,
+     "status": "source"
+    },
+    {
+     "satellite": 62775,
+     "status": "excluded",
+     "reason": "little_light"
+    },
+    {
+     "satellite": 58886,
+     "status": "excluded",
+     "reason": "little_light"
+    }
+   ]
   },
   {
    "event_id": "60150-80439-cost",
@@ -9518,7 +9746,134 @@
    },
    "designed_event_id": "60150-80439",
    "same_destination": false,
-   "replaces_designed_entry": false
+   "replaces_designed_entry": false,
+   "candidates": [
+    {
+     "satellite": 60138,
+     "hops": 7,
+     "stay_s": 1079.925078500004,
+     "control_latency_ms": 17.63073410715575,
+     "availability": 0.993818746658555,
+     "status": "admissible"
+    },
+    {
+     "satellite": 60142,
+     "hops": 6,
+     "stay_s": 898.925078500004,
+     "control_latency_ms": 13.947381470747509,
+     "availability": 0.9925741414277515,
+     "status": "admissible"
+    },
+    {
+     "satellite": 68285,
+     "hops": 5,
+     "stay_s": 713.925078500004,
+     "control_latency_ms": 11.478893677049665,
+     "availability": 0.9906498725132143,
+     "status": "chosen"
+    },
+    {
+     "satellite": 58890,
+     "hops": 4,
+     "stay_s": 535.925078500004,
+     "control_latency_ms": 10.261036781662263,
+     "availability": 0.9875443587774024,
+     "status": "excluded",
+     "reason": "short_stay"
+    },
+    {
+     "satellite": 60144,
+     "hops": 3,
+     "stay_s": 353.925078500004,
+     "control_latency_ms": 10.256276979885918,
+     "availability": 0.9811392554371126,
+     "status": "excluded",
+     "reason": "short_stay"
+    },
+    {
+     "satellite": 68283,
+     "hops": 2,
+     "stay_s": 168.92507850000402,
+     "control_latency_ms": 11.53356771171416,
+     "availability": 0.9604837211901114,
+     "status": "excluded",
+     "reason": "short_stay"
+    },
+    {
+     "satellite": 60141,
+     "status": "excluded",
+     "reason": "shadow_before_migration_ends"
+    },
+    {
+     "satellite": 60150,
+     "status": "source"
+    },
+    {
+     "satellite": 62760,
+     "hops": 8,
+     "stay_s": 1094.925078500004,
+     "control_latency_ms": 17.64195781788134,
+     "availability": 0.9939034271558258,
+     "status": "admissible"
+    },
+    {
+     "satellite": 62768,
+     "hops": 7,
+     "stay_s": 911.925078500004,
+     "control_latency_ms": 13.954784756396869,
+     "availability": 0.9926800011784209,
+     "status": "admissible"
+    },
+    {
+     "satellite": 62776,
+     "hops": 6,
+     "stay_s": 730.925078500004,
+     "control_latency_ms": 11.500266314735265,
+     "availability": 0.9908673396270826,
+     "status": "admissible"
+    },
+    {
+     "satellite": 58893,
+     "hops": 5,
+     "stay_s": 550.925078500004,
+     "control_latency_ms": 10.286215961265258,
+     "availability": 0.9878834876819128,
+     "status": "excluded",
+     "reason": "short_stay"
+    },
+    {
+     "satellite": 58883,
+     "hops": 4,
+     "stay_s": 369.925078500004,
+     "control_latency_ms": 10.263534595660873,
+     "availability": 0.9819550203866797,
+     "status": "excluded",
+     "reason": "short_stay"
+    },
+    {
+     "satellite": 62774,
+     "hops": 3,
+     "stay_s": 184.92507850000402,
+     "control_latency_ms": 11.527712007273907,
+     "availability": 0.9639027299372577,
+     "status": "excluded",
+     "reason": "short_stay"
+    },
+    {
+     "satellite": 62775,
+     "hops": 2,
+     "stay_s": 2.9250785000040196,
+     "control_latency_ms": 13.987966113012288,
+     "availability": -1.2820893524667132,
+     "status": "excluded",
+     "reason": "short_stay"
+    },
+    {
+     "satellite": 58886,
+     "status": "excluded",
+     "reason": "shadow_before_migration_ends"
+    }
+   ]
   }
  ]
 }

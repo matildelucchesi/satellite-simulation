@@ -245,6 +245,41 @@ class DestinationPolicyTests(DesignedEventTests):
         self.assertEqual([row['destination'] for row in self.candidates(availability_min=0.5, minimum_stay_s=2750)[1]], [4])
         self.assertEqual(model.DESTINATION_POLICY['minimum_stay_s'], 600.0)
 
+    def test_the_candidate_map_shows_every_domain_satellite_and_why(self):
+        distance = lambda a, b, tick: 3000.0
+        parameters = {**self.SELECTION, 'downtime_s': self.DOWNTIME, 'duration_s': self.DURATION, 'overhead_ms': 0.0,
+                      'rule': 'ignored'}
+        view = lambda domain, **changes: {entry['satellite']: entry for entry in model.candidate_map(
+            self.index, self.periods, list(domain), self.plane, 1, 1000, distance, **self.LIMITS, **(parameters | changes))}
+        rows = view((1, 2, 3, 4))
+        self.assertEqual(list(rows), [1, 2, 3, 4])
+        self.assertEqual({sid: entry['status'] for sid, entry in rows.items()},
+                         {1: 'source', 2: 'excluded', 3: 'chosen', 4: 'admissible'})
+        # 2 meets the constraints but half of its 200 s stay would be Cold downtime
+        self.assertEqual(rows[2]['reason'], 'low_availability')
+        self.assertAlmostEqual(rows[2]['availability'], 0.5)
+        self.assertEqual((rows[3]['hops'], rows[3]['stay_s']), (2, 2700))
+        self.assertAlmostEqual(rows[3]['control_latency_ms'], 4 / 3 * 3000.0 / model.LIGHT_SPEED_KM_S * 1000.0)
+        # The minimum stay excludes 3 too: the policy then chooses 4
+        longer = view((1, 2, 3, 4), minimum_stay_s=2750)
+        self.assertEqual((longer[3]['status'], longer[3]['reason'], longer[4]['status']), ('excluded', 'short_stay', 'chosen'))
+        # A satellite reached only through one outside the domain has no path in it
+        smaller = view((1, 2, 4))
+        self.assertEqual((smaller[4]['status'], smaller[4]['reason']), ('excluded', 'path_outside_domain'))
+        rejected = {}
+        model.destination_candidates(self.index, self.periods, [1, 2, 4], self.plane, 1, 1000, distance, **self.LIMITS,
+                                     downtime_s=self.DOWNTIME, duration_s=self.DURATION, rejected=rejected)
+        self.assertEqual(rejected[4], 'path_outside_domain')
+        self.assertTrue(set(rejected.values()) <= set(model.REJECTION_REASONS))
+        # Attached to policy events: the chosen satellite must be the event's destination
+        pick = {'event_id': '1-800-cost', 'source': 1, 'source_shadow_entry_s': 1000, 'destination': 3}
+        model.attach_candidate_maps([pick], parameters, self.index, self.periods, [1, 2, 3, 4], self.plane, distance,
+                                    **self.LIMITS)
+        self.assertEqual(len(pick['candidates']), 4)
+        with self.assertRaises(ValueError):
+            model.attach_candidate_maps([pick | {'destination': 4}], parameters, self.index, self.periods, [1, 2, 3, 4],
+                                        self.plane, distance, **self.LIMITS)
+
     def test_the_stay_starts_at_the_end_of_the_longest_migration(self):
         # With a 350 s migration the trigger of 2 (300 s after this one) comes before its end
         rows = self.candidates(availability_min=0.01, duration_s={'hot': 50.0, 'cold': 350.0})[1]
@@ -330,13 +365,45 @@ class DestinationPolicyTests(DesignedEventTests):
         self.assertTrue(pick['replaces_designed_entry'])
         self.assertEqual(pick['designed_event_id'], '1-800')
         self.assertIn('replacement_reason', pick)
-        # An entry already used by another designed event is not taken twice
+        # On this rail every other served entry shares a satellite with the nearest one: once that
+        # one is a designed event, no distinct replacement is left
         served_row = {'event_id': nearest['event_id'], 'source': nearest['source'], 'trigger_s': nearest['trigger_s'],
                       'source_shadow_entry_s': nearest['source_shadow_entry_s'], 'policy': nearest, 'same_destination': True}
-        picks = model.policy_selected_events([served_row, unserved], others, self.index, 100)
-        self.assertNotEqual((picks[1]['source'], picks[1]['trigger_s']), (nearest['source'], nearest['trigger_s']))
+        with self.assertRaises(ValueError):
+            model.policy_selected_events([served_row, unserved], others, self.index, 100)
         with self.assertRaises(ValueError):
             model.policy_selected_events([unserved], [], self.index, 100)
+
+    def test_a_replacement_is_a_migration_distinct_from_the_other_events(self):
+        class Index:
+            def hops(self, source, trigger):
+                return {source: 0, 10: 1, 11: 1, 12: 1}, {}
+
+            def path_end(self, source, destination, trigger, *_):
+                return trigger + 1000
+
+        def served(source, destination, trigger):
+            return {'event_id': f'{source}-{trigger}', 'source': source, 'destination': destination, 'hops': 2,
+                    'path': [source, 9, destination], 'other_plane': False, 'trigger_s': trigger,
+                    'source_shadow_entry_s': trigger + 900, 'destination_light_remaining_s': 1500,
+                    'stay_s': 700, 'stay_from_trigger_s': 800, 'control_latency_ms': 12.0, 'downtime_fraction': {'hot': 0.01}}
+
+        kept = served(1, 10, 5000)
+        events = [kept, served(1, 11, 990),   # nearest, but the same source as the kept event
+                  served(2, 10, 1020),        # same destination as the kept event
+                  served(3, 11, 1100),        # distinct: taken by the first replacement
+                  served(4, 11, 1150),        # destination already taken by the first replacement
+                  served(5, 12, 1300)]        # distinct: taken by the second replacement
+        row = lambda event: {'event_id': event['event_id'], 'source': event['source'], 'trigger_s': event['trigger_s'],
+                             'source_shadow_entry_s': event['source_shadow_entry_s'], 'policy': event, 'same_destination': True}
+        unserved = lambda name: {'event_id': name, 'source': 7, 'trigger_s': 1000, 'source_shadow_entry_s': 1900,
+                                 'policy': None, 'same_destination': False}
+        picks = model.policy_selected_events([unserved('7-1000'), row(kept), unserved('8-1000')], events, Index(), 100)
+        self.assertEqual([(pick['source'], pick['destination']) for pick in picks], [(3, 11), (1, 10), (5, 12)])
+        self.assertEqual([pick['replaces_designed_entry'] for pick in picks], [True, False, True])
+        self.assertIn('non usate', picks[0]['replacement_reason'])
+        with self.assertRaises(ValueError):
+            model.policy_selected_events([unserved('7-1000'), row(kept), unserved('8-1000')], events[:-1], Index(), 100)
 
     def test_following_the_controller_until_the_policy_or_the_replay_stops(self):
         distance = lambda a, b, tick: 3000.0

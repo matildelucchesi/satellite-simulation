@@ -17,8 +17,18 @@ def entry(index, trigger):
             'source_light_remaining_s': 900, 'destination_light_remaining_s': 1800, 'path_end_s': 86400}
 
 
+def receipt(route, size):
+    # 3000 km per link at 1 Gbit/s, plus 1 ms of host time over the model
+    from src.transport import modelled_transfer
+    delay = 3000.0 * (len(route) - 1) / 299792.458
+    return {'route': route, 'one_way_delay_s': delay, 'received_bytes': size, 'configured_rate_bps': 1000000000,
+            'elapsed_s': modelled_transfer(size, delay, 1000000000)['modelled_s'] + 0.001}
+
+
 class FakeOrbit:
     duration = 86400
+    def graph(self, tick):
+        return {a: {b: 3000.0 for b in (1, 2, 8, 9) if b != a} for a in (1, 2, 8, 9)}
     def contact(self, a, b, tick): return False
     def migration_link(self, a, b, tick): return True
 
@@ -57,7 +67,16 @@ class EventComparisonTests(unittest.TestCase):
                 'baseline': {'success': True}, 'service_verification': {'success': not failed},
                 'controller_downtime_s': downtime, 'total_operation_s': 190.0 if method == 'hot' else 1000.0,
                 'probes': {'ping': {'observed_probes': 2000, 'lost_probes': 0, 'time_to_stable_recovery_s': None}},
-                'software_on_board': True, 'recovery_required': len(self.calls) in self.recovery}
+                'software_on_board': True, 'recovery_required': len(self.calls) in self.recovery,
+                # Hot: a failed attempt, then the accepted one with its snapshot and delta
+                'events': [{'phase': 'transfer', 'payload': 'snapshot-1.json', 'orbital_s': 1000.2},
+                           {'phase': 'transfer_verified', 'payload': 'snapshot-1.json', 'receipt': receipt([1, 9, 2], 4000)},
+                           {'phase': 'attempt_failed', 'attempt': 1},
+                           {'phase': 'transfer', 'payload': 'snapshot-2.json', 'orbital_s': 1100.4},
+                           {'phase': 'transfer_verified', 'payload': 'snapshot-2.json', 'receipt': receipt([1, 8, 2], 250000)},
+                           {'phase': 'transfer', 'payload': 'delta-2.json', 'orbital_s': 1180.0},
+                           {'phase': 'transfer_verified', 'payload': 'delta-2.json', 'receipt': receipt([1, 8, 2], 500)}]
+                if method == 'hot' else []}
 
     def test_warmup_then_replicas_over_all_events_with_random_pair_order(self):
         output = module.compare(self.app)
@@ -82,6 +101,19 @@ class EventComparisonTests(unittest.TestCase):
         self.assertEqual(hot['phases']['seconds']['queued_topology_apply'], 11.0)
         self.assertTrue(hot['feasibility']['fits_before_shadow'])
         self.assertFalse(event['replicas'][0]['runs']['cold']['feasibility']['fits_before_shadow'])
+        # The route is the last attempt's; a run without transfer receipts has none
+        # The transfers of the accepted attempt only, each link with its share of the measured time
+        transfers = hot['transfers']
+        self.assertEqual([item['payload'] for item in transfers], ['snapshot-2.json', 'delta-2.json'])
+        snapshot, delta = transfers
+        self.assertEqual(snapshot['route'], [1, 8, 2])
+        self.assertEqual((snapshot['model']['bound'], snapshot['model']['crossings']), ('latency', 11))
+        self.assertEqual(delta['model']['crossings'], 3)
+        self.assertAlmostEqual(snapshot['host_s'], 0.001)
+        self.assertEqual([(link['from'], link['to']) for link in snapshot['links']], [(1, 8), (8, 2)])
+        self.assertAlmostEqual(sum(link['share_s'] for link in snapshot['links']),
+                               11 * snapshot['one_way_delay_s'])
+        self.assertEqual(event['replicas'][0]['runs']['cold']['transfers'], [])
         directory = self.root / 'results/event-comparisons' / output['comparison_id']
         with open(directory / 'summary.csv', encoding='utf-8') as handle:
             rows = list(csv.DictReader(handle))
@@ -98,7 +130,8 @@ class EventComparisonTests(unittest.TestCase):
     def test_cost_policy_runs_the_policy_events_with_hot_and_cold(self):
         catalogue = json.loads((self.root / 'config/migration_events.json').read_text())
         policy = [{**entry(1, 1000), 'event_id': 'e1-cost', 'destination': 31, 'designed_event_id': 'e1',
-                   'replaces_designed_entry': False, 'stay_s': 300, 'control_latency_ms': 12.0},
+                   'replaces_designed_entry': False, 'stay_s': 300, 'control_latency_ms': 12.0,
+                   'candidates': [{'satellite': 31, 'status': 'chosen', 'control_latency_ms': 12.0}]},
                   {**entry(2, 4800), 'event_id': 'e9-cost', 'source': 19, 'designed_event_id': 'e2',
                    'replaces_designed_entry': True, 'stay_s': 200, 'control_latency_ms': 11.0}]
         catalogue.update(policy_selected=policy, destination_policy={'parameters': {'availability_min': 0.95}})
@@ -111,6 +144,9 @@ class EventComparisonTests(unittest.TestCase):
         self.assertEqual([row['destination'] for row in output['events']], [31, 22])
         self.assertEqual([row['replaces_designed_entry'] for row in output['events']], [False, True])
         self.assertEqual(output['events'][1]['designed_event_id'], 'e2')
+        # The candidates the policy weighed are kept with the event; none recorded stays None
+        self.assertEqual(output['events'][0]['candidates'], [{'satellite': 31, 'status': 'chosen', 'control_latency_ms': 12.0}])
+        self.assertIsNone(output['events'][1]['candidates'])
         # Every replica of every policy event has both Hot and Cold (the warm-up is extra)
         self.assertEqual({identifier for identifier, _ in self.calls}, {'e1-cost', 'e9-cost'})
         self.assertTrue(all(event['replicas'] and all({'hot', 'cold'} == set(r['runs']) for r in event['replicas'])

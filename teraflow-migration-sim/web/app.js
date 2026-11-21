@@ -3,6 +3,8 @@
 const $=id=>document.getElementById(id);
 let token='',state=null,jobs=[],profile=null,comparisons=[],verificationRows=[],artifacts=[];
 let selectedComparison='',stream=null,streamJob='',streamEvents=[],refreshTimer=null;
+/* Replay of the followed job's events after (re)connecting: pending until it has been read */
+let replay={pending:false,since:0};
 
 function node(tag,text,className){const element=document.createElement(tag);if(text!==undefined)element.textContent=text;if(className)element.className=className;return element;}
 function notice(message,error=false){const box=$('notice');box.textContent=message;box.dataset.state=error?'error':'ok';}
@@ -52,23 +54,41 @@ function renderProfile(){
   ['Controller software',profile.migration?.software_on_board?'on board every satellite: only the state migrates':'transferred at every migration'],
   ['Profile files',profile.integrity==='sizes_match'?'consistent with the manifest':'changed: '+(profile.changed_files||[]).join(', ')]];
  const list=node('dl');for(const [term,value] of rows)list.append(node('dt',term),node('dd',value));box.append(list);
- box.append(node('h2','Experiment events'));
- const table=node('table'),head=node('tr'),body=node('tbody');
- for(const title of ['No.','Migration','Hops','Destination','Time','Source light','Destination light'])head.append(node('th',title));
- const thead=node('thead');thead.append(head);
- profile.selected_events.forEach((event,index)=>{const tr=node('tr');tr.append(node('td',String(index+1)),node('td',`${event.source} → ${event.destination}`),node('td',String(event.hops)),node('td',event.other_plane?'other plane':'same plane'),node('td',clock(event.trigger_s)),node('td',Math.round(event.source_light_remaining_s/60)+' min'),node('td',Math.round(event.destination_light_remaining_s/60)+' min'));body.append(tr);});
- table.append(thead,body);const scroller=node('div',undefined,'table-scroll');scroller.append(table);box.append(scroller);
- if(profile.policy_events?.length){
+ /* Events of the policy chosen in the Laboratory: the designed ones, or those of the cost policy */
+ const cost=$('policy-select').value==='cost'&&profile.policy_events?.length>0;
+ const tabulate=(headers,rows)=>{const table=node('table'),head=node('tr'),body=node('tbody'),thead=node('thead');
+  for(const title of headers)head.append(node('th',title));thead.append(head);
+  for(const cells of rows){const tr=node('tr');for(const cell of cells){if(cell instanceof Node){const td=node('td');td.append(cell);tr.append(td);}else tr.append(node('td',cell));}body.append(tr);}
+  table.append(thead,body);const scroller=node('div',undefined,'table-scroll');scroller.append(table);return scroller;};
+ const generic=`Each event starts ${Math.round(p.trigger_lead_s/60)} min before the source enters shadow. The destination must stay in sunlight for at least ${Math.round(p.minimum_destination_light_s/60)} min, with a path stable for at least ${Math.round(p.minimum_path_persistence_s/60)} min.`;
+ if(!cost){
+  box.append(node('h2','Experiment events'));
+  box.append(node('p','Designed events: the ones an experiment runs with the policy “Designed events” chosen in the Laboratory.','small muted'));
+  box.append(tabulate(['No.','Migration','Hops','Destination','Time','Source light','Destination light'],
+   profile.selected_events.map((event,index)=>[String(index+1),`${event.source} → ${event.destination}`,String(event.hops),event.other_plane?'other plane':'same plane',clock(event.trigger_s),Math.round(event.source_light_remaining_s/60)+' min',Math.round(event.destination_light_remaining_s/60)+' min'])));
+  box.append(node('p',`${generic} The destinations are fixed by hand to cover 1, 5 and 7 laser hops, the last towards the other plane; each hop towards the satellites that follow on the orbit gives the destination about 3 more minutes of sunlight.`,'small muted'));
+ }else{
+  const designed=new Map(profile.selected_events.map((event,index)=>[event.event_id,{index:index+1,event}]));
+  const was=id=>{const d=designed.get(id);return d?`E${d.index} (${d.event.source} → ${d.event.destination})`:id;};
+  const policy=profile.destination_policy||{},minimum=policy.minimum_stay_s;
   box.append(node('h2','Cost-policy events'));
-  const policy=node('table'),policyHead=node('tr'),policyBody=node('tbody');
-  for(const title of ['No.','Migration','Hops','Destination','Time','Stay','Control latency','Designed event'])policyHead.append(node('th',title));
-  const policyThead=node('thead');policyThead.append(policyHead);
-  profile.policy_events.forEach((event,index)=>{const tr=node('tr');tr.append(node('td',String(index+1)),node('td',`${event.source} → ${event.destination}`),node('td',String(event.hops)),node('td',event.other_plane?'other plane':'same plane'),node('td',clock(event.trigger_s)),node('td',event.stay_s!=null?Math.round(event.stay_s)+' s':'—'),node('td',event.control_latency_ms!=null?milliseconds(event.control_latency_ms):'—'),node('td',`${event.replaces_designed_entry?'replaces':'same entry as'} ${event.designed_event_id}`));policyBody.append(tr);});
-  policy.append(policyThead,policyBody);const policyScroller=node('div',undefined,'table-scroll');policyScroller.append(policy);box.append(policyScroller);
-  const minimum=profile.destination_policy?.minimum_stay_s;
-  box.append(node('p',`Among the destinations where the controller stays available at least ${percent(profile.destination_policy?.availability_min??0.95)} of the time${minimum?` and stays at least ${Math.round(minimum/60)} min after the migration`:''}, the policy chooses the one with the lowest control latency.`,'small muted'));
+  box.append(node('p','Events of the cost policy: the ones an experiment runs with the policy “Cost policy” chosen in the Laboratory.','small muted'));
+  const maps=profile.policy_events.some(event=>event.candidates?.length);
+  box.append(tabulate(['No.','Migration','Hops','Destination','Time','Stay','Control latency','Designed event',...(maps?['Why this destination']:[])],
+   profile.policy_events.map((event,index)=>[String(index+1),`${event.source} → ${event.destination}`,String(event.hops),event.other_plane?'other plane':'same plane',clock(event.trigger_s),
+    event.stay_s!=null?Math.round(event.stay_s)+' s':'—',event.control_latency_ms!=null?milliseconds(event.control_latency_ms):'—',
+    event.replaces_designed_entry?`replaces ${was(event.designed_event_id)}`:`same source and time as ${was(event.designed_event_id)}`,
+    ...(maps?[candidateMap(event,index+1)]:[])])));
+  if(maps){
+   const legend=node('p',undefined,'small muted path-legend');
+   for(const [role,label] of [['source','source'],['target','chosen'],['relay','admissible'],['idle','excluded']])legend.append(node('span','●',`swatch ${role}`),document.createTextNode(` ${label} `));
+   legend.append(document.createTextNode('· number: control latency in ms; under an excluded satellite, why: '+Object.entries(REASON_CODES).map(([key,[code,text]])=>`${code} ${text}`).join(', ')+'. Hover a satellite for its stay and availability.'));
+   box.append(legend);
+  }
+  box.append(node('p',`The moments are those of the designed events (the source is about to enter shadow), but the destination is chosen by a rule instead of by hand. Among the satellites of the domain the controller can reach, the policy keeps those where it would stay at least ${minimum?Math.round(minimum/60):0} min and be available at least ${percent(policy.availability_min??0.95)} of that stay (measured ${methodLabel(policy.selection_mode||'hot')} downtime over the stay), and picks the one with the lowest control latency.`,'small muted'));
+  box.append(node('p','Stay: how long the controller works from the destination, from the end of the migration until that satellite in turn must hand over before its own shadow. Control latency: mean one-way propagation delay from the controller to the other satellites of the domain. When no destination qualifies at a designed moment, the nearest moment in time that has one replaces it.','small muted'));
+  box.append(node('p',generic,'small muted'));
  }
- box.append(node('p',`Each event starts ${Math.round(p.trigger_lead_s/60)} min before the source enters shadow. The events cover 1, 5 and 7 laser hops, the last towards the other plane; each hop towards the satellites that follow on the orbit gives the destination about 3 more minutes of sunlight. The destination must stay in sunlight for at least ${Math.round(p.minimum_destination_light_s/60)} min, with a path stable for at least ${Math.round(p.minimum_path_persistence_s/60)} min.`,'small muted'));
  renderPicker();
 }
 /* Event buttons: the preview goes through all the events by itself; a click jumps to one. */
@@ -214,10 +234,23 @@ async function ensureSample(event,orbital){
   sceneSample={eventId,orbital:topology.orbital_s,loading:false,error:'',failedAt:0};
  }catch(error){sceneSample={...sceneSample,loading:false,error:error.message,failedAt:Date.now()};}
 }
+/* The orbit view starts only when it knows what to show: the laboratory state has arrived and,
+   with a job running, its events up to now have been read again. Until then the loader stays, so
+   a page reloaded during a job never shows the preview of a saved experiment. After 15 s without
+   the events the view starts anyway, with what it has. */
+function sceneReady(){
+ if(!state)return false;
+ const job=sceneJob();
+ if(!job)return true;
+ if(job.job_id!==streamJob)return false;
+ if(replay.pending&&Date.now()-replay.since<15000){orbitLoader('loading','Reconnecting to the running job…');return false;}
+ return true;
+}
 function frame(now){
  requestAnimationFrame(frame);
  if(!scene||$('page-scenario').hidden||document.hidden||now-lastFrame<33)return;
  lastFrame=now;
+ if(!sceneReady())return;
  /* While the console is unreachable the view stays at the last instant it answered */
  const real=Date.now(),wall=link.lostAt??real,view=sceneView(wall);if(!view)return;
  ensureSample(view.event,view.orbital);
@@ -400,7 +433,8 @@ function renderJob(){
  const view=jobView(state?.lock?job:(job&&!['queued','running'].includes(job.status)?job:null),comparison);
  $('job').dataset.active=String(view.active);
  $('job-heading').textContent=view.active?'Job running':job?'Latest job':'Job';
- $('job-title').textContent=view.active?view.step:view.title;
+ /* Before the first answer of the laboratory the state is unknown, not free */
+ $('job-title').textContent=!state?'Reading the laboratory state…':view.active?view.step:view.title;
  $('job-detail').textContent=view.active?view.title+(job?.cancellation_requested?' · stop requested, making the laboratory safe':''):view.detail;
  $('job-clock').hidden=!view.active;$('job-clock').textContent=view.elapsed||'';
  $('stop').hidden=!view.canStop;
@@ -427,8 +461,22 @@ function follow(identifier){
  if(stream)stream.close();
  streamJob=identifier;streamEvents=[];missionJob=identifier;missionEvents=[];
  stream=new EventSource('/api/v1/jobs/'+identifier+'/events');
- stream.onmessage=message=>{contact(true);try{const event=JSON.parse(message.data);streamEvents.push(event);if(missionRelevant(event))missionEvents.push(event);if(streamEvents.length>800)streamEvents=streamEvents.slice(-400);renderJob();}catch{}};
- stream.addEventListener('end',()=>{stream.close();scheduleRefresh();});
+ /* On a reload the server replays the whole job, in chunks: handing each replayed event to the
+    panel and the orbit view would run through the past migrations on screen. Events written
+    before the page started following are held and handed over together once the replay pauses
+    for 0.5 s (at the latest after 5 s); a new event is shown at once, with any held before it. */
+ const since=Date.now()-2000;
+ replay={pending:true,since:Date.now()};
+ let buffer=[],pending=null,firstPending=0;
+ const flush=(partial=false)=>{clearTimeout(pending);pending=null;firstPending=0;if(!partial)replay.pending=false;
+  for(const event of buffer){streamEvents.push(event);if(missionRelevant(event))missionEvents.push(event);}
+  buffer=[];if(streamEvents.length>800)streamEvents=streamEvents.slice(-400);renderJob();};
+ stream.onmessage=message=>{contact(true);try{const event=JSON.parse(message.data);buffer.push(event);
+  const written=Date.parse(event.timestamp_utc||''),now=Date.now();
+  if(!(written<since))return flush();
+  if(!firstPending)firstPending=now;clearTimeout(pending);
+  if(now-firstPending>=5000)flush(true);else pending=setTimeout(flush,500);}catch{}};
+ stream.addEventListener('end',()=>{stream.close();flush();scheduleRefresh();});
  stream.onerror=()=>{};
 }
 const POLICY_KEY='console.policy';
@@ -443,7 +491,7 @@ function renderPolicy(){
  else note.hidden=true;
 }
 $('policy-select').value=savedPolicy();
-$('policy-select').addEventListener('change',()=>{try{localStorage.setItem(POLICY_KEY,$('policy-select').value);}catch{}renderPolicy();});
+$('policy-select').addEventListener('change',()=>{try{localStorage.setItem(POLICY_KEY,$('policy-select').value);}catch{}renderPolicy();renderProfile();});
 async function launch(operation){
  $('verify').disabled=true;$('start').disabled=true;$('launch-error').hidden=true;
  const parameters=operation==='compare_events'&&$('policy-select').value==='cost'?{policy:'cost'}:{};
@@ -489,7 +537,7 @@ function table(headers,rows,rowClass){
  for(const cells of rows){const tr=node('tr',undefined,rowClass?rowClass(cells):undefined);cells.forEach((cell,index)=>tr.append(node(index===0?'th':'td',cell)));body.append(tr);}
  element.append(thead,body);const scroller=node('div',undefined,'table-scroll');scroller.append(element);return scroller;
 }
-/* The destination policy the experiment ran with: its rule, its parameters and, per event, what it chose */
+/* The destination policy the experiment ran with: its rule and its parameters (what it chose is in each event's block) */
 const percent=value=>`${(value*100).toLocaleString('en-GB',{maximumFractionDigits:1})}%`;
 const milliseconds=value=>`${value.toLocaleString('en-GB',{maximumFractionDigits:1})} ms`;
 function policySummary(comparison){
@@ -503,42 +551,381 @@ function policySummary(comparison){
  const mode=parameters.selection_mode||'hot',source=parameters.downtime_source||{};
  section.append(node('p',`A destination is admissible if its ${methodLabel(mode)} availability is at least ${percent(parameters.availability_min)}: downtime ${duration(parameters.downtime_s?.[mode])} over the stay counted from the end of the longest migration (${duration(Math.max(...Object.values(parameters.duration_s||{0:0})))})${parameters.minimum_stay_s?`, and a stay of at least ${duration(parameters.minimum_stay_s)}`:''}. Among the admissible ones the lowest control latency wins, then fewer hops, then the lower NORAD id.`,'small'));
  if(source.experiment)section.append(node('p',`Times measured in ${source.experiment.slice(0,15)}…: Hot ${duration(parameters.downtime_s?.hot)} downtime and ${duration(parameters.duration_s?.hot)} duration, Cold ${duration(parameters.downtime_s?.cold)} and ${duration(parameters.duration_s?.cold)}.`,'small muted'));
- const designed=Object.fromEntries((profile?.selected_events||[]).map(event=>[event.event_id,event]));
- section.append(table(['Event','Policy choice','Designed event','Stay',`Expected ${methodLabel(mode)} availability`,'Control latency'],
-  comparison.events.map(row=>{
-   const original=designed[row.designed_event_id],stay=row.stay_s,downtime=parameters.downtime_s?.[mode];
-   const was=original?`${row.designed_event_id} (${original.source} → ${original.destination}, ${original.hops} ${original.hops===1?'hop':'hops'})`:row.designed_event_id||'—';
-   return [`E${row.index}`,`${row.source} → ${row.destination} · ${row.hops} hops`,row.replaces_designed_entry?`replaces ${was}`:`same shadow entry as ${was}`,
-    stay?duration(stay):'—',stay&&downtime!==undefined?percent(1-downtime/stay):'—',row.control_latency_ms!==undefined?milliseconds(row.control_latency_ms):'—'];
-  })));
  return section;
 }
-/* Schema 2: replicas per event. Overview first, then each event with its replicas. */
+/* Why the policy chose this destination: every satellite of the domain at the event's shadow
+   entry, with its control latency when it meets the constraints and, if excluded, a short code
+   for the first constraint it fails (tools/destination_policy.py records the map). */
+const REASON_CODES={no_path:['none','no path'],path_outside_domain:['out','path leaves the domain'],in_shadow:['dark','in shadow'],
+ little_light:['light','too little sunlight left'],unstable_path:['link','path not stable for long enough'],
+ domain_unreachable:['reach','cannot reach the whole domain'],shadow_before_migration_ends:['late','its own shadow comes before the migration ends'],
+ short_stay:['stay','would stay too short'],low_availability:['avail','availability below the threshold']};
+function candidateMap(event,number){
+ const entries=event.candidates||[];if(!entries.length)return '—';
+ const planes=[profile?.domain?.plane_1||[],profile?.domain?.plane_2||[]],where={};
+ planes.forEach((ids,plane)=>ids.forEach((id,column)=>{where[id]={plane,column};}));
+ if(!entries.every(entry=>where[entry.satellite]))return '—';
+ const columns=Math.max(planes[0].length,planes[1].length),step=38,left=46,width=left+step*(columns-1)+22,rows=[36,92];
+ const svg=document.createElementNS(SVG,'svg');svg.setAttribute('viewBox',`0 0 ${width} 128`);svg.setAttribute('role','img');svg.setAttribute('class','candidate-map');
+ const chosen=entries.find(entry=>entry.status==='chosen');
+ svg.setAttribute('aria-label',`Event ${number}: ${chosen?`${chosen.satellite} chosen with ${milliseconds(chosen.control_latency_ms)}`:'no destination'}; ${entries.filter(entry=>entry.status==='admissible').length} other admissible satellites`);
+ const make=(tag,attributes,text)=>{const element=document.createElementNS(SVG,tag);for(const [key,value] of Object.entries(attributes))element.setAttribute(key,value);if(text!==undefined)element.textContent=text;svg.append(element);return element;};
+ ['Plane 1','Plane 2'].forEach((label,plane)=>make('text',{x:0,y:rows[plane]+4,class:'plane'},label));
+ const role={source:'source',chosen:'target',admissible:'relay',excluded:'idle'};
+ for(const entry of entries){
+  const {plane,column}=where[entry.satellite],x=left+step*column,y=rows[plane],kind=role[entry.status]||'idle';
+  const reason=REASON_CODES[entry.reason];
+  const facts=[`${entry.satellite}`,entry.status==='excluded'?`excluded: ${reason?reason[1]:entry.reason}`:entry.status,
+   entry.control_latency_ms!=null?`control latency ${milliseconds(entry.control_latency_ms)}`:'',entry.stay_s!=null?`stay ${Math.round(entry.stay_s)} s`:'',
+   entry.availability!=null?`availability ${entry.availability>0?percent(entry.availability):'0%'}`:'',entry.hops!=null?`${entry.hops} ${entry.hops===1?'hop':'hops'}`:''].filter(Boolean).join(' · ');
+  const dot=make('circle',{cx:x,cy:y,r:kind==='target'||kind==='source'?6:kind==='relay'?4.5:3.5,class:`sat ${kind}`});
+  dot.append(Object.assign(document.createElementNS(SVG,'title'),{textContent:facts}));
+  const lines=[entry.status==='source'?'src':entry.control_latency_ms!=null?entry.control_latency_ms.toFixed(1):'',entry.status==='excluded'&&reason?reason[0]:''];
+  const [first,second]=plane===0?[y-22,y-11]:[y+17,y+28];
+  if(lines[0])make('text',{x,y:first,class:`id ${kind}${entry.status==='excluded'?' faded':''}`},lines[0]);
+  if(lines[1])make('text',{x,y:second,class:'code'},lines[1]);
+ }
+ return svg;
+}
+/* Path preview: the controller domain as two rows of satellites (plane 1 above, plane 2 below,
+   in orbit order) with the event's laser path drawn on it, from the source to the destination.
+   A path with a satellite outside the installed domain is shown as a list of ids only. */
+function pathPreview(row){
+ const path=row.path||[row.source,row.destination],figure=node('figure',undefined,'path-preview');
+ const planes=[profile?.domain?.plane_1||[],profile?.domain?.plane_2||[]],where={};
+ planes.forEach((ids,plane)=>ids.forEach((id,column)=>{where[id]={plane,column};}));
+ const chain=path.join(' → ');
+ /* Route of the state transfer in each run (fewest km at the start of the transfer): drawn
+    dashed when it differs from the planned path (fewest hops, from the catalogue). */
+ const transfers=[...new Map(row.replicas.flatMap(entry=>Object.values(entry.runs)).flatMap(run=>(run?.transfers||[]).map(item=>item.route))
+  .filter(route=>route&&route.join()!==path.join()).map(route=>[route.join(),route])).values()];
+ const note=transfers.length?node('p',`State transfer via ${transfers.map(route=>route.join(' → ')).join(' or ')}`,'small muted mono'):null;
+ if(![...path,...transfers.flat()].every(id=>where[id])){figure.append(node('p',chain,'small mono'));if(note)figure.append(note);return figure;}
+ const columns=Math.max(planes[0].length,planes[1].length),step=38,left=46,width=left+step*(columns-1)+22,rows=[22,74];
+ const at=id=>[left+step*where[id].column,rows[where[id].plane]];
+ const svg=document.createElementNS(SVG,'svg');
+ svg.setAttribute('viewBox',`0 0 ${width} 100`);svg.setAttribute('role','img');
+ svg.setAttribute('aria-label',`Path of event ${row.index}: ${chain}`);
+ const make=(tag,attributes,text)=>{const element=document.createElementNS(SVG,tag);for(const [key,value] of Object.entries(attributes))element.setAttribute(key,value);if(text!==undefined)element.textContent=text;svg.append(element);return element;};
+ ['Plane 1','Plane 2'].forEach((label,plane)=>make('text',{x:0,y:rows[plane]+4,class:'plane'},label));
+ make('polyline',{points:path.map(id=>at(id).join(',')).join(' '),class:'route'});
+ for(const route of transfers)make('polyline',{points:route.map(id=>at(id).join(',')).join(' '),class:'route transfer'});
+ const roles=new Map([...transfers.flat(),...path].map(id=>[id,'relay']));
+ roles.set(path[0],'source');roles.set(path[path.length-1],'target');
+ planes.forEach(ids=>ids.forEach(id=>{
+  const [x,y]=at(id),role=roles.get(id)||'idle';
+  make('circle',{cx:x,cy:y,r:role==='idle'?3:role==='relay'?4.5:6,class:`sat ${role}`}).append(Object.assign(document.createElementNS(SVG,'title'),{textContent:`${id}${role==='source'?' · source':role==='target'?' · destination':role==='relay'?' · relay':''}`}));
+  if(role!=='idle')make('text',{x,y:where[id].plane===0?y-10:y+18,class:`id ${role}`},String(id));
+ }));
+ figure.append(svg);if(note)figure.append(note);
+ return figure;
+}
+/* The state transfer link by link, for the latest replica with transfers recorded: each link's
+   length, propagation delay and share of the transfer time. The laboratory sends the state with
+   one TCP connection and emulates the delay of the whole route, so a link's share is its delay
+   times the crossings of the route (handshake, slow start, final receipt); the rest is the host. */
+function linkBreakdown(row){
+ const replica=[...row.replicas].sort((a,b)=>b.replica-a.replica).find(entry=>Object.values(entry.runs).some(run=>run?.transfers?.some(item=>item.links)));
+ if(!replica)return null;
+ const columns=[];
+ for(const method of ['cold','hot'])for(const item of replica.runs[method]?.transfers||[])if(item.links)
+  columns.push({label:`${methodLabel(method)} ${/^delta/.test(item.payload||'')?'delta':'snapshot'}`,item,downtime:method==='cold'||/^delta/.test(item.payload||'')});
+ if(!columns.length)return null;
+ const route=columns[0].item.links,same=columns.every(column=>column.item.route.join()===columns[0].item.route.join());
+ const ms=seconds=>`${(seconds*1000).toLocaleString('en-GB',{maximumFractionDigits:1})} ms`;
+ const kb=bytes=>bytes>=1024?`${(bytes/1024).toLocaleString('en-GB',{maximumFractionDigits:0})} kB`:`${bytes} B`;
+ const section=node('section',undefined,'link-breakdown');
+ section.append(node('h4',`State transfer, link by link · replica ${replica.replica}`));
+ const body=route.map((link,index)=>[`${link.from} → ${link.to}`,`${Math.round(link.distance_km).toLocaleString('en-GB')} km`,ms(link.delay_s),
+  ...columns.map(column=>(same||column===columns[0])&&column.item.links[index]?ms(column.item.links[index].share_s):'—')]);
+ const total=(label,pick)=>[label,'','',...columns.map(column=>pick(column.item))];
+ body.push(total('Modelled',item=>`${ms(item.model.modelled_s)}${item.model.bound==='latency'?` · ${item.model.crossings} crossings`:' · rate-bound'}`));
+ body.push(total('Measured',item=>`${ms(item.measured_s)} · ${kb(item.bytes)}`));
+ body.push(total('Host',item=>ms(item.host_s)));
+ section.append(table(['Link','Distance','Propagation',...columns.map(column=>`${column.label}${column.downtime?' (in downtime)':''}`)],body,cells=>cells[0]==='Modelled'?'total first':['Measured','Host'].includes(cells[0])?'total':undefined));
+ section.append(node('p',`Route of the transfer at its start (fewest km). Each link counts its propagation delay once per crossing of the route: the snapshot crosses it ${columns.find(column=>!/delta/.test(column.label))?.item.model.crossings??'—'} times (handshake, slow-start rounds, final receipt), a small delta 3 times. The laboratory emulates the delay of the whole route on one TCP connection, so these shares come from the model; measured is the transfer time, host the part the route does not explain.${same?'':' The modes used different routes: shares shown only for the first.'}`,'small muted'));
+ return section;
+}
+/* Runs of an event that succeeded only after a failed attempt (the orchestrator retries up to 3 times). */
+const retriedRuns=row=>row.replicas.flatMap(entry=>Object.values(entry.runs)).filter(run=>run&&run.attempt>1).length;
+/* Schema 2+: Hot against Cold for the whole experiment first, then one block per event with the
+   controller's path, why the destination was chosen and the event's own results. */
 /* Per-event details opened by the user stay open when the section is rebuilt on refresh. */
 const openEventDetails=new Set();
+const METHODS=['hot','cold'];
+const median=values=>{const v=values.filter(Number.isFinite).sort((a,b)=>a-b);if(!v.length)return null;const m=v.length>>1;return v.length%2?v[m]:(v[m-1]+v[m])/2;};
+const signedDuration=value=>Number.isFinite(value)?`${value<0?'−':'+'}${duration(Math.abs(value))}`:'—';
+const decimal=value=>`${value<0?'−':''}${Math.abs(value).toFixed(1)}`;
+const minutesOrDash=seconds=>Number.isFinite(seconds)?minutes(seconds):'—';
+const share=(value,max)=>`${(Math.max(0,Math.min(value,max))/max*100).toFixed(2)}%`;
+function el(tag,className,...children){const element=node(tag,undefined,className);for(const child of children)if(child!==null&&child!==undefined&&child!==false)element.append(child);return element;}
+/* An axis from 0 with at most 6 round steps that holds `top`. */
+function niceAxis(top){const step=[1,2,5,10,20,30,50,60,100,200,500,1000].find(s=>top/s<=6)||1000;return {max:Math.max(step,Math.ceil(top/step)*step),step};}
+function axisTicks(axis){const box=el('div','r-axis');for(let v=0;v<=axis.max;v+=axis.step){const tick=node('span',`${v}${v+axis.step>axis.max?' s':''}`);tick.style.left=share(v,axis.max);box.append(tick);}return box;}
+/* Runs that enter the statistics: succeeded, with the value measured. */
+const acceptedRuns=(row,method)=>row.replicas.map(entry=>entry.runs?.[method]).filter(run=>run&&run.success);
+const methodKey=()=>{const box=el('span','r-key small muted');for(const method of METHODS)box.append(node('span',undefined,`r-swatch ${method}`),document.createTextNode(` ${methodLabel(method)} `));return box;};
+const tile=(label,value,note,className)=>el('div',`r-tile${className?' '+className:''}`,node('span',label,'r-eyebrow'),value,note?node('span',note,'small muted'):null);
+const pairValue=(hot,cold)=>el('span','r-value',node('span',hot,'hot'),node('span',' vs ','muted r-vs'),node('span',cold,'cold'));
+
+/* One row per event, Hot and Cold on their own lane: a dot per replica, a bar at the median.
+   A value beyond the axis stays visible as an arrow on the edge. */
+function dotChart(comparison,metric,axis,title,note){
+ const grid=el('div','r-dots');
+ grid.append(node('span'),node('span'),node('span','Cold − Hot · 95% CI','r-eyebrow r-right'));
+ let clipped=false;
+ for(const row of comparison.events){
+  const stat=row.statistics?.[metric]||{},track=el('div','r-track');
+  track.setAttribute('role','img');
+  track.setAttribute('aria-label',`E${row.index}: median Hot ${duration(stat.hot?.median)}, Cold ${duration(stat.cold?.median)}`);
+  METHODS.forEach((method,lane)=>{
+   track.append(node('span',undefined,`r-lane r-lane-${lane}`));
+   for(const run of acceptedRuns(row,method)){
+    const value=run[metric];if(!Number.isFinite(value))continue;
+    const mark=run.attempt>1?' †':'';
+    if(value>axis.max){clipped=true;track.append(node('span',`${duration(value)}${mark} →`,`r-clip ${method} r-lane-${lane}`));continue;}
+    const dot=node('span',undefined,`r-dot ${method} r-lane-${lane}`);dot.style.left=share(value,axis.max);
+    dot.title=`${methodLabel(method)} · ${duration(value)}${run.attempt>1?' · after a retry':''}`;track.append(dot);
+   }
+   if(Number.isFinite(stat[method]?.median)){const bar=node('span',undefined,`r-median ${method} r-lane-${lane}`);bar.style.left=share(stat[method].median,axis.max);track.append(bar);}
+  });
+  const difference=stat.cold_minus_hot;
+  grid.append(node('span',`E${row.index}`,'r-mono r-strong'),track,
+   el('div','r-right r-stack',node('span',difference?.n?signedDuration(difference.median):'—','r-mono'),
+    difference?.ci95?node('span',`[${decimal(difference.ci95[0])}, ${decimal(difference.ci95[1])}] s`,'r-mono small muted'):null));
+ }
+ grid.append(node('span'),axisTicks(axis),node('span'));
+ return el('div','r-chart',el('div','r-chart-head',node('h3',title),methodKey()),grid,
+  node('p',`${note}${clipped?' An arrow on the edge marks a replica beyond the axis.':''}`,'small muted'));
+}
+
+function overview(comparison,axes){
+ const section=el('section','r-overview');
+ const pooled=(metric,method)=>median(comparison.events.flatMap(row=>acceptedRuns(row,method).map(run=>run[metric])));
+ const counted=method=>comparison.events.reduce((sum,row)=>sum+acceptedRuns(row,method).filter(run=>Number.isFinite(run.controller_downtime_s)).length,0);
+ const down={hot:pooled('controller_downtime_s','hot'),cold:pooled('controller_downtime_s','cold')};
+ const span={hot:pooled('total_operation_s','hot'),cold:pooled('total_operation_s','cold')};
+ const both=values=>Number.isFinite(values.hot)&&Number.isFinite(values.cold);
+ const tiles=el('div','r-tiles');
+ tiles.append(tile('Controller downtime · median',pairValue(duration(down.hot),duration(down.cold)),
+  `${both(down)&&down.hot>0?`Cold ≈ ${(down.cold/down.hot).toFixed(down.cold/down.hot<10?1:0)}× Hot · `:''}${counted('hot')} Hot and ${counted('cold')} Cold replicas`));
+ tiles.append(tile('Migration duration · median',pairValue(duration(span.hot),duration(span.cold)),
+  both(span)?`Cold ${signedDuration(span.cold-span.hot)} against Hot`:'Both modes needed for the difference'));
+ /* Share of the stay on the destination with the controller up, from the measured medians */
+ const stays=comparison.events.filter(row=>row.stay_s>0);
+ if(stays.length){
+  const range=method=>{const values=stays.map(row=>row.statistics?.controller_downtime_s?.[method]?.median).map((value,index)=>Number.isFinite(value)?1-value/stays[index].stay_s:null).filter(Number.isFinite);
+   if(!values.length)return '—';const low=Math.min(...values),high=Math.max(...values);return low===high?percent(low):`${percent(low)}–${percent(high)}`;};
+  const threshold=comparison.design?.destination_policy_parameters?.availability_min;
+  tiles.append(tile('Availability over the stay',pairValue(range('hot'),range('cold')),`measured, per event${threshold!=null?` · policy threshold ${percent(threshold)}`:''}`));
+ }
+ const runs=comparison.events.flatMap(row=>METHODS.flatMap(method=>acceptedRuns(row,method)));
+ const measured=runs.filter(run=>Number.isFinite(run.lost_pings));
+ const lost=measured.reduce((sum,run)=>sum+run.lost_pings,0),observed=measured.reduce((sum,run)=>sum+(run.observed_pings||0),0);
+ tiles.append(tile('Forwarding',node('span',measured.length?`${lost.toLocaleString('en-GB')} lost`:'not measured','r-value'),
+  measured.length?`of ${observed.toLocaleString('en-GB')} pings in ${measured.length} runs${runs.length>measured.length?`; ${runs.length-measured.length} runs not measured`:''}`:''));
+ section.append(el('div','r-intro',node('h2','Hot and Cold at a glance'),
+  node('p','Hot prepares the destination while the source still controls the network, so the controller startup and the API restore stay out of the downtime; Cold does them after stopping the source.','small muted')),tiles);
+ section.append(el('div','r-charts',
+  dotChart(comparison,'controller_downtime_s',axes.downtime,'Controller downtime','From the freeze (Hot) or the source stop (Cold) to the cutover on the destination. Cold − Hot is paired by replica.'),
+  dotChart(comparison,'total_operation_s',axes.duration,'Migration duration','Whole migration, from the trigger to the end of the cutover. † succeeded after a retry: the duration spans every attempt.')));
+ return section;
+}
+
+/* Why the policy chose the destination: the candidates the policy weighed, recorded with the
+   event or, for older experiments, the same event of the installed catalogue. */
+function eventCandidates(row){
+ if(row.candidates?.length)return {list:row.candidates,source:'experiment'};
+ const same=(profile?.policy_events||[]).find(event=>event.event_id===row.catalog_event_id&&event.source===row.source&&event.destination===row.destination&&event.trigger_s===row.trigger_s);
+ return same?.candidates?.length?{list:same.candidates,source:'catalogue'}:null;
+}
+const latency=value=>`${value.toLocaleString('en-GB',{minimumFractionDigits:3,maximumFractionDigits:3})} ms`;
+function whyPanel(comparison,row){
+ const panel=el('div','r-why');
+ const design=comparison.design||{},parameters=design.destination_policy_parameters;
+ panel.append(node('span',`Why ${row.destination}`,'r-eyebrow'));
+ if((design.destination_policy||'designed')!=='cost'){
+  panel.append(node('h4','Destination fixed by the catalogue of designed events'),node('p','The designed events cover 1, 5 and 7 laser hops, the last towards the other plane; no cost is computed.','small muted'));
+  return panel;
+ }
+ const found=eventCandidates(row),list=found?.list||[];
+ const chosen=list.find(entry=>entry.status==='chosen');
+ const admissible=list.filter(entry=>entry.status==='admissible'&&entry.control_latency_ms!=null).sort((a,b)=>a.control_latency_ms-b.control_latency_ms);
+ const count=list.filter(entry=>['chosen','admissible'].includes(entry.status)).length;
+ panel.append(node('h4',row.replaces_designed_entry?`Replaces the designed entry ${row.designed_event_id}, which had no admissible destination`
+  :count?`Lowest control latency among the ${count} admissible destinations`:'Lowest control latency among the admissible destinations'));
+ const runnerUp=admissible[0],downtime=parameters?.downtime_s?.[parameters?.selection_mode||'hot'];
+ const facts=el('div','r-facts-3');
+ facts.append(tile('Cost · control latency',node('span',row.control_latency_ms!=null?milliseconds(row.control_latency_ms):'—','r-value-s')));
+ facts.append(tile('Margin on the runner-up',node('span',runnerUp&&chosen?.control_latency_ms!=null?`+${latency(runnerUp.control_latency_ms-chosen.control_latency_ms)}`:'—','r-value-s'),runnerUp?`${runnerUp.satellite}, ${runnerUp.hops} ${runnerUp.hops===1?'hop':'hops'}`:''));
+ facts.append(tile(`Expected ${methodLabel(parameters?.selection_mode||'hot')} availability`,node('span',row.stay_s&&downtime!=null?percent(1-downtime/row.stay_s):'—','r-value-s'),row.stay_s?`stay ${duration(row.stay_s)}`:''));
+ panel.append(facts);
+ if(!chosen){
+  panel.append(node('p','The candidates of this event are not recorded with the experiment, and the installed catalogue has no event with the same source, destination and time.','r-empty small muted'));
+ }else{
+  /* The faster satellites the policy turned down, the choice, and the next admissible ones */
+  const faster=list.filter(entry=>entry.status==='excluded'&&entry.control_latency_ms!=null&&entry.control_latency_ms<chosen.control_latency_ms);
+  const shown=[...faster,chosen,...admissible.slice(0,2)].sort((a,b)=>a.control_latency_ms-b.control_latency_ms);
+  const top=Math.max(...shown.map(entry=>entry.control_latency_ms));
+  const listBox=el('div','r-candidates');
+  listBox.append(el('div','r-cand r-cand-head',...['Satellite','Control latency','Stay','Hops','Result'].map(text=>node('span',text,'r-eyebrow'))));
+  const minimum=parameters?.minimum_stay_s;
+  for(const entry of shown){
+   const bar=el('span','r-latency',node('span',undefined,`r-latency-fill ${entry.status}`));bar.firstChild.style.width=share(entry.control_latency_ms,top*1.05);
+   const reason=entry.status==='excluded'?(REASON_CODES[entry.reason]?.[1]||entry.reason):entry.status;
+   listBox.append(el('div',`r-cand ${entry.status}`,node('span',String(entry.satellite),'r-mono r-id'),
+    el('span','r-latency-cell',bar,node('span',latency(entry.control_latency_ms),'r-mono')),
+    node('span',entry.stay_s!=null?`${Math.round(entry.stay_s)} s`:'—',`r-mono r-right${minimum&&entry.stay_s<minimum?' r-short':''}`),
+    node('span',entry.hops!=null?String(entry.hops):'—','r-mono r-right'),node('span',reason,'r-reason')));
+  }
+  panel.append(listBox);
+  const rest=list.filter(entry=>entry.status!=='source'&&!shown.includes(entry));
+  const reasons=[...new Set(rest.filter(entry=>entry.status==='excluded').map(entry=>REASON_CODES[entry.reason]?.[1]||entry.reason))];
+  panel.append(node('p',`${rest.length?`${rest.length} more ${rest.length===1?'satellite':'satellites'} of the domain not shown${reasons.length?` (excluded: ${reasons.join(', ')})`:''}. `:''}${found.source==='catalogue'?'Candidates from the installed catalogue, same event.':''}`,'small muted'));
+ }
+ return panel;
+}
+
+/* Median phases of the runs without retries, in the order the backend runs them; what the
+   phases do not cover (before the first recorded one) is drawn hatched. */
+const PHASE_GROUPS={hot:[['prep',['snapshot','target_perimeter_cleanup']],['startup',['controller_startup']],['restore',['api_restore','queued_topology_apply']],['switch',['freeze','delta_apply','api_verification','cutover']]],
+ cold:[['prep',['snapshot']],['stop',['source_stop']],['startup',['controller_startup','target_perimeter_cleanup']],['restore',['api_restore','queued_topology_apply']],['switch',['freeze','delta_apply','api_verification','cutover']]]};
+const SEGMENT_LABELS={wait:'before the first recorded phase',prep:'snapshot and cleanup',stop:'source stop',startup:'controller startup',restore:'API restore',other:'other phases',switch:'freeze, delta, verification, cutover'};
+function phaseTimeline(row,method){
+ const runs=acceptedRuns(row,method).filter(run=>run.attempt===1&&run.phases?.seconds&&Number.isFinite(run.total_operation_s));
+ if(!runs.length)return null;
+ const phase=key=>median(runs.map(run=>run.phases.seconds[key]??0));
+ const known=new Set(PHASE_GROUPS[method].flatMap(([,keys])=>keys));
+ const segments=PHASE_GROUPS[method].map(([kind,keys])=>[kind,keys.reduce((sum,key)=>sum+phase(key),0)]);
+ const other=[...new Set(runs.flatMap(run=>Object.keys(run.phases.seconds)))].filter(key=>!known.has(key)).reduce((sum,key)=>sum+phase(key),0);
+ if(other>0)segments.splice(segments.length-1,0,['other',other]);
+ const total=median(runs.map(run=>run.total_operation_s)),covered=segments.reduce((sum,[,value])=>sum+value,0);
+ if(total-covered>0.5)segments.unshift(['wait',total-covered]);
+ return {segments:segments.filter(([,value])=>value>0),total:Math.max(total,covered),down:median(runs.map(run=>run.controller_downtime_s)),runs:runs.length};
+}
+function timelineTile(row,axis){
+ const box=el('div','r-tile r-timeline');
+ box.append(el('div','r-tile-head',node('span','Where the time goes · median phases','r-eyebrow'),node('span','white frame: controller down (measured)','small muted')));
+ let drawn=false;
+ for(const method of METHODS){
+  const line=phaseTimeline(row,method);
+  const label=node('span',methodLabel(method),`r-mono ${method}`);
+  if(!line){box.append(el('div','r-timeline-row',label,node('span','no run without retries','small muted')));continue;}
+  drawn=true;
+  const bar=el('div','r-bar');
+  for(const [kind,value] of line.segments){
+   const segment=node('span',undefined,`r-seg ${kind}`);segment.style.width=share(value,axis.max);
+   segment.title=`${SEGMENT_LABELS[kind]} ${duration(value)}`;if(value/axis.max>.13)segment.textContent=SEGMENT_LABELS[kind].split(',')[0];bar.append(segment);
+  }
+  const holder=el('div','r-bar-holder',bar);
+  if(Number.isFinite(line.down)){
+   const frame=node('span',undefined,'r-down');frame.style.left=share(line.total-line.down,axis.max);frame.style.width=share(line.down,axis.max);
+   const caption=node('span',`down ${duration(line.down)} · total ${duration(line.total)}`,'r-down-label r-mono');caption.style.left=share(line.total,axis.max);
+   holder.append(frame,caption);
+  }
+  box.append(el('div','r-timeline-row',label,holder));
+ }
+ if(drawn){
+  box.append(el('div','r-timeline-row',node('span'),axisTicks(axis)));
+  const legend=el('div','r-legend small muted');
+  for(const kind of ['wait','prep','stop','startup','restore','switch'])legend.append(el('span',undefined,node('span',undefined,`r-swatch r-seg-swatch ${kind}`),document.createTextNode(SEGMENT_LABELS[kind])));
+  box.append(legend);
+ }
+ return box;
+}
+
+function eventBlock(comparison,row,axes){
+ const section=el('section','r-event');section.setAttribute('aria-label',`Event ${row.index}`);
+ const stat=row.statistics||{},retries=retriedRuns(row);
+ const chips=el('div','r-chips',node('span',`${row.hops} laser ${row.hops===1?'hop':'hops'}`,'r-chip'),node('span',row.other_plane?'towards the other plane':'same plane','r-chip'),
+  node('span',`trigger ${clock(row.trigger_s)} orbital time`,'r-chip'),
+  row.replaces_designed_entry?node('span',`replaces ${row.designed_event_id}`,'r-chip'):null,
+  retries?node('span',`${retries} ${retries===1?'run':'runs'} after a retry`,'r-chip r-chip-warn'):null);
+ const ends=el('div','r-ends',node('span',String(row.source),'r-host'),node('span',' → ','muted'),node('span',String(row.destination),'r-target'));
+ const head=el('header','r-event-head',
+  el('div','r-stack',node('span',`Event ${row.index} of ${comparison.events.length}`,'r-eyebrow'),el('div','r-title',node('h3',`E${row.index}`),ends),chips),
+  el('div','r-head-figures',node('span','Downtime Cold − Hot','r-eyebrow'),node('span','Duration Cold − Hot','r-eyebrow'),
+   node('span',signedDuration(stat.controller_downtime_s?.cold_minus_hot?.median),'r-mono r-big'),node('span',signedDuration(stat.total_operation_s?.cold_minus_hot?.median),'r-mono r-big')));
+ /* Path of the controller, then the two ends' sunlight */
+ const legend=node('p',undefined,'small muted path-legend');
+ for(const [role,label] of [['source','source'],['relay','laser relay'],['target','destination']])legend.append(node('span','●',`swatch ${role}`),document.createTextNode(` ${label} `));
+ legend.append(document.createTextNode(`· the ${(profile?.domain?.plane_1?.length||0)+(profile?.domain?.plane_2?.length||0)} satellites of the domain in orbit order; dashed: route of the state transfer where it differs.`));
+ const path=el('div','r-path',node('span','Path of the controller','r-eyebrow'),pathPreview(row),legend,
+  el('div','r-facts-2',tile(`Source ${row.source}`,node('span',`enters shadow in ${minutesOrDash(row.source_light_remaining_s)}`,'small')),
+   tile(`Destination ${row.destination}`,node('span',`sunlight left ${minutesOrDash(row.destination_light_remaining_s)}${row.stay_s?` · stay ${minutesOrDash(row.stay_s)}`:''}`,'small'))));
+ section.append(head,el('div','r-event-body',path,whyPanel(comparison,row)));
+ /* The event's results */
+ const results=el('div','r-results',node('h4',`Results of E${row.index}`));
+ const pair=(metric,title,axis)=>{
+  const s=stat[metric]||{},box=el('div','r-tile r-pair',node('span',`${title} · median and quartiles`,'r-eyebrow'));
+  for(const method of METHODS){
+   const value=s[method],track=el('span','r-pair-track');
+   if(value?.n){const fill=node('span',undefined,`r-pair-fill ${method}`);fill.style.width=share(value.median,axis.max);track.append(fill);
+    if(value.n>1){const whisker=node('span',undefined,'r-pair-spread');whisker.style.left=share(value.q1,axis.max);whisker.style.width=share(Math.min(value.q3,axis.max)-Math.min(value.q1,axis.max),axis.max);track.append(whisker);}}
+   box.append(el('div','r-pair-row',node('span',methodLabel(method),`r-mono ${method}`),track,node('span',spread(value),'r-mono r-right')));
+  }
+  const difference=s.cold_minus_hot;
+  box.append(node('span',difference?.n?`Cold − Hot ${signedDuration(difference.median)}${difference.ci95?`, 95% CI ${decimal(difference.ci95[0])} to ${decimal(difference.ci95[1])} s`:''} · ${difference.n} ${difference.n===1?'pair':'pairs'}`:'Cold − Hot needs both modes in a replica','small muted'));
+  return box;
+ };
+ results.append(el('div','r-pairs',pair('controller_downtime_s','Controller downtime',axes.downtime),pair('total_operation_s','Migration duration',axes.duration)));
+ results.append(timelineTile(row,axes.timeline));
+ const facts=el('div','r-facts-3');
+ const deadline=row.source_light_remaining_s;
+ if(Number.isFinite(deadline)){
+  const box=el('div','r-tile',node('span',"Margin before the source's shadow",'r-eyebrow'));
+  const track=el('div','r-deadline');
+  const finish=METHODS.map(method=>stat.total_operation_s?.[method]?.median);
+  METHODS.forEach((method,lane)=>{if(Number.isFinite(finish[lane])){const bar=node('span',undefined,`r-deadline-bar ${method} r-lane-${lane}`);bar.style.width=share(finish[lane],deadline);track.append(bar);}});
+  track.append(node('span',`shadow ${minutesOrDash(deadline)}`,'r-deadline-end r-mono small muted'));
+  box.append(track,node('span',METHODS.map((method,lane)=>Number.isFinite(finish[lane])?`${methodLabel(method)} ends ${minutesOrDash(deadline-finish[lane])} before`:`${methodLabel(method)} not measured`).join(' · '),'small'));
+  facts.append(box);
+ }
+ const parameters=comparison.design?.destination_policy_parameters;
+ if(row.stay_s>0){
+  const box=el('div','r-tile',node('span','Availability over the stay','r-eyebrow'));
+  const availability=METHODS.map(method=>{const expected=parameters?.downtime_s?.[method],measured=stat.controller_downtime_s?.[method]?.median;
+   return [methodLabel(method),expected!=null?percent(1-expected/row.stay_s):'—',Number.isFinite(measured)?percent(1-measured/row.stay_s):'—'];});
+  box.append(table(['','Expected','Measured'],availability));
+  facts.append(box);
+ }
+ const forwarding=METHODS.map(method=>{const runs=acceptedRuns(row,method).filter(run=>Number.isFinite(run.lost_pings));
+  return runs.length?`${methodLabel(method)} ${runs.reduce((sum,run)=>sum+run.lost_pings,0)} lost of ${runs.reduce((sum,run)=>sum+(run.observed_pings||0),0).toLocaleString('en-GB')}`:`${methodLabel(method)} not measured`;});
+ facts.append(tile('Forwarding during the migration',node('span',forwarding.join(' · '),'small'),'pings over the probe window of each run'));
+ results.append(facts);
+ /* Replicas, one row each, with the transfer link by link */
+ const key=`${comparison.comparison_id}:${row.index}`;
+ const card=node('details',undefined,'event-detail r-replicas');
+ card.open=openEventDetails.has(key);
+ card.addEventListener('toggle',()=>{if(card.open)openEventDetails.add(key);else openEventDetails.delete(key);});
+ card.append(el('summary',undefined,node('span',`Replicas (${row.replicas.length}) — order, values, outcome`,'r-summary')));
+ const rows=[...row.replicas].sort((a,b)=>a.replica-b.replica).map(entry=>{
+  const hot=entry.runs.hot,cold=entry.runs.cold;
+  const retried=[hot,cold].filter(run=>run&&run.attempt>1).map(run=>`${methodLabel(run.method)} on attempt ${run.attempt}`);
+  const outcome=([hot,cold].every(run=>run&&run.success)?'succeeded':[hot,cold].map(run=>run?(run.success?'':methodLabel(run.method)+' failed'):'').filter(Boolean).join(', ')||'incomplete')+(retried.length?' · '+retried.join(', '):'');
+  const mark=(run,field)=>duration(run?.[field])+(run?.attempt>1?' †':'');
+  return [String(entry.replica),(entry.order||[]).map(methodLabel).join(' → ')||'—',mark(hot,'controller_downtime_s'),mark(cold,'controller_downtime_s'),
+   duration(entry.cold_minus_hot?.controller_downtime_s),mark(hot,'total_operation_s'),mark(cold,'total_operation_s'),outcome];
+ });
+ card.append(table(['Replica','Order','Downtime Hot','Downtime Cold','Cold − Hot (downtime)','Duration Hot','Duration Cold','Outcome'],rows));
+ const links=linkBreakdown(row);if(links)card.append(links);
+ if(retries)card.append(node('p','† Succeeded after a failed attempt: the downtime covers only the last attempt, including the cleanup the failed one left on the destination; the outage of the failed attempt is not counted, and the duration spans every attempt. The replica still enters the statistics.','small muted'));
+ results.append(card);
+ section.append(results);
+ return section;
+}
+
 function renderDesignResults(comparison,box,status){
  const design=comparison.design||{};
- status.textContent=`${comparison.complete?'':comparison.reason?'Not complete: '+(REASONS[comparison.reason]||comparison.reason)+' · ':'In progress · '}${comparison.completed_runs} of ${comparison.run_total} runs${comparison.failed_runs?`, ${comparison.failed_runs} failed`:''} · ${design.replicas} replicas per event and mode · ${POLICY_NAMES[design.destination_policy||'designed']} · ${comparison.rate_bps/1e9} Gbit/s`;
- box.append(policySummary(comparison));
- box.append(table(['Event','Path','Hops','Destination','Hot · median and quartiles','Cold · median and quartiles','Cold − Hot · median and 95% CI','Pairs'],
-  comparison.events.map(row=>{const s=row.statistics?.controller_downtime_s;return [`E${row.index}`,`${row.source} → ${row.destination}`,String(row.hops),row.other_plane?'other plane':'same plane',
-   spread(s?.hot),spread(s?.cold),interval(s?.cold_minus_hot),String(s?.cold_minus_hot?.n??0)];})));
- for(const row of comparison.events){
-  const key=`${comparison.comparison_id}:${row.index}`;
-  const card=node('details',undefined,'event-detail'),summary=node('summary');
-  card.open=openEventDetails.has(key);
-  card.addEventListener('toggle',()=>{if(card.open)openEventDetails.add(key);else openEventDetails.delete(key);});
-  summary.append(node('span',`E${row.index} · ${row.source} → ${row.destination}`,'event-name'),node('span',`${row.hops} hops · ${row.other_plane?'other plane':'same plane'} · ${clock(row.trigger_s)}${row.replaces_designed_entry?` · replaces ${row.designed_event_id}`:''}`,'small muted'));
-  card.append(summary);
-  const rows=[...row.replicas].sort((a,b)=>a.replica-b.replica).map(entry=>{
-   const hot=entry.runs.hot,cold=entry.runs.cold;
-   const outcome=[hot,cold].every(run=>run&&run.success)?'succeeded':[hot,cold].map(run=>run?(run.success?'':methodLabel(run.method)+' failed'):'').filter(Boolean).join(', ')||'incomplete';
-   return [String(entry.replica),duration(hot?.controller_downtime_s),duration(cold?.controller_downtime_s),
-    duration(entry.cold_minus_hot?.controller_downtime_s),duration(hot?.total_operation_s),duration(cold?.total_operation_s),outcome];
-  });
-  card.append(table(['Replica','Controller downtime Hot','Controller downtime Cold','Cold − Hot (downtime)','Migration duration Hot','Migration duration Cold','Outcome'],rows));
-  box.append(card);
- }
+ status.textContent=`${comparison.complete?'':comparison.reason?'Not complete: '+(REASONS[comparison.reason]||comparison.reason)+' · ':'In progress · '}${comparison.completed_runs} of ${comparison.run_total} runs${comparison.failed_runs?`, ${comparison.failed_runs} failed`:''}${(n=>n?`, ${n} after a retry`:'')(comparison.events.reduce((sum,row)=>sum+retriedRuns(row),0))} · ${design.replicas} replicas per event and mode · ${POLICY_NAMES[design.destination_policy||'designed']} · ${comparison.rate_bps/1e9} Gbit/s`;
+ /* Axes shared by every event, so the blocks compare at a glance */
+ const medians=metric=>comparison.events.flatMap(row=>METHODS.map(method=>row.statistics?.[metric]?.[method]?.median)).filter(Number.isFinite);
+ const lines=comparison.events.flatMap(row=>METHODS.map(method=>phaseTimeline(row,method)?.total)).filter(Number.isFinite);
+ const axes={downtime:niceAxis(Math.max(1,...medians('controller_downtime_s').map(value=>value*1.15))),
+  duration:niceAxis(Math.max(1,...medians('total_operation_s').map(value=>value*1.25))),
+  timeline:niceAxis(Math.max(1,...lines.map(value=>value*1.02)))};
+ box.append(overview(comparison,axes),policySummary(comparison));
+ for(const row of comparison.events)box.append(eventBlock(comparison,row,axes));
 }
 function renderResults(){
  renderComparisonSelect();
@@ -582,13 +969,23 @@ function renderDownloads(comparison){
 
 /* ---------- refresh ---------- */
 function scheduleRefresh(){clearTimeout(refreshTimer);refreshTimer=setTimeout(refresh,300);}
+/* Each part is drawn as soon as its data arrives: the laboratory and the running job first, so a
+   page reloaded during a job follows it again at once, even when the list of downloads is slow
+   (its first build can take several seconds). */
 async function refresh(){
+ const pending={state:api('/state'),jobs:api('/jobs'),comparisons:api('/event-comparisons'),
+  verifications:api('/verifications'),artifacts:api('/artifacts')};
+ for(const request of Object.values(pending))request.catch(()=>{});
  try{
-  [state,{jobs},{comparisons},{verifications:verificationRows},{artifacts}]=await Promise.all([api('/state'),api('/jobs'),api('/event-comparisons'),api('/verifications'),api('/artifacts')]);
+  [state,{jobs}]=await Promise.all([pending.state,pending.jobs]);
   const c=state.components||{},ready=c.mininet?.reachable&&c.p4_proxy?.reachable;
   $('health').textContent=(ready?'Laboratory reachable':'Laboratory unreachable')+(state.lock?' · job running':'');
   $('health').dataset.state=ready?'ok':'error';
-  renderComponents();renderLatest();renderJob();renderResults();renderPreviewSources();
+  renderComponents();renderJob();
+  [{comparisons},{verifications:verificationRows}]=await Promise.all([pending.comparisons,pending.verifications]);
+  renderLatest();renderJob();renderResults();renderPreviewSources();
+  ({artifacts}=await pending.artifacts);
+  renderResults();
  }catch(error){$('health').textContent='Console not connected: '+error.message;$('health').dataset.state='error';}
 }
 /* ---------- the controller over the day (model) ----------

@@ -83,7 +83,7 @@ def scenario_profiles(root):
             'selected_events': [{key: event.get(key) for key in keys} for event in events.get('selected', [])],
             # Events of the destination policy (same shadow entries, the policy's destinations), if built
             'policy_events': [{key: event.get(key) for key in keys + ('designed_event_id', 'replaces_designed_entry', 'stay_s',
-                                                                       'control_latency_ms')}
+                                                                       'control_latency_ms', 'candidates')}
                               for event in events.get('policy_selected', [])],
             'destination_policy': (events.get('destination_policy') or {}).get('parameters')})
     return {'profiles': profiles}

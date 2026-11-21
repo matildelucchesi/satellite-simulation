@@ -102,6 +102,9 @@ def main(argv=None):
     try:
         selected = model.policy_selected_events(report['designed_vs_policy'], report['events'], index,
                                                 limits['minimum_path_persistence_s'])
+        # What the policy saw at each event: every domain satellite with its cost or why it is excluded
+        model.attach_candidate_maps(selected, report['parameters'], index, periods, domain, plane_of, distance_km,
+                                    **limits)
     except ValueError as exc:
         selected = None
         print(f'Eventi della politica non creati: {exc}')

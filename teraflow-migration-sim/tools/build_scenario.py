@@ -211,6 +211,10 @@ def main(argv=None):
         duration_s={'hot': args.policy_duration_hot_s, 'cold': args.policy_duration_cold_s})
     policy_selected = model.policy_selected_events(destination_policy['designed_vs_policy'], destination_policy['events'],
                                                    index, args.minimum_path_persistence_s)
+    model.attach_candidate_maps(policy_selected, destination_policy['parameters'], index, periods, domain, plane_of,
+                                distance_km, trigger_lead_s=args.trigger_lead_s,
+                                minimum_destination_light_s=args.minimum_destination_light_s,
+                                minimum_path_persistence_s=args.minimum_path_persistence_s)
     hop_histogram = {}
     for event in feasible:
         hop_histogram[str(event['hops'])] = hop_histogram.get(str(event['hops']), 0) + 1

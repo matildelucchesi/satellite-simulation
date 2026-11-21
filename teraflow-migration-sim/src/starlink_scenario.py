@@ -501,7 +501,7 @@ def control_latency_ms(graph, domain, controller, distance_km, overhead_ms=0.0):
 
 def destination_candidates(index, periods, domain, plane_of, source, shadow_entry, distance_km, *, trigger_lead_s,
                            minimum_destination_light_s, minimum_path_persistence_s, downtime_s,
-                           duration_s=None, overhead_ms=0.0):
+                           duration_s=None, overhead_ms=0.0, rejected=None):
     """Destinations that meet the constraints for one shadow entry, before the availability test,
     lowest control latency first (ties: fewer hops, lower id).
 
@@ -511,7 +511,12 @@ def destination_candidates(index, periods, domain, plane_of, source, shadow_entr
     domain, and its own trigger must come after the end of the migration. ``downtime_s`` and
     ``duration_s`` map each mode to its measured downtime and duration; the stay starts at the
     end of the longest migration, so it holds for both modes, and every row carries the downtime
-    fraction of each mode. ``distance_km(a, b, tick)`` gives the distance between two satellites."""
+    fraction of each mode. ``distance_km(a, b, tick)`` gives the distance between two satellites.
+    A ``rejected`` dict, if given, receives the first constraint each other reachable satellite
+    fails (one of ``REJECTION_REASONS``)."""
+    def reject(target, reason):
+        if rejected is not None:
+            rejected[target] = reason
     migration = max((duration_s or {}).values(), default=0.0)
     trigger = shadow_entry - trigger_lead_s
     members = set(domain)
@@ -520,21 +525,29 @@ def destination_candidates(index, periods, domain, plane_of, source, shadow_entr
     at = lambda a, b: distance_km(a, b, trigger)
     rows = []
     for target, hops in depth.items():
-        if target == source or not all(node in members for node in paths[target]):
+        if target == source:
+            continue
+        if not all(node in members for node in paths[target]):
+            reject(target, 'path_outside_domain')
             continue
         window = _containing(periods[target], trigger)
         if window is None:
+            reject(target, 'in_shadow')
             continue
         light = window[1] - trigger
         if light < minimum_destination_light_s or light <= shadow_entry - trigger:
+            reject(target, 'little_light')
             continue
         if index.path_end(source, target, trigger, minimum_path_persistence_s) - trigger < minimum_path_persistence_s:
+            reject(target, 'unstable_path')
             continue
         latency = control_latency_ms(graph, domain, target, at, overhead_ms)
         if latency is None:
+            reject(target, 'domain_unreachable')
             continue
         stay = light - trigger_lead_s - migration
         if stay <= 0:
+            reject(target, 'shadow_before_migration_ends')
             continue
         rows.append({'destination': target, 'hops': hops, 'other_plane': plane_of[target] != plane_of[source],
                      'path': paths[target], 'destination_light_remaining_s': light, 'stay_s': stay,
@@ -545,11 +558,67 @@ def destination_candidates(index, periods, domain, plane_of, source, shadow_entr
     return trigger, rows
 
 
+# Why a domain satellite is not the destination at a shadow entry: the first constraint it fails
+# (``destination_candidates``) or, if it meets them all, the policy's own tests (``admissible``).
+REJECTION_REASONS = ('no_path', 'path_outside_domain', 'in_shadow', 'little_light', 'unstable_path',
+                     'domain_unreachable', 'shadow_before_migration_ends', 'short_stay', 'low_availability')
+
+
 def admissible(row, availability_min, selection_mode, minimum_stay_s=0.0):
     """Whether the controller stays available for at least ``availability_min`` of the stay and
     stays at least ``minimum_stay_s``, so it does not migrate again soon after arriving."""
     return (row['downtime_fraction'][selection_mode] <= 1.0 - availability_min + 1e-12
             and row['stay_s'] >= minimum_stay_s)
+
+
+def candidate_map(index, periods, domain, plane_of, source, shadow_entry, distance_km, *, trigger_lead_s,
+                  minimum_destination_light_s, minimum_path_persistence_s, availability_min, minimum_stay_s,
+                  selection_mode, downtime_s, duration_s, overhead_ms=0.0, **_):
+    """Every domain satellite at one shadow entry, as the policy sees it, in domain order: the
+    source, the chosen destination, the other admissible ones, and the rest with the reason they
+    are excluded. Satellites that meet the constraints carry hops, stay, control latency and
+    expected availability (``selection_mode``), also when the stay or availability test excludes them."""
+    rejected = {}
+    _, rows = destination_candidates(index, periods, domain, plane_of, source, shadow_entry, distance_km,
+                                     trigger_lead_s=trigger_lead_s, minimum_destination_light_s=minimum_destination_light_s,
+                                     minimum_path_persistence_s=minimum_path_persistence_s, downtime_s=downtime_s,
+                                     duration_s=duration_s, overhead_ms=overhead_ms, rejected=rejected)
+    allowed = [row for row in rows if admissible(row, availability_min, selection_mode, minimum_stay_s)]
+    chosen = allowed[0]['destination'] if allowed else None
+    by = {row['destination']: row for row in rows}
+    out = []
+    for satellite in domain:
+        row = by.get(satellite)
+        entry = {'satellite': satellite}
+        if satellite == source:
+            entry['status'] = 'source'
+        elif row is None:
+            entry.update(status='excluded', reason=rejected.get(satellite, 'no_path'))
+        else:
+            entry.update(hops=row['hops'], stay_s=row['stay_s'], control_latency_ms=row['control_latency_ms'],
+                         availability=1.0 - row['downtime_fraction'][selection_mode])
+            if satellite == chosen:
+                entry['status'] = 'chosen'
+            elif row in allowed:
+                entry['status'] = 'admissible'
+            else:
+                entry.update(status='excluded',
+                             reason='short_stay' if row['stay_s'] < minimum_stay_s else 'low_availability')
+        out.append(entry)
+    return out
+
+
+def attach_candidate_maps(picks, parameters, index, periods, domain, plane_of, distance_km, **limits):
+    """Add to each policy event the ``candidate_map`` of its shadow entry, with the policy's own
+    ``parameters`` (those of ``destination_policy_report``); the chosen satellite must be the
+    event's destination."""
+    for pick in picks:
+        pick['candidates'] = candidate_map(index, periods, domain, plane_of, pick['source'],
+                                           pick['source_shadow_entry_s'], distance_km, **limits, **parameters)
+        chosen = [entry['satellite'] for entry in pick['candidates'] if entry['status'] == 'chosen']
+        if chosen != [pick['destination']]:
+            raise ValueError(f"{pick['event_id']}: candidate map chooses {chosen}, the event {pick['destination']}")
+    return picks
 
 
 def policy_candidates(index, periods, domain, plane_of, source, shadow_entry, distance_km, *, trigger_lead_s,
@@ -729,19 +798,27 @@ def policy_selected_events(comparison, events, index, minimum_path_persistence_s
     Each entry has the fields of a designed event (same source, trigger and shadow entry; the
     policy's destination and path) plus the policy's figures, so the experiment runs it
     unchanged. A designed shadow entry the policy cannot serve is replaced by the served shadow
-    entry nearest in time to it (ties: lower source id), not used by another entry, so the
-    experiment keeps as many events as the designed one; the entry records what it replaces."""
-    used = {(row['source'], row['trigger_s']) for row in comparison if row['policy'] is not None}
+    entry nearest in time to it (ties: lower source id) whose source and destination no other
+    entry uses as source or destination, so the experiment keeps as many events as the designed
+    one and they are distinct migrations; the entry records what it replaces."""
+    kept = [row for row in comparison if row['policy'] is not None]
+    used = {(row['source'], row['trigger_s']) for row in kept}
+    sources = {row['source'] for row in kept}
+    destinations = {row['policy']['destination'] for row in kept}
     served = [event for event in events if event['destination'] is not None]
     picks = []
     for row in comparison:
         replaced = row['policy'] is None
         if replaced:
-            options = [event for event in served if (event['source'], event['trigger_s']) not in used]
+            options = [event for event in served if (event['source'], event['trigger_s']) not in used
+                       and event['source'] not in sources and event['destination'] not in destinations]
             if not options:
-                raise ValueError('Nessun ingresso in ombra servito dalla politica per sostituire ' + row['event_id'])
+                raise ValueError('Nessun ingresso in ombra servito dalla politica, con sorgente e destinazione '
+                                 'non usate dagli altri eventi, per sostituire ' + row['event_id'])
             event = min(options, key=lambda event: (abs(event['trigger_s'] - row['trigger_s']), event['source']))
             used.add((event['source'], event['trigger_s']))
+            sources.add(event['source'])
+            destinations.add(event['destination'])
         else:
             event = {**row['policy'], 'source': row['source'], 'trigger_s': row['trigger_s'],
                      'source_shadow_entry_s': row['source_shadow_entry_s']}
@@ -750,7 +827,8 @@ def policy_selected_events(comparison, events, index, minimum_path_persistence_s
                     replaces_designed_entry=replaced)
         if replaced:
             pick['replacement_reason'] = ('nessuna destinazione ammessa sull ingresso in ombra progettato: '
-                                          'ingresso servito piu vicino nel tempo')
+                                          'ingresso servito piu vicino nel tempo, con sorgente e destinazione '
+                                          'non usate dagli altri eventi')
         picks.append(pick)
     return picks
 

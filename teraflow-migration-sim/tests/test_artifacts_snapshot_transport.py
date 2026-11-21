@@ -46,6 +46,21 @@ class ArtifactSnapshotTransportTests(unittest.TestCase):
         self.assertAlmostEqual(latency_offset_s(INITIAL_WINDOW_BYTES, .01), .02)
         self.assertAlmostEqual(latency_offset_s(3 * INITIAL_WINDOW_BYTES, .01), .04)
 
+    def test_modelled_transfer_counts_the_crossings_of_the_path(self):
+        from src.transport import modelled_transfer
+        # The state snapshot (about 250 kB) over a 24 ms path: handshake, 4 slow-start rounds and the
+        # final receipt cross the path 11 times; the rate (2 ms at 1 Gbit/s) does not bound it
+        model = modelled_transfer(247360, .024, 1_000_000_000)
+        self.assertEqual((model['bound'], model['crossings'], model['slow_start_rounds']), ('latency', 11, 4))
+        self.assertAlmostEqual(model['modelled_s'], 11 * .024)
+        # A small delta: one round trip and the receipt
+        self.assertEqual(modelled_transfer(505, .024, 1_000_000_000)['crossings'], 3)
+        self.assertAlmostEqual(modelled_transfer(505, .024, 1_000_000_000)['modelled_s'], 3 * .024)
+        # 100 MB at 1 Gbit/s over 1 ms: the rate bounds it
+        large = modelled_transfer(100_000_000, .001, 1_000_000_000)
+        self.assertEqual(large['bound'], 'rate')
+        self.assertAlmostEqual(large['modelled_s'], .8 + .001)
+
     def test_deadline_terminates_paced_copy(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "payload.bin"
